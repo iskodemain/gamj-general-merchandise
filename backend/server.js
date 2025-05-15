@@ -1,0 +1,32 @@
+import express from 'express';
+import cors from 'cors';
+import 'dotenv/config'
+import { connectToDatabase } from './config/sequelize';
+
+
+// APP CONFIG
+const app = express();
+const port = process.env.PORT || 5001;
+
+
+// MIDDLEWARES
+app.use(express.json());
+app.use(cors());
+
+
+// API ENDPOINTS
+app.get('/', (req, res) => {
+    res.send("API Working")
+}) 
+
+const startServer = async () => {
+    try {
+        await connectToDatabase();
+        app.listen(port, () => {
+            console.log("Server Start on PORT: " + port);
+        })
+    } catch (error) {
+        console.log("Error connecting to the database: " + error)
+    }
+}
+startServer();
