@@ -1,12 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config'
-import { connectToDatabase } from './config/sequelize';
+import { connectToDatabase } from './config/sequelize.js';
+import connectCloudinary from './config/cloudinary.js';
 
 
 // APP CONFIG
 const app = express();
 const port = process.env.PORT || 5001;
+connectCloudinary()
 
 
 // MIDDLEWARES
@@ -15,6 +17,8 @@ app.use(cors());
 
 
 // API ENDPOINTS
+
+
 app.get('/', (req, res) => {
     res.send("API Working")
 }) 
