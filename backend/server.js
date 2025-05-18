@@ -2,7 +2,7 @@
 // COMMENT BY BERNIL 
 // COMMENT FOR TESTING ULIT
 // COMMENT BY ADMIN\
-// gir pare
+// gir parekoy
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config'
