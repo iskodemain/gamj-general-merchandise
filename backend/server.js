@@ -1,8 +1,4 @@
-// ADDED MY COMMENTS
-// GIT ADDED BY ADMIN
-// ADDED BY BERNILS
-// ADDED BY BERNIL PART 2
-// ADDED BY OWNER
+// REMOVE ALL COMMENTS
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config'
