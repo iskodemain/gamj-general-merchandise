@@ -2,6 +2,7 @@
 // GIT ADDED BY ADMIN
 // ADDED BY BERNILS
 // ADDED BY BERNIL PART 2
+// ADDED BY OWNER
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config'
