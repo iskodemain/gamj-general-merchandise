@@ -1,3 +1,5 @@
+// Adding comments by Bernil
+// TESTING PUSH BY BERNIL
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config'
