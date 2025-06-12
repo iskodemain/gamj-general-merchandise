@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/sequelize.js';  // Adjust the path as needed
+import { sequelize } from '../config/sequelize.js';
 
 const Notifications = sequelize.define(
   'Notifications',
