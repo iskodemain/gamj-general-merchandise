@@ -4,7 +4,6 @@ import 'dotenv/config'
 import { connectToDatabase } from './config/sequelize.js';
 import connectCloudinary from './config/cloudinary.js';
 
-
 // APP CONFIG
 const app = express();
 const port = process.env.PORT || 5001;
@@ -17,12 +16,11 @@ app.use(cors());
 
 
 // API ENDPOINTS
-
-
 app.get('/', (req, res) => {
     res.send("API Working")
 }) 
 
+// START SERVER
 const startServer = async () => {
     try {
         await connectToDatabase();
