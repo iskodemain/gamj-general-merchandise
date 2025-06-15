@@ -1,0 +1,12 @@
+.inactive-product{
+    opacity: 0.5; 
+    pointer-events: none;
+}
+
+.empty-wishlist-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-style: italic;
+    color: #8b8b8b;
+}

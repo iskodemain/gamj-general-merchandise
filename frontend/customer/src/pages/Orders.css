@@ -1,0 +1,89 @@
+.product-name {
+    font-size: 1rem;
+    color: #494949;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+}
+
+.empty-order-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-style: italic;
+    color: #8b8b8b;
+}
+
+.date-text-1{
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #3C3C3C;
+}
+
+.date-text-2 {
+    color: #989898;
+}
+
+
+.qsd-container {
+    color: #494949;
+}
+
+.order-button-container {
+    border: 1px solid #BABABA;
+    width: 7.5rem;
+    height: 2rem;
+    font-size: 0.9rem;
+    border-radius: 0.3rem;
+    color: #454545;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.pending-circle {
+    background-color: #FFA600;
+}
+
+.packing-circle {
+    background-color: #00E3B6;
+}
+
+.ofd-circle {
+    background-color: #656DFF;
+}
+
+.delivered-circle {
+    background-color: #00DD31;
+}
+
+.cancelled-circle {
+    background-color: #D10000;
+}
+
+.cancelled-item {
+    opacity: 0.6;
+}
+
+
+.pending-text {
+    font-size: 0.9rem;
+    color: #454545;
+}
+
+.disabled-button {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.reload-container {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    justify-content: end;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}

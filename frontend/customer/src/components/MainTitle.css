@@ -1,0 +1,17 @@
+.line-color {
+    background-color: #470507;
+}
+
+.firstWishText {
+    color: #707070;
+    font-weight:500;
+}
+
+.secondWishText {
+    color: #470507;
+    font-weight: bold;
+}
+
+.firstWishText, .secondWishText {
+    font-size: 1.5rem;
+}
