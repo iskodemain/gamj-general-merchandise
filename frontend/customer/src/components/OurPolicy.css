@@ -1,0 +1,73 @@
+.p-text {
+    font-size: 14px;
+}
+
+.OP-container {
+    margin-top: 10rem; 
+    padding-left: 1rem; 
+    padding-right: 1rem;
+}
+
+.main-policy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 3rem;                  
+  text-align: center;
+  padding-top: 5rem;         
+  padding-bottom: 5rem;
+  font-size: 0.75rem;        
+  color: #374151;           
+}
+
+.policy3 {
+  width: 2.5rem;       
+  margin-left: auto;   
+  margin-right: auto;
+  margin-bottom: 1.25rem; 
+}
+
+.car {
+  width: 3rem; 
+  margin-top: 0.5rem;
+}
+
+/* OP CONTAINER */
+@media (min-width: 640px) {
+  .OP-container {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+
+@media (min-width: 768px) {
+  .OP-container {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
+}
+
+
+@media (min-width: 1024px) {
+  .OP-container {
+    padding-left: 9vw;
+    padding-right: 9vw;
+  }
+}
+
+/* MAIN POLICY */
+@media (min-width: 640px) {
+  .main-policy {
+    flex-direction: row;
+    gap: 0.5rem;             /* sm:gap-2 = 8px */
+    font-size: 0.875rem;     /* sm:text-sm = 14px */
+  }
+}
+
+/* Medium screens and up (≥768px) */
+@media (min-width: 768px) {
+  .main-policy {
+    font-size: 1rem;         /* md:text-base = 16px */
+  }
+}

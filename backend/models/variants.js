@@ -26,11 +26,11 @@ const Variants = sequelize.define(
       onUpdate: 'CASCADE',
     },
     variantName: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(100), // For example size
       allowNull: false,
     },
     value: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.JSON, // If the variant name is size the possible value is (S, M, L, XL, XXL)
       allowNull: false,
     },
     createAt: {

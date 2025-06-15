@@ -1,0 +1,192 @@
+
+
+.main-multiple-img::-webkit-scrollbar {
+    display: none;
+}
+
+.child-multiple-img:hover {
+    background-color: #d75f5f6e;
+    transition: background-color 0.4s ease;
+}
+
+
+.pi-name {
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: #3D3D3D;
+}
+
+.pi-price {
+    color: #2A2A2A;
+    font-weight: 600;
+}
+
+.pi-description {
+    color: #555555;
+}
+
+.select-size-text {
+    color: #656565;
+}
+
+.sizes-none {
+    border: 1px solid #EBEBEB;
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+    background-color: #FBFBFB;
+}
+
+.sizes-pick {
+    border: 1px solid #FF9292;
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+    background-color: #FBFBFB;
+}
+
+.quantity-container {
+    display: flex;
+    align-items: center;
+    column-gap: 3rem;
+    margin-top: 0.4rem;
+
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+}
+  
+.quantity-btn {
+    width: 38px;
+    height: 38px;
+    background-color: white;
+    border: 1px solid #DFDFDF;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;   
+}
+
+.minus {
+    stroke-width: 2;
+    color: #A7A7A7;
+    
+}
+
+.plus {
+    color: #494949;
+}
+
+.quantity-btn:hover {
+    background-color: #f8f8f8;
+}
+  
+.quantity-input {
+    width: 50px;
+    height: 38px;
+    text-align: center;
+    border-block: 1px solid #DFDFDF;
+    font-size: 17px;
+    font-weight: 500;
+    color: #494949; /* Dark Gray */
+    padding: 0;
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.quantity-input::-webkit-inner-spin-button, .quantity-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+  
+.quantity-input:focus {
+    outline: none;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.main-button {
+    height: 50px;
+    width: 180px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.add-cart {
+    background-color: white;
+    border: 2px solid #470507;
+    color: #470507;
+}
+
+.buy-now {
+    background-color: #470507;
+    color: white;
+    box-shadow: 0px 0px 10px -2px rgba(0, 0, 0, 0.537);
+}
+
+.main-button:active {
+    background-color: rgb(143, 143, 143);
+    transition: ease-in-out 0.1s;
+}
+
+.add-cart:active {
+    color: white;
+}
+
+.p-details, .p-stocks, .p-message {
+    border: 1px solid #D0D0D0;
+
+}
+
+.p-details, .p-stocks {
+    border-bottom: none;
+    padding-inline: 2.5rem;
+    padding-block: 1rem;
+}
+
+.p-stocks {
+    border-left: none;
+    font-weight: bold;
+    background-color: #FBFBFB;
+    color: #898989;
+}
+
+.product-details {
+    font-size: 1rem;
+    color: #313131;
+    padding-bottom: 1.5rem;
+}
+
+.nameWish-container {
+    display: flex;
+    align-items: end;
+    gap: 0.7rem;
+}
+
+.wishlist-icon {
+    font-size: 1.8rem;
+    color: #470507;
+}
+
+.wishlist-inac {
+    color: #3e3e3e;
+
+}
+
+.detainer {
+    scroll-margin-top: 10rem;
+}

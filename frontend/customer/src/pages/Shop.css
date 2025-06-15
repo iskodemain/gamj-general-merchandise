@@ -1,0 +1,130 @@
+
+.product-filter{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 13rem;
+}
+
+.filter-button {
+    color: #272727;
+    font-size: 1.2rem;
+    stroke-width: 25;
+    transform: rotate(90deg);
+}
+
+.dropdown-container {
+    z-index: 6;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(194, 194, 194);
+    box-shadow: -1px 5px 10px 2px rgba(6, 6, 6, 0.444);
+    color: #333; 
+}
+
+.dropdown-container .dropdown-choices:hover {
+    color: white;
+    background-color: #247dd7;
+    
+}
+
+.dropdown-container .dropdown-choices-top:hover {
+    color: white;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    background-color: #247dd7;
+    
+}
+
+.dropdown-container .dropdown-choices-buttom:hover {
+    color: white;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    background-color: #247dd7;
+    
+}
+
+.sort-container {
+    cursor: pointer; 
+    width: 100%;  
+}
+
+.sort-container:focus {
+    outline: none;
+}
+
+select option {
+    padding: 8px 10px; 
+    background-color: white; 
+    color: #333; 
+}
+
+
+.shop-main {
+  padding-left: 1rem;    
+  padding-right: 1rem;
+}
+
+.shop-semi {
+  display: flex;
+  flex-direction: column;     
+  gap: 1.25rem;               
+  padding-top: 2.5rem;        
+}
+
+.shop-settings {
+  display: flex;                  
+  flex-direction: row;           
+  justify-content: space-between;
+  font-size: 1rem;               
+  margin-bottom: 1rem;           
+}
+
+.filter-btn {
+  display: flex; 
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem; 
+  padding-left: 0.5rem;
+  padding-right: 0.5rem; 
+  align-items: center; 
+  font-size: 0.875rem;
+  line-height: 1.25rem; 
+}
+
+
+/* SHOP MAIN */
+@media (min-width: 640px) {
+  .shop-main {
+    padding-left: 5vw;   
+    padding-right: 5vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .shop-main {
+    padding-left: 7vw;   
+    padding-right: 7vw;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shop-main {
+    padding-left: 9vw;   
+    padding-right: 9vw;
+  }
+}
+
+
+/* SHOP SEMI */
+@media (min-width: 640px) {
+  .shop-semi {
+    flex-direction: column;   
+    gap: 1.25rem;             
+  }
+}
+
+/* SHOP SETTINGS */
+@media (min-width: 640px) {
+  .shop-settings {
+    font-size: 1.5rem;           
+  }
+}
