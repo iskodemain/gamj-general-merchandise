@@ -1,0 +1,16 @@
+.title-text {
+    font-size: 0.8rem;
+}
+
+.shop-button {
+    background-color: #470507;
+    color: white;
+    font-size: 1rem;
+    padding-block: 0.5rem;
+    border-radius: 0.5rem;
+    box-shadow: -2px 3px 5px 1px rgba(0, 0, 0, 0.615);
+}
+
+#best-seller {
+    scroll-margin-top: 4rem;
+}

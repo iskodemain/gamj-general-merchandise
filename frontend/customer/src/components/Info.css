@@ -1,0 +1,44 @@
+.info-main {
+    margin-top: 10rem;
+    
+}
+
+.infos-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 3rem;
+}
+
+.infos-container .logo-container {
+    min-width: 100px;
+    width: 10%;
+    height: auto;
+}
+.infos-container .logo-container .img-logo {
+    width: auto;
+    margin: 0 auto;
+}
+
+.infos-container .img-socials {
+    width: 2.5%;
+    min-width: 30px;
+    height: auto;
+}
+
+.infos-container .img-socials .insta-img {
+    width: auto;
+    margin: 0 auto;
+}
+
+.infos-text {
+    font-size: 14px;
+    color: #595959;
+    width: 100%;
+}
+
+.img-socials {
+    cursor: pointer;
+}

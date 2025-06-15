@@ -1,0 +1,207 @@
+img {
+    display: block;
+}
+
+.navContainer {
+    padding-block: 1.5rem;
+    padding-inline: 2.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+    border-bottom: 2px solid #E9E9E9;
+    width: 100%;
+}
+
+.navContainer .angleLogo {
+    width: 100%;
+    height: auto;
+}
+
+.navContainer .mainLogo {
+    width: 90px;
+    margin-right: 3rem;
+}
+
+.navContainer .allButtons {
+    width: 11rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1.6rem;
+    align-items: center;
+}
+
+.navContainer .allButtons .bcontainer {
+    width: 10%;
+}
+
+.navContainer .allButtons .bcontainer .linkImg {
+    width: 100%;
+}
+
+.navContainer .allButtons .cbutton {
+    width: 11.5%;
+}
+
+.navContainer .allButtons .lbutton {
+    width: 9%;
+}
+
+.navContainer .allButtons .lbutton {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+
+}
+.navContainer .allButtons .cbutton {
+    position: relative;
+}
+
+.navContainer .allButtons .cbutton .cart-quantity {
+    position: absolute;
+    bottom: 50%;
+    left: 45%;
+    background-color: #FF9292;
+    color: white;
+    font-size: 0.6rem;
+    min-width: 18px; 
+    min-height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-inline: 3px;
+    border: 1px solid white;
+    border-radius: 50%;
+    
+}
+
+.hidden-order {
+    display: none;
+}
+
+.navContainer .allButtons .lbutton .dropdown {
+    display: none; 
+    position: absolute; 
+    top: 100; 
+    right: -10px; 
+    background-color: #ffffff; 
+    border-radius: 4px; 
+    box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.221); 
+    width: 180px; 
+}
+
+.navContainer .allButtons .lbutton .dropdown .dropdown-content {
+    padding: 8px 0;
+}
+
+.navContainer .allButtons .lbutton .dropdown .dropdown-content .dropdown-item {
+    padding: 10px 20px; 
+    cursor: pointer; 
+    transition: background-color 0.2s ease;
+    color: rgb(90, 90, 90);
+    margin-inline: 7px;
+    
+}
+
+.navContainer .allButtons .lbutton .dropdown .dropdown-content .dropdown-item:hover {
+    background-color: #f1f1f1;
+    color: #470507;
+}
+
+.navContainer .allButtons .lbutton:hover .dropdown {
+    display: block;
+}
+
+
+.navContainer .allButtons .mbutton {
+    margin-left: 20px;
+    width: 12%;
+}
+
+/* HOVER */
+.navContainer .mainLogo:hover {
+    cursor: pointer;
+}
+
+.navContainer .allButtons .bcontainer:hover {
+    cursor: pointer;
+}
+
+
+.nav-menu {
+    background-color: white;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    display: flex;
+    justify-content: start;
+    position: fixed;
+    top: 0;
+    z-index: 150;
+    right: -1000%;
+    transition: right 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    height: 100vh;
+    border-left: 1px solid rgb(232, 232, 232);
+    border-top-left-radius: 1rem;
+}
+
+.nav-menu.active {
+    right: 0;
+    transition: right 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.nav-menu ul li {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    text-align: right;
+    padding: 8px 10px 8px 10px;
+    height: 74px;  
+    border-bottom: 1px solid rgb(230, 230, 230);
+
+}
+
+.nav-menu ul li a{
+    text-decoration: none; 
+    color: #470507;
+    font-size: 18px;
+    font-weight: 400;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 16px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.nav-menu ul li a:hover {
+    background-color: #470507;
+    color: white;
+}
+
+.nav-menu-items {
+    width: 100%;
+}
+
+.nav-menu ul li .menu-bars {
+    display: flex;
+    justify-content: start;
+    color: rgb(182, 182, 182);
+    font-size: 25px;
+    font-weight: bolder;
+}
+
+.nav-menu ul li .menu-bars:hover {
+    background-color: white;
+    color: #470507;
+}
+
+
+
+

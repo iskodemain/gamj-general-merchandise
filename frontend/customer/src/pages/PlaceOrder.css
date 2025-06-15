@@ -1,0 +1,69 @@
+.input-delivery-info {
+    border: 1px solid #C5C5C5;
+}
+
+.input-delivery-info:focus {
+    outline: 2px solid #470507;
+}
+
+.line-payment {
+    background-color: #470507;
+}
+
+.required-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border: 1px solid #aaaaaa;
+    width: 3.5rem;
+    border-radius: 0.3rem;
+    color: #212121;
+}
+
+.firstPaymentText {
+    color: #707070;
+    font-weight:500;
+}
+
+.secondPaymentText {
+    color: #470507;
+    font-weight: bold;
+}
+
+.firstPaymentText, .secondPaymentText {
+    font-size: 1rem;
+}
+
+.order-container {
+    min-width: 350px;
+}
+
+.cashOnDelivery-main {
+    border: 1px solid #470507;
+    border-radius: 0.4rem;
+}
+
+.cashOnDelivery-circle {
+    border: 2.5px solid white;
+    outline: 1px solid #470507;
+    background-color: #470507;
+}
+
+.cashOnDelivery-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #343434;
+}
+
+.submit-button {
+    background-color: #470507;
+    color: white;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    border-radius: 0.5rem;
+}
