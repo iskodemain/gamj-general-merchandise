@@ -3,7 +3,7 @@ img {
 }
 
 .navContainer {
-    padding-block: 1.5rem;
+    padding-block: 1rem;
     padding-inline: 2.5rem;
     display: flex;
     flex-direction: row;
@@ -16,13 +16,13 @@ img {
     width: 100%;
 }
 
-.navContainer .angleLogo {
+.navContainer .gamjLogo {
     width: 100%;
     height: auto;
 }
 
 .navContainer .mainLogo {
-    width: 90px;
+    width: 15%;
     margin-right: 3rem;
 }
 
@@ -202,6 +202,12 @@ img {
     color: #470507;
 }
 
-
+.bs-maintext {
+  text-align: center;     /* text-center */
+  padding-top: 2rem;      /* py-8 = 32px top & bottom */
+  padding-bottom: 2rem;
+  font-size: 1.875rem;    /* text-3xl = 30px */
+  line-height: 2.25rem;   /* Tailwind also applies line-height with font size */
+}
 
 
