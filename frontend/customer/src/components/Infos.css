@@ -1,6 +1,7 @@
 .info-main {
     margin-top: 10rem;
-    
+    padding-left: 1rem;  
+    padding-right: 1rem;
 }
 
 .infos-container {
@@ -14,7 +15,7 @@
 
 .infos-container .logo-container {
     min-width: 100px;
-    width: 10%;
+    width: 15%;
     height: auto;
 }
 .infos-container .logo-container .img-logo {
@@ -23,9 +24,11 @@
 }
 
 .infos-container .img-socials {
-    width: 2.5%;
-    min-width: 30px;
+    width: 12rem;
     height: auto;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
 }
 
 .infos-container .img-socials .insta-img {
@@ -41,4 +44,28 @@
 
 .img-socials {
     cursor: pointer;
+}
+
+
+@media (min-width: 640px) {
+  .info-main {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+
+@media (min-width: 768px) {
+  .info-main {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
+}
+
+
+@media (min-width: 1024px) {
+  .info-main {
+    padding-left: 9vw;
+    padding-right: 9vw;
+  }
 }

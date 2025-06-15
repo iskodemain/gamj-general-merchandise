@@ -3,7 +3,7 @@ import './Footer.css'
 function Footer() {
   return (
     <div className='footer-container'>
-      <p className='copyright'>&copy;2024. ANGLE </p>
+      <p className='copyright'>&copy;2025, GAMJ GENERAL MERCHANDISE  </p>
     </div>
   )
 }

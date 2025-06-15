@@ -59,3 +59,72 @@ select option {
 }
 
 
+.shop-main {
+  padding-left: 1rem;    
+  padding-right: 1rem;
+}
+
+.shop-semi {
+  display: flex;
+  flex-direction: column;     
+  gap: 1.25rem;               
+  padding-top: 2.5rem;        
+}
+
+.shop-settings {
+  display: flex;                  
+  flex-direction: row;           
+  justify-content: space-between;
+  font-size: 1rem;               
+  margin-bottom: 1rem;           
+}
+
+.filter-btn {
+  display: flex; 
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem; 
+  padding-left: 0.5rem;
+  padding-right: 0.5rem; 
+  align-items: center; 
+  font-size: 0.875rem;
+  line-height: 1.25rem; 
+}
+
+
+/* SHOP MAIN */
+@media (min-width: 640px) {
+  .shop-main {
+    padding-left: 5vw;   
+    padding-right: 5vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .shop-main {
+    padding-left: 7vw;   
+    padding-right: 7vw;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shop-main {
+    padding-left: 9vw;   
+    padding-right: 9vw;
+  }
+}
+
+
+/* SHOP SEMI */
+@media (min-width: 640px) {
+  .shop-semi {
+    flex-direction: column;   
+    gap: 1.25rem;             
+  }
+}
+
+/* SHOP SETTINGS */
+@media (min-width: 640px) {
+  .shop-settings {
+    font-size: 1.5rem;           
+  }
+}

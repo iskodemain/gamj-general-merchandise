@@ -90,15 +90,15 @@ const Shop = () => {
     };
   }, []);
   return (
-    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] upthis'>
-      <div className='flex flex-col sm:flex-col gap-5 sm:gap-5 pt-10'>
+    <div className='shop-main'>
+      <div className='shop-semi'>
         <MainTitle mtext1={'DISCOVER'} mtext2={'ALL COLLECTIONS'}/>
-        <div className='flex flex-row justify-between text-base sm:text-2xl mb-4 main-operations'>
+        <div className='shop-settings'>
           {/* PRODUCT FILTER */}
-          <div className='product-filter relative ' ref={dropdownRef}>
+          <div className='product-filter relative' ref={dropdownRef}>
             <button 
               onClick={toggleFilterDropdown} 
-              className="flex items-center text-sm px-2 py-1">
+              className="filter-btn">
               <GiSettingsKnobs className='mr-3.5 filter-button' />
               {selectedFilter}
             </button>
@@ -133,12 +133,12 @@ const Shop = () => {
             filteredProducts.map((item, index) => (
               <ProductItem 
                 key={index} 
-                id={item._id} 
-                image={item.image} 
-                name={item.name} 
+                id={item.productId} 
+                image={item.images} 
+                name={item.productName} 
                 price={item.price} 
-                active={item.active}
-                bestseller={item.bestseller}
+                active={item.isActive}
+                bestseller={item.isBestSeller}
               />
             ))
           ) : (

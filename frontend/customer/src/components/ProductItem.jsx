@@ -35,8 +35,8 @@ const ProductItem = ({id, image, name, price, active, bestseller}) => {
                     <img className='hover:scale-110 transition ease-in-out product-image'src={image[0]} draggable="false" alt={name} />
                 </div>
             )}
-        <p className='pt-3 pb-1 text-sm'>{name}</p>
-        <p className='text-sm font-medium'>{currency}{price}</p>
+        <p className='pd-name'>{name}</p>
+        <p className='ph-price'>{currency}{price}</p>
     </div>
   )
 }

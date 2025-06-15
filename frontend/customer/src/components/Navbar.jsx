@@ -84,7 +84,7 @@ function Navbar() {
       {/* LEFT */}
       <div className='mainLogo'>
         <NavLink to="/">
-          <img src={assets.logo} className="angleLogo" alt="" draggable="false"/>
+          <img src={assets.logo} className="gamjLogo" alt="" draggable="false"/>
         </NavLink>
       </div>
 
