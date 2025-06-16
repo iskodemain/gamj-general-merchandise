@@ -11,6 +11,7 @@
     font-size: 1.2rem;
     stroke-width: 25;
     transform: rotate(90deg);
+    margin-right: 0.875rem; 
 }
 
 .dropdown-container {
@@ -21,18 +22,42 @@
     color: #333; 
 }
 
+.dropdown-container .dropdown-choices {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem; 
+    padding-left: 1rem;
+    padding-right: 1rem; 
+    cursor: pointer; 
+}
+
 .dropdown-container .dropdown-choices:hover {
     color: white;
-    background-color: #247dd7;
+    background-color: #43A047;
     
+}
+
+.dropdown-container .dropdown-choices-top {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem; 
+    padding-left: 1rem;
+    padding-right: 1rem; 
+    cursor: pointer; 
 }
 
 .dropdown-container .dropdown-choices-top:hover {
     color: white;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
-    background-color: #247dd7;
+    background-color: #43A047;
     
+}
+
+.dropdown-choices-buttom {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem; 
+    padding-left: 1rem;
+    padding-right: 1rem; 
+    cursor: pointer; 
 }
 
 .dropdown-container .dropdown-choices-buttom:hover {
@@ -90,6 +115,14 @@ select option {
   line-height: 1.25rem; 
 }
 
+.dropdown-container {
+  position: absolute;             /* absolute */
+  background-color: white;        /* bg-white */
+  border-width: 2px;              /* border-2 */
+  border-color: #f3f4f6;          /* border-gray-100 (#f3f4f6) */
+  margin-top: 2.5rem;             /* mt-10 = 40px */
+  width: 100%;                    /* w-full */
+}
 
 /* SHOP MAIN */
 @media (min-width: 640px) {

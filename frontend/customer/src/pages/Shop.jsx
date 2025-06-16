@@ -99,12 +99,12 @@ const Shop = () => {
             <button 
               onClick={toggleFilterDropdown} 
               className="filter-btn">
-              <GiSettingsKnobs className='mr-3.5 filter-button' />
+              <GiSettingsKnobs className='m-20 filter-button' />
               {selectedFilter}
             </button>
             {/* Dropdown Menu */}
             {isFilterOpen && (
-              <div className='absolute bg-white border-2 border-gray-100 mt-10 w-full dropdown-container'>
+              <div className='dropdown-container'>
                 <ul className='text-sm'>
                 <li onClick={() => handleFilterSelect('All')} className='px-4 py-2 cursor-pointer dropdown-choices-top'>All</li>
                 <li onClick={() => handleFilterSelect('Best Sellers')} className='px-4 py-2 cursor-pointer dropdown-choices'>Best Sellers</li>
