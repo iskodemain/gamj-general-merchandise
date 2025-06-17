@@ -1,4 +1,3 @@
-
 import React, {useContext, useEffect, useState}from 'react'
 import './Login.css'
 import OurPolicy from '../components/OurPolicy.jsx'
@@ -87,7 +86,7 @@ function Login() {
   return (
     
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] upthis'>
-      <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-[90%] m-auto mt-14 gap-4 text-gray-800 formsize'>
+      <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-[90%] m-auto gap-4 text-gray-800 formsize'>
         <div className='inline-flex items-center gap-2 mb-2 mt-10 '>
           <p className='cs-text'>{currentState}</p>
           <hr className='border-none h-[3px] w-8 ml-1 ca-color'/>
@@ -113,7 +112,14 @@ function Login() {
             </div>
             : ""
           }
-          <p onClick={()=> navigate('/forgot-password')} className='ft-button'>Forgot Password?</p>
+          {currentState === 'Login' && (
+            <button 
+              onClick={() => navigate('/forgot-password')} 
+              className='ft-button'
+            >
+              Forgot Password?
+            </button>
+          )}
         </div>
         {currentState === "Create Account" ? (
           <>

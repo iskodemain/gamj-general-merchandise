@@ -28,7 +28,7 @@ function BestSeller() {
             <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 gap-y-6'>
                 {
                     bestSellingProducts.slice(0, 4).map((item, index) => (
-                        <ProductItem key={index} ID={item.productId} image={item.images} name ={item.productName} price={item.price} active={item.isActive} bestseller={item.isBestSeller}/>
+                        <ProductItem key={index} id={item.productId} image={item.images} name ={item.productName} price={item.price} active={item.isActive} bestseller={item.isBestSeller}/>
                     ))
                 }
             </div>
