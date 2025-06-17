@@ -8,34 +8,33 @@ import { assets } from '../assets/assets.js'
 
 const About = () => {
   return (
-    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
-      <div className='text-2xl text-center pt-8 border-t'>
-        <MainTitle mtext1={'ABOUT'} mtext2={'US'}/>
-      </div>
-      <div className='about-container'>
-        <div className='img-about'>
-          <img className='main-log' src={assets.mainlogo} alt="" />
+    <>
+      <div className='abt-container'>
+        <p className='about-us'>About Us</p>
+        <div className='cover-abtimg'>
+            <img src={assets.about_cover} alt="" />
         </div>
-        <div className='text-gray-600 text-cont'>
-          <p>Welcome to Angel Online Store, where you can shop the latest trends and timeless styles from home. We offer affordable, original branded clothing designed to exceed your expectations and keep you looking
-          your best. </p>
-          <p>Discover stylish pieces from your favorite brands, perfect for every occasion. Plus, enjoy daily discounts and vouchers to find your perfect outfit at a great price!n</p>
-          <div className='contacts-abt'>
-            <b className='contacts-text'>Contacts</b>
-            <p className='email-text'>Email: <a href='https://mail.google.com/mail/u/0/#inbox?compose=new' className='link-about'>anglephilippines090721@gmail.com</a></p>
-            <p className='insta-text'>Instagram:  <a className='link-about' href='https://www.instagram.com/angleofficial_ph?igsh=MTQ0a2NrdmY4a2xjYw==' target='blank'>https://www.instagram.com/angleofficial_ph?igsh=MTQ0a2NrdmY4a2xjYw==</a></p>
+      </div>
+      <div className='about-main'>
+        <div className='about-container'>
+          <div className='text-cont'>
+            <h1 className='os-text'>Our Story</h1>
+            <p>Launched in 2006, GAMJ General Merchandise is a local hospital product supplier and ordering business based in Villa Alegre Mabuhay, Carmona, Cavite, Philippines. Supported by a dedicated team of four employees handling orders, inventory, and customer service, GAMJ serves 3 to 10 hospitals per week through cash-on-delivery and online payments.</p>
+            <p>GAMJ offers a wide range of hospital supplies, including face masks, underpads, diapers, and syringes. The business continues to grow steadily, expanding its product selection to meet the increasing demand in the healthcare industry.</p>
           </div>
-          
+          <div className='img-about'>
+            <img className='main-log' src={assets.aboutus_pic} alt="" />
+          </div>
         </div>
-      </div>
 
-      <div className='text-4xl'>
+        <div className='text-4xl'>
 
+        </div>
+        <OurPolicy/>
+        <Infos/>
+        <Footer/>
       </div>
-      <OurPolicy/>
-      <Infos/>
-      <Footer/>
-    </div>
+    </>
   )
 }
 

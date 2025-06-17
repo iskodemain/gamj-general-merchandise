@@ -32,7 +32,7 @@ const Shop = () => {
     // Apply category filter
     if (selectedFilter !== 'All' && selectedFilter !== 'Filter') {
       if (selectedFilter === 'Best Sellers') {
-        updatedProducts = updatedProducts.filter(item => item.bestseller === true);
+        updatedProducts = updatedProducts.filter(item => item.isBestSeller === true);
       } else {
         updatedProducts = updatedProducts.filter(item => item.category === selectedFilter);
       }
@@ -41,7 +41,7 @@ const Shop = () => {
     // Apply search filter
     if (search) {
       updatedProducts = updatedProducts.filter(item =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        item.productName.toLowerCase().includes(search.toLowerCase())
       );
     }
 
@@ -108,10 +108,12 @@ const Shop = () => {
                 <ul className='text-sm'>
                 <li onClick={() => handleFilterSelect('All')} className='px-4 py-2 cursor-pointer dropdown-choices-top'>All</li>
                 <li onClick={() => handleFilterSelect('Best Sellers')} className='px-4 py-2 cursor-pointer dropdown-choices'>Best Sellers</li>
-                  <li onClick={() => handleFilterSelect('Men')} className='px-4 py-2 cursor-pointer dropdown-choices'>Men</li>
+                {/* DISPLAY ALL CATEGORIES HERE RELAATED TO PRODUCT IN BACKEND */}
+                
+                  {/* <li onClick={() => handleFilterSelect('Men')} className='px-4 py-2 cursor-pointer dropdown-choices'>Men</li>
                   <li onClick={() => handleFilterSelect('Women')} className='px-4 py-2 cursor-pointer dropdown-choices'>Women</li>
                   <li onClick={() => handleFilterSelect('Shorts')} className='px-4 py-2 cursor-pointer dropdown-choices'>Shorts</li>
-                  <li onClick={() => handleFilterSelect('Striped Shirts(UNISEX)')} className='px-4 py-2 cursor-pointer dropdown-choices-buttom'>Striped Shirts(UNISEX)</li>
+                  <li onClick={() => handleFilterSelect('Striped Shirts(UNISEX)')} className='px-4 py-2 cursor-pointer dropdown-choices-buttom'>Striped Shirts(UNISEX)</li> */}
                 </ul>
               </div>
             )}

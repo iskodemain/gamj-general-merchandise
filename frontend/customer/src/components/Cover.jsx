@@ -1,6 +1,7 @@
 import React from 'react'
 import './Cover.css'
 import {assets} from '../assets/assets'
+import { NavLink } from 'react-router-dom'
 
 function Cover() {
   return (
@@ -16,8 +17,8 @@ function Cover() {
             including face masks, syringes, underpads, and more, 
             continually expanding to meet evolving healthcare needs.</p>
           <div className="auth-buttons">
-            <button className="auth-btn">Create an Account</button>
-            <button className="auth-btn">Login</button>
+            <NavLink to="login" className="auth-btn">Create an Account</NavLink>
+            <NavLink to="login" className="auth-btn">Login</NavLink>
           </div>
         </div>
         <div className='cover-container'>

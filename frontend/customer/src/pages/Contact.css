@@ -1,11 +1,11 @@
-.abt-container {
+.ctc-container {
     position: relative;
     width: 100%;
     display: flex;
     align-items: center;
 }
 
-.about-us {
+.contact-us {
     position: absolute;
     right: 0;
     color: #171717;
@@ -14,7 +14,7 @@
     margin-inline: 5rem;
 }
 
-.cover-abtimg {
+.cover-ctimg {
     width: 100%;
     height: 100%;
     display: flex;
@@ -22,19 +22,20 @@
     align-items: center;
 }
 
-.cover-abtimg img {
+.cover-ctimg img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center; 
 }
 
-.about-main {
+
+.contact-main {
   padding-left: 1rem;   
   padding-right: 1rem;
 }
 
-.about-container {
+.contact-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -43,29 +44,34 @@
     margin-top: 5rem;
 }
 
-.about-semi {
+.contact-semi {
     padding-top: 2rem; 
     font-size: 1.5rem;
     line-height: 2rem; 
     text-align: center; 
 }
 
-.os-text {
-    font-size: 2rem;
+.contact-text {
+    font-size: 2.5rem;
     font-weight: 600;
+    color: #171717;
 }
 
-.main-log {
+.contact-description {
+    color: #2C2C2C;
+}
+
+.main-logo-ct {
     width: 100%;
     height: auto;
 }
 
-.img-about {
-    min-width: 25rem;
-    max-width: 60%;
+.img-contact {
+    min-width: 10rem;
+    max-width: 50%;
 }
 
-.text-cont {
+.ct-cont {
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -77,27 +83,51 @@
     margin-top: 1.5rem;
 }
 
-.contacts-text {
-    font-size: 1.1rem;
-    
-}
-
 .email-text, .insta-text {
     font-weight: 600;
     font-size: 1rem;
 }
 
-.link-about {
-    font-weight: 400;
+
+.list-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+}
+
+.ctc-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    align-items: center;
+    font-weight: 600;
+}
+
+.ctc-icon {
+    color: #43A047;
+    font-size: 1.4rem;
+    
+}
+
+.ctc-text {
+    color: #171717;
+    font-size: 1.1rem;
+    line-height: 1rem;
+}
+
+.msgr {
     text-decoration: underline;
-    font-size: 0.9rem;
-    color: #1e1ee9;
+}
+
+.vbr {
+    text-decoration: underline;
 }
 
 
 /* || MEDIUM */
 @media screen and (min-width: 1115px) {
-    .about-container {
+    .contact-container {
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
@@ -106,7 +136,7 @@
         padding-left: 6rem;
     }
     
-    .img-about {
+    .img-contact {
         max-width: 40%;
     }
     
@@ -118,23 +148,23 @@
 }
 
 
-/* ABOUT-MAIN */
+/* contact-MAIN */
 @media (min-width: 640px) {
-  .about-main {
+  .contact-main {
     padding-left: 5vw;
     padding-right: 5vw;
   }
 }
 
 @media (min-width: 768px) {
-  .about-main {
+  .contact-main {
     padding-left: 7vw;
     padding-right: 7vw;
   }
 }
 
 @media (min-width: 1024px) {
-  .about-main {
+  .contact-main {
     padding-left: 9vw;
     padding-right: 9vw;
   }
