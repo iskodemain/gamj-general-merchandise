@@ -54,10 +54,6 @@ img {
     position: relative;
     display: inline-block;
     cursor: pointer;
-
-}
-.navContainer {
-    position: relative;
 }
 
 .navContainer .cart-quantity {
@@ -222,6 +218,7 @@ img {
 .nav-link:hover {
   color: #2e7031;
 }
+
 /* eto yung zero di ko alam bat nadadamay mag changed color */
 .nav-icons {
     color: #000000;
@@ -237,15 +234,34 @@ img {
     align-items: center;
 }
 
-.icon-button img, .nav-icon {
-    width: 24px;
-    height: 24px;
+.icon-button img {
+    width: 21px;
+    height: 22px;
+    transition: filter 0.3s ease;
+}
+
+.icon-button img:hover {
+    filter: brightness(0) saturate(100%) invert(29%) sepia(31%) saturate(1406%) hue-rotate(71deg) brightness(92%) contrast(88%);
 }
 
 .nav-icon {
-    
+    width: 26px;
+    height: 26px;
     color: #43A047;
     transition: color 0.3s ease;
+}
+
+.notifcon {
+    width: 27px;
+    height: 27px;
+}
+
+.searchcon {
+    stroke-width: 0.1;
+}
+
+.wishcon {
+    stroke-width: 0.3;
 }
 
 .nav-icon:hover {

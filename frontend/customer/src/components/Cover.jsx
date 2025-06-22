@@ -23,7 +23,7 @@ function Cover() {
         </div>
         <div className='cover-container'>
           <div className='cover-image'>
-            <img src={assets.cover} alt="Medical supplies showcase" />
+            <img src={assets.cover} alt="Cover Photo" />
           </div>
         </div>
       </div>

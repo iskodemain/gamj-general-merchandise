@@ -32,6 +32,7 @@ const ProductItem = ({id, image, name, price, active, bestseller}) => {
                 </NavLink>
             ) : (
                 <div className={`overflow-hidden product-container inactive`}>
+                    <p className='ofs'>Out of stock</p>
                     <img className='hover:scale-110 transition ease-in-out product-image'src={image[0]} draggable="false" alt={name} />
                 </div>
             )}
