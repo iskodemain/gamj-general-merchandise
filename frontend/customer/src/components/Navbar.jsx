@@ -104,15 +104,17 @@ function Navbar() {
       <div className='nav-icons'>
         {isShopPath && (
           <div onClick={() => setShowSearch(true)} className='icon-button'>
-            <CiSearch className="nav-icon"/>
+            <CiSearch className="nav-icon searchcon"/>
           </div>
         )}
         <div className='icon-button'>
-          <IoIosNotificationsOutline className="nav-icon" />
+          <IoIosNotificationsOutline className="nav-icon notifcon" />
           
         </div>
         <div className='icon-button'>
-          <NavLink to="/wishlist"><CiHeart className="nav-icon" /></NavLink>
+          <NavLink to="/wishlist">
+            <CiHeart className="nav-icon wishcon" />
+          </NavLink>
         </div>
         <div className='icon-button'>
           <NavLink to="/cart">

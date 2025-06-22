@@ -101,7 +101,7 @@ export const products = [
         stockQuantity: 186,
         sizes: ["Pedia", "Adult"],
         isBestSeller: true,
-        isActive: true,
+        isActive: false,
         expirationDate: "2025-12-01 15:45:53",
         createAt: "2025-03-05 15:15:53",
         updateAt: "2025-03-05 15:45:53"
