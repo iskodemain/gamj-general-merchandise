@@ -3,6 +3,7 @@ import {Routes, Route, Navigate} from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import Shop from './pages/Shop.jsx'
 import About from './pages/About.jsx'
+import Contact from './pages/Contact.jsx'
 import Wishlist from './pages/Wishlist.jsx'
 import Cart from './pages/Cart.jsx'
 import Product from './pages/Product.jsx'
@@ -33,6 +34,7 @@ const App = () => {
         <Route path="/" element={<Home/>}/>
         <Route path="/shop" element={<Shop/>}/>
         <Route path="/about" element={<About/>}/>
+        <Route path="/contact" element={<Contact/>}/>
         <Route path="/wishlist" element={<Wishlist/>}/>
         <Route path="/cart" element={<Cart/>}/>
         <Route path="/product/:productId" element={<Product/>}/>

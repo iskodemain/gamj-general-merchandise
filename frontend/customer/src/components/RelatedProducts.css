@@ -1,0 +1,39 @@
+.rp-main {
+    margin-top: 6rem;
+    margin-bottom: 6rem;
+}
+
+.rp-text {
+  text-align: center;
+  font-size: 1.875rem; 
+  line-height: 2.25rem; 
+  padding-top: 0.5rem;  
+  padding-bottom: 1rem; 
+}
+
+.rp-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 1.75rem; 
+  row-gap: 1.5rem; 
+}
+
+
+/* RP-LIST */
+@media (min-width: 640px) {
+  .rp-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .rp-list {
+    grid-template-columns: repeat(3, 1fr); 
+  }
+}
+
+@media (min-width: 1024px) {
+  .rp-list {
+    grid-template-columns: repeat(4, 1fr); 
+  }
+}

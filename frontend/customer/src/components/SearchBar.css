@@ -1,3 +1,8 @@
+.sb-main {
+  padding-left: 1rem;   /* Tailwind's px-4 = 16px */
+  padding-right: 1rem;
+}
+
 .searh-container {
     border-bottom: 1px solid #E9E9E9;
     border-right: 1px solid #E9E9E9;
@@ -9,10 +14,27 @@
     position: fixed;
     width: 82%;
     background-color: white;
+    text-align: center;
 }
 
 .search-bar {
-    border: 2px solid #470507;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding-left: 1.25rem;   
+    padding-right: 1.25rem;
+    padding-top: 0.5rem;    
+    padding-bottom: 0.5rem;
+
+    margin-top: 1.25rem;     
+    margin-bottom: 1.25rem;
+    margin-left: 0.75rem;    
+    margin-right: 0.75rem;
+
+    border-radius: 9999px;   
+    width: 75%;              
+    border: 2px solid #43A047;
 }
 
 .search-icon {
@@ -25,4 +47,35 @@
     font-size: 1.6rem;
     color: #8c8c8c;
     cursor: pointer;
+}
+
+
+/* SB-MAIN */
+@media (min-width: 640px) {
+  .sb-main {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .sb-main {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sb-main {
+    padding-left: 9vw;
+    padding-right: 9vw;
+  }
+}
+
+
+/* SEARCH-BAR */
+@media (min-width: 640px) {
+  .search-bar {
+    width: 50%;            
+  }
 }

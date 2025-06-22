@@ -63,7 +63,10 @@ import ph_icon from './ph_icon.png'
 import profile_icon from './profile_icon.png'
 import refund_icon from './refund_icon.png'
 import search_icon from './search_icon.png'
-
+import aboutus_pic from './aboutus-pic.png'
+import contactus_pic from './contactus-pic.png'
+import contact_cover from './contact-cover.png'
+import about_cover from './about-cover.png'
 
 export const assets = {
     cart_icon,
@@ -78,7 +81,11 @@ export const assets = {
     ph_icon,
     profile_icon,
     refund_icon,
-    search_icon
+    search_icon,
+    aboutus_pic,
+    contactus_pic,
+    contact_cover,
+    about_cover
 }
 
 export const products = [
@@ -94,7 +101,7 @@ export const products = [
         stockQuantity: 186,
         sizes: ["Pedia", "Adult"],
         isBestSeller: true,
-        isActive: true,
+        isActive: false,
         expirationDate: "2025-12-01 15:45:53",
         createAt: "2025-03-05 15:15:53",
         updateAt: "2025-03-05 15:45:53"

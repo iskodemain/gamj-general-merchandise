@@ -1,4 +1,8 @@
 import { IoIosArrowBack } from "react-icons/io";
+import { IoIosNotificationsOutline } from "react-icons/io";
+import { CiHeart } from "react-icons/ci";
+import { CiSearch } from "react-icons/ci";
+
 import React, {useState, useEffect, useRef, useContext} from 'react'
 import {assets} from '../assets/assets.js'
 import './Navbar.css'
@@ -80,46 +84,51 @@ function Navbar() {
   
   return (
     <>
-    <div className='navContainer ' >
-      {/* LEFT */}
+    <div className='navContainer'>
+      {/* LEFT - Logo */}
       <div className='mainLogo'>
         <NavLink to="/">
           <img src={assets.logo} className="gamjLogo" alt="" draggable="false"/>
         </NavLink>
       </div>
 
-      {/* RIGHT */}
-      <div className='allButtons'>
-        {isShopPath && <div onClick={() => setShowSearch(true)} className='sbutton bcontainer'>
-          <img src={assets.search_icon} className="bImg linkImg" alt="" draggable="false"/>
-        </div>} 
-        <div className='lbutton bcontainer'>
-            <img onClick={()=> token ? null : navigate('/login')} src={assets.profile_icon} className="lImg linkImg" alt="" draggable="false"/>
-            {/* DROPDOWN MO SA NAVBAR */}
-            {!token ? 
-            <div className="dropdown">
-              <div className="dropdown-content">
-                <p onClick={()=>navigate('/orders')} className="dropdown-item">Orders</p>
-                <p onClick={logout} className="dropdown-item">Logout</p>
-              </div>
-            </div> : 
-            <div className="dropdown">
-            <div className="dropdown-content">
-              <p onClick={()=>navigate('/login')} className="dropdown-item">Login</p>
-            </div>
+      {/* CENTER - Navigation Links */}
+      <div className='nav-links'>
+        <NavLink to="/" className="nav-link">Home</NavLink>
+        <NavLink to="/shop" className="nav-link">Shop</NavLink>
+        <NavLink to="/about" className="nav-link">About</NavLink>
+        <NavLink to="/contact" className="nav-link">Contact</NavLink>
+      </div>
+
+      {/* RIGHT - Icons */}
+      <div className='nav-icons'>
+        {isShopPath && (
+          <div onClick={() => setShowSearch(true)} className='icon-button'>
+            <CiSearch className="nav-icon searchcon"/>
           </div>
-            }
+        )}
+        <div className='icon-button'>
+          <IoIosNotificationsOutline className="nav-icon notifcon" />
+          
         </div>
-        <div className='cbutton bcontainer'>
+        <div className='icon-button'>
+          <NavLink to="/wishlist">
+            <CiHeart className="nav-icon wishcon" />
+          </NavLink>
+        </div>
+        <div className='icon-button'>
           <NavLink to="/cart">
-            <img src={assets.cart_icon} className="cImg linkImg" alt="" draggable="false"/>
-            <p className="cart-quantity">{getCartCount()}</p>
+            <img src={assets.cart_icon} alt="Cart" draggable="false"/>
+            <span className="cart-quantity">{getCartCount(1)}</span>
           </NavLink>
         </div>
-        <div className='mbutton bcontainer'>
-          <NavLink to="#" className="menu-bars">
-            <img src={assets.menu_icon} className=" mImg linkImg" alt="" onClick={showSidebar}/>
-          </NavLink>
+        <div className='icon-button'>
+          <img 
+            onClick={() => token ? null : navigate('/login')} 
+            src={assets.profile_icon} 
+            alt="Profile" 
+            draggable="false"
+          />
         </div>
       </div>
     </div>
