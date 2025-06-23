@@ -67,6 +67,8 @@ import aboutus_pic from './aboutus-pic.png'
 import contactus_pic from './contactus-pic.png'
 import contact_cover from './contact-cover.png'
 import about_cover from './about-cover.png'
+import cod_icon from './cod-icon.png'
+import paypal_icon from './paypal-icon.png'
 
 export const assets = {
     cart_icon,
@@ -85,7 +87,9 @@ export const assets = {
     aboutus_pic,
     contactus_pic,
     contact_cover,
-    about_cover
+    about_cover,
+    paypal_icon,
+    cod_icon
 }
 
 export const products = [

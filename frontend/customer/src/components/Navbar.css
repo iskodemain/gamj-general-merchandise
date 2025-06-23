@@ -56,9 +56,9 @@ img {
     cursor: pointer;
 }
 
-.navContainer .cart-quantity {
+.cart-quantity {
     position: absolute;
-    top: -8px;
+    top: -7.5px;
     right: -8px;
     background-color: #FF3333;
     color: white;
@@ -71,6 +71,24 @@ img {
     border-radius: 50%;
     border: 1px solid white;
 }
+
+.wishlist-quantity {
+    position: absolute;
+    top: -6px;
+    right: -7px;
+    background-color: #FF3333;
+    color: white;
+    font-size: 0.6rem;
+    min-width: 18px; 
+    min-height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 1px solid white;
+}
+
+
 
 .hidden-order {
     display: none;
