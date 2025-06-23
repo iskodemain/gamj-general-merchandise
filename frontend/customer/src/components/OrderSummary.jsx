@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import { ShopContext } from '../context/ShopContext'
 import MainTitle from './MainTitle.jsx';
+import './OrderSummary.css'
 
 function OrderSummary() {
     const {currency, delivery_fee, totalProductPrice, overallPrice, getOverAllPrice} = useContext(ShopContext);
@@ -13,24 +14,24 @@ function OrderSummary() {
       getOverAllPrice(finalTotal.toFixed(2));
     }, [totalProductPrice, overallPrice])
   return (
-    <div className='w-full'>
+    <div className='ordersum-head'>
       <div className='text-2xl'>
         <MainTitle mtext1={'ORDER'} mtext2={'SUMMARY'}/>
       </div>
-      <div className='flex flex-col gap-2 mt-2 text-sm'>
-        <div className='flex justify-between'>
+      <div className='ordersum-content'>
+        <div className='ordersum-list'>
             <p>Subtotal</p>
-            <p>{currency}{totalProductPrice.toFixed(2)}</p>
+            <p className='ordersum-price'>{currency}{totalProductPrice.toFixed(2)}</p>
         </div>
         <hr />
-        <div className='flex justify-between'>
+        <div className='ordersum-list'>
             <p>Shipping Fee</p>
-            <p>{currency}{delivery_fee.toFixed(2)}</p>
+            <p className='ordersum-price'>{currency}{delivery_fee.toFixed(2)}</p>
         </div>
         <hr />
-        <div className='flex justify-between'>
+        <div className='ordersum-list'>
             <b>Total</b>
-            <p>{currency}{totalProductPrice === 0 ? 0 : overallPrice}</p>
+            <p className='ordersum-price'>{currency}{totalProductPrice === 0 ? 0 : overallPrice}</p>
         </div>
       </div>
     </div>

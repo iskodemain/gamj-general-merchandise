@@ -1,0 +1,21 @@
+.ordersum-head {
+    width: 100%;
+}
+
+.ordersum-content {
+  display: flex;
+  flex-direction: column;   /* flex-col = vertical layout */
+  gap: 0.5rem;              /* gap-2 = 8px */
+  margin-top: 0.5rem;       /* mt-2 = 8px */
+  font-size: 0.875rem;      /* text-sm = 14px */
+}
+
+.ordersum-list {
+    display: flex; 
+    justify-content: space-between; 
+}
+
+.ordersum-price {
+    display: flex;
+    align-items: center;
+}

@@ -1,3 +1,46 @@
+.main-cart {
+  padding-left: 1rem;    
+  padding-right: 1rem;
+} 
+
+.main-semi {
+    padding-top: 3.5rem; 
+}
+
+.cart-container {
+  padding-top: 1rem;               
+  padding-bottom: 1rem;
+  border-top: 1px solid #e5e7eb;   
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;                 
+  display: grid;
+  grid-template-columns: 4fr 0.1fr; 
+  gap: 1rem;                       
+  margin-bottom: 0.5rem;           
+}
+
+.cc-2 {
+  display: flex;
+  align-items: flex-start; 
+  gap: 1.5rem;             
+}
+
+.cart-name {
+  font-size: 0.75rem;     
+  font-weight: 500;       
+}
+
+.cc-size {
+  display: flex;
+  align-items: center;  
+  gap: 0.5rem;          
+} 
+
+.cart-size {
+  font-size: 0.75rem;     
+  font-weight: 300;       
+} 
+
 .hidden {
     display: none;
 }
@@ -35,6 +78,8 @@
 }
 
 .cart-price {
+    display: flex;
+    align-items: center;
     font-size: 0.8rem;
     color: #494949;
 }
@@ -134,6 +179,8 @@ input[type="checkbox"] {
 }
 
 .checkout-total-price {
+    display: flex;
+    align-items: center;
     font-size: 1rem;
     font-weight: 600;
     color: #494949;
@@ -151,6 +198,7 @@ input[type="checkbox"] {
     font-size: 0.8rem;
     border-radius: 0.5rem;
     font-weight: 600;
+    cursor: pointer;
 }
 
 .cart-button-delete {
@@ -160,12 +208,53 @@ input[type="checkbox"] {
 }
 
 .cart-button-checkout {
-    background-color: #470507;
-    border: 2px solid #470507;
+    background-color: #289828;
+    border: 2px solid #289828;
     color: white;
 }
 
+/* CART-SIZE */
+@media (min-width: 640px) {
+  .cart-size {
+    font-size: 0.875rem;   
+  }
+}
 
+/* CART-NAME */
+@media (min-width: 640px) {
+  .cart-name {
+    font-size: 1rem;       
+  }
+}
+
+/* CART-CONTAINER */
+@media (min-width: 640px) {
+  .cart-container {
+    grid-template-columns: 4fr 0.1fr;
+  }
+}
+
+/* MAIN-CART */
+@media (min-width: 640px) {
+  .main-cart {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .main-cart {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main-cart {
+    padding-left: 9vw;
+    padding-right: 9vw;
+  }
+}
 
 @media (min-width: 640px) {
     .cart-product-img {

@@ -34,6 +34,7 @@
     border: 2px solid #E2E2E2;
     border-radius: 1rem;
     position: relative;
+    overflow: hidden;
 }
 
 .main-product-container .inactive {
@@ -43,6 +44,9 @@
 
 .main-product-container .inactive .ofs {
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     font-size: 1.5rem;
     color: black;
 }

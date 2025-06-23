@@ -109,14 +109,22 @@ const Product = () => {
             <p className='pi-price'>{currency}{productData.price}</p>
             <p className='pi-description'>{productData.productDescription}</p>
             <div className='ss-main'>
-              <p className='select-size-text'>Select Size</p>
-              <div className='ss-list'>
-                {
-                  productData.sizes.map((item, index) => (
-                    <button onClick={() => setSize(item)} className={`sizes-none ${item === size ? 'sizes-pick' : ''}`} key={index}>{item}</button>
-                  ))
-                }
-              </div>
+              {
+                productData.sizes?.length > 0 && ( 
+                <>
+                <p className='select-size-text'>Select Size</p>
+                <div className='ss-list'>
+                  {
+                    productData.sizes.map((item, index) => (
+                      <button onClick={() => setSize(item)} className={`sizes-none ${item === size ? 'sizes-pick' : ''}`} key={index}>{item}</button>
+                    ))
+                  }
+                  
+                </div>
+                </>
+                )
+              }
+
               <div className='quantity-container'>
                 <div className="quantity-semi">
                     <p className='select-size-text'>Select Quantity</p>
@@ -129,7 +137,7 @@ const Product = () => {
                 </div>
               </div>
               <div className='buttons-container'>
-                <button onClick={()=>handleAddToCart(productData.stockQuantity, productData.active)} className='main-button add-cart'>ADD TO CART</button>
+                <button onClick={()=>handleAddToCart(productData.stockQuantity, productData.isActive)} className='main-button add-cart'>ADD TO CART</button>
                 <button className='main-button buy-now'>BUY NOW</button>
               </div>
               <hr className='line-hr'/>

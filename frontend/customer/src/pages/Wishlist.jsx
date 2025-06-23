@@ -13,34 +13,34 @@ function Wishlist() {
       <div className='wishlist-semi'>
         <div className='wishlist-title'>
           <div className='wishlist-title-mn'> 
-          <p className='firstWishText'>WISH<span className='secondWishText'>LIST</span></p>
+          <p className='firstMainText'>WISH<span className='secondMainText'>LIST</span></p>
           <p className='w-8 sm:w-10 h-[1px] sm:h-[3px] line-color'></p>
           </div>
         </div>
         {wishlistProducts.length > 0 ? (
           wishlistProducts.map((productData) => (
-            <div key={productData.productId} className='py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.1fr] sm:grid-cols-[4fr_0.1fr] gap-4 mb-2 items-center'>
+            <div key={productData.productId} className='wishlist-item'>
                 {productData.isActive ? (
-                  <div className='flex items-center gap-6'>
+                  <div className='active-product'>
                   <NavLink className='cursor-pointer' to={`/product/${productData.productId}`}>
-                    <img className='cart-product-img' src={productData.images[0]} alt="" />
+                    <img className='wish-product-img' src={productData.images[0]} alt="" />
                   </NavLink>
                   <div>
-                    <p className='text-xs sm:text-base font-medium'>{productData.product_name}</p>
-                    <div className='flex items-center gap-2'>
-                      <p className='text-xs sm:text-sm font-light'>Price: {currency}{productData.price}</p>
+                    <p className='wishlist-pn'>{productData.productName}</p>
+                    <div className='wishlist-price'>
+                      <p className='wl-text'>Price: {currency}{productData.price}</p>
                     </div>
                       </div>
                   </div>
                 ) : (
-                  <div className='flex items-center gap-6 inactive-product'>
+                  <div className='inactive-product'>
                   <NavLink className='cursor-pointer' to={`/product/${productData.productId}`}>
-                    <img className='cart-product-img' src={productData.images[0]} alt="" />
+                    <img className='wish-product-img' src={productData.images[0]} alt="" />
                   </NavLink>
                   <div>
-                    <p className='text-xs sm:text-base font-medium'>{productData.product_name}</p>
-                    <div className='flex items-center gap-2'>
-                      <p className='text-xs sm:text-sm font-light'>Price: {currency}{productData.price}</p>
+                    <p className='wishlist-pn'>{productData.productName}</p>
+                    <div className='wishlist-price'>
+                      <p className='wl-text'>Price: {currency}{productData.price}</p>
                     </div>
                       </div>
                   </div>
