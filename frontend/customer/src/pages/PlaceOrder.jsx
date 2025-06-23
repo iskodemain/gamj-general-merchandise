@@ -8,11 +8,13 @@ import Footer from '../components/Footer'
 import { ShopContext } from '../context/ShopContext'
 import axios from 'axios'
 import { toast } from "react-toastify";
+import { assets } from '../assets/assets'
 
 function PlaceOrder() {
   const [zipCode, setZipCode] = useState('')
   const [phoneNum, setPhoneNum] = useState('')
   const [paymentMethod] = useState('COD')
+  const [method, setMethod] = useState('cod')
   const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems} = useContext(ShopContext);
 
   // const loadOrderData = async () => {
@@ -148,61 +150,70 @@ function PlaceOrder() {
   }
 
   return (
-    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
-      <form onSubmit={onSubmitHandler} className='flex flex-col sm:flex-row justify-between gap-4 pt-9 sm:pt-10 min-h-[80vh]'>
+    <div className='pl-main'>
+      <form onSubmit={onSubmitHandler} className='pl-form'>
         {/* DELIVERY INFORMATION */}
-        <div className='flex flex-col gap-4 w-full sm:max-w-[500px]'>
+        <div className='di-main'>
             <div className='text-xl sm:text-2xl my-3'>
               <MainTitle mtext1={'DELIVERY'} mtext2={'INFORMATION'}></MainTitle>
             </div>
             {/* FIRST AND LAST NAME */}
-            <div className='flex gap-3'>
-              <input onChange={onChangeHandler} name='firstName' value={formData.firstName} className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="text" placeholder='First name' required/>
-              <input onChange={onChangeHandler} name='lastName' value={formData.lastName} className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="text" placeholder='Last name ' required/>
+            <div className='input-container'>
+              <input onChange={onChangeHandler} name='firstName' value={formData.firstName} className='input-delivery-info ' type="text" placeholder='First name' required/>
+              <input onChange={onChangeHandler} name='lastName' value={formData.lastName} className='input-delivery-info ' type="text" placeholder='Last name ' required/>
             </div>
             {/* EMAIL ADDRESS */}
-            <div className='flex gap-3'>
-              <input onChange={onChangeHandler} name='email' value={formData.email}  className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="email" placeholder='Email address' required/>
+            <div className='input-container'>
+              <input onChange={onChangeHandler} name='email' value={formData.email}  className='input-delivery-info ' type="email" placeholder='Email address' required/>
             </div>
             {/* COUNTRY PHILIPPINES */}
-            <div className='flex gap-3'>
-              <input className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="text" value="Country: Philippines" readOnly/>
+            <div className='input-container'>
+              <input className='input-delivery-info ' type="text" value="Country: Philippines" readOnly/>
             </div>
             {/* PROVINCE AND CITY */}
-            <div className='flex gap-3'>
-              <input onChange={onChangeHandler} name='province' value={formData.province} className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="text" placeholder='Province' required/>
-              <input onChange={onChangeHandler} name='city' value={formData.city} className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="text" placeholder='City' required/>
+            <div className='input-container'>
+              <input onChange={onChangeHandler} name='province' value={formData.province} className='input-delivery-info ' type="text" placeholder='Province' required/>
+              <input onChange={onChangeHandler} name='city' value={formData.city} className='input-delivery-info ' type="text" placeholder='City' required/>
             </div>
             {/* STREET ADDRESS */}
-            <div className='flex gap-3'>
-              <input onChange={onChangeHandler} name='street' value={formData.street}  className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="text" placeholder='Street' required/>
+            <div className='input-container'>
+              <input onChange={onChangeHandler} name='street' value={formData.street}  className='input-delivery-info ' type="text" placeholder='Street' required/>
             </div>
             {/* ZIP CODE AND BARANGAY */}
-            <div className='flex gap-3'>
-              <input onChange={handleZipCodeChange} className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="text" value={zipCode} placeholder='Zip code' required/>
-              <input onChange={onChangeHandler} name='barangay' value={formData.barangay} className='input-delivery-info rounded py-1.5 px-3.5 w-full' placeholder='Barangay' required/>
+            <div className='input-container'>
+              <input onChange={handleZipCodeChange} className='input-delivery-info ' type="text" value={zipCode} placeholder='Zip code' required/>
+              <input onChange={onChangeHandler} name='barangay' value={formData.barangay} className='input-delivery-info ' placeholder='Barangay' required/>
             </div>
             {/* PHONE NUMBER */}
-            <div className='flex gap-3'>
+            <div className='input-container'>
               <p className='required-num'>+63</p>
-              <input onChange={handlePhoneNumber} value={phoneNum} className='input-delivery-info rounded py-1.5 px-3.5 w-full' type="tel" placeholder='Phone number' required/>
+              <input onChange={handlePhoneNumber} value={phoneNum} className='input-delivery-info ' type="tel" placeholder='Phone number' required/>
             </div>
         </div>
         {/* ORDER SUMMARY */}
-         <div className='mt-8'>
-            <div className='mt-8 order-container'>
+         <div className='ordersum-main'>
+            <div className='ordersum-container'>
                 <OrderSummary/>
             </div>
-            <div className='mt-12'>
-              <div className='inline-flex gap-3 items-center mb-3'> 
-                <p className='firstPaymentText'>PAYMENT <span className='secondPaymentText'>METHOD</span></p>
+            <div className='pm-main'>
+              <div className='pm-textainer'> 
+                <p className='firstMainText'>PAYMENT <span className='secondMainText'>METHOD</span></p>
                 <p className='w-8 sm:w-10 h-[1px] sm:h-[2px] line-payment'></p>
                 </div>
               {/* PAYMENT METHOD */}
-              <div className='flex gap-3 flex-col lg:flex-col'>
-                <div className='cashOnDelivery-main flex items-center p-2 px-3 cursor-pointer'>
-                  <p className='min-w-3.5 h-3.5 rounded-full cashOnDelivery-circle'></p>
-                  <p className='cashOnDelivery-text text-sm font-medium mx-3'>CASH ON DELIVERY</p>
+              <div className='pm-info'>
+                <div onClick={() => setMethod('cod')} className={`cashOnDelivery-main ${method === 'cod' ? 'codline-active' : 'codline-inactive'}`}>
+                  <p className={`cashOnDelivery-circle ${method === 'cod' ? 'codcircle-active' : 'codcircle-inactive'}`}></p>
+                  <div className='cod-imgtainer'>
+                    <img src={assets.cod_icon} alt="" className='cod-imgs'/>
+                  </div>
+                  <p className='cashOnDelivery-text'>Cash On Delivery</p>
+                </div>
+                <div onClick={() => setMethod('paypal')} className={`paypal-main ${method === 'paypal' ? 'ppline-active' : 'ppline-inactive'}`}>
+                  <p className={`paypal-circle ${method === 'paypal' ? 'ppcircle-active' : 'ppcircle-inactive'}`}></p>
+                  <div className='paypal-imgtainer'>
+                    <img src={assets.paypal_icon} alt="" className='paypal-imgs'/>
+                  </div>
                 </div>
               </div>
               <button type='submit' className='w-full text-center mt-8 submit-button'>PLACE ORDER</button>

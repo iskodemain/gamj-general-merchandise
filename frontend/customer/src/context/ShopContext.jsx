@@ -16,9 +16,9 @@ const ShopContextProvider = (props) => {
     const [showSearch, setShowSearch] = useState(false)
     const [cartItems, setCartItems] = useState({});
     const [wishlistItems, setWishListItems] = useState({});
+    const [showWishlistContent, setShowWishlistContent] = useState(false);
     const [showCartContent, setShowCartContent] = useState(false);
     const [totalProductPrice, getTotalProductPrice] = useState(0);
-    console.log(totalProductPrice);
     const [overallPrice, getOverAllPrice] = useState(0);
     // const [products, setProducts] = useState([])
     const [token, setToken] = useState('');
@@ -28,7 +28,6 @@ const ShopContextProvider = (props) => {
     const [code, setCode] = useState(''); // GETTER OF SESSION
     const [isLoading, setIsLoading] = useState(true);
     const [emailAccountCreate, setEmailAccountCreate] = useState('');
-    
 
     /*--------------------------------FORGOT PASSWORD SESSION------------------------------*/
     useEffect(() => {
@@ -89,10 +88,14 @@ const ShopContextProvider = (props) => {
 
     /*-------------------------------CART------------------------------*/
     const addToCart = async (itemId, size, quantity) => {
-        if (!size) {
-            toast.error('No size selected for the product.', {...toastError});
+
+        const product = products.find(p => p.productId === itemId);
+        
+        if (product.sizes && product.sizes.length > 0 && !size) {
+            toast.error('No size selected for this product.', { ...toastError });
             return;
         }
+
 
         let cartData = structuredClone(cartItems);
         
@@ -131,6 +134,19 @@ const ShopContextProvider = (props) => {
         }
         return totalCount;
     };
+
+    const getWishlistCount = () => {
+        let totalCount = 0;
+        for (const items in wishlistItems) {
+            totalCount += 1;
+        }
+        if (totalCount === 0) {
+            setShowWishlistContent(false);
+        }
+        return totalCount;
+    };
+
+    
 
     const updateQuantity = async (itemId, size, quantity) => {
         let cartData = structuredClone(cartItems);
@@ -197,7 +213,7 @@ const ShopContextProvider = (props) => {
 
     /*------------------------------------VALUE ACCESS--------------------------------------*/
     const value = {
-        products, currency, delivery_fee, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, totalProductPrice, getTotalProductPrice, navigate, overallPrice, getOverAllPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, orderData, setOrderData, emailVerification, setEmailVerification, code, setCode, isLoading, setIsLoading, emailAccountCreate, setEmailAccountCreate
+        products, currency, delivery_fee, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, totalProductPrice, getTotalProductPrice, navigate, overallPrice, getOverAllPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, orderData, setOrderData, emailVerification, setEmailVerification, code, setCode, isLoading, setIsLoading, emailAccountCreate, setEmailAccountCreate, getWishlistCount, showWishlistContent
     }
 
     return (

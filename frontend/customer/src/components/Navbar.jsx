@@ -12,7 +12,7 @@ import { ShopContext } from "../context/ShopContext.jsx";
 function Navbar() {
   const [sidebar, setSideBar] = useState(false)
   const dropdownRef = useRef(null);
-  const {setShowSearch, getCartCount, navigate, token, setToken, setCartItems, orderData} = useContext(ShopContext);
+  const {setShowSearch, getCartCount, getWishlistCount, navigate, token, setToken, setCartItems, orderData} = useContext(ShopContext);
   const location = useLocation() // Get the current location
   const isShopPath = location.pathname === "/shop"; // Check if the path is "/shop"
 
@@ -31,41 +31,41 @@ function Navbar() {
     const cartQuantityElement = document.querySelector(".cart-quantity");
 
     // Only modify the cart quantity display if it is updated
-    const cartTextContent = cartQuantityElement.textContent;
-    const cartLowValue = Number(cartTextContent);
+    // const cartTextContent = cartQuantityElement.textContent;
+    // const cartLowValue = Number(cartTextContent);
 
-    if (cartTextContent > 99999) {
-      cartQuantityElement.style.height = "20px";
-      cartQuantityElement.style.color = "white";
-      cartQuantityElement.style.backgroundColor = "#fc9a9a";
-      cartQuantityElement.textContent = "❗";
-    }
-    else if (cartLowValue > 9999) {
-      if (Number(cartTextContent[4]) > 0) {
-        cartQuantityElement.style.height = "24px";
-        cartQuantityElement.textContent = cartTextContent.slice(0, 2) + "k+";
-      }
-      else {
-        cartQuantityElement.style.height = "21px";
-        cartQuantityElement.textContent = cartTextContent.slice(0, 2) + "k";
-      }
-    }
-    else if (cartLowValue > 999) {
-      if (Number(cartTextContent[3]) > 0) {
-        cartQuantityElement.style.minHeight = "21px";
-        cartQuantityElement.textContent = cartTextContent[0] + "k+";
-      }
-      else {
-        cartQuantityElement.style.minHeight = "18px";
-        cartQuantityElement.textContent = cartTextContent[0] + "k";
-      }
-    }
-    else if (cartLowValue > 99) {
-      cartQuantityElement.style.minHeight = "22px";
-    }
-    else {
-      cartQuantityElement.style.minHeight = "18px";
-    }
+    // if (cartTextContent > 99999) {
+    //   cartQuantityElement.style.height = "20px";
+    //   cartQuantityElement.style.color = "white";
+    //   cartQuantityElement.style.backgroundColor = "#fc9a9a";
+    //   cartQuantityElement.textContent = "❗";
+    // }
+    // else if (cartLowValue > 9999) {
+    //   if (Number(cartTextContent[4]) > 0) {
+    //     cartQuantityElement.style.height = "24px";
+    //     cartQuantityElement.textContent = cartTextContent.slice(0, 2) + "k+";
+    //   }
+    //   else {
+    //     cartQuantityElement.style.height = "21px";
+    //     cartQuantityElement.textContent = cartTextContent.slice(0, 2) + "k";
+    //   }
+    // }
+    // else if (cartLowValue > 999) {
+    //   if (Number(cartTextContent[3]) > 0) {
+    //     cartQuantityElement.style.minHeight = "21px";
+    //     cartQuantityElement.textContent = cartTextContent[0] + "k+";
+    //   }
+    //   else {
+    //     cartQuantityElement.style.minHeight = "18px";
+    //     cartQuantityElement.textContent = cartTextContent[0] + "k";
+    //   }
+    // }
+    // else if (cartLowValue > 99) {
+    //   cartQuantityElement.style.minHeight = "22px";
+    // }
+    // else {
+    //   cartQuantityElement.style.minHeight = "18px";
+    // }
   }, [getCartCount]);
   
   // CLOSE CLICK OUTSIDE
@@ -114,12 +114,19 @@ function Navbar() {
         <div className='icon-button'>
           <NavLink to="/wishlist">
             <CiHeart className="nav-icon wishcon" />
+            {getWishlistCount() > 0 && (
+              <span className="wishlist-quantity">{getWishlistCount()}</span>
+            )}
+            {/* <span className="wishlist-quantity">{getWishlistCount(1)}</span> */}
           </NavLink>
         </div>
         <div className='icon-button'>
           <NavLink to="/cart">
             <img src={assets.cart_icon} alt="Cart" draggable="false"/>
-            <span className="cart-quantity">{getCartCount(1)}</span>
+            {getCartCount() > 0 && (
+              <span className="cart-quantity">{getCartCount()}</span>
+            )}
+            {/* <span className="cart-quantity">{getCartCount(1)}</span> */}
           </NavLink>
         </div>
         <div className='icon-button'>

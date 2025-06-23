@@ -24,7 +24,7 @@ function Cart() {
         for(const item in cartItems[items]) {
           if (cartItems[items][item] > 0) {
             tempData.push({
-              _id: items,
+              productId: items,
               size: item, 
               quantity: cartItems[items][item],
             })
@@ -43,7 +43,7 @@ function Cart() {
     // CALCULATE TOTAL PRICE
     let price = 0;
     cartData.forEach(item => {
-        const productData = products.find(product => product._id === item._id);
+        const productData = products.find(product => product.productId === item.productId);
         price += productData.price * item.quantity;
     });
     getTotalProductPrice(price);
@@ -85,13 +85,13 @@ function Cart() {
         const quantity = sizeQuantityObj[size];
 
         // Find the product using its _id
-        const product = products.find(p => p._id === productId);
+        const product = products.find(p => p.productId === productId);
         if (!product) continue;
 
         const orderItem = {
           order_id: Math.random().toString(36).substring(2, 10), // Random ID
-          product_id: product._id,
-          product_name: product.name,
+          product_id: product.productId,
+          product_name: product.productName,
           price: product.price,
           size: size,
           quantity: quantity,
@@ -99,8 +99,8 @@ function Cart() {
           payment: 'Unpaid',
           payment_method: 'COD',
           order_date: new Date().toISOString(),
-          images: product.image, // already an array
-          category: product.category
+          images: product.images, // already an array
+          category: product.categoryId
         };
         newOrders.push(orderItem);
       }
@@ -111,8 +111,8 @@ function Cart() {
   }
 
   return (
-    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
-      <div className='pt-14'>
+    <div className='main-cart'>
+      <div className='main-semi'>
         <div className='text-2xl'>
           <MainTitle mtext1={'YOUR'} mtext2={'CART'}/>
         </div>
@@ -128,44 +128,44 @@ function Cart() {
             <div>
               {
                 cartData.map((item, index) => {
-                  const productData = products.find((product) => product._id === item._id);
-                  if (!productData?.active) {
-                    updateQuantity(item._id, item.size, 0);
+                  const productData = products.find((product) => product.productId === item.productId);
+                  if (!productData?.isActive) {
+                    updateQuantity(item.productId, item.size, 0);
                   }
                   return (
-                    <div key={index} className='py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.1fr] sm:grid-cols-[4fr_0.1fr] gap-4 mb-2'>
-                      <div className='flex items-start gap-6'>
-                          <NavLink className='cursor-pointer' to={`/product/${item._id}`}>
-                            <img className='cart-product-img' src={productData.image?.[0] || 'default-image.jpg'} alt={productData?.name || 'Product Image' }/>
+                    <div key={index} className='cart-container'>
+                      <div className='cc-2'>
+                          <NavLink className='cursor-pointer' to={`/product/${item.productId}`}>
+                            <img className='cart-product-img' src={productData.images?.[0] || 'default-image.jpg'} alt={productData?.productName || 'Product Image' }/>
                           </NavLink>
                           <div>
-                            <p className='text-xs sm:text-base font-medium'>{productData.name}</p>
-                            <div className='flex items-center gap-2'>
-                              <p className='text-xs sm:text-sm font-light'>Size: {item.size}</p>
+                            <p className='cart-name'>{productData.productName}</p>
+                            <div className='cc-size'>
+                              <p className='cart-size'>Size: {item.size}</p>
                             </div>
                             <div className='qd-container'>
                               <div className="quantity-controls-cart">
-                                <button onClick={() => handleDecrease(item._id, item.size, item.quantity)} className="quantity-btn-cart"><FiMinus className='minus-cart'/></button>
+                                <button onClick={() => handleDecrease(item.productId, item.size, item.quantity)} className="quantity-btn-cart"><FiMinus className='minus-cart'/></button>
                                 <input
                                   onChange={(e) => {
                                     const value = Number(e.target.value);
                                     if (isNaN(value) || value <= 0) return;
-                                    if (value > productData.stocks) {
-                                      updateQuantity(item._id, item.size, productData.stocks);
+                                    if (value > productData.stockQuantity) {
+                                      updateQuantity(item.productId, item.size, productData.stockQuantity);
                                     } else {
-                                      updateQuantity(item._id, item.size, value);
+                                      updateQuantity(item.productId, item.size, value);
                                     }
                                   }}
                                   type="number"
                                   value={item.quantity}
                                   className="quantity-input-cart"
                                   min={1}
-                                  max={productData.stocks}
+                                  max={productData.stockQuantity}
                                 />
 
-                                <button onClick={() => handleIncrease(item._id, item.size, item.quantity, productData.stocks)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
+                                <button onClick={() => handleIncrease(item.productId, item.size, item.quantity, productData.stockQuantity)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
                               </div>
-                              <RiDeleteBinLine onClick={() => updateQuantity(item._id, item.size, 0)} className='cart-delete'/>
+                              <RiDeleteBinLine onClick={() => updateQuantity(item.productId, item.size, 0)} className='cart-delete'/>
                             </div>
                           </div>
                       </div>
