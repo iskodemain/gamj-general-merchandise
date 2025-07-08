@@ -10,6 +10,7 @@ import Product from './pages/Product.jsx'
 import Login from './pages/Login.jsx'
 import PlaceOrder from './pages/PlaceOrder.jsx'
 import Orders from './pages/Orders.jsx'
+import Notification from './pages/Notification'
 import { ToastContainer} from 'react-toastify';
 // COMPONENTS
 import Navbar from "./components/Navbar.jsx";
@@ -39,8 +40,10 @@ const App = () => {
         <Route path="/cart" element={<Cart/>}/>
         <Route path="/product/:productId" element={<Product/>}/>
         <Route path="/login" element={<Login/>}/>
+    
         <Route path="/place-order" element={<PlaceOrder/>}/>
         <Route path="/orders" element={<Orders/>}/>
+        <Route path="/notification" element={<Notification />} />
         {/* VERIFICATION CREATE ACCOUNT*/}
         <Route path="/account-verification" element={<AccountVerifyCode/>}/>
         {/* VERIFICATION FORGOT PASSWORD*/}

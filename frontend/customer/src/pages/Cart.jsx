@@ -144,7 +144,6 @@ function Cart() {
                               {item.size.length > 0 && (
                                 <p className="cart-size">Size: {item.size}</p>
                               )}
-                              {/* <p className='cart-size'>Size: {item.size}</p> */}
                             </div>
                             <div className='qd-container'>
                               <div className="quantity-controls-cart">

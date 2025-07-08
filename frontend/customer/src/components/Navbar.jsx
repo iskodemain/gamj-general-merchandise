@@ -8,10 +8,15 @@ import {assets} from '../assets/assets.js'
 import './Navbar.css'
 import { NavLink, parsePath, useLocation } from 'react-router-dom'
 import { ShopContext } from "../context/ShopContext.jsx";
+import '../pages/Notification.css' // Import the notification styles
 
 function Navbar() {
   const [sidebar, setSideBar] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const notifRef = useRef(null)
+  const profileRef = useRef(null);
   const {setShowSearch, getCartCount, getWishlistCount, navigate, token, setToken, setCartItems, orderData} = useContext(ShopContext);
   const location = useLocation() // Get the current location
   const isShopPath = location.pathname === "/shop"; // Check if the path is "/shop"
@@ -81,6 +86,31 @@ function Navbar() {
     };
   }, []);
 
+  // Close notification dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifications(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  // Add this useEffect to close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
   return (
     <>
@@ -99,6 +129,7 @@ function Navbar() {
         <NavLink to="/about" className="nav-link">About</NavLink>
         <NavLink to="/contact" className="nav-link">Contact</NavLink>
       </div>
+      
 
       {/* RIGHT - Icons */}
       <div className='nav-icons'>
@@ -107,11 +138,43 @@ function Navbar() {
             <CiSearch className="nav-icon searchcon"/>
           </div>
         )}
-        <div className='icon-button'>
-          <IoIosNotificationsOutline className="nav-icon notifcon" />
-          
+        <div className='icon-button' ref={notifRef} style={{ position: 'relative' }}>
+          <IoIosNotificationsOutline
+            className="nav-icon notifcon"
+            onClick={() => setShowNotifications((prev) => !prev)}
+            style={{ cursor: 'pointer' }}
+          />
+          {showNotifications && (
+            <div
+              className="notification-container"
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: 0,
+                zIndex: 1000,
+                width: '350px'
+              }}
+            >
+              <h1 className="notification-title">Notification</h1>
+              <ul className="notification-list">
+                <li className="notification-item">
+                  No notifications yet.
+                </li>
+              </ul>
+              <button
+                className="notification-all-btn"
+                onClick={() => {
+                  setShowNotifications(false);
+                  navigate('/notification');
+                }}
+              >
+                All Notifications
+              </button>
+            </div>
+          )}
         </div>
         <div className='icon-button'>
+  
           <NavLink to="/wishlist">
             <CiHeart className="nav-icon wishcon" />
             {getWishlistCount() > 0 && (
@@ -129,13 +192,45 @@ function Navbar() {
             {/* <span className="cart-quantity">{getCartCount(1)}</span> */}
           </NavLink>
         </div>
-        <div className='icon-button'>
-          <img 
-            onClick={() => token ? null : navigate('/login')} 
-            src={assets.profile_icon} 
-            alt="Profile" 
+        <div className='icon-button' ref={profileRef} style={{ position: 'relative' }}>
+          <img
+            onClick={() => setShowProfileDropdown((prev) => !prev)}
+            src={assets.profile_icon}
+            alt="Profile"
             draggable="false"
+            style={{ cursor: 'pointer' }}
           />
+          {showProfileDropdown && (
+            <div className="profile-dropdown">
+              <button
+                className="profile-dropdown-item"
+                onClick={() => { setShowProfileDropdown(false); navigate('/profile'); }}
+              >
+                My Profile
+              </button>
+              <button
+                className="profile-dropdown-item"
+                onClick={() => { setShowProfileDropdown(false); navigate('/orders'); }}
+              >
+                Orders
+              </button>
+              {!token ? (
+                <button
+                  className="profile-dropdown-item"
+                  onClick={() => { setShowProfileDropdown(false); navigate('/login'); }}
+                >
+                  Login / Register
+                </button>
+              ) : (
+                <button
+                  className="profile-dropdown-item logout"
+                  onClick={() => { setShowProfileDropdown(false); logout(); }}
+                >
+                  Logout
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
