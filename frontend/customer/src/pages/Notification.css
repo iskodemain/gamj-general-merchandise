@@ -1,0 +1,50 @@
+/* STYLES */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.notification-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 24px;
+}
+
+.notification-title {
+    font-size: 1.5rem;
+    margin-right: 60%;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.notification-list {
+    list-style: none;
+    padding: 0;
+}
+
+.notification-item {
+    background: #f5f7fa;
+    border-left: 4px solid #0078d4;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.notification-item.unread {
+    background: #e6f0fa;
+    font-weight: 600;
+}
+
+.notification-time {
+    display: block;
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 8px;
+}
