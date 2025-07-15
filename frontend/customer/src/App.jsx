@@ -12,6 +12,7 @@ import PlaceOrder from './pages/PlaceOrder.jsx'
 import Orders from './pages/Orders.jsx'
 import Notification from './pages/Notification'
 import { ToastContainer} from 'react-toastify';
+import Profile from './pages/Profile';
 // COMPONENTS
 import Navbar from "./components/Navbar.jsx";
 import SearchBar from "./components/SearchBar.jsx";
@@ -40,7 +41,8 @@ const App = () => {
         <Route path="/cart" element={<Cart/>}/>
         <Route path="/product/:productId" element={<Product/>}/>
         <Route path="/login" element={<Login/>}/>
-    
+        <Route path="/profile" element={<Profile />} />
+        
         <Route path="/place-order" element={<PlaceOrder/>}/>
         <Route path="/orders" element={<Orders/>}/>
         <Route path="/notification" element={<Notification />} />
