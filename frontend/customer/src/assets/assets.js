@@ -69,6 +69,14 @@ import contact_cover from './contact-cover.png'
 import about_cover from './about-cover.png'
 import cod_icon from './cod-icon.png'
 import paypal_icon from './paypal-icon.png'
+import pending_icon from './pending_icon.png'
+import processing_icon from './processing_icon.png'
+import outfordelivery_icon from './outfordelivery_icon.png'
+import delivered_icon from './delivered_icon.png'
+import wpending_icon from './wpending_icon.png'
+import wprocessing_icon from './wprocessing_icon.png'
+import woutfordelivery_icon from './woutfordelivery_icon.png'
+import wdelivered_icon from './wdelivered_icon.png'
 
 export const assets = {
     cart_icon,
@@ -89,7 +97,15 @@ export const assets = {
     contact_cover,
     about_cover,
     paypal_icon,
-    cod_icon
+    cod_icon,
+    pending_icon,
+    processing_icon,
+    outfordelivery_icon,
+    delivered_icon,
+    wpending_icon,
+    wprocessing_icon,
+    woutfordelivery_icon,
+    wdelivered_icon,
 }
 
 export const products = [

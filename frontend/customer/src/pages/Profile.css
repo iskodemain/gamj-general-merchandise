@@ -1,0 +1,355 @@
+.profile-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 36px 32px 32px 32px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+/* Pill-shaped segmented bar for steps */
+.profile-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  background: #eafaf1;
+  border-radius: 999px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(33,150,83,0.07);
+  overflow: hidden;
+  height: 48px;
+}
+.step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #219653;
+  background: transparent;
+  
+  cursor: pointer;
+  height: 48px;
+  border: none;
+  outline: none;
+  border-radius: 0;
+}
+/* Active circle*/
+.step.active {
+  background: #219653;
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(33,150,83,0.10);
+  z-index: 1;
+}
+/*.step:not(.active):hover {
+  background: #d6f5e3;
+  color: #176c3a;
+}*/
+.step-label {
+  width: 100%;
+  text-align: center;
+  padding: 0 18px;
+  user-select: none;
+}
+.profile-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  color: #222;
+  text-align: left;
+}
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.form-group select {
+  padding: 10px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 7px;
+  font-size: 1rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+.form-group select:focus {
+  border: 1.5px solid #219653;
+  outline: none;
+  background: #fff;
+}
+.profile-section {
+  margin-bottom: 0;
+}
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: #219653;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+  flex: 1;
+}
+.form-row {
+  display: flex;
+  gap: 18px;
+}
+
+.form-group label {
+  font-size: 0.98rem;
+  font-weight: 500;
+  margin-bottom: 7px;
+  color: #444;
+}
+.form-group input {
+  padding: 10px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 7px;
+  font-size: 1rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+.form-group input:focus {
+  border: 1.5px solid #26322b;
+  outline: none;
+  background: #fff;
+}
+.review-proof-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #219653;
+  background: transparent;
+  color: #219653;
+  font-weight: 600;
+  border-radius: 7px;
+  padding: 9px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.18s, color 0.18s;
+  width: 100%;
+}
+.review-proof-btn:hover {
+  background: #eafaf1;
+}
+
+.eye-icon {
+  font-size: 1.2em;
+}
+.save-btn {
+  width: 100%;
+  background: #219653;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 7px;
+  padding: 14px 0;
+  margin-top: 18px;
+  cursor: pointer;
+  transition: background 0.18s;
+  box-shadow: 0 2px 8px rgba(33,150,83,0.07);
+}
+.save-btn:hover {
+  background: #176c3a;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  background: rgba(34, 34, 34, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Card */
+.modal-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  border: 1.5px solid #ececec;
+  padding: 36px 32px 28px 32px;
+  min-width: 350px;
+  max-width: 95vw;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #43A047;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: color 0.15s;
+}
+.modal-close-btn:hover {
+  color: #222;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #222;
+  text-align: center;
+}
+
+.modal-message {
+  color: #444;
+  font-size: 1rem;
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.modal-proof-container {
+  background: #fff;
+  border: 2.5px solid #21b66f;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(33,182,111,0.07);
+  padding: 28px 24px 18px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 26px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.modal-proof-icon {
+  background: #21b66f;
+  color: #fff;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(33,182,111,0.10);
+}
+
+.modal-proof-filename {
+  font-weight: 700;
+  font-size: 1.08rem;
+  margin-bottom: 4px;
+  color: #222;
+}
+
+.modal-proof-size {
+  color: #888;
+  font-size: 0.97rem;
+  margin-bottom: 12px;
+}
+
+.modal-proof-type {
+  width: 100%;
+  background: #f5f5f5;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 1rem;
+  color: #666;
+  margin-top: 2px;
+  pointer-events: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.modal-remove-btn {
+  background: #ff4d4f;
+  margin-right: 45%;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.18s;
+}
+.modal-remove-btn:hover {
+  background: #d9363e;
+}
+
+.modal-view-btn {
+  background: #f5f5f5;
+  color: #222;
+  border: none;
+  border-radius: 7px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.18s;
+}
+.modal-view-btn:hover {
+  background: #e0e0e0;
+  
+}
+/* --- Account Security Section --- */
+.security-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 30px;
+}
+
+.delete-account-btn {
+  background: none;
+  border: none;
+  color: #ff4d4f;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.delete-account-btn:hover {
+  color: #d32f2f;
+}
+
+.security-password-group {
+  position: relative;
+  border: 2px solid #e0e0e0;
+  border-radius: 7px;
+  margin-bottom: 18px;
+  padding-bottom: 0;
+  background: #fff;
+
+}
+
+.security-password-group label {
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+
+
+
+.security-password-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  color: #888;
+  cursor: pointer;
+}

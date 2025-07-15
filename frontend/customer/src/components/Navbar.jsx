@@ -2,6 +2,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
 import { CiSearch } from "react-icons/ci";
+import { useNavigate } from 'react-router-dom'; // Add this import
 
 import React, {useState, useEffect, useRef, useContext} from 'react'
 import {assets} from '../assets/assets.js'
@@ -17,7 +18,8 @@ function Navbar() {
   const dropdownRef = useRef(null);
   const notifRef = useRef(null)
   const profileRef = useRef(null);
-  const {setShowSearch, getCartCount, getWishlistCount, navigate, token, setToken, setCartItems, orderData} = useContext(ShopContext);
+  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, orderData} = useContext(ShopContext);
+  const navigate = useNavigate(); // Add this line
   const location = useLocation() // Get the current location
   const isShopPath = location.pathname === "/shop"; // Check if the path is "/shop"
 

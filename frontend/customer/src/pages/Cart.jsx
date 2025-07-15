@@ -14,6 +14,8 @@ import { toast } from "react-toastify";
 function Cart() {
   const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, totalProductPrice, getTotalProductPrice, navigate, token, toastError, orderData, setOrderData} = useContext(ShopContext)
   const [cartData, setCartData] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const allSelected = selectedItems.length === cartData.length && cartData.length > 0;
 
   console.log(totalProductPrice);
 
@@ -64,7 +66,30 @@ function Cart() {
     }
   };
 
-  
+  // Select/Deselect all
+  const handleSelectAll = () => {
+    if (allSelected) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cartData.map((item, idx) => idx));
+    }
+  };
+
+  // Select single item
+  const handleSelectItem = (idx) => {
+    setSelectedItems(prev =>
+      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    );
+  };
+
+  // Delete selected items
+  const handleDeleteSelected = () => {
+    selectedItems.forEach(idx => {
+      const item = cartData[idx];
+      updateQuantity(item.productId, item.size, 0);
+    });
+    setSelectedItems([]);
+  };
 
   const hadleCheckout = async () => {
     //----------BACKEND-----------
@@ -125,6 +150,16 @@ function Cart() {
         {/* ACTIVE CART */}
         {showCartContent && (
           <>
+            <div className="cart-header-actions">
+              <label className="cart-select-all">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={handleSelectAll}
+                />
+                All ({cartData.length})
+              </label>
+            </div>
             <div>
               {
                 cartData.map((item, index) => {
@@ -135,43 +170,50 @@ function Cart() {
                   return (
                     <div key={index} className='cart-container'>
                       <div className='cc-2'>
-                          <NavLink className='cursor-pointer' to={`/product/${item.productId}`}>
-                            <img className='cart-product-img' src={productData.images?.[0] || 'default-image.jpg'} alt={productData?.productName || 'Product Image' }/>
-                          </NavLink>
-                          <div>
-                            <p className='cart-name'>{productData.productName}</p>
-                            <div className='cc-size'>
-                              {item.size.length > 0 && (
-                                <p className="cart-size">Size: {item.size}</p>
-                              )}
-                            </div>
-                            <div className='qd-container'>
-                              <div className="quantity-controls-cart">
-                                <button onClick={() => handleDecrease(item.productId, item.size, item.quantity)} className="quantity-btn-cart"><FiMinus className='minus-cart'/></button>
-                                <input
-                                  onChange={(e) => {
-                                    const value = Number(e.target.value);
-                                    if (isNaN(value) || value <= 0) return;
-                                    if (value > productData.stockQuantity) {
-                                      updateQuantity(item.productId, item.size, productData.stockQuantity);
-                                    } else {
-                                      updateQuantity(item.productId, item.size, value);
-                                    }
-                                  }}
-                                  type="number"
-                                  value={item.quantity}
-                                  className="quantity-input-cart"
-                                  min={1}
-                                  max={productData.stockQuantity}
-                                />
-
-                                <button onClick={() => handleIncrease(item.productId, item.size, item.quantity, productData.stockQuantity)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
-                              </div>
-                              <RiDeleteBinLine onClick={() => updateQuantity(item.productId, item.size, 0)} className='cart-delete'/>
-                            </div>
+                        <NavLink className='cursor-pointer' to={`/product/${item.productId}`}>
+                          <img className='cart-product-img' src={productData.images?.[0] || 'default-image.jpg'} alt={productData?.productName || 'Product Image'}/>
+                        </NavLink>
+                        <div>
+                          <p className='cart-name'>{productData.productName}</p>
+                          <div className='cc-size'>
+                            {item.size.length > 0 && (
+                              <p className="cart-size">Size: {item.size}</p>
+                            )}
                           </div>
+                          <div className='qd-container'>
+                            <div className="quantity-controls-cart">
+                              <button onClick={() => handleDecrease(item.productId, item.size, item.quantity)} className="quantity-btn-cart"><FiMinus className='minus-cart'/></button>
+                              <input
+                                onChange={(e) => {
+                                  const value = Number(e.target.value);
+                                  if (isNaN(value) || value <= 0) return;
+                                  if (value > productData.stockQuantity) {
+                                    updateQuantity(item.productId, item.size, productData.stockQuantity);
+                                  } else {
+                                    updateQuantity(item.productId, item.size, value);
+                                  }
+                                }}
+                                type="number"
+                                value={item.quantity}
+                                className="quantity-input-cart"
+                                min={1}
+                                max={productData.stockQuantity}
+                              />
+
+                              <button onClick={() => handleIncrease(item.productId, item.size, item.quantity, productData.stockQuantity)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
+                            </div>
+                            <RiDeleteBinLine onClick={() => updateQuantity(item.productId, item.size, 0)} className='cart-delete'/>
+                          </div>
+                        </div>
                       </div>
                       <div className='cart-right-functions'>
+                        <div className="cart-item-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(index)}
+                            onChange={() => handleSelectItem(index)}
+                          />
+                        </div>
                         <p className='cart-price'>Price: {currency}{productData.price}</p>
                       </div>
                     </div>
@@ -179,14 +221,27 @@ function Cart() {
                 })
               }
             </div>
+            {/* Checkout section with DELETE on left, CHECKOUT on right */}
+            <div className={`${showCartContent ? 'checkout-container' : 'hidden'}`}>
+              <p className='checkout-total-price'>Total Price: {currency}{totalProductPrice.toFixed(2)}</p>
+            <div className='checkout-buttons'>
+                <button
+                  className="cart-button-delete"
+                  onClick={handleDeleteSelected}
+                  disabled={selectedItems.length === 0}
+                  style={{marginRight: 'auto'}}
+                >
+                  {selectedItems.length === 1
+                  ? 'DELETE(1 ITEM)'
+                  :selectedItems.length > 1
+                  ? `DELETE(${selectedItems.length} ITEMS)`
+                  : 'DELETE'}
+                </button>
+              <button onClick={()=> hadleCheckout()} className='cart-button-checkout'>CHECKOUT</button>  
+            </div>   
+            </div>
           </>
         )}
-        <div className={`${showCartContent ? 'checkout-container' : 'hidden'}`}>
-          <p className='checkout-total-price'>Total Price: {currency}{totalProductPrice.toFixed(2)}</p>
-          <div className='checkout-buttons'>
-            <button onClick={()=> hadleCheckout()} className='cart-button-checkout'>CHECKOUT</button>  
-          </div>   
-        </div>
       </div>
       <OurPolicy/>
       <Infos/>

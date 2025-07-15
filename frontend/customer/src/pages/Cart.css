@@ -1,4 +1,4 @@
-.main-cart {
+.main-cart {  
   padding-left: 1rem;    
   padding-right: 1rem;
 } 
@@ -82,11 +82,13 @@
     align-items: center;
     font-size: 0.8rem;
     color: #494949;
+    
+    
 }
 
 .cart-delete {
     font-size: 1rem;
-    color: #404040;
+    color: #FF3333;
     cursor: pointer;
 }
 
@@ -154,17 +156,40 @@
 .cart-right-functions {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
+    align-items: flex-end;
     width: 25vw;
-    align-items: end;
     padding-right: 1rem;
 }
 
 input[type="checkbox"] {
     width: 15px;
     height: 15px;
-    accent-color: #470507; 
-    
+    accent-color: #289828; /* Green color for checkbox */
+}
+.cart-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1.2rem;
+}
+
+.cart-select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: #494949;
+    font-weight: 500;
+}
+
+.cart-bottom-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 1.5rem;
+    gap: 1rem;
 }
 
 .checkout-container {
@@ -189,7 +214,8 @@ input[type="checkbox"] {
 .checkout-buttons {
     width: 100%;
     display: flex;
-    justify-content: end;
+    align-items: center;
+    gap: 1rem;
 }
 
 .cart-button-delete, .cart-button-checkout {
@@ -203,14 +229,33 @@ input[type="checkbox"] {
 
 .cart-button-delete {
     background-color: white;
-    border: 2px solid #470507;
-    color: #470507;
+    border: 2px solid #289828;
+    color: #289828;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.7rem 2rem;
+    cursor: pointer;
+    transition: background 0.2s, border 0.2s;
+    margin-right: auto; /* Push DELETE to the left */
+    
+}
+
+.cart-button-delete:hover {
+    background-color: #e6f7e6;
+    border-color: #289828;
 }
 
 .cart-button-checkout {
     background-color: #289828;
     border: 2px solid #289828;
     color: white;
+}
+
+.cart-item-checkbox {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 3rem;
 }
 
 /* CART-SIZE */
@@ -293,5 +338,7 @@ input[type="checkbox"] {
         font-size: 17px;
     }
     
-} 
+}
+
+
 
