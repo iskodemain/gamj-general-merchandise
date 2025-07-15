@@ -85,6 +85,22 @@ const Customer = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    verificationCode: {
+      type: DataTypes.STRING(10),
+      allowNull: true,
+    },
+    codeExpiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    loginToken: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    resetPasswordToken: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    }
   },
   {
     tableName: 'customer',

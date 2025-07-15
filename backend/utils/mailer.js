@@ -11,7 +11,7 @@ export const transporter = nodemailer.createTransport({
 
 export const sendMail = async ({ to, subject, html, attachments }) => {
   return transporter.sendMail({
-    from: `Verification Code ${process.env.AOS_EMAIL}`,
+    from: `Verification Code ${process.env.GAMJ_EMAIL}`,
     to,
     subject,
     html,
