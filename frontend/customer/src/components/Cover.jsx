@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './Cover.css'
 import {assets} from '../assets/assets'
 import { NavLink } from 'react-router-dom'
+import { ShopContext } from '../context/ShopContext'
 
 function Cover() {
+  const { token } = useContext(ShopContext);
   return (
     <section className='cover-section'>
       <div className='cover-content'>
@@ -15,11 +17,15 @@ function Cover() {
           </h1>
           <p>GAMJ provides essential hospital supplies, 
             including face masks, syringes, underpads, and more, 
-            continually expanding to meet evolving healthcare needs.</p>
-          <div className="auth-buttons">
-            <NavLink to="login" className="auth-btn">Create an Account</NavLink>
+            continually expanding to meet evolving healthcare needs.
+          </p>
+          {!token && 
+            <div className="auth-buttons">
+            <NavLink to="signup" className="auth-btn">Create an Account</NavLink>
             <NavLink to="login" className="auth-btn">Login</NavLink>
           </div>
+          }
+          
         </div>
         <div className='cover-container'>
           <div className='cover-image'>

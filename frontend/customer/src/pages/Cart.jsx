@@ -22,6 +22,7 @@ function Cart() {
   useEffect(() => {
     if (products.length > 0) {
       const tempData = [];
+      let hasItems = false;
       for (const items in cartItems) {
         for(const item in cartItems[items]) {
           if (cartItems[items][item] > 0) {
@@ -29,15 +30,15 @@ function Cart() {
               productId: items,
               size: item, 
               quantity: cartItems[items][item],
-            })
-            setShowCartContent(true);
-          }
-          else {
-            setShowCartContent(false);
+            });
+            hasItems = true;  
           }
         }
       }
       setCartData(tempData);
+      setShowCartContent(hasItems);
+    } else {
+      setShowCartContent(false);
     }
   }, [cartItems, products])
 
@@ -83,23 +84,58 @@ function Cart() {
   };
 
   // Delete selected items
-  const handleDeleteSelected = () => {
-    selectedItems.forEach(idx => {
-      const item = cartData[idx];
-      updateQuantity(item.productId, item.size, 0);
-    });
-    setSelectedItems([]);
-  };
+const handleDeleteSelected = () => {
+  // Clone cartItems to avoid direct mutation
+  const updatedCartItems = { ...cartItems };
+
+  // Only delete checked items
+  selectedItems.forEach(idx => {
+    const item = cartData[idx];
+    if (updatedCartItems[item.productId] && updatedCartItems[item.productId][item.size] !== undefined) {
+      // Remove the size entry
+      delete updatedCartItems[item.productId][item.size];
+      // If no sizes left for this product, remove the product entry
+      if (Object.keys(updatedCartItems[item.productId]).length === 0) {
+        delete updatedCartItems[item.productId];
+      }
+    }
+  });
+
+  setCartItems(updatedCartItems);
+  setSelectedItems([]);
+  const isEmpty = 
+    Object.keys(updatedCartItems).length === 0 &&
+    Object.values(updatedCartItems).every(
+      sizes => Object.keys(sizes).length === 0
+  );
+  if (isEmpty) setShowCartContent(false);
+
+};
+
+// Helper for deleting a single item and hiding cart if empty
+const handleDeleteSingle = (productId, size) => {
+  updateQuantity(productId, size, 0);
+
+  // Wait for cartItems to update, then check if empty
+  setTimeout(() => {
+    const updatedCartItems = { ...cartItems };
+    if (
+      Object.keys(updatedCartItems).length === 0 ||
+      Object.values(updatedCartItems).every(
+        sizes => Object.keys(sizes).length === 0
+      )
+    ) {
+      setShowCartContent(false);
+    }
+  }, 0);
+};
 
   const hadleCheckout = async () => {
-    //----------BACKEND-----------
-    // if (token) {
-    //   navigate('/place-order')
-    // }
-    // else {
-    //   toast.error("You must log in to proceed with the checkout.", {...toastError});
-    //   navigate('/login');
-    // }
+    if (!token) {
+      navigate('/login');
+      toast.error("You must log in to proceed with the checkout.", {...toastError});
+      return;
+    }
 
     let newOrders = [];
 
@@ -156,8 +192,7 @@ function Cart() {
                   type="checkbox"
                   checked={allSelected}
                   onChange={handleSelectAll}
-                />
-                All ({cartData.length})
+                />All ({cartData.length})
               </label>
             </div>
             <div>
@@ -202,7 +237,7 @@ function Cart() {
 
                               <button onClick={() => handleIncrease(item.productId, item.size, item.quantity, productData.stockQuantity)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
                             </div>
-                            <RiDeleteBinLine onClick={() => updateQuantity(item.productId, item.size, 0)} className='cart-delete'/>
+                            <RiDeleteBinLine onClick={() => handleDeleteSingle(item.productId, item.size)} className='cart-delete'/>
                           </div>
                         </div>
                       </div>

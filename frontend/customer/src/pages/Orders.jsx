@@ -8,7 +8,7 @@ import { assets } from '../assets/assets';
 
 function Orders() {
   const { currency, setOrderData, orderData } = useContext(ShopContext);
-  const [activeStep, setActiveStep] = React.useState(0); // 0: Pending, 1: Processing, 2: Out for Delivery, 3: Delivered
+  const [activeStep, setActiveStep] = React.useState(0); // Show Processing by default
   /* active ste 0: Pending, 1: Processing, 2: Out for Delivery, 3: Delivered */
   const steps = [
     { id: 0, name: 'Pending', icon: assets.pending_icon, status: 'Pending' },
@@ -151,24 +151,33 @@ function Orders() {
                             <span className="order-detail-label">Color:</span> {item.color}
                           </div>
                         )}
-                      </div>
-                      <div className='order-card-status'>
-                        <span className={`order-card-status-dot ${item.status === 'Pending' ? 'pending-circle' : item.status === 'Packing' ? 'packing-circle' : item.status === 'Out for Delivery' ? 'ofd-circle' : item.status === 'Delivered' ? 'delivered-circle' : 'cancelled-circle'}`}></span>
-                        <span>{item.status}</span>
+                        <div className= 'pencancel'>
+                          <span className={`order-card-status-dot ${item.status === 'Pending' ? 'pending-circle' : item.status === 'Packing' ? 'packing-circle' : item.status === 'Out for Delivery' ? 'ofd-circle' : item.status === 'Delivered' ? 'delivered-circle' : 'cancelled-circle'}`}></span>
+                          <span>{item.status}</span>
+                          <button
+                            className={`order-card-cancel-btn ${
+                              item.status === 'Pending' || item.status === 'Cancelled Order' || item.status === 'Delivered'? '' : 'disabled-button'
+                            }`}
+                            onClick={() =>
+                              item.status === 'Pending'
+                                ? handleCancel(item.product_id, item.order_id, item.size)
+                                : item.status === 'Cancelled Order' || item.status === 'Delivered'
+                                ? handleRemove(item.product_id, item.order_id, item.size)
+                                : null
+                            }
+                          >
+                            {item.status === 'Pending'
+                              ? 'Cancel'
+                              : item.status === 'Cancelled Order' || item.status === 'Delivered'
+                              ? 'Remove'
+                              : 'Processing'}
+                          </button>
+                        </div>
                       </div>
                       <div className='order-card-date'>
                         Date you ordered: {new Date(item.order_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </div>
                     </div>
-                    <button
-                      className={`order-card-cancel-btn ${
-                        item.status === 'Pending' || item.status === 'Cancelled Order' || item.status === 'Delivered'? '' : 'disabled-button'
-                      }`}
-                      onClick={() =>
-                        item.status === 'Pending' ? handleCancel(item.product_id, item.order_id, item.size) : item.status === 'Cancelled Order' || item.status === 'Delivered' ? handleRemove(item.product_id, item.order_id, item.size) : null
-                      }>
-                      {item.status === 'Pending' ? 'Cancel' : item.status === 'Cancelled Order' || item.status === 'Delivered' ? 'Remove' : 'Processing'}
-                    </button>
                   </div>
                 ))
               }
@@ -181,3 +190,45 @@ function Orders() {
 }
 
 export default Orders
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

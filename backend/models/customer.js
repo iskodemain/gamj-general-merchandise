@@ -35,6 +35,10 @@ const Customer = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    proofType: {
+      type: DataTypes.STRING(250),
+      allowNull: true,
+    },
     imageProof: {
       type: DataTypes.TEXT,
       allowNull: false,

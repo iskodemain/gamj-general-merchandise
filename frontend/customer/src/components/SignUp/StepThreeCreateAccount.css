@@ -1,0 +1,253 @@
+.sp3-main {
+    padding-top: 5rem;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.sp3-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    margin: auto;
+    gap: 1rem;
+    color: #2d3748; /* Tailwind's gray-800 */
+}
+
+.sp3-progress-line {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.sp3-progress-line .sp3-line-password {
+    border-radius: 3rem;
+    background-color: #EAEAEA;
+    width: 10rem;
+    height: 0.3rem;
+}
+
+.sp3-progress-line .stepOne, 
+.sp3-progress-line .stepTwo,
+.sp3-progress-line .stepThree {
+    background-color: #43A047;
+    cursor: pointer;
+}
+
+.sp2-tainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: 2.5rem;
+}
+
+.sp2-text {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+.sp2-stepNum {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.sp2-input-info {
+    border-radius: 2px;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.sp2-input-info:focus {
+    outline: 2px solid #43A047;
+}
+
+.sp3-pass-tainer {
+    border-radius: 2px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+.sp3-pass-tainer.focused {
+    outline: 2px solid #43A047;
+}
+
+.sp3-pass-tainer input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 0;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.sp3-showHidePass {
+    cursor: pointer;
+}
+
+.sp3-offPass, .sp3-onPass {
+    font-size: 1.2rem;
+    color: #43A047;
+}
+
+.identifier-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 3rem;
+    background-color: #F0F0F0;
+    border-radius: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+.identifier-btn .email-btn, .identifier-btn .phone-btn {
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+}
+
+
+.identifier-btn .email-btn {
+    color: #43A047;
+    border-radius: 0.6rem;
+    background-color: #F0F0F0;
+}
+
+.identifier-btn .email-btn.focused {
+    color: white;
+    background-color: #43A047;
+    border-radius: 0.6rem;
+}
+
+.identifier-btn .phone-btn {
+    color: #43A047;
+    border-radius: 0.6rem;
+    background-color: #F0F0F0;
+}
+
+.identifier-btn .phone-btn.focused {
+    color: white;
+    background-color: #43A047;
+    border-radius: 0.6rem;
+}
+
+.sp2-pnx-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%; 
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sp3-pn-prefix {
+    border-left: 1px solid #e2e8f0;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    height: 2.6rem;
+    padding-inline: 0.6rem;
+    display: flex;
+    align-items: center;
+    color: #969ba3;
+}
+
+.LC-button {
+    cursor: pointer;
+    color: white;
+    background-color: #43A047;
+    width: 100%;
+    padding: 10px;
+    border-radius: 0.3rem;
+}
+
+.LC-button:disabled {
+    background: #aae2be;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.LC-button-next {
+    cursor: pointer;
+    background-color: white;
+    border-radius: 0.3rem;
+    color: #43A047;
+    border: 2px solid #43A047;
+    width: 100%;
+    padding: 8px;
+}
+
+.sp3-password-validator {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-top: -5px;
+    padding: 0;
+}
+
+.sp3-line-password {
+    border-radius: 3rem;
+    background-color: #EAEAEA;
+    width: 10rem;
+    height: 3.5px;
+    transition: background-color 0.3s ease;
+}
+
+.sp3-line-password.valid {
+  background-color: #43A047; /* green when valid */
+}
+
+.sp3-password-rules {
+    margin-top: -10px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.password-infocon {
+    color: #333333;
+}
+
+.password-infocon-valid {
+    color: #43A047;
+}
+
+.password-rules-txt {
+    font-size: 0.8rem;
+    color: #333333;
+}
+
+.password-rules-txt.valid{
+    color: #43A047;
+    font-weight: 500;
+}
+
+
+@media (min-width: 640px) {
+  .sp3-form  {
+      max-width: 35rem;
+  }
+}
+

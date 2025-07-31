@@ -1,0 +1,140 @@
+<h1 className="medical">Medical Institution Information</h1>
+            <input
+              onChange={(e) => setMedicalInstitutionName(e.target.value)}
+              value={medicalInstitutionName}
+              type="text"
+              className="w-full px-3 py-2 input-account-page"
+              placeholder="Medical Institution Name"
+              required
+            />
+            <div className="w-full flex gap-2">
+              <div className="contact-prefix-container">
+                <span className="contact-prefix">+63</span>
+                <input
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  value={contactNumber}
+                  type="tel"
+                  className="w-full px-3 py-2 input-account-page contact-input"
+                  placeholder="Contact Number"
+                  pattern="[0-9]{10}"
+                  required
+                  maxLength={10}
+                  style={{ paddingLeft: "2.5rem" }}
+                />
+              </div>
+              <input
+                onChange={(e) => setLandlineNumber(e.target.value)}
+                value={landlineNumber}
+                type="tel"
+                className="w-full px-3 py-2 input-account-page lnumber"
+                placeholder="Landline Number (optional)"
+                style={{ maxWidth: 200 }}
+              />
+            </div>
+            <input
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              type="email"
+              className="w-full px-3 py-2 input-account-page"
+              placeholder="Email Address"
+              required
+            />
+            <input
+              onChange={(e) => setFullAddress(e.target.value)}
+              value={fullAddress}
+              type="text"
+              className="w-full px-3 py-2 input-account-page"
+              placeholder="Full Address"
+              required
+            />
+            <div className="w-full flex flex-col gap-2 mt-2">
+              
+              <button
+                type="button"
+                className="upload-btn"
+                onClick={() => setShowUploadModal(true)}
+              >
+                <FaCloudUploadAlt size={24} />
+                <span>Upload Proof of Legitimacy</span>
+              </button>
+              {proofFile && (
+                <span className="proof-file-name">{proofFile.name}</span>
+              )}
+            </div>
+          </>
+        )}
+
+        <div className='w-full flex justify-between text-sm button-bottom'>
+          {currentState === "Create Account" ? <div></div> : ""}
+          {currentState === 'Login' && (
+            <button 
+              onClick={() => navigate('/forgot-password')} 
+              className='ft-button'
+            >
+              Forgot Password?
+            </button>
+          )}
+        </div>
+        {currentState === "Create Account" ? (
+          <>
+            <button className='LC-button mt-2' type="submit" disabled={loading}>
+              {loading ? 'Verifying...' : 'Proceed to Next Step'}
+            </button>
+            {loading && <div className="loaderCA"></div>}
+            <button type="button" onClick={() => handleStateSwitch("Login")} className='LC-button-next'>Sign in</button>
+          </>
+        ) : (
+          <>
+            <button className='LC-button' disabled>Sign In</button>
+            <button type="button" onClick={() => handleStateSwitch("Create Account")} className='LC-button-next'>Create an Account</button>
+          </>
+        )}
+
+
+
+  //  for file upload
+  const UploadModal = () => (
+    <div className="upload-modal-bg">
+      <div className="upload-modal-card">
+        <div className="upload-modal-header">Upload Proof of Legitimacy</div>
+        <label htmlFor="proofFileInput" className="upload-modal-dashed">
+          <FaCloudUploadAlt size={36} color="#43A047" style={{marginBottom: 8}} />
+          <span className="upload-modal-text">Select one image file to upload</span>
+          <input
+            id="proofFileInput"
+            type="file"
+            accept="image/*,application/pdf"
+            style={{display: 'none'}}
+            onChange={handleProofUpload}
+          />
+          {proofFile && <span className="proof-file-name">{proofFile.name}</span>}
+        </label>
+        <div>
+          <label className="upload-modal-dropdown-label">Uploaded Proof Type</label>
+          <select
+            value={uploadedProofType}
+            onChange={e => setUploadedProofType(e.target.value)}
+            className="upload-modal-dropdown"
+          >
+            <option value="">Select type</option>
+            <option value="Business Permit">Business Permit</option>
+            <option value="DOH License">DOH License</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div className="upload-modal-btns">
+          <button
+            type="button"
+            className="upload-modal-cancel"
+            onClick={() => setShowUploadModal(false)}
+          >Cancel</button>
+          <button
+            type="button"
+            className="upload-modal-confirm"
+            onClick={() => setShowUploadModal(false)}
+            disabled={!proofFile || !uploadedProofType}
+          >Confirm &amp; Submit</button>
+        </div>
+      </div>
+    </div>
+  );

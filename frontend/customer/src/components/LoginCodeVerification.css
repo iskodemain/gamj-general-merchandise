@@ -1,0 +1,103 @@
+.lcv-vc {
+    z-index: 10;
+    padding-left: 1rem; /* Tailwind px-4 = 1rem = 16px */
+    padding-right: 1rem;
+}
+
+.lcv-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: auto;
+  margin-top: 3.5rem; /* Tailwind mt-14 = 3.5rem = 56px */
+  gap: 1rem;          /* Tailwind gap-4 = 1rem */
+  color: #2d3748;     /* Tailwind text-gray-800 */
+}
+
+.lcv-vc-text {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+.lcv-vc-button {
+    color: white;
+    background-color: #43A047;
+    width: 100%;
+    padding: 10px;
+    border-radius: 0.3rem;
+    margin-bottom: 2rem;
+    cursor: pointer;
+}
+
+.lcv-vc-button:disabled {
+  background: #aae2be;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.lcv-valid-identifier {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.lcv-vc-textsm {
+    font-size: 1.1rem;
+    color: rgb(66, 66, 66);
+}
+
+.lcv-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.lcv-input-code-page {
+    width: 100%;         /* w-full */
+    padding-left: 0.75rem;  /* px-3 = 12px */
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;     /* py-2 = 8px */
+    padding-bottom: 0.5rem;
+    border: 1px solid #C5C5C5;
+    margin-bottom: 0.3rem;
+}
+
+.lcv-input-code-page:focus {
+    outline: 2px solid #43A047;
+}
+
+/* lcv-vc */
+@media (min-width: 640px) {
+  .lcv-vc {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .lcv-vc {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lcv-vc {
+    padding-left: 9vw;
+    padding-right: 9vw;
+  }
+}
+
+
+/* lcv-FORM */
+@media (min-width: 640px) {
+  .lcv-form {
+    max-width: 30rem; 
+  }
+}

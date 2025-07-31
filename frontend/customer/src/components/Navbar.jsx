@@ -7,18 +7,20 @@ import { useNavigate } from 'react-router-dom'; // Add this import
 import React, {useState, useEffect, useRef, useContext} from 'react'
 import {assets} from '../assets/assets.js'
 import './Navbar.css'
-import { NavLink, parsePath, useLocation } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { ShopContext } from "../context/ShopContext.jsx";
 import '../pages/Notification.css' // Import the notification styles
 
 function Navbar() {
+  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, orderData} = useContext(ShopContext);
+  const cartCount = getCartCount();
+  const wishlistCount = getWishlistCount();
   const [sidebar, setSideBar] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const notifRef = useRef(null)
   const profileRef = useRef(null);
-  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, orderData} = useContext(ShopContext);
   const navigate = useNavigate(); // Add this line
   const location = useLocation() // Get the current location
   const isShopPath = location.pathname === "/shop"; // Check if the path is "/shop"
@@ -26,18 +28,18 @@ function Navbar() {
 
 
   const logout = () => {
-    navigate('/login')
-    localStorage.removeItem('token')
+    localStorage.removeItem('token');
     setToken('');
-    setCartItems({})
+    setCartItems({});
+    navigate('/login');
   }
-
+  
   const showSidebar = () => setSideBar(!sidebar)
   
   useEffect(() => {
-    const cartQuantityElement = document.querySelector(".cart-quantity");
+    // const cartQuantityElement = document.querySelector(".cart-quantity");
 
-    // Only modify the cart quantity display if it is updated
+    // // Only modify the cart quantity display if it is updated
     // const cartTextContent = cartQuantityElement.textContent;
     // const cartLowValue = Number(cartTextContent);
 
@@ -141,28 +143,54 @@ function Navbar() {
           </div>
         )}
         <div className='icon-button' ref={notifRef} style={{ position: 'relative' }}>
-          <IoIosNotificationsOutline
-            className="nav-icon notifcon"
-            onClick={() => setShowNotifications((prev) => !prev)}
-            style={{ cursor: 'pointer' }}
-          />
+          {token && 
+            <IoIosNotificationsOutline className="nav-icon notifcon" onClick={() => setShowNotifications((prev) => !prev)} style={{ cursor: 'pointer' }}/>
+          }
           {showNotifications && (
-            <div
-              className="notification-container"
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: 0,
-                zIndex: 1000,
-                width: '350px'
-              }}
-            >
-              <h1 className="notification-title">Notification</h1>
-              <ul className="notification-list">
-                <li className="notification-item">
-                  No notifications yet.
-                </li>
-              </ul>
+            <div className="notification-container notification-dropdown">
+              <h1 className="notification-title">Notifications</h1>
+              <div className="notification-panel">
+                <ul className="notification-list">
+                  {[
+                    { id: 1, action: 'place an order #254845', timestamp: '9 hours ago' },
+                    { id: 2, action: 'edit email address', timestamp: '2 days ago' },
+                    { id: 3, action: 'cancel order', timestamp: '3 days ago' },
+                    { id: 4, action: 'order processing', timestamp: '5 days ago' },
+                  ].map((notif) => (
+                    <li className="notification-item" key={notif.id}>
+                      <div className="notification-avatar">
+                        <img
+                          src="https://ui-avatars.com/api/?name=Medical+Hospital+Cavite&background=43A047&color=fff&rounded=true"
+                          alt="avatar"
+                        />
+                      </div>
+                      <div className="notification-content">
+                        <span className="notification-name">
+                          <b>Medical Hospital Cavite</b>
+                        </span>
+                        <span
+                          className="notification-action"
+                          dangerouslySetInnerHTML={{
+                            __html: notif.action.replace(
+                              /#\d+/g,
+                              (match) =>
+                                `<span class="action-highlight ${match.toLowerCase()}">${match}</span>`
+                            ),
+                          }}
+                        />
+                        <span className="notification-time">{notif.timestamp}</span>
+                      </div>
+                      <button
+                        className="notification-dismiss"
+                        onClick={() => {/* implement dismiss logic if needed */}}
+                        aria-label="Dismiss"
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <button
                 className="notification-all-btn"
                 onClick={() => {
@@ -176,22 +204,20 @@ function Navbar() {
           )}
         </div>
         <div className='icon-button'>
-  
           <NavLink to="/wishlist">
             <CiHeart className="nav-icon wishcon" />
-            {getWishlistCount() > 0 && (
-              <span className="wishlist-quantity">{getWishlistCount()}</span>
+            {wishlistCount > 0 && (
+              <span className="wishlist-quantity">{wishlistCount}</span>
             )}
-            {/* <span className="wishlist-quantity">{getWishlistCount(1)}</span> */}
           </NavLink>
         </div>
         <div className='icon-button'>
           <NavLink to="/cart">
             <img src={assets.cart_icon} alt="Cart" draggable="false"/>
-            {getCartCount() > 0 && (
-              <span className="cart-quantity">{getCartCount()}</span>
+            {cartCount > 0 && (
+              <span className="cart-quantity">{cartCount}</span>
+              
             )}
-            {/* <span className="cart-quantity">{getCartCount(1)}</span> */}
           </NavLink>
         </div>
         <div className='icon-button' ref={profileRef} style={{ position: 'relative' }}>
@@ -204,32 +230,19 @@ function Navbar() {
           />
           {showProfileDropdown && (
             <div className="profile-dropdown">
-              <button
-                className="profile-dropdown-item"
-                onClick={() => { setShowProfileDropdown(false); navigate('/profile'); }}
-              >
-                My Profile
-              </button>
-              <button
-                className="profile-dropdown-item"
-                onClick={() => { setShowProfileDropdown(false); navigate('/orders'); }}
-              >
-                Orders
-              </button>
+              {token && (
+                <>
+                  <button className="profile-dropdown-item" onClick={() => { setShowProfileDropdown(false); navigate('/profile'); }}>My Profile</button>
+
+                  <button className="profile-dropdown-item" onClick={() => { setShowProfileDropdown(false); navigate('/orders'); }}>Orders</button>
+                </>
+              )
+              }
+
               {!token ? (
-                <button
-                  className="profile-dropdown-item"
-                  onClick={() => { setShowProfileDropdown(false); navigate('/login'); }}
-                >
-                  Login / Register
-                </button>
+                <button className="profile-dropdown-item" onClick={() => { setShowProfileDropdown(false); navigate('/login'); }}>Login / Register</button>
               ) : (
-                <button
-                  className="profile-dropdown-item logout"
-                  onClick={() => { setShowProfileDropdown(false); logout(); }}
-                >
-                  Logout
-                </button>
+                <button className="profile-dropdown-item logout" onClick={() => { setShowProfileDropdown(false); logout(); }}>Logout</button>
               )}
             </div>
           )}
@@ -243,15 +256,18 @@ function Navbar() {
               <IoIosArrowBack />
             </NavLink>
           </li>
-          <li><NavLink to="/" onClick={() => {showSidebar(); }}>Home</NavLink></li>
-          <li><NavLink to="/shop" onClick={() => {showSidebar(); }}>Shop</NavLink></li>
-          <li><NavLink to="/about" onClick={() => {showSidebar(); }}>About</NavLink></li>
+          <li><NavLink to="/" onClick={showSidebar}>Home</NavLink></li>
+          <li><NavLink to="/shop" onClick={showSidebar}>Shop</NavLink></li>
+          <li><NavLink to="/about" onClick={showSidebar}>About</NavLink></li>
           {!token && 
-            <li onClick={()=>{navigate('/orders'); showSidebar();}} className={`${orderData.length > 0 ? '' : 'hidden-orer'}`}><NavLink>Orders</NavLink></li>
+            <li className={`${orderData.length > 0 ? '' : 'hidden-orer'}`}>
+              <NavLink to="/orders" onClick={showSidebar}>Orders</NavLink>
+            </li>
           }
-          <li><NavLink to="/wishlist" onClick={() => {showSidebar(); }}>Wishlist</NavLink></li>
+          <li><NavLink to="/wishlist" onClick={showSidebar}>Wishlist</NavLink></li>
           {token ?
-            <li onClick={()=>{logout(); showSidebar();}}><NavLink>Logout</NavLink></li> : <li onClick={()=>{navigate('/login'); showSidebar();}}><NavLink>Register / Sign In</NavLink></li>
+            <li onClick={()=>{logout(); showSidebar();}}>Logout</li> : 
+            <li onClick={()=>{navigate('/login'); showSidebar();}}><NavLink>Register / Sign In</NavLink></li>
           }
         </ul>
       </nav>

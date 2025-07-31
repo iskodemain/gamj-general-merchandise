@@ -1,0 +1,159 @@
+.sp2-main {
+    padding-top: 5rem;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.sp2-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    margin: auto;
+    gap: 1rem;
+    color: #2d3748; /* Tailwind's gray-800 */
+}
+
+.sp2-progress-line {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.sp2-progress-line .sp2-line-steps {
+    border-radius: 3rem;
+    background-color: #EAEAEA;
+    width: 10rem;
+    height: 0.3rem;
+}
+
+.sp2-progress-line .stepOne, .sp2-progress-line .stepTwo {
+    background-color: #43A047;
+    cursor: pointer;
+}
+
+.sp2-tainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: 2.5rem;
+}
+
+.sp2-text {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+.sp2-stepNum {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.sp2-ard {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #565656;
+    width: 100%;
+}
+
+.sp1-name-tainer {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+}
+
+.sp2-fn-container, .sp2-ln-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%; 
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sp2-number-tainer {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+}
+
+.sp2-cpx-container, .sp2-lp-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%; 
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.sp2-ct-prefix {
+    border-left: 1px solid #e2e8f0;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    height: 2.6rem;
+    padding-inline: 0.6rem;
+    display: flex;
+    align-items: center;
+    color: #969ba3;
+}
+
+.sp2-input-info {
+    border-radius: 2px;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.sp2-input-info:focus {
+    outline: 2px solid #43A047;
+}
+
+.sp2-LC-button {
+    cursor: pointer;
+    color: white;
+    background-color: #43A047;
+    width: 100%;
+    padding: 10px;
+    border-radius: 0.3rem;
+}
+
+.sp2-LC-button:disabled {
+    background: #b6e2c6;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.sp2-LC-button-next {
+    cursor: pointer;
+    background-color: white;
+    border-radius: 0.3rem;
+    color: #43A047;
+    border: 2px solid #43A047;
+    width: 100%;
+    padding: 8px;
+}
+
+@media (min-width: 640px) {
+  .sp2-form  {
+      max-width: 35rem;
+  }
+}

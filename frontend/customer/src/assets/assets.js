@@ -77,6 +77,7 @@ import wpending_icon from './wpending_icon.png'
 import wprocessing_icon from './wprocessing_icon.png'
 import woutfordelivery_icon from './woutfordelivery_icon.png'
 import wdelivered_icon from './wdelivered_icon.png'
+import uploaded_file_icon from './uploaded-file-icon.png'
 
 export const assets = {
     cart_icon,
@@ -106,6 +107,7 @@ export const assets = {
     wprocessing_icon,
     woutfordelivery_icon,
     wdelivered_icon,
+    uploaded_file_icon
 }
 
 export const products = [
