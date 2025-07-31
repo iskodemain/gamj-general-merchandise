@@ -302,7 +302,7 @@ const StepOneInstitution = () => {
           }
         </div>
         <button className='sp1-LC-button' type="submit" disabled={!isStepOneComplete}>Proceed to the Next Step</button>
-        <button type="button" onClick={handleStateSignIn} className='sp1-LC-button-next' >Sign In</button>
+        <button type="button" onClick={handleStateSignIn} className='sp1-LC-button-next' >Already have an account?</button>
       </form>
       <OurPolicy/>
       <Infos/>
