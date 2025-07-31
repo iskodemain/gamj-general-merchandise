@@ -25,7 +25,7 @@ function BestSeller() {
                 <NavLink to="/shop"><p className='shop-button'>SHOP</p></NavLink>
             </div>
             {/* RENDERING PRODUCTS */}
-            <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 gap-y-6'>
+            <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 gap-y-6 render-products'>
                 {
                     bestSellingProducts.slice(0, 4).map((item, index) => (
                         <ProductItem key={index} id={item.productId} image={item.images} name ={item.productName} price={item.price} active={item.isActive} bestseller={item.isBestSeller}/>

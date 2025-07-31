@@ -10,9 +10,9 @@ import { loginEmailTemplate, registrationEmailTemplate, resetPasswordEmailTempla
  
 // CUSTOMER REGISTRATION INPUT
 let tempUserData = {};
-export const registerCustomerService = async (medicalInstitutionName, contactNumber, landlineNumber, emailAddress, fullAddress, imageProof, repFirstName, repLastName, repContactNumber, repEmailAddress, repJobPosition, loginPhoneNum, loginEmail, loginPassword) => {
+export const registerCustomerService = async (medicalInstitutionName, contactNumber, landlineNumber, emailAddress, fullAddress, proofType, imageProof, repFirstName, repLastName, repContactNumber, repEmailAddress, repJobPosition, loginPhoneNum, loginEmail, loginPassword) => {
     try {
-        if (!medicalInstitutionName || !contactNumber || !emailAddress || !fullAddress || !repFirstName || !repLastName || !repContactNumber || !repEmailAddress || !repJobPosition) {
+        if (!medicalInstitutionName || !contactNumber || !emailAddress || !proofType || !fullAddress || !repFirstName || !repLastName || !repContactNumber || !repEmailAddress || !repJobPosition) {
             return { 
                 success: false, 
                 message: "Please complete all fields in the account details to proceed with account creation." 
@@ -111,6 +111,7 @@ export const registerCustomerService = async (medicalInstitutionName, contactNum
             landlineNumber, 
             emailAddress, 
             fullAddress, 
+            proofType,
             imageUrl: cloudResult.secure_url,
             cloudinaryId: cloudResult.public_id, 
             repFirstName, 
@@ -141,6 +142,7 @@ export const registerCustomerService = async (medicalInstitutionName, contactNum
         return {
             success: true,
             message: `Verification code sent to your ${hasEmail ? 'email' : 'phone'}.`,
+            registerKey,
         };
     } catch (error) {
         console.log(error);
@@ -189,6 +191,7 @@ export const registerCodeVerifyService = async (registerKey, code) => {
             landlineNumber: userData.landlineNumber, 
             emailAddress: userData.emailAddress, 
             fullAddress: userData.fullAddress, 
+            proofType: userData.proofType,
             imageProof: userData.imageUrl, 
             repFirstName: userData.repFirstName, 
             repLastName: userData.repLastName, 
@@ -205,6 +208,7 @@ export const registerCodeVerifyService = async (registerKey, code) => {
                 'landlineNumber',
                 'emailAddress',
                 'fullAddress',
+                'proofType',
                 'imageProof',
                 'repFirstName',
                 'repLastName',
@@ -226,7 +230,7 @@ export const registerCodeVerifyService = async (registerKey, code) => {
         return {
             success: true,
             message: "Account created successfully.",
-            authToken
+            token: authToken
         };
 
     } catch (error) {
@@ -250,13 +254,13 @@ export const loginCustomerService = async (identifier, password) => {
         })
 
         if (!user) {
-            return {success: false, message: 'This user is not registered.'};
+            return {success: false, message: 'Your account and/or password is incorrect, please try again'};
         }
 
         const isMatch = await bcrypt.compare(password, user.loginPassword);
 
         if (!isMatch) {
-            return {success: false, message: 'Incorrect credentials. Please try again'};
+            return {success: false, message: 'Your account and/or password is incorrect, please try again'};
         }
         
         // Generate Codes
@@ -282,7 +286,7 @@ export const loginCustomerService = async (identifier, password) => {
         return {
             success: true, 
             message: 'Verification code sent. Please enter the code to complete login.',
-            loginToken: loginToken // Process this to frontend local storage
+            loginToken: loginToken, // Process this to frontend local storage
         };
     } catch (error) {
         console.log(error);
@@ -323,7 +327,8 @@ export const loginCodeVerifyService = async (loginToken, code) => {
             });
             return {
                 success: false,
-                message: 'Verification code expired. Please log in again.'
+                message: 'Verification code expired. Please log in again.',
+                codeExpired: true
             }
         }
 
@@ -389,7 +394,7 @@ export const requestPasswordResetService = async (identifier) => {
         // SUCCESSFULLY SENT
         return { 
             success: true, 
-            message: `A verification code has been sent to your ${isEmail ? 'email address' : 'phone number'}. Please check your inbox.`
+            message: `A verification code has been sent to your ${isEmail ? 'email address' : 'phone number'}. Please check your inbox.`,
         };
 
     } catch (error) {
@@ -410,7 +415,8 @@ export const verifyPasswordResetService = async (identifier, code) => {
         if (!user) {
             return {
                 success: false,
-                message: 'We could not find an account associated with the provided details.'
+                message: 'We could not find an account associated with the provided details.',
+                emptyUser: true
             }
         }
 
@@ -428,7 +434,8 @@ export const verifyPasswordResetService = async (identifier, code) => {
             });
             return { 
                 success: false,
-                 message: 'Verification code has expired. Please request a new one.'
+                message: 'Verification code has expired. Please request a new one.',
+                codeExpired: true
             };
         }
 
@@ -440,7 +447,8 @@ export const verifyPasswordResetService = async (identifier, code) => {
 
         return { 
             success: true, 
-            message: 'Code verified successfully!' 
+            message: 'Code verified successfully!',
+            resetPasswordToken 
         };
 
     } catch (error) {
@@ -450,15 +458,8 @@ export const verifyPasswordResetService = async (identifier, code) => {
 }
 
 // CONFIRM CUSTOMER PASSWORD RESET
-export const confirmPasswordResetService = async (identifier, code, resetPasswordToken, newPassword) => {
+export const confirmPasswordResetService = async (identifier, resetPasswordToken, newPassword) => {
     try {
-        if (!resetPasswordToken || !code) {
-            return {
-                success: false,
-                message: 'Reset password session or code is missing or expired. Please restart the process.'
-            }
-        }
-
         const isEmail = validateEmail(identifier);
         const passwordError = validatePassword(newPassword);
 
@@ -469,29 +470,47 @@ export const confirmPasswordResetService = async (identifier, code, resetPasswor
         if (!user) {
             return {
                 success: false,
-                message: 'We could not find an account associated with the provided details.'
+                message: 'We could not find an account associated with the provided details.',
+                emptyUser: true
+            }
+        }
+
+        if (!resetPasswordToken) {
+            await user.update({ 
+                verificationCode: null,
+                codeExpiresAt: null,
+                resetPasswordToken: null
+            });
+            return {
+                success: false,
+                message: 'Forgot password session has expired. Please restart the process.',
+                emptyResetToken: true
             }
         }
 
         if (user.resetPasswordToken !== resetPasswordToken) {
+            await user.update({ 
+                verificationCode: null,
+                codeExpiresAt: null,
+                resetPasswordToken: null
+            });
             return {
                 success: false,
-                message: 'Your forgot password session has expired. Please request a new code.'
+                message: 'Forgot password session has expired. Please restart the process.',
+                differentResetToken: true
             }
         }
 
-        if (user.verificationCode !== code) {
-            return {
-                success: false,
-                message: 'The code entered is invalid. Please make sure you typed it correctly.'
-            };
-        }
-
         if (new Date() > user.codeExpiresAt) {
-            await user.update({ verificationCode: null});
+            await user.update({ 
+                verificationCode: null,
+                codeExpiresAt: null,
+                resetPasswordToken: null
+            });
             return { 
                 success: false,
-                 message: 'Verification code has expired. Please request a new one.'
+                message: 'Verification code has expired. Please request a new one.',
+                codeExpired: true
             };
         }
 

@@ -29,8 +29,8 @@ export const loginCodeVerify = async (req, res) => {
 export const registerCustomer = async (req, res) => {
     try {
         const imageProof = req.file;
-        const {medicalInstitutionName, contactNumber, landlineNumber, emailAddress, fullAddress, repFirstName, repLastName, repContactNumber, repEmailAddress, repJobPosition, loginPhoneNum, loginEmail, loginPassword} = req.body;
-        const result = await registerCustomerService(medicalInstitutionName, contactNumber, landlineNumber, emailAddress, fullAddress, imageProof, repFirstName, repLastName, repContactNumber, repEmailAddress, repJobPosition, loginPhoneNum, loginEmail, loginPassword);
+        const {medicalInstitutionName, contactNumber, landlineNumber, emailAddress, fullAddress, proofType, repFirstName, repLastName, repContactNumber, repEmailAddress, repJobPosition, loginPhoneNum, loginEmail, loginPassword} = req.body;
+        const result = await registerCustomerService(medicalInstitutionName, contactNumber, landlineNumber, emailAddress, fullAddress, proofType, imageProof, repFirstName, repLastName, repContactNumber, repEmailAddress, repJobPosition, loginPhoneNum, loginEmail, loginPassword);
         res.json(result);
     } catch (error) {
         console.log(error);
@@ -90,8 +90,8 @@ export const verifyPasswordResetCustomer = async (req, res) => {
 // CONFIRM CUSTOMER PASSWORD RESET
 export const confirmPasswordResetCustomer = async (req, res) => {
     try {
-        const {identifier, code, resetPasswordToken, newPassword} = req.body;
-        const result = await confirmPasswordResetService(identifier, code, resetPasswordToken, newPassword);
+        const {identifier, resetPasswordToken, newPassword} = req.body;
+        const result = await confirmPasswordResetService(identifier, resetPasswordToken, newPassword);
         res.json(result);
     } catch (error) {
         console.log(error);

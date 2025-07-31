@@ -286,6 +286,7 @@
   flex-wrap: wrap;
   gap: 1.5rem 2.5rem;
   font-size: 1rem;
+
   
 }
 .order-detail-label {
@@ -294,8 +295,15 @@
   margin-right: 0.2rem;
 }
 .order-card-details span {
-  font-weight: 600;
-  color: #494949;
+  font-weight: 400;
+  color: #494949; 
+}
+.pencancel{
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-left: auto;
+  width: 50%;
   
 }
 .order-card-status {
@@ -313,6 +321,7 @@
   border-radius: 50%;
   background: #FFA600;
   display: inline-block;
+  
 }
 
 .order-card-date {

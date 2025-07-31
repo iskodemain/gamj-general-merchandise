@@ -1,0 +1,131 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.sp4-vc {
+    z-index: 10;
+    padding-left: 1rem; /* Tailwind px-4 = 1rem = 16px */
+    padding-right: 1rem;
+}
+
+.sp4-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: auto;
+  margin-top: 3.5rem; /* Tailwind mt-14 = 3.5rem = 56px */
+  gap: 1rem;          /* Tailwind gap-4 = 1rem */
+  color: #2d3748;     /* Tailwind text-gray-800 */
+}
+
+.sp4-progress-line {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.sp4-progress-line .sp4-line-password {
+    border-radius: 3rem;
+    background-color: #EAEAEA;
+    width: 10rem;
+    height: 0.3rem;
+}
+
+.sp4-progress-line .stepOne, 
+.sp4-progress-line .stepTwo,
+.sp4-progress-line .stepThree,
+.sp4-progress-line .stepFour {
+    background-color: #43A047;
+    cursor: pointer;
+}
+
+.sp2-vc-text {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+.sp4-vc-button {
+    color: white;
+    background-color: #43A047;
+    width: 100%;
+    padding: 10px;
+    border-radius: 0.3rem;
+    margin-bottom: 2rem;
+    cursor: pointer;
+}
+
+.sp4-vc-button:disabled {
+  background: #aae2be;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.sp4-valid-identifier {
+    color: #43A047;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.sp4-vc-textsm {
+    font-size: 1.1rem;
+    color: rgb(66, 66, 66);
+}
+
+.sp4-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.sp4-input-code-page {
+    width: 100%;         /* w-full */
+    padding-left: 0.75rem;  /* px-3 = 12px */
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;     /* py-2 = 8px */
+    padding-bottom: 0.5rem;
+    border: 1px solid #C5C5C5;
+    margin-bottom: 0.3rem;
+}
+
+.sp4-input-code-page:focus {
+    outline: 2px solid #43A047;
+}
+
+/* SP4-VC */
+@media (min-width: 640px) {
+  .sp4-vc {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .sp4-vc {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sp4-vc {
+    padding-left: 9vw;
+    padding-right: 9vw;
+  }
+}
+
+
+/* SP4-FORM */
+@media (min-width: 640px) {
+  .sp4-form {
+    max-width: 35rem; 
+  }
+}

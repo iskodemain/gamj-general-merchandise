@@ -1,34 +1,70 @@
-.upthis {
-    padding-top: 2%;
+.signIn-main {
+    padding-top: 5rem;
     z-index: 10;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
+
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: auto;
+  gap: 1rem;
+  color: #2d3748; /* Tailwind's gray-800 */
+}
+
+.signIn-tainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: 2.5rem;
+}
+
 .medical {
    margin-right: 54%;
 }
+
 .ca-color {
     background-color: #43A047;
+    border: none;
+    height: 3px;
+    width: 2rem; /* 8 * 0.25rem */
+    margin-left: 0.25rem;
 }
 
 .cs-text {
-    
     color: #43A047;
     font-weight: 600;
     font-size: 2rem;
 }
 
-.input-account-page {
+.li-input-account-page {
     border-radius: 2px;
     border: 1px solid #e2e8f0;
+    width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
-.input-account-page:focus {
-    outline: 2px solid #470507;
+.li-input-account-page:focus {
+    outline: 2px solid #43A047;
+}
+
+.li-fp-main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem; /* 14px */
 }
 
 .button-bottom {
@@ -37,8 +73,8 @@
     
 }
 
-.ft-button:hover, .lh-button:hover, .ca-button:hover {
-    color: #470507;
+.li-fp-button:hover, .lh-button:hover, .ca-button:hover {
+    color: #43A047;
     cursor: pointer;
 }
 
@@ -54,72 +90,66 @@
     font-size: 0.8rem;
 }
 
-.LC-button {
+.LI-button {
     color: white;
     background-color: #43A047;
     width: 100%;
     padding: 10px;
     border-radius: 0.3rem;
+    cursor: pointer;
 }
 
-.LC-button-next {
+.LI-button:disabled {
+  background: #aae2be;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.LI-button-next {
     background-color: white;
     border-radius: 0.3rem;
     color: #43A047;
     border: 2px solid #43A047;
     width: 100%;
     padding: 8px;
+    cursor: pointer;
 }
 
-.pass-tainer {
+.li-pass-tainer {
     border-radius: 2px;
     border: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
+    width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.5rem;
+    /* padding-top: 0.5rem; */
+    /* padding-bottom: 0.5rem; */
 }
 
-.pass-tainer.focused {
-    outline: auto;
+.li-pass-tainer.focused {
+    outline: 2px solid #43A047;
 }
 
-.pass-tainer input {
-    border-radius: 8px;
+.li-pass-tainer input {
     width: 100%;
     border: none;
     outline: none;
-    padding: 0;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
-.showHidePass {
+.login-showHidePass {
     padding: 0 8px;
     cursor: pointer;
 }
 
-.loaderCA {
-    display: flex;
-    position: fixed;
-    top: 40%;
-    right: 48%;
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-    width: 50px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: 
-      radial-gradient(farthest-side,#470507 94%,#0000) top/8px 8px no-repeat,
-      conic-gradient(#0000 30%,#470507);
-    -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
-    animation: l13 0.6s infinite linear;
-  }
-  @keyframes l13{ 
-    100%{transform: rotate(1turn)}
-  }
-  @media (min-width: 640px) {
-    .formsize {
-        max-width: 30rem;
-    }
-  }
+.login-offPass, .login-onPass {
+    font-size: 1.2rem;
+    color: #43A047;
+}
+
+
 .upload-label {
   font-weight: 500;
   font-size: 1rem;
@@ -127,137 +157,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.upload-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-  border: 2px #43A047;
-  border-radius: 0.7rem;
-  padding: 1rem;
-  background: #43A047;
-  color: white;
-  font-weight: 500;
-}
-
-
-.proof-file-name {
-  color: #222;
-  font-size: 13px;
-  margin-top: 4px;
-  word-break: break-all;
-}
-
-.upload-modal-bg {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.18);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.upload-modal-card {
-  background: #fff;
-  border-radius: 1.2rem;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  padding: 2rem;
-  min-width: 340px;
-  max-width: 380px;
-  width: 90%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.upload-modal-header {
-  font-weight: 600;
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-}
-
-.upload-modal-dashed {
-  border: 2px dashed gray;
-  border-radius: 0.7rem;
-  padding: 2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  background: #fafafa;
-  transition: background 0.15s;
-}
-
-.upload-modal-dashed:hover {
-  background: #f3fef6;
-}
-
-.upload-modal-text {
-  color: #888;
-  font-size: 1rem;
-}
-
-.upload-modal-dropdown-label {
-  font-weight: 500;
-  font-size: 14px;
-  margin-bottom: 4px;
-  display: block;
-}
-
-.upload-modal-dropdown {
-  width: 100%;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.5rem;
-  font-size: 15px;
-  background: #fff;
-  margin-top: 4px;
-}
-
-.upload-modal-btns {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.upload-modal-cancel {
-  flex: 1;
-  background: #fff;
-  color: #43A047;
-  border: 1.5px solid #43A047;
-  border-radius: 6px;
-  padding: 0.6rem 0;
-  font-weight: 500;
-  font-size: 15px;
-  box-shadow: none;
-  transition: background 0.15s;
-}
-
-.upload-modal-cancel:hover {
-  background: #f3fef6;
-}
-
-.upload-modal-confirm {
-  flex: 1;
-  background: #43A047;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.6rem 0;
-  font-weight: 500;
-  font-size: 15px;
-  box-shadow: none;
-  transition: background 0.15s;
-}
-
-.upload-modal-confirm:disabled {
-  background: #b6e2c6;
-  color: #fff;
-  cursor: not-allowed;
 }
 
 .contact-prefix-container {
@@ -280,3 +179,51 @@
   padding-left: 2.5rem !important;
   
 }
+/* LOGIN-MAIN */
+@media (min-width: 640px) {
+  .signIn-main {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .signIn-main {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
+}
+
+
+@media (min-width: 1024px) {
+  .signIn-main {
+    padding-left: 9vw;
+    padding-right: 9vw;
+  }
+}
+
+.loaderCA {
+    display: flex;
+    position: fixed;
+    top: 40%;
+    right: 48%;
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: 
+      radial-gradient(farthest-side,#43A047 94%,#0000) top/8px 8px no-repeat,
+      conic-gradient(#0000 30%,#43A047);
+    -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+    animation: l13 0.6s infinite linear;
+  }
+  @keyframes l13{ 
+    100%{transform: rotate(1turn)}
+  }
+  @media (min-width: 640px) {
+    .signin-form {
+        max-width: 30rem;
+    }
+  }

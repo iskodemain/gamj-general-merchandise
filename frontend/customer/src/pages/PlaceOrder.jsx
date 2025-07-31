@@ -124,7 +124,7 @@ function PlaceOrder() {
         address: formData
       }
 
-      if (paymentMethod === 'COD' && !token) {
+      if (paymentMethod === 'COD' && token) {
         // const response = await axios.post(backendUrl + '/api/order/place-order', orderData, {headers: {token}});
         // if (response.data.success) {
         //   setCartItems({});
