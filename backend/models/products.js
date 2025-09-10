@@ -88,6 +88,11 @@ const Products = sequelize.define(
       allowNull: false,
       defaultValue: true,
     },
+    hasVariant: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     expirationDate: {
       type: DataTypes.DATE,
       allowNull: true,

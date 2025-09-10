@@ -1,0 +1,157 @@
+
+
+.plc-card {
+  width: min(720px, 95%);
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(16,24,40,0.06);
+  box-sizing: border-box;
+}
+
+/* Header */
+.plc-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.plc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.plc-back {
+  border: none;
+  background: transparent;
+  color: #374151;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.plc-back:hover { background: rgba(16,24,40,0.04); }
+
+.plc-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  margin-bottom: 24px;
+}
+
+/* Add New button (top-right) */
+.plc-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #43A047;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(16,185,129,0.12);
+  cursor: pointer;
+}
+.plc-add-btn svg { font-size: 14px; }
+.plc-add-btn:hover { filter: brightness(0.95); }
+
+/* List */
+.plc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Row with input and trash icon */
+.plc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fbfdfb;
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.03);
+}
+
+.plc-input {
+  flex: 1;
+  border: 1px solid #e6f1ea;
+  background: white;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #111827;
+  outline: none;
+  box-sizing: border-box;
+}
+.plc-input::placeholder { color: #9ca3af; }
+
+.plc-delete-icon {
+  background: #fff5f5;
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.15);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.plc-delete-icon:hover { background: #fee2e2; }
+
+/* Actions row */
+.plc-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 18px;
+  align-items: center;
+}
+
+.plc-save-btn {
+  background: #43A047;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 8px 24px rgba(16,185,129,0.12);
+  cursor: pointer;
+  flex: 1;
+  max-width: 320px;
+}
+.plc-save-btn:hover { filter: brightness(0.96); }
+
+.plc-delete-all-btn {
+  background: #fff5f5;
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.12);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  width: 140px;
+}
+.plc-delete-all-btn:hover { background: #fee2e2; }
+
+/* Responsive */
+@media (max-width: 520px) {
+  .plc-card { padding: 14px; }
+  .plc-header { flex-direction: column; align-items: stretch; gap: 10px; }
+  .plc-add-btn { justify-self: end; }
+  .plc-actions { flex-direction: column; gap: 10px; align-items: stretch; }
+  .plc-delete-all-btn { width: 100%; max-width: none; }
+  .plc-save-btn { width: 100%; max-width: none; }
+}

@@ -1,10 +1,9 @@
+import React, {useState, useEffect, useRef, useContext} from 'react'
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
 import { CiSearch } from "react-icons/ci";
-import { useNavigate } from 'react-router-dom'; // Add this import
-
-import React, {useState, useEffect, useRef, useContext} from 'react'
+import { toast } from "react-toastify";
 import {assets} from '../assets/assets.js'
 import './Navbar.css'
 import { NavLink, useLocation } from 'react-router-dom'
@@ -12,7 +11,7 @@ import { ShopContext } from "../context/ShopContext.jsx";
 import '../pages/Notification.css' // Import the notification styles
 
 function Navbar() {
-  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, orderData} = useContext(ShopContext);
+  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, orderData, navigate, toastSuccess} = useContext(ShopContext);
   const cartCount = getCartCount();
   const wishlistCount = getWishlistCount();
   const [sidebar, setSideBar] = useState(false)
@@ -21,7 +20,6 @@ function Navbar() {
   const dropdownRef = useRef(null);
   const notifRef = useRef(null)
   const profileRef = useRef(null);
-  const navigate = useNavigate(); // Add this line
   const location = useLocation() // Get the current location
   const isShopPath = location.pathname === "/shop"; // Check if the path is "/shop"
 
@@ -32,6 +30,7 @@ function Navbar() {
     setToken('');
     setCartItems({});
     navigate('/login');
+    toast.success("Logged out successfully", {...toastSuccess});
   }
   
   const showSidebar = () => setSideBar(!sidebar)

@@ -1,0 +1,133 @@
+
+/* Top section */
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar { width: 44px; height: 44px; flex: 0 0 44px; }
+
+.user-texts .org {
+  font-weight: 700;
+  font-size: 16px;
+  color: #0F172A;
+}
+.muted {
+  color: #6B7280;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* Status pill (right) */
+.status-pill {
+  border: 2px solid #27AE60;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #111827;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.status-pill .chev { font-size: 12px; opacity: 0.9; }
+
+/* Item card */
+.item-card {
+  border: 1px solid #27AE60;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 18px auto;
+  position: relative;
+  background: #fff;
+  max-width: calc(100% - 8px);
+  box-sizing: border-box;
+}
+
+.product-img { width: 72px; height: 72px; flex: 0 0 72px; display:flex; align-items:center; justify-content:center; }
+.product-meta { flex: 1 1 auto; min-width: 0; }
+.product-name { font-size: 14px; font-weight: 700; color: #0F172A; }
+.product-sub { color: #6B7280; font-size: 13px; margin-top: 6px; }
+.product-price { font-weight: 700; margin-top: 8px; color: #0F172A; }
+
+/* Payment badge bottom-right inside item card */
+.payment-badge {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6B7280;
+  font-size: 13px;
+}
+.paypal-badge {
+  background: #003087;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* Form */
+.form-section { margin-top: 18px; display: flex; flex-direction: column; gap: 10px;
+  
+}
+.q-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #111827;
+  display: flex;
+  align-items: flex-start;
+}
+
+.single-input, .multi-input {
+  background: #fff;
+  border: 1px solid #CCCCCC;
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #111827;
+}
+.multi-input { min-height: 100px; resize: vertical; }
+
+/* Action button */
+.action-row { margin-top: 18px; display: flex; }
+.primary-btn {
+  background: #43A047;
+  color: #fff;
+  font-weight: 800;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  width: 100%;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.primary-btn:hover { background: #00c42a; }
+
+/* Spacing consistency */
+.cancel-reason-root > * + * { margin-top: 16px; }
+
+/* Responsive */
+@media (max-width: 520px) {
+  .top-section { flex-direction: column; align-items: stretch; gap: 12px; }
+  .item-card { padding: 10px; }
+  .payment-badge { position: static; justify-self: end; margin-top: 8px; }
+
+}

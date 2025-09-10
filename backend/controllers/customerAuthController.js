@@ -1,4 +1,4 @@
-import { loginCustomerService, loginCodeVerifyService, registerCustomerService, registerCodeVerifyService, requestPasswordResetService, verifyPasswordResetService, confirmPasswordResetService } from '../services/customerAuthService.js';
+import { loginCustomerService, loginCodeVerifyService, registerCustomerService, registerCodeVerifyService, requestPasswordResetService, verifyPasswordResetService, confirmPasswordResetService, fetchVerifiedCustomerService } from '../services/customerAuthService.js';
 
 
 // CUSTOMER LOGIN INPUT
@@ -18,6 +18,18 @@ export const loginCodeVerify = async (req, res) => {
     try {
         const {loginToken, code} = req.body;
         const result = await loginCodeVerifyService(loginToken, code);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+// FETCH VERIFIED CUSTOMER
+export const fetchVerifiedCustomer = async (req, res) => {
+    try {
+        const { ID } = req.user;
+        const result = await fetchVerifiedCustomerService(ID);
         res.json(result);
     } catch (error) {
         console.log(error);

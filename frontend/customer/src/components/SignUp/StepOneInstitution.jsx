@@ -167,7 +167,6 @@ const StepOneInstitution = () => {
             <IoCloseOutline onClick={() => setShowUploadedImage(false)} className="close-preview-btn"/>
             <p className='vi-profile-name'>{proofFile.name}</p>
         </div>
-        
       </div>
     );
   }

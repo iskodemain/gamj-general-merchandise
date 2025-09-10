@@ -1,0 +1,139 @@
+
+.profile-card {
+  width: min(800px, 95%);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
+  box-sizing: border-box;
+}
+
+/* Header section with title and icon */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.profile-title {
+  color: #000000;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.icon-container {
+  width: 70px;
+  height: 70px;
+  
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-icon {
+  color: #43A047;
+  font-size: 24px;
+}
+
+/* Section styling */
+.info-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #128C3A;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+/* Form elements */
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #111827;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+/* Password field styling */
+.password-input {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Action section */
+.action-section {
+  display: flex;
+  justify-content: flex-start;
+  width: 25%;
+  margin-top: 32px;
+}
+
+.btn-save {
+  
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #43A047;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.btn-save:hover {
+  background-color: #388e3c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-card {
+    padding: 24px;
+  }
+  
+  .action-section {
+    justify-content: center;
+  }
+  
+  .btn-save {
+    width: 100%;
+  }
+}

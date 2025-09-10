@@ -9,7 +9,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 
 const StepFourVerifyEmail = () => {
-  const {token, setToken, navigate, backendUrl, toastSuccess, toastError, signUpStep, setSignUpStep, signUpData, setSignUpData} = useContext(ShopContext);
+  const {token, setToken, navigate, backendUrl, toastSuccess, toastError, signUpData, setVerifiedUser, setShowImportantNote} = useContext(ShopContext);
 
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ const StepFourVerifyEmail = () => {
     setVerificationCode(value);
   };
 
-  const handleVerifyForm  = async(e) => {
+  const handleVerifyForm = async(e) => {
     e.preventDefault();
 
     if (!signUpData.registerKey) {
@@ -44,6 +44,14 @@ const StepFourVerifyEmail = () => {
       if (response.data.success) {
         localStorage.setItem("authToken", response.data.token);
         setToken(response.data.token);
+
+        const isVerified = false;
+        setVerifiedUser(isVerified);
+
+        if (isVerified === false) {
+          setShowImportantNote(true);
+        }
+
         toast.success(response.data.message, {...toastSuccess});
       } else {
         toast.error(response.data.message, {...toastError});

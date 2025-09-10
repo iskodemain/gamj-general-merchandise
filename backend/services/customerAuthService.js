@@ -200,7 +200,7 @@ export const registerCodeVerifyService = async (registerKey, code) => {
             repJobPosition: userData.repJobPosition, 
             loginPhoneNum: userData.loginPhoneNum, 
             loginEmail: userData.loginEmail, 
-            loginPassword: hashedPassword,
+            loginPassword: hashedPassword
         }, {
             fields: [
                 'medicalInstitutionName',
@@ -222,7 +222,7 @@ export const registerCodeVerifyService = async (registerKey, code) => {
         });
 
         // CREATE TOKEN
-        const authToken = createToken(newUser.customerId); // Permanent token
+        const authToken = createToken(newUser.ID); // Permanent token
 
         // CLEAN TEMPDATA
         delete tempUserData[registerKey];
@@ -340,18 +340,42 @@ export const loginCodeVerifyService = async (loginToken, code) => {
         });
 
         // Create token
-        const authToken = createToken(user.customerId);
+        const authToken = createToken(user.ID);
 
         return {
             success: true,
             message: 'Login successfully!',
             token: authToken, // Eto na yung permanent token for headers
+            verifiedCustomer: user.verifiedCustomer
         };
     } catch (error) {
         console.log(error);
         throw new Error(error.message);
     }
 }
+
+// FETCH VERIFIED CUSTOMER
+export const fetchVerifiedCustomerService = async (ID) => {
+    try {
+        const user = await Customer.findByPk(ID);
+        if (!user) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+        
+        return {
+            // IMAGE PROOF NAME
+            success: true,
+            user
+        }
+        
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+} 
 
 
 // REQUEST CUSTOMER PASSWORD RESET
@@ -542,3 +566,5 @@ export const confirmPasswordResetService = async (identifier, resetPasswordToken
         throw new Error(error.message);
     }
 }
+
+

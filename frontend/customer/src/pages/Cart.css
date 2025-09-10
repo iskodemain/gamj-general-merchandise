@@ -251,6 +251,12 @@ input[type="checkbox"] {
     color: white;
 }
 
+.cart-button-checkout:disabled {
+  background-color: #2898287c;
+  border: none;
+  cursor: not-allowed;
+}
+
 .cart-item-checkbox {
     display: flex;
     justify-content: flex-end;

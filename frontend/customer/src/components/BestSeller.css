@@ -29,12 +29,14 @@
 }
 
 .seemore-container {
-    width: 83%;
     text-align: center;
     margin: 0 auto;
     margin-top: 3rem;
     color: #43A047;
-    cursor: pointer;
+}
+
+.seemore-container .seemore-text {
+  cursor: pointer;
 }
 
 .bs-container {

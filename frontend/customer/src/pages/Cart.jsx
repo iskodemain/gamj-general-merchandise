@@ -10,125 +10,107 @@ import Infos from '../components/Infos.jsx';
 import Footer from '../components/Footer.jsx';
 import { NavLink } from 'react-router-dom';
 import { toast } from "react-toastify";
+import UnavailableNote from '../components/Notice/UnavailableNote.jsx';
 
 function Cart() {
-  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, totalProductPrice, getTotalProductPrice, navigate, token, toastError, orderData, setOrderData} = useContext(ShopContext)
+  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, totalProductPrice, getTotalProductPrice, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, showUnavailableNote, setShowUnavailableNote, verifiedUser, orderData, setOrderData} = useContext(ShopContext)
   const [cartData, setCartData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const allSelected = selectedItems.length === cartData.length && cartData.length > 0;
 
-  console.log(totalProductPrice);
-
   useEffect(() => {
     if (products.length > 0) {
-      const tempData = [];
-      let hasItems = false;
-      for (const items in cartItems) {
-        for(const item in cartItems[items]) {
-          if (cartItems[items][item] > 0) {
-            tempData.push({
-              productId: items,
-              size: item, 
-              quantity: cartItems[items][item],
-            });
-            hasItems = true;  
-          }
-        }
-      }
+      const tempData = cartItems.filter(item => item.quantity > 0);
       setCartData(tempData);
-      setShowCartContent(hasItems);
+      setShowCartContent(tempData.length > 0);
     } else {
       setShowCartContent(false);
     }
-  }, [cartItems, products])
+  }, [cartItems, products]);
 
   useEffect(() => {
-    // CALCULATE TOTAL PRICE
     let price = 0;
-    cartData.forEach(item => {
-        const productData = products.find(product => product.productId === item.productId);
+    selectedItems.forEach(cartMainId => {
+      const item = cartData.find(i => i.ID === cartMainId); 
+      if (!item) return;
+
+      const productData = products.find(product => product.ID === item.productId);
+      if (productData) {
         price += productData.price * item.quantity;
+      }
     });
+
     getTotalProductPrice(price);
-  }, [cartData, products]);
+  }, [selectedItems, cartData, products]);
+
+  // TOTAL STOCKS
+  const getTotalStockForValue = (productId, value, productVariantValues) => {
+    if (!Array.isArray(value)) return 0;
+
+    return value.reduce((total, val) => {
+      const match = productVariantValues.find(
+        (pv) => pv.productId === productId && pv.value === val
+      );
+      return total + (match ? match.stock : 0);
+    }, 0);
+  };
 
 
   // MINIMUM BUTTON
-  const handleDecrease = (itemId, size, currentQuantity) => {
-    if (currentQuantity > 1) {
-      updateQuantity(itemId, size, currentQuantity - 1);
+  const handleDecrease = (productId, value, quantity) => {
+    if (quantity > 1) {
+      updateQuantity(productId, value, quantity - 1);
     }
   };
 
   // MAXIMUM BUTTON
-  const handleIncrease = (itemId, size, currentQuantity, maxStock) => {
-    if (currentQuantity < maxStock) {
-      updateQuantity(itemId, size, currentQuantity + 1);
+  const handleIncrease = (productId, value, quantity, productData) => {
+    const maxStock = productData.hasVariant
+      ? getTotalStockForValue(productId, value, productVariantValues)
+      : productData.stockQuantity;
+
+    if (maxStock && quantity < maxStock) {
+      updateQuantity(productId, value, quantity + 1);
     }
   };
+
 
   // Select/Deselect all
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(cartData.map((item, idx) => idx));
+      setSelectedItems(cartData.map(item => item.ID));
     }
   };
 
   // Select single item
-  const handleSelectItem = (idx) => {
+  const handleSelectItem = (cartIds) => {
     setSelectedItems(prev =>
-      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+      prev.includes(cartIds) ? prev.filter(i => i !== cartIds) : [...prev, cartIds]
     );
   };
 
+
   // Delete selected items
-const handleDeleteSelected = () => {
-  // Clone cartItems to avoid direct mutation
-  const updatedCartItems = { ...cartItems };
+  const handleDeleteSelected = () => {
+    const updatedCartItems = cartItems.filter((item) => !selectedItems.includes(item.ID));
+    setCartItems(updatedCartItems);
+    setSelectedItems([]);
+    setShowCartContent(updatedCartItems.length > 0);
+    deleteMultipleCartItem(selectedItems);
+  };
 
-  // Only delete checked items
-  selectedItems.forEach(idx => {
-    const item = cartData[idx];
-    if (updatedCartItems[item.productId] && updatedCartItems[item.productId][item.size] !== undefined) {
-      // Remove the size entry
-      delete updatedCartItems[item.productId][item.size];
-      // If no sizes left for this product, remove the product entry
-      if (Object.keys(updatedCartItems[item.productId]).length === 0) {
-        delete updatedCartItems[item.productId];
-      }
-    }
-  });
+  
+  const handleDeleteSingle = (cartMainId) => {
+    const updatedCartItems = cartItems.filter(
+      (item) => !(item.ID === cartMainId)
+    );
+    setCartItems(updatedCartItems);
+    setShowCartContent(updatedCartItems.length > 0);
+    deleteCartItem(cartMainId);
+  };
 
-  setCartItems(updatedCartItems);
-  setSelectedItems([]);
-  const isEmpty = 
-    Object.keys(updatedCartItems).length === 0 &&
-    Object.values(updatedCartItems).every(
-      sizes => Object.keys(sizes).length === 0
-  );
-  if (isEmpty) setShowCartContent(false);
-
-};
-
-// Helper for deleting a single item and hiding cart if empty
-const handleDeleteSingle = (productId, size) => {
-  updateQuantity(productId, size, 0);
-
-  // Wait for cartItems to update, then check if empty
-  setTimeout(() => {
-    const updatedCartItems = { ...cartItems };
-    if (
-      Object.keys(updatedCartItems).length === 0 ||
-      Object.values(updatedCartItems).every(
-        sizes => Object.keys(sizes).length === 0
-      )
-    ) {
-      setShowCartContent(false);
-    }
-  }, 0);
-};
 
   const hadleCheckout = async () => {
     if (!token) {
@@ -137,42 +119,16 @@ const handleDeleteSingle = (productId, size) => {
       return;
     }
 
-    let newOrders = [];
-
-    for (const productId in cartItems) {
-      const sizeQuantityObj = cartItems[productId];
-
-      for (const size in sizeQuantityObj) {
-        const quantity = sizeQuantityObj[size];
-
-        // Find the product using its _id
-        const product = products.find(p => p.productId === productId);
-        if (!product) continue;
-
-        const orderItem = {
-          order_id: Math.random().toString(36).substring(2, 10), // Random ID
-          product_id: product.productId,
-          product_name: product.productName,
-          price: product.price,
-          size: size,
-          quantity: quantity,
-          status: 'Pending',
-          payment: 'Unpaid',
-          payment_method: 'COD',
-          order_date: new Date().toISOString(),
-          images: product.images, // already an array
-          category: product.categoryId
-        };
-        newOrders.push(orderItem);
-      }
+    if (verifiedUser === false) {
+      setShowUnavailableNote(true);
+      return;
     }
-    // Add to orderData context
-    setOrderData(prev => [...newOrders, ...prev]);
-    navigate('/place-order')
+
   }
 
   return (
     <div className='main-cart'>
+      {showUnavailableNote && <UnavailableNote />}
       <div className='main-semi'>
         <div className='text-2xl'>
           <MainTitle mtext1={'YOUR'} mtext2={'CART'}/>
@@ -198,46 +154,51 @@ const handleDeleteSingle = (productId, size) => {
             <div>
               {
                 cartData.map((item, index) => {
-                  const productData = products.find((product) => product.productId === item.productId);
+                  const productData = products.find((product) => product.ID === item.productId);
                   if (!productData?.isActive) {
-                    updateQuantity(item.productId, item.size, 0);
+                    updateQuantity(item.productId, item.value, 0);
                   }
                   return (
                     <div key={index} className='cart-container'>
                       <div className='cc-2'>
-                        <NavLink className='cursor-pointer' to={`/product/${item.productId}`}>
+                        <NavLink className='cursor-pointer' to={`/product/${productData.productId}`}>
                           <img className='cart-product-img' src={productData.images?.[0] || 'default-image.jpg'} alt={productData?.productName || 'Product Image'}/>
                         </NavLink>
                         <div>
                           <p className='cart-name'>{productData.productName}</p>
                           <div className='cc-size'>
-                            {item.size.length > 0 && (
-                              <p className="cart-size">Size: {item.size}</p>
-                            )}
+                            {productData.hasVariant && 
+                              <p> 
+                                {item.value ? item.value.join(", ") : ''}
+                              </p>
+                            }
+                          
                           </div>
                           <div className='qd-container'>
                             <div className="quantity-controls-cart">
-                              <button onClick={() => handleDecrease(item.productId, item.size, item.quantity)} className="quantity-btn-cart"><FiMinus className='minus-cart'/></button>
+                              <button onClick={() => handleDecrease(item.productId, item.value, item.quantity)} className="quantity-btn-cart"><FiMinus className='minus-cart'/></button>
                               <input
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
                                   if (isNaN(value) || value <= 0) return;
-                                  if (value > productData.stockQuantity) {
-                                    updateQuantity(item.productId, item.size, productData.stockQuantity);
+                                  
+                                  const maxStock = productData.hasVariant ? getTotalStockForValue(item.productId, item.value, productVariantValues) : productData.stockQuantity;
+
+                                  if (value > maxStock) {
+                                    updateQuantity(item.productId, item.value, maxStock);
                                   } else {
-                                    updateQuantity(item.productId, item.size, value);
+                                    updateQuantity(item.productId, item.value, value);
                                   }
                                 }}
                                 type="number"
                                 value={item.quantity}
                                 className="quantity-input-cart"
                                 min={1}
-                                max={productData.stockQuantity}
+                                max={productData.hasVariant ? getTotalStockForValue(item.productId, item.value, productVariantValues) : productData.stockQuantity}
                               />
-
-                              <button onClick={() => handleIncrease(item.productId, item.size, item.quantity, productData.stockQuantity)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
+                              <button onClick={() => handleIncrease(item.productId, item.value, item.quantity, productData)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
                             </div>
-                            <RiDeleteBinLine onClick={() => handleDeleteSingle(item.productId, item.size)} className='cart-delete'/>
+                            <RiDeleteBinLine onClick={() => handleDeleteSingle(item.ID)} className='cart-delete'/>
                           </div>
                         </div>
                       </div>
@@ -245,8 +206,8 @@ const handleDeleteSingle = (productId, size) => {
                         <div className="cart-item-checkbox">
                           <input
                             type="checkbox"
-                            checked={selectedItems.includes(index)}
-                            onChange={() => handleSelectItem(index)}
+                            checked={selectedItems.includes(item.ID)}
+                            onChange={() => handleSelectItem(item.ID)}
                           />
                         </div>
                         <p className='cart-price'>Price: {currency}{productData.price}</p>
@@ -258,7 +219,11 @@ const handleDeleteSingle = (productId, size) => {
             </div>
             {/* Checkout section with DELETE on left, CHECKOUT on right */}
             <div className={`${showCartContent ? 'checkout-container' : 'hidden'}`}>
-              <p className='checkout-total-price'>Total Price: {currency}{totalProductPrice.toFixed(2)}</p>
+              {selectedItems.length > 0 && ( // ✅ only show if at least one checkbox selected
+                <p className='checkout-total-price'>
+                  Total Price: {currency}{totalProductPrice.toFixed(2)}
+                </p>
+              )}
             <div className='checkout-buttons'>
                 <button
                   className="cart-button-delete"
@@ -272,7 +237,7 @@ const handleDeleteSingle = (productId, size) => {
                   ? `DELETE(${selectedItems.length} ITEMS)`
                   : 'DELETE'}
                 </button>
-              <button onClick={()=> hadleCheckout()} className='cart-button-checkout'>CHECKOUT</button>  
+              <button onClick={()=> hadleCheckout()} className='cart-button-checkout' disabled={selectedItems.length === 0}>CHECKOUT</button>  
             </div>   
             </div>
           </>

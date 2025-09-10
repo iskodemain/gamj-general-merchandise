@@ -1,0 +1,307 @@
+/* Page background & header */
+.view-all-wrapper {
+  min-height: calc(100vh - 64px);
+  padding: 20px 24px;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.view-all-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.view-all-topbar .back-btn{
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.order-title {
+  font-weight: 700;
+  color: #111827;
+  font-size: 22px;
+}
+
+/* Card */
+.card {
+  width: min(1080px, 96%);
+  margin: 0 auto 40px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  padding: 20px;
+  margin-right: 20%;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+}
+.card1 {
+  width: min(1080px, 90%);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  padding: 20px;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+}
+
+/* Sticky header inside card */
+.card-header.sticky{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 4;
+  padding: 6px 0;
+}
+
+/* header left */
+.header-left { display:flex; align-items:center; gap:12px; }
+
+/* All checkbox */
+.all-checkbox { display:flex; align-items:center; gap:8px; cursor:pointer; color:#6B7280; font-weight:500; }
+.all-checkbox input { width:18px; height:18px; accent-color: #2FA14C; }
+
+/* header right - search */
+.header-right { display:flex; align-items:center; gap:8px; }
+
+.search-wrap {
+  position: relative;
+  height: 35px;
+  width: 260px;
+  max-width: 60%;
+}
+
+.search-input {
+  width:100%;
+  height:100%;
+  border-radius: 20px;
+  border:1px solid #000000;
+  padding: 8px 44px 8px 14px;
+  outline: none;
+  font-size: 14px;
+  background: #fff;
+}
+.search-input:focus { box-shadow: 0 0 0 3px rgba(47,161,76,0.08); border-color:#2FA14C; }
+
+.search-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; }
+
+/* thin bottom divider */
+.divider { height:1px; background:#ECEFF3; margin:12px 0; }
+
+/* list */
+.items-list { list-style:none; margin:0; padding:0; }
+
+/* row */
+.items-row {
+  display:flex;
+  gap:2px;
+  padding:18px 6px;
+  align-items:center;
+  border-bottom:1px solid #ECEFF3;
+  transition: background .12s;
+}
+.items-row:hover { background: rgba(0,0,0,0.02); }
+
+/* columns */
+.col { display:flex; align-items:center; }
+.item-col { flex: 0 0 40%; min-width:0; }
+.status-col { flex: 0 0 20%; justify-content:center; }
+.pay-col {
+  flex: 0 0 25%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* left: payment info / right: dropdown */
+  position: relative;
+  padding-left: 18px;
+  min-width: 180px;
+}
+
+/* separators */
+.item-col { padding-right: 18px; border-right:1px solid #F1F4F6; }
+.status-col { padding: 0 18px; border-right:1px solid #F1F4F6; }
+
+/* item column internals */
+.row-left { display:flex; align-items:flex-start; gap:12px; min-width:0; }
+.row-checkbox { width:18px; height:18px; margin-top:6px; accent-color:#2FA14C; }
+.thumb { width:56px; height:56px; object-fit:cover; border-radius:8px; background:#F8FAFB; }
+.item-meta { display:flex; flex-direction:column; min-width:0; }
+.item-name { font-weight:600; font-size:15px; color:#111827; margin-bottom:6px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+.item-sub { display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:#6B7280; }
+.item-price { margin-top:8px; font-weight:600; font-size:14px; color:#111827; }
+
+/* status column for cancelled orders */
+.status-inner { display:flex; gap:8px; align-items:center; }
+.status-dot { width:15px; height:10px; border-radius:50%; display:inline-block; }
+.status-label { color:#6B7280; font-weight:500; font-size:13px; }
+
+/* payment column */
+.pay-meta { 
+  text-align: left; 
+  margin-right: 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+.pay-meta .pay-method { white-space:nowrap; font-size:13px; color:#6B7280; }
+.small-label { font-size:12px; color:#6B7280; margin-right:6px; }
+.method-val { font-weight:600; color:#111827; text-transform:lowercase; }
+
+/* status pill */
+.status-pick { position:relative; display:inline-block; margin-left: 12px; }
+.status-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:11px;
+  border:1px solid #2FA14C;
+  background:#fff;
+  cursor:pointer;
+  font-size:13px;
+  min-width:92px;
+  justify-content:center;
+}
+
+/* keep dropdown pinned to the right edge of the pay-col (end of row) */
+.status-menu {
+  position:absolute;
+  right: 0; /* stays at the end of the pay column / row */
+  top:42px;
+  background:#fff;
+  box-shadow: 0 8px 24px rgba(16,24,40,0.08);
+  border-radius:8px;
+  border:1px solid #E6E9EE;
+  z-index: 120;
+  min-width:160px;
+  padding:8px;
+}
+.status-menu-item {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  background:transparent;
+  border:none;
+  width:100%;
+  padding:8px;
+  text-align:left;
+  cursor:pointer;
+  color:#111827;
+  border-radius:6px;
+}
+.status-menu-item:hover { 
+    background:#43A047;
+    color: white;
+    }
+.menu-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+
+/* empty row */
+.empty-row { padding:18px; text-align:center; color:#6B7280; }
+
+/* selected row */
+.items-row.selected { background: rgba(47,161,76,0.06); }
+
+/* trash button next to status pill for delivered items */
+.row-trash-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  margin-right: 8px;
+  background: transparent;
+  color: #d32f2f;
+  padding: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-size: 0.95rem;
+}
+.row-trash-btn svg { width: 16px; height: 16px; }
+.row-trash-btn:hover { background: rgba(211,47,47,0.06); }
+
+/* ensure status-pick area keeps items aligned */
+/* status-pick aligned without extra left margin now that trash sits on the left */
+.status-pick { display: inline-flex; align-items: center; gap: 6px; position: relative; margin-left: 0; }
+
+/* action buttons for cancelled items */
+.action-btn {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 14px;
+  border-radius:8px;
+  border:1px solid #2FA14C;
+  background:#2FA14C;
+  color:#fff;
+  cursor:pointer;
+  font-weight:500;
+  min-width:92px;
+  justify-content:center;
+  position:relative;
+  box-shadow: none;
+}
+/* reason button: remove hacky left margin so it lines up with review button */
+.action-btn.reason-btn {
+  background:#2FA14C;
+  border-color:#2FA14C;
+  margin-left: 3rem;
+}
+/* review button */
+.action-btn.review-btn {
+  background:#ffffff;
+  border-color:#2FA14C;
+  color: #000000;
+}
+/* consistent spacing when multiple action buttons appear next to each other */
+.action-btn + .action-btn { margin-left:8px; }
+
+/* small red notification dot inside action button */
+
+
+/* bold parentheses part of status */
+.status-bracket { font-weight:700; color: #111827; margin-left:6px; }
+
+/* adjust existing status-pill appearance (keeps dropdown behaviour) */
+.status-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:11px;
+  border:1px solid #2FA14C;
+  background:#fff;
+  cursor:pointer;
+  font-size:13px;
+  min-width:92px;
+  justify-content:center;
+}
+
+/* responsiveness: stack columns */
+@media (max-width: 880px) {
+  .card { padding: 14px; width: 96%; }
+  .items-row { flex-direction: column; align-items: stretch; gap:12px; padding:16px 6px; }
+  .item-col, .status-col, .pay-col { flex: none; border-right: none; padding:0; }
+  .status-col { order: 2; display:flex; justify-content:flex-start; }
+  .pay-col { order: 3; display:flex; justify-content:space-between; }
+  .search-wrap { width: 100%; max-width: none; }
+  .header-right { width:100%; margin-top:10px; }
+
+  /* keep action buttons aligned to the end on narrow screens; allow them to wrap neatly */
+  .pay-col { gap: 8px; align-items: center; }
+  .action-btn { min-width: 120px; flex: 1 1 auto; }
+  .action-btn + .action-btn { margin-left: 8px; }
+
+  /* if space is tight, stack buttons with full width */
+  @media (max-width: 480px) {
+    .action-btn { width: 100%; min-width: 0; }
+    .action-btn + .action-btn { margin-left: 0; margin-top: 8px; }
+  }
+}

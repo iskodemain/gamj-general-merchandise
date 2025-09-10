@@ -10,37 +10,38 @@ import './Shop.css'
 import { GiSettingsKnobs } from "react-icons/gi";
 
 const Shop = () => {
-  const {products, search} = useContext(ShopContext);
+  const {products, search, productCategory} = useContext(ShopContext);
   const [isFilterOpen, setIsFilterOpen] = useState(false); 
-  const [selectedFilter, setSelectedFilter] = useState('Filter'); 
+  // const [selectedFilter, setSelectedFilter] = useState('Filter'); 
+  const [selectedFilter, setSelectedFilter] = useState({ id: null, name: 'Filter' });
+
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [sortType, setSortType] = useState('default')
 
   const dropdownRef = useRef(null);
   const toggleFilterDropdown = () => setIsFilterOpen(!isFilterOpen);
 
-  // Function to handle filter selection
-  const handleFilterSelect = (value) => {
-    setSelectedFilter(value);
-    setIsFilterOpen(false); //CLOSE FILTER BY CLIKING WINDOW
-  }
+  const handleFilterSelect = (id, name) => {
+    setSelectedFilter({ id, name });
+    setIsFilterOpen(false);
+  };
 
-  // FILTER PRODUCTS FUNCTIONS
+
   const filteringProducts = () => {
-    let updatedProducts = products;
+  let updatedProducts = products;
 
-    // Apply category filter
-    if (selectedFilter !== 'All' && selectedFilter !== 'Filter') {
-      if (selectedFilter === 'Best Sellers') {
-        updatedProducts = updatedProducts.filter(item => item.isBestSeller === true);
-      } else {
-        updatedProducts = updatedProducts.filter(item => item.category === selectedFilter);
-      }
+    if (selectedFilter.name !== 'All' && selectedFilter.name !== 'Best Sellers' && selectedFilter.name !== 'Filter') {
+      // Filter by categoryId (from DB)
+      updatedProducts = updatedProducts.filter(
+        (item) => item.categoryId === selectedFilter.id
+      );
+    } else if (selectedFilter.name === 'Best Sellers') {
+      updatedProducts = updatedProducts.filter((item) => item.isBestSeller === true);
     }
 
-    // Apply search filter
+    // Apply search
     if (search) {
-      updatedProducts = updatedProducts.filter(item =>
+      updatedProducts = updatedProducts.filter((item) =>
         item.productName.toLowerCase().includes(search.toLowerCase())
       );
     }
@@ -58,10 +59,10 @@ const Shop = () => {
       setFilteredProducts(fpCopy.sort((a, b) => (b.price - a.price)));
     }
     else if (sortType === "a-z") {
-      setFilteredProducts(fpCopy.sort((a, b) => (a.name.localeCompare(b.name))));
+      setFilteredProducts(fpCopy.sort((a, b) => (a.productName.localeCompare(b.productName))));
     }
     else if (sortType === "z-a") {
-      setFilteredProducts(fpCopy.sort((a, b) => (b.name.localeCompare(a.name)))); 
+      setFilteredProducts(fpCopy.sort((a, b) => (b.productName.localeCompare(a.productName)))); 
     }
     else {
       setFilteredProducts(fpCopy);
@@ -89,6 +90,8 @@ const Shop = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+
   return (
     <div className='shop-main'>
       <div className='shop-semi'>
@@ -97,23 +100,29 @@ const Shop = () => {
           {/* PRODUCT FILTER */}
           <div className='product-filter relative' ref={dropdownRef}>
             <button 
-              onClick={toggleFilterDropdown} 
-              className="filter-btn">
+              onClick={toggleFilterDropdown} className="filter-btn">
               <GiSettingsKnobs className='m-20 filter-button' />
-              {selectedFilter}
+              {selectedFilter.name}
             </button>
             {/* Dropdown Menu */}
             {isFilterOpen && (
               <div className='dropdown-container'>
                 <ul className='text-sm'>
-                <li onClick={() => handleFilterSelect('All')} className='px-4 py-2 cursor-pointer dropdown-choices-top'>All</li>
-                <li onClick={() => handleFilterSelect('Best Sellers')} className='px-4 py-2 cursor-pointer dropdown-choices'>Best Sellers</li>
-                {/* DISPLAY ALL CATEGORIES HERE RELAATED TO PRODUCT IN BACKEND */}
-                
-                  {/* <li onClick={() => handleFilterSelect('Men')} className='px-4 py-2 cursor-pointer dropdown-choices'>Men</li>
-                  <li onClick={() => handleFilterSelect('Women')} className='px-4 py-2 cursor-pointer dropdown-choices'>Women</li>
-                  <li onClick={() => handleFilterSelect('Shorts')} className='px-4 py-2 cursor-pointer dropdown-choices'>Shorts</li>
-                  <li onClick={() => handleFilterSelect('Striped Shirts(UNISEX)')} className='px-4 py-2 cursor-pointer dropdown-choices-buttom'>Striped Shirts(UNISEX)</li> */}
+                  <li onClick={() => handleFilterSelect(null, 'All')} className='px-4 py-2 cursor-pointer dropdown-choices-top'>All</li>
+                  <li onClick={() => handleFilterSelect(null, 'Best Sellers')} className='px-4 py-2 cursor-pointer dropdown-choices'>Best Sellers</li>
+                  {productCategory.map((cat, index) => (
+                    <li
+                      key={cat.ID}
+                      onClick={() => handleFilterSelect(cat.ID, cat.categoryName)}
+                      className={`px-4 py-2 cursor-pointer ${
+                        index === productCategory.length - 1
+                          ? "dropdown-choices-buttom"
+                          : "dropdown-choices"
+                      }`}
+                    >
+                      {cat.categoryName}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -135,7 +144,8 @@ const Shop = () => {
             filteredProducts.map((item, index) => (
               <ProductItem 
                 key={index} 
-                id={item.productId} 
+                ID={item.ID} 
+                productId={item.productId} 
                 image={item.images} 
                 name={item.productName} 
                 price={item.price} 
