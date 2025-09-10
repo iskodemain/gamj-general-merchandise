@@ -19,7 +19,7 @@ const Cart = sequelize.define(
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
-        model: 'customer', // match your actual table name
+        model: 'customer', // must match your actual table name
         key: 'ID',
       },
       onDelete: 'CASCADE',
@@ -29,21 +29,15 @@ const Cart = sequelize.define(
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
-        model: 'products', // match your actual table name
+        model: 'products', // must match your actual table name
         key: 'ID',
       },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
-    variantId: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: 'variants', // match your actual table name
-        key: 'ID',
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+    value: {
+      type: DataTypes.JSON, // ✅ matches your CREATE TABLE value JSON
+      allowNull: true,
     },
     quantity: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -56,7 +50,7 @@ const Cart = sequelize.define(
   },
   {
     tableName: 'cart',
-    timestamps: false,
+    timestamps: false, // you're handling dateAdded manually
   }
 );
 
@@ -72,13 +66,6 @@ Cart.associate = (models) => {
   Cart.belongsTo(models.Products, {
     foreignKey: 'productId',
     as: 'product',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  });
-
-  Cart.belongsTo(models.Variants, {
-    foreignKey: 'variantId',
-    as: 'variant',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });

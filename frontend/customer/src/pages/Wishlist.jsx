@@ -1,13 +1,20 @@
-import React, {useContext}from 'react'
+import React, {useContext, useEffect, useState}from 'react'
 import './Wishlist.css'
 import { ShopContext } from '../context/ShopContext';
 import { NavLink } from 'react-router-dom';
 import { RiDeleteBinLine } from "react-icons/ri";
+import Loading from '../components/Loading';
+
 
 
 function Wishlist() {
   const { products, wishlistItems, removeFromWishlist, currency } = useContext(ShopContext);
-  const wishlistProducts = products.filter((product) => wishlistItems[product.productId]);
+
+  const wishlistProducts = products.filter(product =>
+      wishlistItems.some(wishItem => wishItem.productId === product.ID)
+  );
+
+  
   return (
     <div className='wishlist-main'>
       <div className='wishlist-semi'>
@@ -19,7 +26,7 @@ function Wishlist() {
         </div>
         {wishlistProducts.length > 0 ? (
           wishlistProducts.map((productData) => (
-            <div key={productData.productId} className='wishlist-item'>
+            <div key={productData.ID} className='wishlist-item'>
                 {productData.isActive ? (
                   <div className='active-product'>
                   <NavLink className='cursor-pointer' to={`/product/${productData.productId}`}>
@@ -45,7 +52,7 @@ function Wishlist() {
                       </div>
                   </div>
                 )}
-              <RiDeleteBinLine onClick={() => removeFromWishlist(productData.productId)} className='cart-delete'/>
+              <RiDeleteBinLine onClick={() => removeFromWishlist(productData.ID)} className='cart-delete'/>
             </div>
           ))
         ) : (<p className='empty-wishlist-message'>No items in your wishlist.</p>)}

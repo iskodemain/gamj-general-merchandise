@@ -1,0 +1,101 @@
+:root {
+  --card-radius: 16px;
+  --stat-radius: 12px;
+  --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+  --font-stack: "Inter", "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Main container */
+.dashboard-card {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-subtle);
+  padding: 22px;
+  font-family: var(--font-stack);
+  color: #111827;
+  width: 95%;
+}
+
+/* Grid layout for stat cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* Stat card base */
+.stat-card {
+  border-radius: var(--stat-radius);
+  color: #ffffff;
+  padding: 16px 18px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  cursor: default;
+  will-change: transform, box-shadow, filter;
+  width: 80%;
+}
+
+
+/* Hover interaction: slight lift + brighter background */
+.stat-card:hover {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-hover);
+  filter: brightness(1.04);
+}
+
+/* Typography */
+.stat-title {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.95;
+  margin: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.stat-number {
+  font-size: 30px;
+  font-weight: 800;
+  margin-top: 8px;
+  line-height: 1;
+}
+
+.stat-country {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 8px;
+  line-height: 1;
+}
+
+/* Individual card colors */
+.stat-card.country {
+  background: #D46A6A;
+}
+
+.stat-card.provinces {
+  background: #8ED37F;
+}
+
+.stat-card.cities {
+  background: #6DD1D4;
+}
+
+.stat-card.barangays {
+  background: #B875D6;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-card {
+    padding: 16px;
+  }
+}

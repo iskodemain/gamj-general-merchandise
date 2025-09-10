@@ -23,7 +23,7 @@ function RelatedProducts({category}) {
         <div className='rp-list'>
             {
                 related.map((item, index) => (
-                    <ProductItem key={index} id={item.productId} image={item.images} name={item.productName} price={item.price} active={item.isActive} bestseller={item.isBestSeller}/>
+                    <ProductItem key={index} ID={item.ID} productId={item.productId} image={item.images} name={item.productName} price={item.price} active={item.isActive} bestseller={item.isBestSeller}/>
                 ))
             }
         </div>

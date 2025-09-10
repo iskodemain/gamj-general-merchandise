@@ -1,6 +1,6 @@
 .admin-signup-bg{
     min-height: 100vh;
-    background: #f6faf7;
+    background: #f6f8f9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -25,19 +25,21 @@
 }
 .admin-signup-logo{
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Changed from column to row */
     align-items: center;
+    gap: 0.5rem; /* Add space between logo and text */
 }
 .admin-signup-logo img{
-    width: 35px;
-    height: 35px;
-    margin-bottom: .25rem;
+    width: 24px;
+    height:24px;
+    margin-bottom: 20px;
 }
 .admin-signup-logo-text{
     color: #7ED957;
     font-weight: 600;
     font-size: 1.1rem;
     letter-spacing: 1px;
+    margin-bottom: 20px;
 }
 .logo-text{
     color: #43A047;
@@ -57,17 +59,27 @@
     font-size: 1rem;
     background: #fff;
 }
+.admin-signup-phone-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+}
 .admin-signup-phone-prefix{
     background: #fff ;
     border: 1.5px solid #D3D3D3;
-    border-radius: 4px;
+    border-radius: 8px;
     color: #8B8B8B;
     font-size: 1rem;
-    border-right: none;
+    padding: .7rem ;
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
-.admin-signup-phone{
-    border-radius: 0 0.75rem 0.75rem 0;
-    border: none;
+.admin-signup-input.phone {
+    border-radius: 8px;
+    
+    flex: 1;
 }
 .admin-signup-strength-bars{
     display: flex;

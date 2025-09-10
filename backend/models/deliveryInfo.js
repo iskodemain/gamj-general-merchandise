@@ -55,6 +55,15 @@ const DeliveryInfo = sequelize.define(
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
+    medicalInstitutionName: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    emailAddress: {
+      type: DataTypes.STRING(255),
+      unique: true,
+      allowNull: false,
+    },
     country: {
       type: DataTypes.STRING(11),
       allowNull: false,
@@ -71,11 +80,6 @@ const DeliveryInfo = sequelize.define(
     contactNumber: {
       type: DataTypes.STRING(15),
       allowNull: false,
-    },
-    CNVerified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
     },
     updateAt: {
       type: DataTypes.DATE,

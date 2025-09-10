@@ -9,7 +9,7 @@ import './LoginCodeVerification.css'
 import Loading from './Loading.jsx';
 
 const LoginCodeVerification = () => {
-  const {toastSuccess, toastError, navigate, backendUrl, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, token, setToken} = useContext(ShopContext);
+  const {toastSuccess, toastError, navigate, backendUrl, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, token, setToken, setVerifiedUser, setShowImportantNote} = useContext(ShopContext);
   const [loading, setLoading] = useState(false);
   const [loginVerificationCode, setLoginVerificationCode] = useState('');
 
@@ -31,10 +31,17 @@ const LoginCodeVerification = () => {
           localStorage.removeItem('loginToken');
           setLoginIdentifier('');
           sessionStorage.removeItem('loginIdentifier');
-
           localStorage.setItem("authToken", response.data.token);
           setToken(response.data.token);
-          toast.success(response.data.message, {...toastSuccess});
+          
+          const isVerified = response.data.verifiedCustomer;
+          setVerifiedUser(isVerified);
+
+          if (isVerified === false) {
+            setShowImportantNote(true);
+          }
+
+          toast.success(response.data.message, { ...toastSuccess });
 
         } else {
             if (response.data.codeExpired) {
@@ -65,9 +72,9 @@ const LoginCodeVerification = () => {
 
   useEffect(() => {
       if (token) {
-        navigate('/')
+        navigate('/');
       }
-  }, [token])
+  }, [token]);
 
   useEffect(() => {
     if (!loginToken || !loginIdentifier) {

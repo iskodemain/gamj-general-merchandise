@@ -220,8 +220,7 @@ const StepThreeCreateAccount = () => {
         </div>
         
         <button className='LC-button' type="submit" disabled={!isPasswordValid || loading}>
-        {loading ? 'Verifying...' : 'Verify Account'}
-      </button>
+        {loading ? 'Verifying...' : 'Verify Account'}</button>
         <button type="button" onClick={handleBackBtn} className='LC-button-next'>Back</button>
       </form>
       <OurPolicy/>

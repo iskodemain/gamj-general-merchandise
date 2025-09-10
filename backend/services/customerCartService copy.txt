@@ -1,0 +1,199 @@
+import Customer from "../models/customer.js";
+import Products from "../models/products.js";
+import Cart from "../models/cart.js";
+import ProductVariantValues from "../models/productVariantValues.js";
+
+export const fetchCartItemService = async (customerId) => {
+  try {
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+        return {
+            success: false,
+            message: 'User not found'
+        }
+    }
+
+    const cartItems = await Cart.findAll({
+        where: {
+            customerId
+        }
+    });
+
+    if (cartItems.length === 0) {
+        return { 
+            success: false, 
+            message: 'No items in cart', 
+            cartItems: [] 
+        };
+    }
+
+    return {
+        success: true,
+        message: "Fetch Cart Items.",
+        cartItems
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const addCartItemService = async (customerId, productId, productVariantValueId, quantity) => {
+  try {
+    const user = await Customer.findByPk(customerId);
+    const product = await Products.findByPk(productId);
+    const productVariantValue = await ProductVariantValues.findByPk(productVariantValueId);
+    quantity = Number(quantity)
+    if (!user) {
+        return {
+            success: false,
+            message: 'User not found'
+        }
+    }
+
+    if (!product) {
+        return {
+            success: false,
+            message: 'Product not found'
+        }
+    }
+
+    if (!productVariantValue) {
+        return {
+            success: false,
+            message: 'Product Variant Value not found'
+        }
+    }
+
+    if (quantity === undefined || quantity === null || quantity <= 0) {
+        return {
+            success: false,
+            message: "Product quantity is required."
+        }
+    }
+
+    
+
+    // const existingCartItem = await Cart.findOne({ where: { customerId, productId, productVariantValueId } });
+    // if (existingCartItem) {
+    //     existingCartItem.quantity += quantity;
+    //     await existingCartItem.save();
+    //     return { 
+    //         success: true, 
+    //         message: "Added to cart.", 
+    //         cartItem: existingCartItem 
+    //     };
+    // }
+
+    // const addedCartItem = await Cart.create({
+    //     customerId: customerId, 
+    //     productId: productId,
+    //     productVariantValueId: productVariantValueId || null,
+    //     quantity
+    // }, {
+    //     fields: [
+    //         'customerId',
+    //         'productId',
+    //         'productVariantValueId',
+    //         'quantity'
+    //     ]
+    // });
+
+    return {
+        success: true,
+        message: "Added to cart.",
+        cartItem: results
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+
+export const updateCartItemService = async (customerId, productId, productVariantValueId, quantity) => {
+  try {
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+        return {
+            success: false,
+            message: 'User not found'
+        }
+    }
+
+    const cartItem = await Cart.findOne({
+        where: {
+            customerId,
+            productId,
+            productVariantValueId
+        }
+    });
+
+    if (!cartItem) {
+        return {
+            success: false,
+            message: 'Cart item not found'
+        }
+    }
+
+    if (quantity === undefined || quantity === null || quantity <= 0) {
+        return {
+            success: false,
+            message: "Product quantity is required."
+        }
+    }
+
+    cartItem.quantity = quantity;
+    await cartItem.save();
+
+    return {
+        success: true,
+        message: "Cart item updated.",
+        cartItem
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const deleteCartItemService = async (customerId, productId, productVariantValueId) => {
+  try {
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+        return {
+            success: false,
+            message: 'User not found'
+        }
+    }
+
+    const cartItem = await Cart.findOne({ 
+        where: { 
+            customerId, 
+            productId, 
+            productVariantValueId 
+        } 
+    });
+
+    if (!cartItem) return { 
+        success: false, 
+        message: "Cart item not found" 
+    };
+
+    await Cart.destroy({
+        where: {
+            customerId,
+            productId,
+            productVariantValueId
+        }
+    });
+
+    return {
+        success: true,
+        message: "Removed from cart."
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

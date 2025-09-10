@@ -35,11 +35,11 @@ const OrderItems = sequelize.define(
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
-    variantId: {
+    productVariantValueId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       references: {
-        model: 'variants',
+        model: 'productVariantValues', // match your actual table name
         key: 'ID',
       },
       onDelete: 'CASCADE',
@@ -76,9 +76,9 @@ OrderItems.associate = (models) => {
     onUpdate: 'CASCADE',
   });
 
-  OrderItems.belongsTo(models.Variants, {
-    foreignKey: 'variantId',
-    as: 'variant',
+  OrderItems.belongsTo(models.ProductVariantValues, {
+    foreignKey: 'productVariantValueId',
+    as: 'productVariantValue',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });

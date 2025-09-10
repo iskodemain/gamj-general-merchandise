@@ -34,7 +34,7 @@ import { IoIosArrowUp } from "react-icons/io";
 
 const App = () => {
   const { token, loginToken, fpIdentifier, resetPasswordToken } = useContext(ShopContext);
-  const isNotAllowedReset = token || !fpIdentifier || !resetPasswordToken;
+  const cannotResetPassword = token || !fpIdentifier || !resetPasswordToken;
   return(
     <div className="App">
       <button onClick={()=> window.scrollTo(0, 0)} className="up-scroll"><IoIosArrowUp className="arrow"/></button>
@@ -51,14 +51,14 @@ const App = () => {
         <Route path="/product/:productId" element={<Product/>}/>
         <Route path="/login" element={token ? <Navigate to="/"/> : <Login/>}/>
         <Route path="/signup" element={token ? <Navigate to="/"/> : <SignUp/>}/>
-        <Route path="/profile" element={token ? <Profile /> : <Navigate to="/"/> } />
-        <Route path="/place-order" element={token ? <PlaceOrder/> : <Navigate to="/"/> }/>
-        <Route path="/orders" element={token ? <Orders/> : <Navigate to="/"/> }/>
-        <Route path="/notification" element={token ? <Notification /> : <Navigate to="/"/>} />
+        <Route path="/profile" element={token ? <Profile /> : <Navigate to="/login"/> } />
+        <Route path="/place-order" element={token ? <PlaceOrder/> : <Navigate to="/login"/> }/>
+        <Route path="/orders" element={token ? <Orders/> : <Navigate to="/login"/> }/>
+        <Route path="/notification" element={token ? <Notification /> : <Navigate to="/login"/>} />
         <Route path="/login-verification" element={token || !loginToken ? <Navigate to="/"/> : <LoginCodeVerification/>}/>
         <Route path="/forgot-password" element={token ? <Navigate to="/"/> : <ForgotPassword/>}/>
         <Route path="/reset-verify-code" element={token || !fpIdentifier ? <Navigate to="/"/> : <ResetVerifyCode />}/>
-        <Route path="/reset-password" element={isNotAllowedReset ? <Navigate to="/"/> : <ResetPassword /> }/>
+        <Route path="/reset-password" element={cannotResetPassword ? <Navigate to="/"/> : <ResetPassword /> }/>
         <Route path="*" element={<Home/>}/>
       </Routes>
     </div>

@@ -1,0 +1,252 @@
+/* Page background */
+
+
+/* Card */
+.rr-card {
+  width: 100%;
+  max-width: 920px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 20px 20px 20px;
+  box-shadow: 0 10px 30px rgba(20, 60, 30, 0.06);
+  box-sizing: border-box;
+}
+
+/* TOPBAR outside the card */
+.rr-topbar {
+  width: 100%;
+  margin-bottom: 12px;
+  
+}
+
+.rr-topbar-inner {
+  width: 100%;
+  max-width: 920px; /* matches .rr-card max-width */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 ; /* align with card padding */
+  box-sizing: border-box;
+}
+
+.rr-top-title {
+  font-size: 18px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Header */
+.rr-header {
+  display: flex;
+  justify-content: space-between; /* left = select all, right = search */
+  align-items: center;             /* aligns the checkbox and search vertically */
+  gap: 12px;
+  padding: 0;                      /* no extra top spacing here */
+}
+
+.rr-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rr-back {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px ;
+  border-radius: 8px;
+  cursor: pointer;
+  
+}
+
+.rr-title {
+  font-size: 18px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Search */
+.rr-header-right { display: flex; align-items: center; }
+
+.rr-search {
+  position: relative;
+  min-width: 220px;
+}
+
+.rr-search-input {
+  width: 100%;
+  padding: 8px 36px 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  background: #fff;
+  outline: none;
+  font-size: 14px;
+  color: #111827;
+}
+
+.rr-search-input::placeholder { color: #9CA3AF; }
+
+.rr-search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Select all row */
+.rr-select-row {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.rr-all-checkbox {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#6B7280;
+  font-weight:500;
+}
+
+.rr-all-checkbox input {
+  width:18px;
+  height:18px;
+  accent-color:#2FA14C;
+}
+
+/* thin divider */
+.rr-divider {
+  height:1px;
+  background:#ECEFF3;
+  margin:12px 0;
+}
+
+/* Items list */
+.rr-items { list-style:none; margin:0; padding:0; }
+
+/* Row */
+.rr-item-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 4px;
+  box-sizing: border-box;
+}
+
+.rr-item-row + .rr-item-row {
+  border-top: 1px solid #F1F4F6; /* row divider */
+}
+
+/* Left section */
+.rr-item-left {
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  flex: 1 1 55%;
+  min-width: 0;
+}
+
+.rr-row-checkbox { width:18px; height:18px; margin-top:6px; accent-color:#2FA14C; }
+
+.rr-thumb {
+  width:72px;
+  height:56px;
+  object-fit:cover;
+  border-radius:6px;
+  background:#F8FAFB;
+  flex: 0 0 72px;
+}
+
+.rr-item-meta {
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  overflow:visible;
+}
+
+.rr-item-name {
+  font-weight:700;
+  font-size:15px;
+  color:#111827;
+  margin-bottom:6px;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+}
+
+.rr-item-sub {
+  font-size:13px;
+  color:#6B7280;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:8px;
+}
+
+.rr-item-price { font-weight:700; font-size:14px; color:#111827; }
+
+/* Middle section */
+.rr-item-middle {
+  flex: 0 0 220px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.rr-status {
+  color:#6B7280;
+  font-style:italic;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+}
+
+.rr-dot {
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#E53E3E; /* red */
+  display:inline-block;
+}
+
+/* Right section */
+.rr-item-right {
+  flex: 0 0 240px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:8px;
+}
+
+.rr-payment {
+  font-size:13px;
+  color:#6B7280;
+}
+
+.rr-payment-val { font-weight:700; color:#111827; }
+
+.rr-review-btn {
+  background:#2FA14C;
+  color:#fff;
+  border:none;
+  padding:8px 14px;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  min-width:96px;
+  box-shadow: 0 6px 18px rgba(47,161,76,0.12);
+}
+
+.rr-review-btn:active { transform: translateY(1px); }
+
+/* Responsive */
+@media (max-width: 780px) {
+  .rr-card { padding: 16px; }
+  .rr-item-middle { display:none; } /* hide status column on small screens */
+  .rr-item-right { align-items:flex-start; gap:6px; }
+  .rr-item-row { flex-direction: column; align-items:flex-start; gap:10px; }
+  .rr-item-left { width:100%; }
+}

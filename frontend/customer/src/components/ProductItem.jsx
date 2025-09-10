@@ -6,26 +6,26 @@ import './ProductItem.css'
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoMdHeart } from "react-icons/io";
 import { GiBowTieRibbon } from "react-icons/gi";
-const ProductItem = ({id, image, name, price, active, bestseller}) => {
+const ProductItem = ({ID, productId, image, name, price, active, bestseller}) => {
     const {currency, addToWishlist, removeFromWishlist, isInWishlist} = useContext(ShopContext)
     const toggleWishlist = () => {
-        if (isInWishlist(id)) {
-            removeFromWishlist(id);
+        if (isInWishlist(ID)) {
+            removeFromWishlist(ID);
             
         } else {
-            addToWishlist(id);
+            addToWishlist(ID);
         }
     };
   return (
     <div className='main-product-container'>
-        <button className={`wishlist-icon1 ${isInWishlist(id) ? 'hidden' : ''}`} 
+        <button className={`wishlist-icon1 ${isInWishlist(ID) ? 'hidden' : ''}`} 
         onClick={toggleWishlist}><IoMdHeartEmpty /></button>
-        <button className={`wishlist-icon2 ${isInWishlist(id) ? '' : 'hidden'}`} onClick={toggleWishlist}><IoMdHeart /></button>
+        <button className={`wishlist-icon2 ${isInWishlist(ID) ? '' : 'hidden'}`} onClick={toggleWishlist}><IoMdHeart /></button>
         {
             bestseller && <div className='bestseller-prod'><GiBowTieRibbon /></div>
         }
         {active ? (
-                <NavLink className='cursor-pointer' to={`/product/${id}`}>
+                <NavLink className='cursor-pointer' to={`/product/${productId}`}>
                     <div className={`overflow-hidden product-container`}>
                         <img className='hover:scale-110 transition ease-in-out product-image' src={image[0]} draggable="false" alt={name} />
                     </div>

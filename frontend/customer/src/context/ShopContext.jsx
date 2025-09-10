@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { products } from "../assets/assets.js";
+// import { products } from "../assets/assets.js";
 import axios from "axios"
 import { TbCurrencyPeso } from "react-icons/tb";
 import './ShopContext.css'
@@ -17,18 +17,46 @@ const ShopContextProvider = (props) => {
     const [resetPasswordToken, setResetPasswordToken] = useState(() => localStorage.getItem('resetPasswordToken') || '');
     const [loginIdentifier, setLoginIdentifier] = useState(() => sessionStorage.getItem('loginIdentifier') || '');
     const [fpIdentifier, setFpIdentifier] = useState(() => sessionStorage.getItem('fpIdentifier') || '');
+    const [verifiedUser, setVerifiedUser] = useState(null);
+    const [showImportantNote, setShowImportantNote] = useState(false);
+    const [showUnavailableNote, setShowUnavailableNote] = useState(false);
     const [search, setSearch] = useState('')
     const [showSearch, setShowSearch] = useState(false)
-    const [cartItems, setCartItems] = useState({});
-    const [wishlistItems, setWishListItems] = useState({});
+    const [cartItems, setCartItems] = useState([]);
+    const [wishlistItems, setWishListItems] = useState([]);
     const [showWishlistContent, setShowWishlistContent] = useState(false);
     const [showCartContent, setShowCartContent] = useState(false);
     const [totalProductPrice, getTotalProductPrice] = useState(0);
     const [overallPrice, getOverAllPrice] = useState(0);
-    // const [products, setProducts] = useState([])
+    const [products, setProducts] = useState([]);
+    const [productVariantValues, setProductVariantValues] = useState([]);
+    const [variantName, setVariantName] = useState([]);
+    const [productCategory, setProductCategory] = useState([]);
     const navigate = useNavigate();
     const [orderData, setOrderData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+
+
+    /*-----------------------FETCH VERIFIED CUSTOMER-------------------------*/
+    const fetchVerifiedCustomer = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/customer/verified-customer", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+            });
+            if (response.data.success) {
+            setVerifiedUser(response.data.user.verifiedCustomer);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+            fetchVerifiedCustomer();
+        }
+    }, [token]);
 
     /*---------------------------SIGN UP PROCESS-----------------------------*/
     const [signUpStep, setSignUpStep] = useState(1);
@@ -58,6 +86,165 @@ const ShopContextProvider = (props) => {
         registerKey: '',
     });
 
+    /*---------------------------FETCH PRODUCT CATEGORY-----------------------------*/
+    const fetchProductCategory = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/product/category");
+            if (response.data.success) {
+                setProductCategory(response.data.productCategory);
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+            
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        fetchProductCategory();
+    }, []);
+
+    /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
+    const fetchAllProducts = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/product/list");
+            if (response.data.success) {
+                setProducts(response.data.products);
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+            
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        fetchAllProducts();
+    }, []);
+
+    /*---------------------------FETCH ALL PRODUCT VARIANT VALUES-----------------------------*/
+    const fetchProductVariantValues = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/product/product-variant-values");
+            if (response.data.success) {
+                setProductVariantValues(response.data.productVariantValues);
+            } else {
+                toast.error(response.data.message, { ...toastError });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, { ...toastError });
+        }
+    };
+    useEffect(() => {
+        fetchProductVariantValues();
+    }, []);
+
+    /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
+    const fetchVariantName = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/product/variant-name");
+            if (response.data.success) {
+                setVariantName(response.data.variantName);
+            } else {
+                toast.error(response.data.message, { ...toastError });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, { ...toastError });
+        }
+    };
+    useEffect(() => {
+        fetchVariantName();
+    }, []);
+
+    /*---------------------------DATA LOCATIONS-----------------------------*/
+    const [provinces, setProvinces] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [barangays, setBarangays] = useState([]);
+
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedBarangay, setSelectedBarangay] = useState("");
+
+    const [filteredCities, setFilteredCities] = useState([]);
+    const [filteredBarangays, setFilteredBarangays] = useState([]);
+
+    const handleFetchLocation = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/customer/location`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            });
+
+            if (response.data.success) {
+            setProvinces(response.data.provinces || []);
+            setCities(response.data.cities || []);
+            setBarangays(response.data.barangays || []);
+            } else {
+            toast.error(response.data.message, { ...toastError });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, { ...toastError });
+        }
+    };
+
+
+    useEffect(() => {
+        if (!selectedProvince) {
+            setFilteredCities([]);
+            setSelectedCity("");
+            setFilteredBarangays([]);
+            setSelectedBarangay("");
+            return;
+        }
+
+        if (!cities || cities.length === 0) {
+            return;
+        }
+
+        const newCities = cities.filter(city => city.provinceId === Number(selectedProvince));
+        setFilteredCities(newCities);
+
+        if (selectedCity && !newCities.some(c => c.ID === Number(selectedCity))) {
+            setSelectedCity("");
+            setFilteredBarangays([]);
+            setSelectedBarangay("");
+        }
+    }, [selectedProvince, cities, selectedCity]);
+
+    useEffect(() => {
+        if (!selectedCity) {
+            setFilteredBarangays([]);
+            setSelectedBarangay("");
+            return;
+        }
+
+        if (!barangays || barangays.length === 0) {
+            return;
+        }
+
+        const newBarangays = barangays.filter(
+            brgy =>
+            brgy.cityId === Number(selectedCity) &&
+            brgy.provinceId === Number(selectedProvince)
+        );
+        setFilteredBarangays(newBarangays);
+
+        if (selectedBarangay && !newBarangays.some(b => b.ID === Number(selectedBarangay))) {
+            setSelectedBarangay("");
+        }
+    }, [selectedCity, selectedProvince, barangays, selectedBarangay]);
+
+    useEffect(() => {
+    if (token) {
+        handleFetchLocation();
+    }
+    }, [token]);
     /*-----------------------------------------TOAST--------------------------------------*/
     const toastSuccess = { 
         position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
@@ -67,87 +254,219 @@ const ShopContextProvider = (props) => {
     }
 
     /*-------------------------------WISHLIST------------------------------*/
-    const addToWishlist = async (itemId) => {
-        let wishlistData = structuredClone(wishlistItems);
-        wishlistData[itemId] = true;
-        setWishListItems(wishlistData);
-        // if (token) {
-        //     try {
-        //         await axios.post(backendUrl + '/api/wishlist/add', {itemId}, {headers: {token}})
-        //     } catch (error) {
-        //         console.log(error);
-        //         toast.error(error.message, {...toastError});
-        //     }
+    const getUserWishlist = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/wishlist/", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                setWishListItems(response.data.wishlistItems);
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
+    }
+    useEffect(() => {
+        if (token) {
+            getUserWishlist();
+        }
+    }, [token]);
+
+
+    const addToWishlist = async (productId) => {
+        // let wishlistData = structuredClone(wishlistItems);
+        // wishlistData[productId] = true;
+        // setWishListItems(wishlistData);
+        // if (!wishlistItems.includes(productId)) {
+        //     const newWishlist = [...wishlistItems, productId];
+        //     setWishListItems(newWishlist);
         // }
+        if (!wishlistItems.some(item => item.productId === productId)) {
+            setWishListItems([...wishlistItems, { productId }]);
+        }
+
+        try {
+            const response = await axios.post(backendUrl + "/api/wishlist/add", { productId }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                toast.success(response.data.message, {...toastSuccess});
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
     }
 
-    const removeFromWishlist = async (itemId) => {
-        let wishlistData = structuredClone(wishlistItems);
-        delete wishlistData[itemId];
-        setWishListItems(wishlistData);
-        // if (token) {
-        //     try {
-        //         await axios.post(backendUrl + '/api/wishlist/remove', {itemId}, {headers: {token}})
-        //     } catch (error) {
-        //         console.log(error);
-        //         toast.error(error.message, {...toastError});
-        //     }
-        // }
+    const removeFromWishlist = async (productId) => {
+        // let wishlistData = structuredClone(wishlistItems);
+        // delete wishlistData[productId];
+        // setWishListItems(wishlistData);
+        // const newWishlist = wishlistItems.filter(id => id !== productId);
+        // setWishListItems(newWishlist);
+
+        setWishListItems(wishlistItems.filter(item => item.productId !== productId));
+        
+        try {
+            const response = await axios.delete(backendUrl + "/api/wishlist/delete", {
+                headers: { Authorization: `Bearer ${token}` },
+                data: { productId }
+            });
+            if (response.data.success) {
+                toast.success(response.data.message, {...toastSuccess});
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
     };
 
+    
+
+    // const isInWishlist = (itemId) => {
+    //     return wishlistItems[itemId] !== undefined;
+    // };
+
+    // const isInWishlist = (itemId) => {
+    //     return wishlistItems.includes(itemId);
+    // };
+
     const isInWishlist = (itemId) => {
-        return wishlistItems[itemId] !== undefined;
+        return wishlistItems.some(item => item.productId === itemId);
     };
 
 
     /*-------------------------------CART------------------------------*/
-    const addToCart = async (itemId, size, quantity) => {
-
-        const product = products.find(p => p.productId === itemId);
-        
-        if (product.sizes && product.sizes.length > 0 && !size) {
-            toast.error('No size selected for this product.', { ...toastError });
-            return;
-        }
-
-
-        let cartData = structuredClone(cartItems);
-        
-        // Check if the item already exists in the cart
-        if (cartData[itemId] && cartData[itemId][size]) {
-            cartData[itemId][size] += quantity;
-        } else {
-            if (!cartData[itemId]) {
-                cartData[itemId] = {};
+    const getUserCart = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/cart", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                setCartItems(response.data.cartItems);
+            } else {
+                // console.error(response.data.message, {...toastError});
             }
-            cartData[itemId][size] = quantity;
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
+    }
+    useEffect(() => {
+        if (token) {
+            getUserCart();
         }
-        setCartItems(cartData);
-        toast.success('Added to cart successfully!', {...toastSuccess});
+    }, [token]);
 
-        // if (token) {
-        //     try {
-        //         await axios.post(backendUrl + '/api/cart/add', {itemId, size, quantity}, {headers: {token}})
-        //     } catch (error) {
-        //         console.log(error);
-        //         toast.error(error.message, {...toastError});
-        //     }
-        // }
+
+    const addToCart = async (productId, value, quantity) => {
+
+        try {
+            let payload = {
+                productId,
+                value,
+                quantity
+            }
+            const response = await axios.post(backendUrl + "/api/cart/add", payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                await getUserCart();
+                toast.success(response.data.message, {...toastSuccess});
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
 
     };
+
+    const updateQuantity = async (productId, value, quantity) => {
+        let cartData = cartItems.map((item) => {
+            if (item.productId === productId && JSON.stringify(item.value) === JSON.stringify(value)) {
+                return { ...item, quantity };
+            }
+            return item;
+        }).filter(item => item.quantity > 0);
+
+        setCartItems(cartData);
+
+        try {
+            let payload = {
+                productId,
+                value,
+                quantity
+            }
+            const response = await axios.put(backendUrl + "/api/cart/update", payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                // toast.success(response.data.message, {...toastSuccess});
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
+    }
+
+    const deleteCartItem = async (cartMainId) => {
+        setCartItems(prevCart => prevCart.filter(item => item.ID !== cartMainId));
+
+        try {
+            const response = await axios.delete(backendUrl + "/api/cart/delete", {
+                headers: { Authorization: `Bearer ${token}` },
+                data: { cartMainId }
+            });
+            if (response.data.success) {
+                toast.success(response.data.message, {...toastSuccess});
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
+    }
+
+    const deleteMultipleCartItem = async (cartIds) => {
+        try {
+            const response = await axios.delete(backendUrl + "/api/cart/delete-multiple", {
+                headers: { Authorization: `Bearer ${token}` },
+                data: { cartIds }
+            });
+            if (response.data.success) {
+                toast.success(response.data.message, {...toastSuccess});
+            } else {
+                toast.error(response.data.message, {...toastError});
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        } 
+    }
     
     const getCartCount = () => {
-        let count = 0;
-        for (const productId in cartItems) {
-            for (const size in cartItems[productId]) {
-                const qty = cartItems[productId][size];
-                if (qty > 0) {
-                    count += 1; // Count each unique productId+size pair
-                }
-            }
-         }
-        return count;
-        };
+        if (!Array.isArray(cartItems)) return 0;
+        let totalCount = 0;
+        for (const item of cartItems) {   
+            totalCount += 1;
+        }
+        if (totalCount === 0) {
+            setShowCartContent(false);    
+        }
+        return totalCount;
+    };
 
     const getWishlistCount = () => {
         let totalCount = 0;
@@ -160,72 +479,48 @@ const ShopContextProvider = (props) => {
         return totalCount;
     };
 
-    
 
-    const updateQuantity = async (itemId, size, quantity) => {
-        let cartData = structuredClone(cartItems);
-        if (quantity === 0) {
-            delete cartData[itemId][size];
-            if (Object.keys(cartData[itemId]).length === 0) {
-                delete cartData[itemId];
-            }
-        }
-        else {
-            cartData[itemId][size] = quantity;
-        }
-        setCartItems(cartData);
 
-        // if (token) {
-        //     try {
-        //         await axios.post(backendUrl + '/api/cart/update', {itemId, size, quantity}, {headers: {token}})
-        //     } catch (error) {
-        //         console.log(error);
-        //         toast.error(error.message, {...toastError});
-        //     }
-        // }
-    }
-    
-    /*------------------------------------BACKEND URL--------------------------------------*/
-    
+    /*------------------------------------DEBUGGING--------------------------------------*/
 
-    const getUserCart = async (token) => {
-        try {
-            const response = await axios.post(backendUrl + '/api/cart/get', {}, {headers: {token}})
-            if (response.data.success) {
-                setCartItems(response.data.cartData)
-            }
 
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        }
-    }
+    // useEffect(() => {
+    //     console.log('Cart Items:', cartItems);
+    //     console.log('Wishlist Items:', wishlistItems);
+    //     console.log('Products:', products);
 
-    const getUserWishlist = async (token) => {
-        try {
-            const response = await axios.post(backendUrl + '/api/wishlist/get', {}, {headers: {token}})
-            if (response.data.success) {
-                setWishListItems(response.data.wishlistData)
-            }
+    //     // typeof gives "object" for arrays too
+    //     console.log('Cart Items type:', typeof cartItems); 
+    //     console.log('Wishlist Items type:', typeof wishlistItems);
+    //     console.log('Products type:', typeof products);
 
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        }
-    }
+    //     // Array.isArray() tells if it is an array
+    //     console.log('Is Cart Items an array?', Array.isArray(cartItems)); // true if array
+    //     console.log('Is Wishlist Items an array?', Array.isArray(wishlistItems));
+    //     console.log('Is Products an array?', Array.isArray(products));
 
-    // useEffect(()=> {
-    //     if (!token && localStorage.getItem('authToken')) {
-    //         setToken(localStorage.getItem('authToken'));
-    //         getUserWishlist(localStorage.getItem('authToken'));
-    //         getUserCart(localStorage.getItem('authToken'));
+    //     // Count items depending on whether it's array or object
+    //     const getItemCount = (data) => {
+    //         if (Array.isArray(data)) return data.length;
+    //         if (data && typeof data === 'object') return Object.keys(data).length;
+    //         return 0;
     //     }
-    // }, [])
+
+    //     console.log('Cart count:', getItemCount(cartItems));
+    //     console.log('Wishlist count:', getItemCount(wishlistItems));
+    //     console.log('Products count:', getItemCount(products));
+    // }, [cartItems, wishlistItems, products]);
+
+    
+    
+    /*------------------------------------TOKEN--------------------------------------*/
 
     // CUSTOMER TOKEN
     useEffect(() => {
         if (token) {
             localStorage.setItem('authToken', token);
+            setWishListItems(wishlistItems)
+            console.log(token);
         } else {
             localStorage.removeItem('authToken');
         }
@@ -263,7 +558,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, currency, delivery_fee, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, totalProductPrice, getTotalProductPrice, navigate, overallPrice, getOverAllPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, orderData, setOrderData, isLoading, setIsLoading, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, delivery_fee, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, totalProductPrice, getTotalProductPrice, navigate, overallPrice, getOverAllPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, orderData, setOrderData, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote
     }
 
     return (

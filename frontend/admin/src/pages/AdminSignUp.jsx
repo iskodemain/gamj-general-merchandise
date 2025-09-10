@@ -57,6 +57,7 @@ function AdminSignUp() {
           </div>
           <select className="admin-signup-input" defaultValue="Admin">
             <option value="Admin">Admin</option>
+            <option value="Admin">Staff</option>
           </select>
           <input
             type="password"
@@ -76,6 +77,12 @@ function AdminSignUp() {
           </div>
           <div className="admin-signup-helper">
             Password must be at least 8 characters long
+            <br />
+            Password must contain at least one uppercase letter
+            <br />
+            Password must contain at least one number
+            <br />
+            Password must contain at least one special character
           </div>
           <button type="submit" className="admin-signup-btn primary">
             Create Admin Account
