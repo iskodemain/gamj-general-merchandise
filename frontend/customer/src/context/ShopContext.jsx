@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
     const currency = <TbCurrencyPeso className="peso-sign"/>; 
-    const delivery_fee = 38;
     const backendUrl = import.meta.env.VITE_BACKEND_URL
     
     /*--------------------------USE STATE--------------------------*/
@@ -26,14 +25,65 @@ const ShopContextProvider = (props) => {
     const [wishlistItems, setWishListItems] = useState([]);
     const [showWishlistContent, setShowWishlistContent] = useState(false);
     const [showCartContent, setShowCartContent] = useState(false);
-    const [totalProductPrice, getTotalProductPrice] = useState(0);
-    const [overallPrice, getOverAllPrice] = useState(0);
     const [products, setProducts] = useState([]);
     const [productVariantValues, setProductVariantValues] = useState([]);
     const [variantName, setVariantName] = useState([]);
     const [productCategory, setProductCategory] = useState([]);
+    const [activeStep, setActiveStep] = useState(1); 
+    const [hasDeliveryInfo, setHasDeliveryInfo] = useState(false);
     const navigate = useNavigate();
-    const [orderData, setOrderData] = useState([]);
+
+    /*-----------------------CHECKOUT PROCESS-------------------------*/
+    const [subtotal, getSubtotal] = useState(0);
+    const [totalPrice, getTotalPrice] = useState(0);
+    const [shippingFee, getShippingFee] = useState(0);
+    const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
+    const [productIds, setProductIds] = useState([]);
+    const [values, setValues] = useState([]);
+    const [quantities, setQuantities] = useState([]);
+
+
+
+    /*-----------------------FETCH DELIVERY INFO-------------------------*/
+    const [medicalInstitutionName, setMedicalInstitutionName] = useState('');
+    const [emailAddress, setEmailAddress] = useState('');
+    const [detailedAddress, setDetailedAddress] = useState('');
+    const [zipCode, setZipCode] = useState('');
+    const [contactNumber, setcontactNumber] = useState('');
+
+    const handleFetchDeliveryInfo = async() => {
+        try {
+        const response = await axios.get(backendUrl + "/api/customer/profile/delivery-info", {
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            setMedicalInstitutionName(response.data.user.medicalInstitutionName)
+            setEmailAddress(response.data.user.emailAddress);
+            setDetailedAddress(response.data.user.detailedAddress);
+            setZipCode(response.data.user.zipCode);
+            setcontactNumber(response.data.user.contactNumber);
+
+            // Use context states instead of local ones
+            setSelectedProvince(response.data.user.provinceId);
+            setSelectedCity(response.data.user.cityId);
+            setSelectedBarangay(response.data.user.barangayId); 
+            setHasDeliveryInfo(true);
+        }
+        else {
+            setHasDeliveryInfo(false);
+        }
+        } catch (error) {
+        console.log(error);
+        toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+        handleFetchDeliveryInfo();
+        }
+    }, [token]);
 
 
     /*-----------------------FETCH VERIFIED CUSTOMER-------------------------*/
@@ -558,7 +608,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, delivery_fee, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, totalProductPrice, getTotalProductPrice, navigate, overallPrice, getOverAllPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, orderData, setOrderData, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, subtotal, getSubtotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, medicalInstitutionName, setMedicalInstitutionName, emailAddress, setEmailAddress, detailedAddress, setDetailedAddress, zipCode, setZipCode, contactNumber, setcontactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee
     }
 
     return (

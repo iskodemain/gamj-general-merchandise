@@ -17,13 +17,12 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const {token, backendUrl, toastSuccess, toastError, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, setToken, verifiedUser, setVerifiedUser} = useContext(ShopContext);
+  const {token, backendUrl, toastSuccess, toastError, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, setToken, verifiedUser, setVerifiedUser, activeStep, setActiveStep} = useContext(ShopContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUploadedImage, setShowUploadedImage] = useState(false);
-  const [activeStep, setActiveStep] = useState(1); 
   const [imageProofSize, setImageProofSize] = useState(null);
 
 

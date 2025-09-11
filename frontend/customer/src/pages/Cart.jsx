@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import UnavailableNote from '../components/Notice/UnavailableNote.jsx';
 
 function Cart() {
-  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, totalProductPrice, getTotalProductPrice, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, showUnavailableNote, setShowUnavailableNote, verifiedUser, orderData, setOrderData} = useContext(ShopContext)
+  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, subtotal, getSubtotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, orderData, setOrderData} = useContext(ShopContext)
   const [cartData, setCartData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const allSelected = selectedItems.length === cartData.length && cartData.length > 0;
@@ -40,7 +40,7 @@ function Cart() {
       }
     });
 
-    getTotalProductPrice(price);
+    getSubtotal(price);
   }, [selectedItems, cartData, products]);
 
   // TOTAL STOCKS
@@ -123,6 +123,17 @@ function Cart() {
       setShowUnavailableNote(true);
       return;
     }
+
+    if (!hasDeliveryInfo) {
+      setActiveStep(2);
+      navigate('/profile');
+      toast.error("Add delivery information to proceed with checkout.", {...toastError});
+      return;
+    }
+
+    navigate('/place-order');
+
+
 
   }
 
@@ -221,7 +232,7 @@ function Cart() {
             <div className={`${showCartContent ? 'checkout-container' : 'hidden'}`}>
               {selectedItems.length > 0 && ( // ✅ only show if at least one checkbox selected
                 <p className='checkout-total-price'>
-                  Total Price: {currency}{totalProductPrice.toFixed(2)}
+                  Total Price: {currency}{subtotal.toFixed(2)}
                 </p>
               )}
             <div className='checkout-buttons'>

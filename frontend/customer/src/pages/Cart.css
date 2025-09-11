@@ -184,6 +184,10 @@ input[type="checkbox"] {
     font-weight: 500;
 }
 
+.cart-select-all input {
+  cursor: pointer;
+}
+
 .cart-bottom-actions {
     display: flex;
     justify-content: flex-start;
@@ -262,6 +266,10 @@ input[type="checkbox"] {
     justify-content: flex-end;
     align-items: center;
     padding-bottom: 3rem;
+}
+
+.cart-item-checkbox input {
+  cursor: pointer;
 }
 
 /* CART-SIZE */

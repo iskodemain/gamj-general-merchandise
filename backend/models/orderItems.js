@@ -35,15 +35,14 @@ const OrderItems = sequelize.define(
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
-    productVariantValueId: {
-      type: DataTypes.BIGINT.UNSIGNED,
+    orderStatus: {
+      type: DataTypes.ENUM('Pending', 'Processing', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return/Refund'),
       allowNull: false,
-      references: {
-        model: 'productVariantValues', // match your actual table name
-        key: 'ID',
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      defaultValue: 'Pending',
+    },
+    value: {
+      type: DataTypes.JSON, // ✅ matches your CREATE TABLE value JSON
+      allowNull: true,
     },
     quantity: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -72,13 +71,6 @@ OrderItems.associate = (models) => {
   OrderItems.belongsTo(models.Products, {
     foreignKey: 'productId',
     as: 'product',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  });
-
-  OrderItems.belongsTo(models.ProductVariantValues, {
-    foreignKey: 'productVariantValueId',
-    as: 'productVariantValue',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });
