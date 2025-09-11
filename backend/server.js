@@ -7,7 +7,9 @@ import customerRouter from './routes/customerRoute.js';
 import productRouter from './routes/productRoute.js';
 import wishlistRouter from './routes/wishlistRoute.js';
 import cartRouter from './routes/cartRoute.js';
+import orderRouter from './routes/orderRoute.js';
 import multer from 'multer';
+
 
 
 // APP CONFIG
@@ -21,10 +23,11 @@ app.use(express.json());
 app.use(cors());
 
 // ROUTES
-app.use('/api/customer', customerRouter)
-app.use('/api/product', productRouter)
-app.use('/api/wishlist', wishlistRouter)
-app.use('/api/cart', cartRouter)
+app.use('/api/customer', customerRouter);
+app.use('/api/product', productRouter);
+app.use('/api/wishlist', wishlistRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/order', orderRouter);
 
 
 // TEST

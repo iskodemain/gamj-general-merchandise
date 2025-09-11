@@ -4,15 +4,14 @@ import MainTitle from './MainTitle.jsx';
 import './OrderSummary.css'
 
 function OrderSummary() {
-    const {currency, delivery_fee, totalProductPrice, overallPrice, getOverAllPrice} = useContext(ShopContext);
-    console.log(totalProductPrice);
-    console.log(overallPrice);
+    const {currency, shippingFee, subtotal, totalPrice, getTotalPrice} = useContext(ShopContext);
+
 
     
     useEffect(() => {
-      const finalTotal = totalProductPrice + delivery_fee
-      getOverAllPrice(finalTotal.toFixed(2));
-    }, [totalProductPrice, overallPrice])
+      const finalTotal = subtotal + shippingFee
+      getTotalPrice(finalTotal.toFixed(2));
+    }, [subtotal, getTotalPrice, shippingFee])
   return (
     <div className='ordersum-head'>
       <div className='text-2xl'>
@@ -21,17 +20,16 @@ function OrderSummary() {
       <div className='ordersum-content'>
         <div className='ordersum-list'>
             <p>Subtotal</p>
-            <p className='ordersum-price'>{currency}{totalProductPrice.toFixed(2)}</p>
+            <p className='ordersum-price'>{currency}{subtotal.toFixed(2)}</p>
         </div>
         <hr />
-        <div className='ordersum-list'>
+        <div className='ordersum-list sf'>
             <p>Shipping Fee</p>
-            <p className='ordersum-price'>{currency}{delivery_fee.toFixed(2)}</p>
-        </div>
-        <hr />
+            <p className='ordersum-price'>{currency}{shippingFee.toFixed(2)}</p>
+        </div>  
         <div className='ordersum-list'>
             <b>Total</b>
-            <p className='ordersum-price'>{currency}{totalProductPrice === 0 ? 0 : overallPrice}</p>
+            <p className='ordersum-price'>{currency}{subtotal === 0 ? 0 : totalPrice}</p>
         </div>
       </div>
     </div>

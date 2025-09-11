@@ -26,16 +26,7 @@ const Orders = sequelize.define(
       onUpdate: 'CASCADE',
     },
     paymentMethod: {
-      type: DataTypes.ENUM('COD', 'Paypal'),
-      allowNull: false,
-    },
-    orderStatus: {
-      type: DataTypes.ENUM('Pending', 'Processing', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return/Refund'),
-      allowNull: false,
-      defaultValue: 'Pending',
-    },
-    totalAmount: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.ENUM('Cash On Delivery', 'Paypal'),
       allowNull: false,
     },
     dateOrdered: {
