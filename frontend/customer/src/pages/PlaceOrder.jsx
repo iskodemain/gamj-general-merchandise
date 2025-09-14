@@ -10,9 +10,17 @@ import axios from 'axios'
 import { toast } from "react-toastify";
 import { assets } from '../assets/assets'
 import UnavailableNote from '../components/Notice/UnavailableNote'
+import { useLocation } from 'react-router-dom'
 
 function PlaceOrder() {
-  const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, medicalInstitutionName, emailAddress, detailedAddress, zipCode, contactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, subtotal} = useContext(ShopContext);
+  const location = useLocation();
+  const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, subtotal, handleFetchDeliveryInfo} = useContext(ShopContext);
+
+  useEffect(() => {
+    if (token) {
+      handleFetchDeliveryInfo();
+    }
+  }, [location, token]);
 
   const handleDeliveryInfoButton = () => {
     setActiveStep(2);
@@ -35,10 +43,12 @@ function PlaceOrder() {
       setActiveStep(2);
       navigate('/profile');
       toast.error("Add delivery information to proceed with checkout.", {...toastError});
+      return;
     }
 
     if (subtotal <= 0) {
       toast.error("No products found.", {...toastError});
+      return;
     }
     
   }
@@ -56,11 +66,11 @@ function PlaceOrder() {
             </div>
             {/* MEDICAL INSTITUTION NAME */}
             <div className='input-container'>
-              <input value={medicalInstitutionName} placeholder='Medical Institution Name' className='input-delivery-info ' type="text" disabled/>
+              <input value={poMedicalInstitutionName} placeholder='Medical Institution Name' className='input-delivery-info ' type="text" disabled/>
             </div>
             {/* EMAIL ADDRESS */}
             <div className='input-container'>
-              <input value={emailAddress}  className='input-delivery-info ' type="email" placeholder='Email Address' disabled/>
+              <input value={poEmailAddress}  className='input-delivery-info ' type="email" placeholder='Email Address' disabled/>
             </div>
             {/* COUNTRY PHILIPPINES */}
             <div className='input-container'>
@@ -92,11 +102,11 @@ function PlaceOrder() {
             </div>
             {/* STREET ADDRESS */}
             <div className='input-container'>
-              <input value={detailedAddress}  className='input-delivery-info ' type="text" placeholder='Detailed Address' disabled/>
+              <input value={poDetailedAddress}  className='input-delivery-info ' type="text" placeholder='Detailed Address' disabled/>
             </div>
             {/* ZIP CODE AND BARANGAY */}
             <div className='PO-dropdown-container'>
-              <input className='input-delivery-info ' type="text" value={zipCode} placeholder='Zip code' disabled/>
+              <input className='input-delivery-info ' type="text" value={poZipCode} placeholder='Zip code' disabled/>
               <select value={selectedBarangay} onChange={(e) => setSelectedBarangay(e.target.value)} disabled> 
                 <option value="" disabled hidden>Select Barangay</option>
                 {
@@ -110,7 +120,7 @@ function PlaceOrder() {
             </div>
             {/* PHONE NUMBER */}
             <div className='input-container'>
-              <input value={contactNumber} className='input-delivery-info ' type="tel" placeholder="+63 | Contact Number" disabled/>
+              <input value={poContactNumber} className='input-delivery-info ' type="tel" placeholder="+63 | Contact Number" disabled/>
             </div>
             <button type="button" className="DI-button" onClick={handleDeliveryInfoButton}>
               {hasDeliveryInfo ? "Edit Delivery Info" : "Add Delivery Info"}

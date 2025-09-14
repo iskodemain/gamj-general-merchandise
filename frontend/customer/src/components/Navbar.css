@@ -1,6 +1,30 @@
 img {
     display: block;
 }
+
+.icon-button .nav-profile-img {
+    outline: 2px solid #43A047;
+    width: 35px;    
+    height: 35px;
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+
+.icon-button .nav-profile-img img {
+    padding: 2px;
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    border-radius: 100%;
+    transition: filter 0.3s ease;
+}
+
+.icon-button .nav-profile-img img:hover {
+    opacity: 0.8;
+}
+
+
 .notification-all-btn {
     margin: 20px auto 0;
     display: block;
@@ -267,7 +291,7 @@ img {
     transition: filter 0.3s ease;
 }
 
-.icon-button img:hover {
+.icon-button .nav-profile-none:hover {
     filter: brightness(0) saturate(100%) invert(29%) sepia(31%) saturate(1406%) hue-rotate(71deg) brightness(92%) contrast(88%);
 }
 

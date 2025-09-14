@@ -262,38 +262,30 @@ export const fetchCustomerDeliveryInfoService = async (customerId) => {
 
 export const updateCustomerDeliveryInfoService = async (customerId, medicalInstitutionName, emailAddress, provinceId, cityId, detailedAddress, zipCode, barangayId, contactNumber) => {
     try {
-        // EMAIL ADDRESS
-        // const customerConflictingEmail = await Customer.findOne({
-        //     where: {
-        //     customerId: { [Op.ne]: customerId },
-        //     [Op.or]: [
-        //         { emailAddress },
-        //         { repEmailAddress: emailAddress },
-        //         { loginEmail: emailAddress },
-        //     ]
-        //     }
-        // });
+
+        const currentCustomer = await Customer.findByPk(customerId);
+        if (!currentCustomer) {
+            return { success: false, message: "Customer not found." };
+        }
+
         const customerConflictingEmail = await Customer.findOne({
             where: {
-                [Op.and]: [
-                    { customerId: { [Op.ne]: customerId } },  // exclude current user
-                    {
-                        [Op.or]: [
-                            { emailAddress },
-                            { repEmailAddress: emailAddress },
-                            { loginEmail: emailAddress },
-                        ]
-                    }
-                ]
-            }
+               ID: {[Op.ne]: currentCustomer.ID},
+               [Op.or]: [
+                { emailAddress },
+                { repEmailAddress: emailAddress },
+                { loginEmail: emailAddress },
+               ],
+            },
         });
 
         const deliveryConflictingEmail = await DeliveryInfo.findOne({
             where: {
-            customerId: { [Op.ne]: customerId },
+            customerId: { [Op.ne]: currentCustomer.ID },
                 emailAddress
             }
         });
+
         if (customerConflictingEmail || deliveryConflictingEmail) {
             return {
                 success: false,
@@ -301,38 +293,22 @@ export const updateCustomerDeliveryInfoService = async (customerId, medicalInsti
             };
         }
 
-        
-        // CONTACT NUMBER
-        // const customerConflictingContact = await Customer.findOne({
-        //     where: {
-        //     customerId: { [Op.ne]: customerId },
-        //     [Op.or]: [
-        //         { contactNumber },
-        //         { repContactNumber: contactNumber },
-        //         { loginPhoneNum: contactNumber },
-        //     ]
-        //     }
-        // });
         const customerConflictingContact = await Customer.findOne({
             where: {
-                [Op.and]: [
-                    { customerId: { [Op.ne]: customerId } },
-                    {
-                        [Op.or]: [
-                            { contactNumber },
-                            { repContactNumber: contactNumber },
-                            { loginPhoneNum: contactNumber },
-                        ]
-                    }
-                ]
-            }
+                ID: { [Op.ne]: currentCustomer.ID },
+                [Op.or]: [
+                { contactNumber },
+                { repContactNumber: contactNumber },
+                { loginPhoneNum: contactNumber },
+                ],
+            },
         });
 
         const deliveryConflictingContact = await DeliveryInfo.findOne({
             where: {
-            customerId: { [Op.ne]: customerId },
-                contactNumber: contactNumber
-            }
+                customerId: { [Op.ne]: currentCustomer.ID },
+                contactNumber,
+            },
         });
         if (customerConflictingContact || deliveryConflictingContact) {
             return {
