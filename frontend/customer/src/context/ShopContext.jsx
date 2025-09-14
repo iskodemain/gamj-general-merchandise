@@ -31,6 +31,7 @@ const ShopContextProvider = (props) => {
     const [productCategory, setProductCategory] = useState([]);
     const [activeStep, setActiveStep] = useState(1); 
     const [hasDeliveryInfo, setHasDeliveryInfo] = useState(false);
+    const [nbProfileImage, setNbProfileImage] = useState(null);
     const navigate = useNavigate();
 
     /*-----------------------CHECKOUT PROCESS-------------------------*/
@@ -45,11 +46,11 @@ const ShopContextProvider = (props) => {
 
 
     /*-----------------------FETCH DELIVERY INFO-------------------------*/
-    const [medicalInstitutionName, setMedicalInstitutionName] = useState('');
-    const [emailAddress, setEmailAddress] = useState('');
-    const [detailedAddress, setDetailedAddress] = useState('');
-    const [zipCode, setZipCode] = useState('');
-    const [contactNumber, setcontactNumber] = useState('');
+    const [poMedicalInstitutionName, setPoMedicalInstitutionName] = useState('');
+    const [poEmailAddress, setPoEmailAddress] = useState('');
+    const [poDetailedAddress, setPoDetailedAddress] = useState('');
+    const [poZipCode, setPoZipCode] = useState('');
+    const [poContactNumber, setPoContactNumber] = useState('');
 
     const handleFetchDeliveryInfo = async() => {
         try {
@@ -59,16 +60,17 @@ const ShopContextProvider = (props) => {
             }
         });
         if (response.data.success) {
-            setMedicalInstitutionName(response.data.user.medicalInstitutionName)
-            setEmailAddress(response.data.user.emailAddress);
-            setDetailedAddress(response.data.user.detailedAddress);
-            setZipCode(response.data.user.zipCode);
-            setcontactNumber(response.data.user.contactNumber);
+            setPoMedicalInstitutionName(response.data.user.medicalInstitutionName)
+            setPoEmailAddress(response.data.user.emailAddress);
+            setPoDetailedAddress(response.data.user.detailedAddress);
+            setPoZipCode(response.data.user.zipCode);
+            setPoContactNumber(response.data.user.contactNumber);
 
             // Use context states instead of local ones
             setSelectedProvince(response.data.user.provinceId);
             setSelectedCity(response.data.user.cityId);
             setSelectedBarangay(response.data.user.barangayId); 
+
             setHasDeliveryInfo(true);
         }
         else {
@@ -85,6 +87,13 @@ const ShopContextProvider = (props) => {
         }
     }, [token]);
 
+    useEffect(() => {
+        if (token) {
+        handleFetchDeliveryInfo();
+        }
+    }, [token]);
+
+
 
     /*-----------------------FETCH VERIFIED CUSTOMER-------------------------*/
     const fetchVerifiedCustomer = async() => {
@@ -95,7 +104,8 @@ const ShopContextProvider = (props) => {
             }
             });
             if (response.data.success) {
-            setVerifiedUser(response.data.user.verifiedCustomer);
+                setNbProfileImage(response.data.user.profileImage);
+                setVerifiedUser(response.data.user.verifiedCustomer);
             }
         } catch (error) {
             console.log(error);
@@ -608,7 +618,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, subtotal, getSubtotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, medicalInstitutionName, setMedicalInstitutionName, emailAddress, setEmailAddress, detailedAddress, setDetailedAddress, zipCode, setZipCode, contactNumber, setcontactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, subtotal, getSubtotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer
     }
 
     return (

@@ -17,7 +17,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const {token, backendUrl, toastSuccess, toastError, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, setToken, verifiedUser, setVerifiedUser, activeStep, setActiveStep} = useContext(ShopContext);
+  const {token, backendUrl, toastSuccess, toastError, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, setToken, verifiedUser, setVerifiedUser, activeStep, setActiveStep, setHasDeliveryInfo, setNbProfileImage} = useContext(ShopContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -166,6 +166,7 @@ const Profile = () => {
       readableSize = (file.size / (1024 * 1024)).toFixed(2) + " MB";
     }
     setNewProfileImage(file);
+    setNbProfileImage(file);
   };
 
   const handleCloseModal = () => {
@@ -295,6 +296,10 @@ const Profile = () => {
         }
       });
       if (response.data.success) {
+        if (response.data.user?.profileImage) {
+          setNbProfileImage(response.data.user.profileImage);
+        }
+        
         toast.success(response.data.message, {...toastSuccess});
       } else {
         toast.error(response.data.message, {...toastError});
@@ -409,7 +414,6 @@ const Profile = () => {
       toast.error("Please enter your contact number.", { ...toastError });
       return;
     }
-  
     setLoading(true); 
 
     try {
@@ -427,6 +431,7 @@ const Profile = () => {
         headers: {Authorization: `Bearer ${token}`}
       });
       if (response.data.success) {
+        setHasDeliveryInfo(true);
         toast.success(response.data.message, {...toastSuccess});
       } else {
         toast.error(response.data.message, {...toastError});

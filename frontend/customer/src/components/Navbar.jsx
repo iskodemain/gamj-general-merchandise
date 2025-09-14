@@ -11,7 +11,7 @@ import { ShopContext } from "../context/ShopContext.jsx";
 import '../pages/Notification.css' // Import the notification styles
 
 function Navbar() {
-  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, orderData, navigate, toastSuccess} = useContext(ShopContext);
+  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, navigate, toastSuccess, nbProfileImage, setWishListItems, fetchVerifiedCustomer} = useContext(ShopContext);
   const cartCount = getCartCount();
   const wishlistCount = getWishlistCount();
   const [sidebar, setSideBar] = useState(false)
@@ -23,12 +23,19 @@ function Navbar() {
   const location = useLocation() // Get the current location
   const isShopPath = location.pathname === "/shop"; // Check if the path is "/shop"
 
-
+  useEffect(() => {
+      if (token) {
+        fetchVerifiedCustomer();
+      }
+    }, [location, token]);
 
   const logout = () => {
     localStorage.removeItem('token');
     setToken('');
-    setCartItems({});
+    setCartItems([]);
+    setWishListItems([])
+
+    // REMOVE ORDER DATA ALSO
     navigate('/login');
     toast.success("Logged out successfully", {...toastSuccess});
   }
@@ -220,13 +227,21 @@ function Navbar() {
           </NavLink>
         </div>
         <div className='icon-button' ref={profileRef} style={{ position: 'relative' }}>
-          <img
+          {nbProfileImage && token? 
+            <div className='nav-profile-img'>
+              <img onClick={() => setShowProfileDropdown((prev) => !prev)} src={nbProfileImage instanceof File || nbProfileImage instanceof Blob ? URL.createObjectURL(nbProfileImage) : nbProfileImage} alt="Profile" draggable="false" />
+            </div> :
+
+            <img
+            className='nav-profile-none'
             onClick={() => setShowProfileDropdown((prev) => !prev)}
             src={assets.profile_icon}
             alt="Profile"
             draggable="false"
             style={{ cursor: 'pointer' }}
+
           />
+          }
           {showProfileDropdown && (
             <div className="profile-dropdown">
               {token && (
@@ -259,7 +274,10 @@ function Navbar() {
           <li><NavLink to="/shop" onClick={showSidebar}>Shop</NavLink></li>
           <li><NavLink to="/about" onClick={showSidebar}>About</NavLink></li>
           {!token && 
-            <li className={`${orderData.length > 0 ? '' : 'hidden-orer'}`}>
+            // <li className={`${orderData.length > 0 ? '' : 'hidden-orer'}`}>
+            //   <NavLink to="/orders" onClick={showSidebar}>Orders</NavLink>
+            // </li>
+            <li>
               <NavLink to="/orders" onClick={showSidebar}>Orders</NavLink>
             </li>
           }
