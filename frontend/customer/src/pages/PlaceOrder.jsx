@@ -29,8 +29,6 @@ function PlaceOrder() {
 
   
   // ORDER DATA
-  
-
   const onSubmitHandler = async(e) => {
     e.preventDefault();
 
