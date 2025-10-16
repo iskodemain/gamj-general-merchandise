@@ -17,7 +17,7 @@ import Loading from '../components/Loading';
 const Product = () => {
   const { productId } = useParams();
   const { products, productVariantValues, variantName, currency, addToCart, toastError, navigate, addToWishlist, removeFromWishlist, isInWishlist, cartItems, showUnavailableNote, setShowUnavailableNote, verifiedUser} = useContext(ShopContext);
-  const [selectedVariants, setSelectedVariants] = useState([]);
+  const [selectedVariants, setSelectedVariants] = useState('');
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -78,58 +78,118 @@ const Product = () => {
 
 
   const handleVariantSelect = (variantType, ID) => {
-    // Find the clicked variant object
+    // // Find the clicked variant object
+    // const selectedOption = variantGroups[variantType].find(opt => opt.ID === ID);
+    // if (!selectedOption) return;
+
+    // let newSelected;
+
+    // if (Array.isArray(selectedVariants)) {
+    //   // Remove old variant of the same type, keep others
+    //   const otherValues = Object.keys(variantGroups).flatMap(vName =>
+    //     vName === variantType ? [] : selectedVariants.filter(val =>
+    //       variantGroups[vName]?.some(opt => opt.value === val)
+    //     )
+    //   );
+
+    //   // Store the VALUE instead of the ID
+    //   newSelected = [...otherValues, selectedOption.value];
+    // } else {
+    //   newSelected = [selectedOption.value];
+    // }
+
+    // setSelectedVariants(newSelected);
+
+
+    // const totalVariantTypes = Object.keys(variantGroups).length;
+
+    // if (newSelected.length === totalVariantTypes) {
+    //   // Get all selected variant objects based on values
+    //   const selectedVariantValues = newSelected.map(val =>
+    //     productVariantValues.find(opt => opt.value === val)
+    //   );
+
+    //   // Price = sum all selected variant prices
+    //   const finalPrice = selectedVariantValues.reduce((sum, v) => sum + Number(v?.price || 0), 0);
+
+    //   // Stock = sum all selected variant stocks
+    //   const finalStock = selectedVariantValues.reduce((sum, v) => sum + Number(v?.stock || 0), 0);
+
+    //   setPrice(finalPrice);
+    //   setStock(finalStock);
+    // } else {
+    //   setPrice(Number(productData.price));
+    //   setStock(Number(productData.stockQuantity));
+    // }
+
     const selectedOption = variantGroups[variantType].find(opt => opt.ID === ID);
     if (!selectedOption) return;
 
-    let newSelected;
+    let newSelected = [];
 
-    if (Array.isArray(selectedVariants)) {
-      // Remove old variant of the same type, keep others
-      const otherValues = Object.keys(variantGroups).flatMap(vName =>
-        vName === variantType ? [] : selectedVariants.filter(val =>
-          variantGroups[vName]?.some(opt => opt.value === val)
-        )
-      );
-
-      // Store the VALUE instead of the ID
-      newSelected = [...otherValues, selectedOption.value];
-    } else {
-      newSelected = [selectedOption.value];
+    // Convert string back to array for processing
+    if (typeof selectedVariants === "string" && selectedVariants.trim() !== "") {
+      newSelected = selectedVariants.split(", ").map(v => v.trim());
     }
 
-    setSelectedVariants(newSelected);
+    // Remove the previous selection of the same type
+    Object.keys(variantGroups).forEach(vName => {
+      if (vName === variantType) {
+        newSelected = newSelected.filter(
+          val => !variantGroups[vName].some(opt => opt.value === val)
+        );
+      }
+    });
 
-    const totalVariantTypes = Object.keys(variantGroups).length;
+    // Add the newly selected variant value
+    newSelected.push(selectedOption.value);
 
-    if (newSelected.length === totalVariantTypes) {
-      // Get all selected variant objects based on values
-      const selectedVariantValues = newSelected.map(val =>
-        productVariantValues.find(opt => opt.value === val)
-      );
+    // Convert back to string format like "L, White"
+    const formatted = newSelected.sort().join(", ");
+    setSelectedVariants(formatted);
 
-      // Price = sum all selected variant prices
-      const finalPrice = selectedVariantValues.reduce((sum, v) => sum + Number(v?.price || 0), 0);
 
-      // Stock = sum all selected variant stocks
-      const finalStock = selectedVariantValues.reduce((sum, v) => sum + Number(v?.stock || 0), 0);
+    // (FIX THIS BUG BASED ON hasVariant or hasVariantCombination etc.)
+    // Calculate price and stock if all selected 
+    // const totalVariantTypes = Object.keys(variantGroups).length;
 
-      setPrice(finalPrice);
-      setStock(finalStock);
-    } else {
-      setPrice(Number(productData.price));
-      setStock(Number(productData.stockQuantity));
-    }
+    // if (newSelected.length === totalVariantTypes) {
+    //   const selectedVariantValues = newSelected.map(val =>
+    //     productVariantValues.find(opt => opt.value === val)
+    //   );
+
+    //   const finalPrice = selectedVariantValues.reduce(
+    //     (sum, v) => sum + Number(v?.price || 0),
+    //     0
+    //   );
+
+    //   const finalStock = selectedVariantValues.reduce(
+    //     (sum, v) => sum + Number(v?.stock || 0),
+    //     0
+    //   );
+
+    //   setPrice(finalPrice);
+    //   setStock(finalStock);
+    // } else {
+    //   setPrice(Number(productData.price));
+    //   setStock(Number(productData.stockQuantity));
+    // }
   };
 
   // Check if all required variants are selected
-  const allVariantsSelected = Object.keys(selectedVariants).length === Object.keys(variantGroups).length;
+  // const allVariantsSelected = Object.keys(selectedVariants).length === Object.keys(variantGroups).length;
+
+  const allVariantsSelected = selectedVariants.split(', ').filter(Boolean).length === Object.keys(variantGroups).length;
 
   const isActionDisabled = productData
   ? (productData.hasVariant
       ? (!allVariantsSelected || stock <= 0)
       : productData.stockQuantity <= 0)
   : true;
+
+  useEffect(() => {
+    console.log('Selected Variant:', selectedVariants);
+  }, [selectedVariants]);
 
 
   // ADD TO CART
@@ -144,8 +204,11 @@ const Product = () => {
       const existingCartItem = cartItems.find(item => {
         const itemValue = Array.isArray(item.value) ? item.value : JSON.parse(item.value || "[]");
 
-        const sortedItemValue = [...itemValue].sort();
-        const sortedSelected = [...selectedVariants].sort();
+        // const sortedItemValue = [...itemValue].sort();
+        // const sortedSelected = [...selectedVariants].sort();
+
+        const sortedItemValue = Array.isArray(itemValue) ? [...itemValue].sort() : [];
+        const sortedSelected = selectedVariants ? selectedVariants.split(', ').sort() : [];
 
         return item.productId === productData.ID && JSON.stringify(sortedItemValue) === JSON.stringify(sortedSelected);
       });
@@ -257,9 +320,10 @@ const Product = () => {
                   <p className='select-size-text'>Select {vName}</p>
                   <div className='ss-list'>
                     {variantGroups[vName].map((opt) => (
+                      //className={`sizes-none ${selectedVariants.includes(opt.value) ? 'sizes-pick' : ''}`
                       <button
                         onClick={() => handleVariantSelect(vName, opt.ID)}
-                        className={`sizes-none ${selectedVariants.includes(opt.value) ? 'sizes-pick' : ''}`}
+                        className={`sizes-none ${selectedVariants.split(', ').includes(opt.value) ? 'sizes-pick' : ''}`}
                         key={opt.ID}
                       >
                         {opt.value}

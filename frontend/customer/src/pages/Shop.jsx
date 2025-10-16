@@ -151,6 +151,7 @@ const Shop = () => {
                 price={item.price} 
                 active={item.isActive}
                 bestseller={item.isBestSeller}
+                outOfStock={item.isOutOfStock}
               />
             ))
           ) : (

@@ -6,7 +6,7 @@ import './ProductItem.css'
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoMdHeart } from "react-icons/io";
 import { GiBowTieRibbon } from "react-icons/gi";
-const ProductItem = ({ID, productId, image, name, price, active, bestseller}) => {
+const ProductItem = ({ID, productId, image, name, price, active, bestseller, outOfStock}) => {
     const {currency, addToWishlist, removeFromWishlist, isInWishlist} = useContext(ShopContext)
     const toggleWishlist = () => {
         if (isInWishlist(ID)) {
@@ -24,7 +24,7 @@ const ProductItem = ({ID, productId, image, name, price, active, bestseller}) =>
         {
             bestseller && <div className='bestseller-prod'><GiBowTieRibbon /></div>
         }
-        {active ? (
+        {!outOfStock ? (
                 <NavLink className='cursor-pointer' to={`/product/${productId}`}>
                     <div className={`overflow-hidden product-container`}>
                         <img className='hover:scale-110 transition ease-in-out product-image' src={image[0]} draggable="false" alt={name} />

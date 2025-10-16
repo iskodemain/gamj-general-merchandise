@@ -2,16 +2,26 @@ import Products from "../models/products.js";
 import Category from "../models/category.js";
 import VariantName from "../models/variantName.js";
 import ProductVariantValues from "../models/productVariantValues.js";
+import ProductVariantCombination from "../models/ProductVariantCombination.js";
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 
 // ALL PRODUCTS 
 // Add Product
-export const addProductService = async (categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, hasVariant, expirationDate) => {
+export const addProductService = async (categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination) => {
     try {
-        price = Number(price); // PROCESS MO ITO SA FROTEND KUNIN MO YUNG PINAKA MABABANG TOTAL NG PRICE NG VARIANT NA PINAG SUM SA DALAWA OR ISANG VARIANT VALUE. KUNG ISANG VARIANT LANG KUNIN MO NA YUNG PINAKA MABABANG PRICE DOON. PERO KUNG DALAWA IPAG PLUS MO YUNG DALAWANG KIND OF PRODUCT VARIANT THEN KUNIN MO YUNG PINAKAMABABA.
-        stockQuantity = Number(stockQuantity);
 
+        if (typeof variantNames === 'string') {
+            try { variantNames = JSON.parse(variantNames); } catch (e) { variantNames = []; }
+        }
+        if (typeof variantValues === 'string') {
+            try { variantValues = JSON.parse(variantValues); } catch (e) { variantValues = []; }
+        }
+        if (typeof variantCombination === 'string') {
+            try { variantCombination = JSON.parse(variantCombination); } catch (e) { variantCombination = []; }
+        }
+
+        // PRODUCTS WITHOUT VARIANTS
         const category = await Category.findByPk(categoryId);
         if (!category) {
             return {
@@ -49,9 +59,6 @@ export const addProductService = async (categoryId, productName, productDescript
             }
         }
         
-
-
-        // const images = [image1, image2, image3, image4].filter((item) => item !== undefined);
         const images = [image1, image2, image3, image4].filter(item => item && item.path);
         let imagesUrl = [];
         
@@ -90,21 +97,23 @@ export const addProductService = async (categoryId, productName, productDescript
             }
         }
 
-        await Products.create({
+        const newProduct = await Products.create({
             categoryId, // or the correct field name
             productName,
             productDescription,
             productDetails: productDetails || '',
-            price,
+            price: Number(price),
             image1: imagesUrl[0]?.secure_url,
             image2: imagesUrl[1]?.secure_url || null,
             image3: imagesUrl[2]?.secure_url || null,
             image4: imagesUrl[3]?.secure_url || null,
-            stockQuantity,
+            stockQuantity: Number(stockQuantity),
             isBestSeller,
             isActive,
+            isOutOfStock,
             hasVariant,
-            expirationDate: hasVariant ? null : expirationDate || ''
+            hasVariantCombination,
+            expirationDate: hasVariant ? null : expirationDate || null
         }, 
         {
             fields: [
@@ -120,17 +129,178 @@ export const addProductService = async (categoryId, productName, productDescript
                 'stockQuantity',
                 'isBestSeller',
                 'isActive',
+                'isOutOfStock',
                 'hasVariant',
+                'hasVariantCombination',
                 'expirationDate'
             ]
         });
 
-        
+        if (!hasVariant && !hasVariantCombination) {
+            return {
+                success: true,
+                message: 'Product added successfully.'
+            };
+        }
 
-        return {
-            success: true,
-            message: 'Product added successfully.'
-        };
+        // PRODUCTS WITH VARIANTS
+        if (hasVariant && !hasVariantCombination) {
+            if (!variantNames || !variantNames.length) {
+                return {
+                    success: false,
+                    message: "Variant name is required."
+                };
+            }
+
+            let variantNameRecord = await VariantName.findOne({
+                where: { name: variantNames[0] }
+            })
+
+            if (!variantNameRecord) {
+                variantNameRecord = await VariantName.create({ 
+                    name: variantNames[0]
+                }, {
+                    fields: [
+                        'name'
+                    ]
+                });
+            }
+
+            if (!variantValues || !variantValues.length) {
+                console.log(variantValues);
+                return { success: false, message: "Variant values are required. " + variantValues };
+            }
+            
+            const variantValueRecords = [];
+            for (const item of variantValues) {
+                const record = await ProductVariantValues.create({
+                    productId: newProduct.ID,
+                    variantNameId: variantNameRecord.ID,
+                    value: item.name,
+                    price: item.price || null,
+                    stock: item.stock || null,
+                    expirationDate: item.expirationDate || null
+                }, {
+                    fields: [
+                        'productId',
+                        'variantNameId',
+                        'value',
+                        'price',
+                        'stock',
+                        'expirationDate'
+                    ]
+                });
+                variantValueRecords.push(record);
+            }
+
+            return {
+                success: true,
+                message: "Product with variants added successfully.",
+                product: newProduct,
+                variantName: variantNameRecord,
+                variantValues: variantValueRecords
+            };
+        }
+        
+        // PRODUCTS WITH VARIANTS AND COMBINATIONS
+        if (hasVariant && hasVariantCombination) {
+            if (!variantNames || !variantNames.length) {
+                return {
+                    success: false,
+                    message: "Variant name is required."
+                };
+            }
+
+            const existingVariantNames = await VariantName.findAll({
+                where: { name: variantNames }
+            });
+
+            const existingNames = existingVariantNames.map(v => v.name);
+
+            const newVariantNames = variantNames.filter(name => !existingNames.includes(name));
+
+            const createdVariantNames  = await Promise.all(
+                newVariantNames.map(async (name) => {
+                    return await VariantName.create({ name }, { fields: ["name"] });
+                })
+            );
+
+            const variantNameRecords = [...existingVariantNames, ...createdVariantNames];
+
+            if (!variantValues || !variantValues.length) {
+                return { success: false, message: "Variant values are required." };
+            }
+
+            const variantValueRecords = [];
+            for (const item of variantValues) {
+                const variantName = variantNameRecords.find(vn => vn.name === item.variantName);
+                const record = await ProductVariantValues.create({
+                    productId: newProduct.ID,
+                    variantNameId: variantName.ID,
+                    value: item.name,
+                    price: item.price || null,
+                    stock: item.stock || null,
+                    expirationDate: item.expirationDate || null
+                }, {
+                    fields: [
+                        'productId',
+                        'variantNameId',
+                        'value',
+                        'price',
+                        'stock',
+                        'expirationDate'
+                    ]
+                });
+                variantValueRecords.push(record);
+            }
+
+            if (!variantCombination || !variantCombination.length) {
+                return { success: false, message: "Variant combination is required." };
+            }
+
+            // Helper function - Normalize spacing AND sort
+            const normalizeVariants = (value) => {
+            if (!value || value.trim() === '') return '';
+            return value
+                .split(',')                       // Split by comma
+                .map(v => v.trim())               // Remove spaces from each part
+                .filter(v => v.length > 0)        // Remove empty values
+                .sort()                           // ✅ Sort alphabetically
+                .join(', ');                      // Join with ", " (comma + space)
+            };
+
+            const combinationRecords = [];
+
+            for (const combo of variantCombination) {
+                const combinationsValue = normalizeVariants(combo.combinations);
+                const record = await ProductVariantCombination.create({
+                    productId: newProduct.ID,
+                    combinations: combinationsValue,
+                    price: combo.price || 0,
+                    stock: combo.stock || 0,
+                    availability: combo.availability ? 1 : 0
+                }, {
+                    fields: [
+                        "productId", 
+                        "combinations", 
+                        "price", 
+                        "stock", 
+                        "availability"
+                    ]
+                });
+
+                combinationRecords.push(record);
+            }
+
+            return {
+                success: true,
+                message: "Product with variant combinations added successfully.",
+                product: newProduct,
+                variantNames: variantNameRecords,
+                variantValues: variantValueRecords.filter(Boolean),
+                variantCombinations: combinationRecords
+            };
+        }
 
     } catch (error) {
         console.log(error);
@@ -161,9 +331,6 @@ export const fetchAllProductsService = async () => {
     }
 }
 
-
-// PRODUCT VARIANTS
-
 // Variant Names (FETCH)
 export const fetchVariantNameService = async () => {
     try {
@@ -186,34 +353,6 @@ export const fetchVariantNameService = async () => {
         throw new Error(error.message);
     }
 }
-
-// Variant Names (ADD)
-export const addVariantNameService = async (name) => {
-    try {
-        if (!name) {
-            return {
-                success: false,
-                message: "Variant name is required."
-            };
-        }
-        const newVariantName = await VariantName.create({ 
-            name 
-        }, {
-            fields: [
-                'name'
-            ]
-        });
-        return {
-            success: true,
-            message: "Variant name added successfully.",
-            variantName: newVariantName
-        };
-    } catch (error) {
-        console.log(error);
-        throw new Error(error.message);
-    }
-}
-
 
 // Product Variant Values (FETCH)
 export const fetchProductVariantValuesService = async () => {
@@ -238,78 +377,28 @@ export const fetchProductVariantValuesService = async () => {
     }
 }
 
-// Product Variant Values (ADD)
-export const addProductVariantValuesService = async (productId, variantNameId, value, price, stock, expirationDate) => {
+// Product Variant Combination (FETCH)
+export const fetchProductVariantCombinationService = async () => {
     try {
-        const findProduct = await Products.findByPk(productId);
-        const findVariantName = await VariantName.findByPk(variantNameId);
-
-        if (!findProduct) {
+        const productVariantCombination = await ProductVariantCombination.findAll({});
+        if (productVariantCombination.length === 0) {
             return {
-                success: false,
-                message: "Product not found."
+                success: true,
+                message: "No product variant combinations found.",
+                productVariantCombination: []
             };
         }
-
-        if (!findVariantName) {
-            return {
-                success: false,
-                message: "Variant name not found."
-            };
-        }
-
-        if (!value) {
-            return {
-                success: false,
-                message: "Variant value is required."
-            };
-        }
-
-        if (price === undefined || price === null || price < 0) {
-            return {
-                success: false,
-                message: "Variant price is required."
-            }
-        }
-
-        if (stock === undefined || stock === null || stock < 0) {
-            return {
-                success: false,
-                message: "Variant stock is required."
-            }
-        }
-
-        const newProductVariantValues = await ProductVariantValues.create({
-            productId,
-            variantNameId, 
-            value, 
-            price, 
-            stock, 
-            expirationDate
-        }, {
-            fields: [
-                'productId',
-                'variantNameId',
-                'value',
-                'price',
-                'stock',
-                'expirationDate'
-            ]
-        });
 
         return {
             success: true,
-            message: "Product variant values added successfully.",
-            productVariantValues: newProductVariantValues
+            productVariantCombination
         };
+
     } catch (error) {
         console.log(error);
         throw new Error(error.message);
     }
 }
-
-
-// PRODUCT CATEGORY
 
 // Product Category (FETCH)
 export const fetchProductCategoryService = async () => {
