@@ -76,7 +76,7 @@ const Products = sequelize.define(
     },
     stockQuantity: {
       type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
     },
     isBestSeller: {
       type: DataTypes.BOOLEAN,
@@ -84,6 +84,11 @@ const Products = sequelize.define(
       defaultValue: false,
     },
     isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    isOutOfStock: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,

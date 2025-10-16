@@ -1,4 +1,4 @@
-import { addProductService, fetchAllProductsService, fetchVariantNameService, addVariantNameService, fetchProductVariantValuesService, addProductVariantValuesService, fetchProductCategoryService, addProductCategoryService } from '../services/customerProductService.js';
+import { addProductService, fetchAllProductsService, fetchVariantNameService, fetchProductVariantValuesService, fetchProductCategoryService, addProductCategoryService, fetchProductVariantCombinationService } from '../services/customerProductService.js';
 
 
 // ALL PRODUCTS 
@@ -10,9 +10,9 @@ export const addProduct = async (req, res) => {
         const image3 = req.files.image3?.[0];
         const image4 = req.files.image4?.[0];
 
-        const {categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, hasVariant, expirationDate} = req.body;
+        const {categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination} = req.body;
 
-        const result = await addProductService(categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, hasVariant, expirationDate);
+        const result = await addProductService(categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination);
 
         res.json(result);
     } catch (error) {
@@ -31,27 +31,11 @@ export const fetchAllProducts = async (req, res) => {
     }
 }
 
-
-// PRODUCT VARIANTS
-
 // Variant Names (FETCH)
 export const fetchVariantName = async (req, res) => {
     try {
         // const { ID } = req.user;
         const result = await fetchVariantNameService();
-        res.json(result);
-    } catch (error) {
-        console.log(error);
-        res.json({success: false, message:error.message})
-    }
-}
-
-// Variant Names (ADD)
-export const addVariantName = async (req, res) => {
-    try {
-        // const { ID } = req.user;
-        const { name } = req.body;
-        const result = await addVariantNameService(name);
         res.json(result);
     } catch (error) {
         console.log(error);
@@ -71,21 +55,17 @@ export const fetchProductVariantValues = async (req, res) => {
     }
 }
 
-// Product Variant Values (ADD)
-export const addProductVariantValues = async (req, res) => {
+// Product Variant Values (FETCH)
+export const fetchProductVariantCombination = async (req, res) => {
     try {
         // const { ID } = req.user;
-        const { productId, variantNameId, value, price, stock, expirationDate } = req.body;
-        const result = await addProductVariantValuesService(productId, variantNameId, value, price, stock, expirationDate);
+        const result = await fetchProductVariantCombinationService();
         res.json(result);
     } catch (error) {
         console.log(error);
         res.json({success: false, message:error.message})
     }
 }
-
-
-// PRODUCT CATEGORY
 
 // Product Category (FETCH)
 export const fetchProductCategory = async (req, res) => {

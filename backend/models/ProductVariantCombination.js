@@ -26,7 +26,7 @@ const ProductVariantCombination = sequelize.define(
       onUpdate: "CASCADE",
     },
     combinations: {
-      type: DataTypes.JSON, // e.g. ["M", "Blue"]
+      type: DataTypes.TEXT, // e.g. ["M", "Blue"]
       allowNull: false,
     },
     price: {
