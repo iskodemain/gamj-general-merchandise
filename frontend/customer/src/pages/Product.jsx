@@ -16,11 +16,12 @@ import UnavailableNote from '../components/Notice/UnavailableNote';
 import Loading from '../components/Loading';
 const Product = () => {
   const { productId } = useParams();
-  const { products, productVariantValues, variantName, currency, addToCart, toastError, navigate, addToWishlist, removeFromWishlist, isInWishlist, cartItems, showUnavailableNote, setShowUnavailableNote, verifiedUser} = useContext(ShopContext);
+  const { products, productVariantValues, variantName, currency, addToCart, toastError, navigate, addToWishlist, removeFromWishlist, isInWishlist, cartItems, showUnavailableNote, setShowUnavailableNote, verifiedUser, productVariantCombination} = useContext(ShopContext);
   const [selectedVariants, setSelectedVariants] = useState('');
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [itemNotAvailable, setItemNotAvailable] = useState(false);
 
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
@@ -51,6 +52,26 @@ const Product = () => {
     }
   }, [productId, products]);
 
+  // useEffect(() => {
+  //   console.log('Product Variant Combination:', productVariantCombination);
+  // }, [productVariantCombination]);
+
+  // useEffect(() => {
+  //   console.log('Product Variant Values:', productVariantValues);
+  // }, [productVariantValues]);
+
+  // useEffect(() => {
+  //   console.log('Product Data:', productData);
+  // }, [productData]);
+
+  // useEffect(() => {
+  //   console.log('Selected Variant:', selectedVariants);
+  // }, [selectedVariants]);
+
+  // useEffect(() => {
+  //   console.log('Variant Groups:', variantGroups);
+  // }, [variantGroups]);
+
 
   const variantGroups = {};
   if (productData) {
@@ -72,56 +93,7 @@ const Product = () => {
       });
   }
 
-  useEffect(() => {
-    console.log('Variant Groups:', variantGroups);
-  }, [variantGroups]);
-
-
   const handleVariantSelect = (variantType, ID) => {
-    // // Find the clicked variant object
-    // const selectedOption = variantGroups[variantType].find(opt => opt.ID === ID);
-    // if (!selectedOption) return;
-
-    // let newSelected;
-
-    // if (Array.isArray(selectedVariants)) {
-    //   // Remove old variant of the same type, keep others
-    //   const otherValues = Object.keys(variantGroups).flatMap(vName =>
-    //     vName === variantType ? [] : selectedVariants.filter(val =>
-    //       variantGroups[vName]?.some(opt => opt.value === val)
-    //     )
-    //   );
-
-    //   // Store the VALUE instead of the ID
-    //   newSelected = [...otherValues, selectedOption.value];
-    // } else {
-    //   newSelected = [selectedOption.value];
-    // }
-
-    // setSelectedVariants(newSelected);
-
-
-    // const totalVariantTypes = Object.keys(variantGroups).length;
-
-    // if (newSelected.length === totalVariantTypes) {
-    //   // Get all selected variant objects based on values
-    //   const selectedVariantValues = newSelected.map(val =>
-    //     productVariantValues.find(opt => opt.value === val)
-    //   );
-
-    //   // Price = sum all selected variant prices
-    //   const finalPrice = selectedVariantValues.reduce((sum, v) => sum + Number(v?.price || 0), 0);
-
-    //   // Stock = sum all selected variant stocks
-    //   const finalStock = selectedVariantValues.reduce((sum, v) => sum + Number(v?.stock || 0), 0);
-
-    //   setPrice(finalPrice);
-    //   setStock(finalStock);
-    // } else {
-    //   setPrice(Number(productData.price));
-    //   setStock(Number(productData.stockQuantity));
-    // }
-
     const selectedOption = variantGroups[variantType].find(opt => opt.ID === ID);
     if (!selectedOption) return;
 
@@ -149,64 +121,66 @@ const Product = () => {
     setSelectedVariants(formatted);
 
 
-    // (FIX THIS BUG BASED ON hasVariant or hasVariantCombination etc.)
-    // Calculate price and stock if all selected 
-    // const totalVariantTypes = Object.keys(variantGroups).length;
+    // (APPLY THE CORRECT PRICE & STOCK BASED ON SELECTED COMBINATION)
+    if (!productData) return;
+    if (!productData.hasVariant && !productData.hasVariantCombination) {
+      setPrice(Number(productData.price));
+      setStock(Number(productData.stockQuantity));
+      setItemNotAvailable(false);
+      return;
+    }
+    // --- 2️⃣ PRODUCT WITH SINGLE VARIANTS ---
+    if (productData.hasVariant && !productData.hasVariantCombination) {
+      const match = productVariantValues.find(pv => pv.productId === productData.ID && pv.value === formatted);
 
-    // if (newSelected.length === totalVariantTypes) {
-    //   const selectedVariantValues = newSelected.map(val =>
-    //     productVariantValues.find(opt => opt.value === val)
-    //   );
+      if (match) {
+        setPrice(Number(match.price || productData.price));
+        setStock(Number(match.stock || productData.stockQuantity));
+        setItemNotAvailable(false);
+      } else {
+        setItemNotAvailable(true);
+        setPrice(Number(productData.price));
+        setStock(Number(productData.stockQuantity));
+      }
+      return;
+    }
+    // --- 3️⃣ PRODUCT WITH VARIANT COMBINATIONS ---
+    if (productData.hasVariant && productData.hasVariantCombination) {
+      const matchCombo = productVariantCombination.find(
+        combo =>
+          combo.productId === productData.ID &&
+          combo.combinations.split(", ").sort().join(", ") === formatted
+      );
 
-    //   const finalPrice = selectedVariantValues.reduce(
-    //     (sum, v) => sum + Number(v?.price || 0),
-    //     0
-    //   );
-
-    //   const finalStock = selectedVariantValues.reduce(
-    //     (sum, v) => sum + Number(v?.stock || 0),
-    //     0
-    //   );
-
-    //   setPrice(finalPrice);
-    //   setStock(finalStock);
-    // } else {
-    //   setPrice(Number(productData.price));
-    //   setStock(Number(productData.stockQuantity));
-    // }
+      if (matchCombo) {
+        setPrice(Number(matchCombo.price || productData.price));
+        setStock(Number(matchCombo.stock || productData.stockQuantity));
+        setItemNotAvailable(false);
+      } else {
+        setItemNotAvailable(true);
+        setPrice(Number(productData.price));
+        setStock(Number(productData.stockQuantity));
+      }
+      return;
+    }
   };
-
-  // Check if all required variants are selected
-  // const allVariantsSelected = Object.keys(selectedVariants).length === Object.keys(variantGroups).length;
 
   const allVariantsSelected = selectedVariants.split(', ').filter(Boolean).length === Object.keys(variantGroups).length;
 
-  const isActionDisabled = productData
-  ? (productData.hasVariant
-      ? (!allVariantsSelected || stock <= 0)
-      : productData.stockQuantity <= 0)
-  : true;
-
-  useEffect(() => {
-    console.log('Selected Variant:', selectedVariants);
-  }, [selectedVariants]);
+  const isActionDisabled = productData ? (productData.hasVariant ? (!allVariantsSelected || stock <= 0 || itemNotAvailable) : productData.stockQuantity <= 0 || itemNotAvailable) : true;
 
 
   // ADD TO CART
-  const handleAddToCart = (productStocks, activeProduct) => {
+  const handleAddToCart = (productStocks, activeProduct, isOutOfStock) => {
     // Block if product has variants but none selected
     if (productData.hasVariant && !allVariantsSelected) {
       toast.error("Please select all product options before adding to cart.", { ...toastError });
       return;
     }
 
-    if (activeProduct) {
+    if (activeProduct && !isOutOfStock) {
       const existingCartItem = cartItems.find(item => {
         const itemValue = Array.isArray(item.value) ? item.value : JSON.parse(item.value || "[]");
-
-        // const sortedItemValue = [...itemValue].sort();
-        // const sortedSelected = [...selectedVariants].sort();
-
         const sortedItemValue = Array.isArray(itemValue) ? [...itemValue].sort() : [];
         const sortedSelected = selectedVariants ? selectedVariants.split(', ').sort() : [];
 
@@ -332,7 +306,10 @@ const Product = () => {
                   </div>
                 </div>
               ))}
-
+              {
+                allVariantsSelected && itemNotAvailable &&
+                <p className='unavailable-item-message'>Sorry, this item is currently unavailable.</p>
+              }
               <div className='quantity-container'>
                 <div className="quantity-semi">
                     <p className='select-size-text'>Select Quantity</p>
@@ -347,8 +324,8 @@ const Product = () => {
                 </div>
               </div>
               <div className='buttons-container'>
-                <button onClick={() => handleAddToCart(stock > 0 ? stock : productData.stockQuantity, productData.isActive)} className='main-button add-cart' disabled={isActionDisabled}>ADD TO CART</button>
-                <button className='main-button buy-now' onClick={() => handleBuyNow(stock > 0 ? stock : productData.stockQuantity, productData.isActive)} disabled={isActionDisabled}>BUY NOW</button>
+                <button onClick={() => handleAddToCart(stock, productData.isActive, productData.isOutOfStock)} className='main-button add-cart' disabled={isActionDisabled}>ADD TO CART</button>
+                <button className='main-button buy-now' onClick={() => handleBuyNow(stock, productData.isActive, productData.isOutOfStock)} disabled={isActionDisabled}>BUY NOW</button>
               </div>
               <hr className='line-hr'/>
               <div className='product-info'>
@@ -363,7 +340,6 @@ const Product = () => {
         <div className='detainer'>
             <div className='flex'>
                 <b className='p-details'>Product Details</b>
-                <p className='p-stocks'>Product Stocks: {productData.stockQuantity}</p>
             </div>
             <div className='p-message'>
              <div className='product-details' 

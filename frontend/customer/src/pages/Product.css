@@ -260,24 +260,15 @@
     padding-right: 1.5rem;
 }
 
-.p-details, .p-stocks, .p-message {
+.p-details, .p-message {
     border: 1px solid #D0D0D0;
 
 }
 
-.p-details, .p-stocks {
+.p-details {
     border-bottom: none;
     padding-inline: 2.5rem;
     padding-block: 1rem;
-}
-
-.p-stocks {
-    border-left: none;
-    font-weight: bold;
-    background-color: #FBFBFB;
-    color: #898989;
-    font-size: 0.875rem;
-    line-height: 1.25rem; 
 }
 
 .product-details {
@@ -307,6 +298,13 @@
 .detainer {
     scroll-margin-top: 10rem;
     margin-top: 5rem; 
+}
+
+.unavailable-item-message {
+  font-size: 0.8rem;
+  color: #FF0000;
+  font-style: italic;
+
 }
 
 /* PRODUCT MAIN */
