@@ -36,7 +36,7 @@ const Cart = sequelize.define(
       onUpdate: 'CASCADE',
     },
     value: {
-      type: DataTypes.JSON, // ✅ matches your CREATE TABLE value JSON
+      type: DataTypes.TEXT, // ✅ matches your CREATE TABLE value JSON
       allowNull: true,
     },
     quantity: {
