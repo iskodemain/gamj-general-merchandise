@@ -11,16 +11,16 @@ function BestSeller() {
     const [bestSellingProducts, setBestSellingProducts] = useState([]);
     const [showAll, setShowAll] = useState(false);
 
-    const bestseller = products.filter((value) => {
-        return value.isBestSeller === true;
-    })  
-
     useEffect(() => {
-        setBestSellingProducts(bestseller)
-    }, [products])
+        const bestseller = products.filter((value) => value.isBestSeller === true && value.isActive === true);
+        setBestSellingProducts(bestseller);
+    }, [products]);
 
 
     const productsToShow = showAll ? bestSellingProducts : bestSellingProducts.slice(0, 4);
+
+    console.log('Best selling products updated:', bestSellingProducts);
+    
 
   return (
     <div id="best-seller" className='bs-container'>
