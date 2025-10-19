@@ -28,7 +28,7 @@ const Shop = () => {
 
 
   const filteringProducts = () => {
-  let updatedProducts = products;
+    let updatedProducts = products.filter(item => item.isActive === true);
 
     if (selectedFilter.name !== 'All' && selectedFilter.name !== 'Best Sellers' && selectedFilter.name !== 'Filter') {
       // Filter by categoryId (from DB)

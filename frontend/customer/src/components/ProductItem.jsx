@@ -17,7 +17,7 @@ const ProductItem = ({ID, productId, image, name, price, active, bestseller, out
         }
     };
   return (
-    <div className='main-product-container'>
+    active && <div className='main-product-container'>
         <button className={`wishlist-icon1 ${isInWishlist(ID) ? 'hidden' : ''}`} 
         onClick={toggleWishlist}><IoMdHeartEmpty /></button>
         <button className={`wishlist-icon2 ${isInWishlist(ID) ? '' : 'hidden'}`} onClick={toggleWishlist}><IoMdHeart /></button>

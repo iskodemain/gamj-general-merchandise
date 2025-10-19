@@ -22,6 +22,7 @@ const Product = () => {
   const [image, setImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [itemNotAvailable, setItemNotAvailable] = useState(false);
+  const [unavailableProduct, setUnavailableProduct] = useState(false);
 
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
@@ -36,8 +37,13 @@ const Product = () => {
       //const productId = Number(productId);  Convert productId to a number
       const product = products.find((item) => String(item.productId) === String(productId));
       if (product) {
-        setProductData(product); 
-        setImage(product.images[0])
+        setProductData(product);
+        setImage(product.images[0]);
+
+        if (!product.hasVariant && !product.hasVariantCombination) {
+          setStock(Number(product.stockQuantity));
+          setPrice(Number(product.price));
+        }
         
       } else {
         console.error('Product not found!');
@@ -51,27 +57,6 @@ const Product = () => {
       fetchProductData();
     }
   }, [productId, products]);
-
-  // useEffect(() => {
-  //   console.log('Product Variant Combination:', productVariantCombination);
-  // }, [productVariantCombination]);
-
-  // useEffect(() => {
-  //   console.log('Product Variant Values:', productVariantValues);
-  // }, [productVariantValues]);
-
-  // useEffect(() => {
-  //   console.log('Product Data:', productData);
-  // }, [productData]);
-
-  // useEffect(() => {
-  //   console.log('Selected Variant:', selectedVariants);
-  // }, [selectedVariants]);
-
-  // useEffect(() => {
-  //   console.log('Variant Groups:', variantGroups);
-  // }, [variantGroups]);
-
 
   const variantGroups = {};
   if (productData) {
@@ -99,7 +84,6 @@ const Product = () => {
 
     let newSelected = [];
 
-    // Convert string back to array for processing
     if (typeof selectedVariants === "string" && selectedVariants.trim() !== "") {
       newSelected = selectedVariants.split(", ").map(v => v.trim());
     }
@@ -180,11 +164,12 @@ const Product = () => {
 
     if (activeProduct && !isOutOfStock) {
       const existingCartItem = cartItems.find(item => {
-        const itemValue = Array.isArray(item.value) ? item.value : JSON.parse(item.value || "[]");
-        const sortedItemValue = Array.isArray(itemValue) ? [...itemValue].sort() : [];
-        const sortedSelected = selectedVariants ? selectedVariants.split(', ').sort() : [];
+        const itemValue = typeof item.value === "string" ? item.value : "";
+        
+        const sortedItemValue = itemValue.split(",").map(v => v.trim()).sort().join(", ");
+        const sortedSelected = selectedVariants ? selectedVariants.split(",").map(v => v.trim()).sort().join(", ") : '';
 
-        return item.productId === productData.ID && JSON.stringify(sortedItemValue) === JSON.stringify(sortedSelected);
+        return item.productId === productData.ID && sortedItemValue === sortedSelected;
       });
 
       const existingQuantity = existingCartItem ? existingCartItem.quantity : 0;
@@ -247,6 +232,14 @@ const Product = () => {
     }
   };
 
+  useEffect(() => {
+    if (productData && (!productData.isActive || productData.isOutOfStock)) {
+      setUnavailableProduct(true);
+    } else {
+      setUnavailableProduct(false);
+    }
+  }, [productData]);
+
   if (!products || products.length === 0) {
     return <Loading />;
   }
@@ -255,11 +248,18 @@ const Product = () => {
     return <Loading />;
   }
 
-  
+  const UnavailableProduct = () => {
+    return (
+      <div className="up-bg">
+        <p className='up-note'>This product is currently unavailable.</p>
+      </div>
+    );
+  };
 
-  return productData ? (
+  return (
     <div className='product-main'>
       {showUnavailableNote && <UnavailableNote />}
+      {unavailableProduct && <UnavailableProduct />}
       <div className='product-semi'>
         {/* Product Data */}
         <div className='pd-container'>
@@ -356,8 +356,7 @@ const Product = () => {
       <Infos/>
       <Footer/>
     </div>
-    
-  ) : <div className=''>...Loading</div>
+  )
 }
 
 export default Product;
