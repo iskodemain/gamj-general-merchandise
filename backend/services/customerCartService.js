@@ -66,15 +66,23 @@ export const addCartItemService = async (customerId, productId, value, quantity)
         }
     }
 
-    const normalizedValue = Array.isArray(value) && value.length > 0 ? [...value].sort() : null;
+    const normalizeValue = (value) => {
+      if (!value || typeof value !== "string" || value.trim() === "") {
+        return "";
+      };
+      return value.split(",").map((v) => v.trim()).filter((v) => v.length > 0).sort().join(", ");
+    };
+
+    const normalizedValue = normalizeValue(value);
 
     const existingCartItems = await Cart.findAll({ 
         where: { customerId, productId }
     });
 
-    const existingCartItem = existingCartItems.find(
-        item => JSON.stringify(item.value) === JSON.stringify(normalizedValue)
-    );
+    const existingCartItem = existingCartItems.find((item) => {
+      const itemValue = normalizeValue(item.value);
+      return itemValue === normalizedValue;
+    }); 
 
     if (existingCartItem) {
         existingCartItem.quantity += quantity;
@@ -87,8 +95,8 @@ export const addCartItemService = async (customerId, productId, value, quantity)
     }
 
     const addedCartItem = await Cart.create({
-        customerId: customerId, 
-        productId: productId,
+        customerId,
+        productId,
         value: normalizedValue,
         quantity
     }, {
@@ -129,15 +137,23 @@ export const updateCartItemService = async (customerId, productId, value, quanti
         }
     }
 
-    const normalizedValue = Array.isArray(value) ? [...value].sort() : null;
+    const normalizeValue = (value) => {
+      if (!value || typeof value !== "string" || value.trim() === "") {
+        return "";
+      };
+      return value.split(",").map((v) => v.trim()).filter((v) => v.length > 0).sort().join(", ");
+    };
+
+    const normalizedValue = normalizeValue(value);
 
     const existingCartItems = await Cart.findAll({
       where: { customerId, productId },
     });
 
-    const existingCartItem = existingCartItems.find(
-      (item) => JSON.stringify(item.value) === JSON.stringify(normalizedValue)
-    );
+    const existingCartItem = existingCartItems.find((item) => {
+      const itemValue = normalizeValue(item.value);
+      return itemValue === normalizedValue;
+    }); 
 
     if (!existingCartItem) {
       return {

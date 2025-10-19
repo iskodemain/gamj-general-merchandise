@@ -318,9 +318,9 @@ const Product = () => {
                     </p>
                 </div>
                 <div className="quantity-controls">
-                  <button onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))} className="quantity-btn"><FiMinus className='minus'/></button>
-                  <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} className="quantity-input" min={1} max={stock > 0 ? stock : productData.stockQuantity}/>
-                  <button onClick={() => setQuantity((prev) => Math.min(prev + 1, stock > 0 ? stock : productData.stockQuantity))} className="quantity-btn"><FiPlus className='plus'/></button>
+                  <button onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))} className="quantity-btn" disabled={isActionDisabled}><FiMinus className='minus'/></button>
+                  <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} className="quantity-input" min={1} max={stock > 0 ? stock : productData.stockQuantity} disabled={isActionDisabled}/>
+                  <button onClick={() => setQuantity((prev) => Math.min(prev + 1, stock > 0 ? stock : productData.stockQuantity))} className="quantity-btn" disabled={isActionDisabled}><FiPlus className='plus'/></button>
                 </div>
               </div>
               <div className='buttons-container'>
