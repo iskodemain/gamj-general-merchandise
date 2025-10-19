@@ -476,9 +476,11 @@ const ShopContextProvider = (props) => {
 
     };
 
+
+    // UPDATE CART ITEM
     const updateQuantity = async (productId, value, quantity) => {
         let cartData = cartItems.map((item) => {
-            if (item.productId === productId && JSON.stringify(item.value) === JSON.stringify(value)) {
+            if (item.productId === productId && item.value === value) {
                 return { ...item, quantity };
             }
             return item;

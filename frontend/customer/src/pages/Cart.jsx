@@ -13,19 +13,74 @@ import { toast } from "react-toastify";
 import UnavailableNote from '../components/Notice/UnavailableNote.jsx';
 
 function Cart() {
-  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, subtotal, getSubtotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, orderData, setOrderData} = useContext(ShopContext)
+  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, subtotal, getSubtotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, productVariantCombination, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, orderData, setOrderData} = useContext(ShopContext)
   const [cartData, setCartData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const allSelected = selectedItems.length === cartData.length && cartData.length > 0;
 
   useEffect(() => {
-    if (products.length > 0) {
-      const tempData = cartItems.filter(item => item.quantity > 0);
-      setCartData(tempData);
-      setShowCartContent(tempData.length > 0);
-    } else {
-      setShowCartContent(false);
+    if (!products.length || !cartItems.length) return;
+
+    const updatedCart = cartItems.filter(item => {
+      const productData = products.find(p => p.ID === item.productId);
+      if (!productData) {
+        toast.warning(`"${productData.productName}" is no longer available.`, { ...toastError });
+        deleteCartItem(item.ID);
+        return false; // Product removed
+      }
+
+      // Case 1: product has variants but no combinations
+      if (productData.hasVariant && !productData.hasVariantCombination) {
+        const exists = productVariantValues.some(
+          pv => pv.productId === item.productId && pv.value === item.value
+        );
+        if (!exists) {
+          toast.warning(`"${productData.productName}" (${item.value}) is no longer available.`, { ...toastError });
+          deleteCartItem(item.ID); // Delete from DB
+          return false; // Remove from frontend
+        }
+      }
+
+      // Case 2: product has variant combinations
+      if (productData.hasVariant && productData.hasVariantCombination) {
+        const exists = productVariantCombination.some(
+          pvc => pvc.productId === item.productId && pvc.combinations === item.value
+        );
+        if (!exists) {
+          toast.warning(`"${productData.productName}" (${item.value}) combination is no longer available.`, { ...toastError });
+          deleteCartItem(item.ID); // Delete from DB
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    if (updatedCart.length !== cartItems.length) {
+      setCartItems(updatedCart);
+      setShowCartContent(updatedCart.length > 0);
     }
+  }, [cartItems, products, productVariantValues, productVariantCombination]);
+
+  useEffect(() => {
+    if (!products.length) {
+      setShowCartContent(false);
+      return;
+    }
+
+    const validCart = cartItems.filter(item => {
+      const productData = products.find(p => p.ID === item.productId);
+      if (!productData) {
+        return false; // Product not found
+      }
+      if (!productData.isActive || productData.isOutOfStock) {
+        return false;
+      }
+      return item.quantity > 0;
+    });
+
+    setCartData(validCart);
+    setShowCartContent(validCart.length > 0);
   }, [cartItems, products]);
 
   useEffect(() => {
@@ -44,15 +99,12 @@ function Cart() {
   }, [selectedItems, cartData, products]);
 
   // TOTAL STOCKS
-  const getTotalStockForValue = (productId, value, productVariantValues) => {
-    if (!Array.isArray(value)) return 0;
-
-    return value.reduce((total, val) => {
-      const match = productVariantValues.find(
-        (pv) => pv.productId === productId && pv.value === val
-      );
-      return total + (match ? match.stock : 0);
-    }, 0);
+  const getTotalStockForValue = (productId, value, source) => {
+    const match = source.find((src) => {
+      const srcValue = src.value || src.combinations || "";
+      return src.productId === productId && srcValue === value;
+    });
+    return match ? match.stock : 0;
   };
 
 
@@ -65,9 +117,7 @@ function Cart() {
 
   // MAXIMUM BUTTON
   const handleIncrease = (productId, value, quantity, productData) => {
-    const maxStock = productData.hasVariant
-      ? getTotalStockForValue(productId, value, productVariantValues)
-      : productData.stockQuantity;
+    const maxStock = productData.hasVariant && productData.hasVariantCombination ? getTotalStockForValue(productId, value, productVariantCombination) : productData.hasVariant && !productData.hasVariantCombination ? getTotalStockForValue(productId, value, productVariantValues) : productData.stockQuantity
 
     if (maxStock && quantity < maxStock) {
       updateQuantity(productId, value, quantity + 1);
@@ -103,16 +153,14 @@ function Cart() {
 
   
   const handleDeleteSingle = (cartMainId) => {
-    const updatedCartItems = cartItems.filter(
-      (item) => !(item.ID === cartMainId)
-    );
+    const updatedCartItems = cartItems.filter((item) => !(item.ID === cartMainId));
     setCartItems(updatedCartItems);
     setShowCartContent(updatedCartItems.length > 0);
     deleteCartItem(cartMainId);
   };
 
 
-  const hadleCheckout = async () => {
+  const handleCheckout  = async () => {
     if (!token) {
       navigate('/login');
       toast.error("You must log in to proceed with the checkout.", {...toastError});
@@ -132,9 +180,6 @@ function Cart() {
     }
 
     navigate('/place-order');
-
-
-
   }
 
   return (
@@ -166,9 +211,6 @@ function Cart() {
               {
                 cartData.map((item, index) => {
                   const productData = products.find((product) => product.ID === item.productId);
-                  if (!productData?.isActive) {
-                    updateQuantity(item.productId, item.value, 0);
-                  }
                   return (
                     <div key={index} className='cart-container'>
                       <div className='cc-2'>
@@ -180,7 +222,7 @@ function Cart() {
                           <div className='cc-size'>
                             {productData.hasVariant && 
                               <p> 
-                                {item.value ? item.value.join(", ") : ''}
+                                {item.value || ''}
                               </p>
                             }
                           
@@ -192,8 +234,8 @@ function Cart() {
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
                                   if (isNaN(value) || value <= 0) return;
-                                  
-                                  const maxStock = productData.hasVariant ? getTotalStockForValue(item.productId, item.value, productVariantValues) : productData.stockQuantity;
+
+                                  const maxStock = productData.hasVariant && productData.hasVariantCombination ? getTotalStockForValue(item.productId, item.value, productVariantCombination) : productData.hasVariant && !productData.hasVariantCombination ? getTotalStockForValue(item.productId, item.value, productVariantValues) : productData.stockQuantity;
 
                                   if (value > maxStock) {
                                     updateQuantity(item.productId, item.value, maxStock);
@@ -205,7 +247,7 @@ function Cart() {
                                 value={item.quantity}
                                 className="quantity-input-cart"
                                 min={1}
-                                max={productData.hasVariant ? getTotalStockForValue(item.productId, item.value, productVariantValues) : productData.stockQuantity}
+                                max={productData.hasVariant && productData.hasVariantCombination ? getTotalStockForValue(item.productId, item.value, productVariantCombination) : productData.hasVariant && !productData.hasVariantCombination ? getTotalStockForValue(item.productId, item.value, productVariantValues) : productData.stockQuantity}
                               />
                               <button onClick={() => handleIncrease(item.productId, item.value, item.quantity, productData)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
                             </div>
@@ -248,7 +290,7 @@ function Cart() {
                   ? `DELETE(${selectedItems.length} ITEMS)`
                   : 'DELETE'}
                 </button>
-              <button onClick={()=> hadleCheckout()} className='cart-button-checkout' disabled={selectedItems.length === 0}>CHECKOUT</button>  
+              <button onClick={()=> handleCheckout ()} className='cart-button-checkout' disabled={selectedItems.length === 0}>CHECKOUT</button>  
             </div>   
             </div>
           </>
