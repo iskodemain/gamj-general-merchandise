@@ -1,7 +1,6 @@
 import Customer from "../models/customer.js";
 import Products from "../models/products.js";
 import Cart from "../models/cart.js";
-import ProductVariantValues from "../models/productVariantValues.js";
 
 export const fetchCartItemService = async (customerId) => {
   try {

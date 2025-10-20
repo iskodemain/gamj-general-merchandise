@@ -2,7 +2,7 @@ import Products from "../models/products.js";
 import Category from "../models/category.js";
 import VariantName from "../models/variantName.js";
 import ProductVariantValues from "../models/productVariantValues.js";
-import ProductVariantCombination from "../models/ProductVariantCombination.js";
+import ProductVariantCombination from "../models/productVariantCombination.js";
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 

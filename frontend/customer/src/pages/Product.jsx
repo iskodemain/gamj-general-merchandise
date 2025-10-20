@@ -40,10 +40,13 @@ const Product = () => {
         setProductData(product);
         setImage(product.images[0]);
 
-        if (!product.hasVariant && !product.hasVariantCombination) {
-          setStock(Number(product.stockQuantity));
-          setPrice(Number(product.price));
-        }
+        // ✅ Always start with product base price & stock quantity
+        const basePrice = Number(product.price);
+        const baseStock = Number(product.stockQuantity);
+
+        setPrice(basePrice);
+        setStock(baseStock);
+        setItemNotAvailable(baseStock <= 0);
         
       } else {
         console.error('Product not found!');
@@ -108,9 +111,10 @@ const Product = () => {
     // (APPLY THE CORRECT PRICE & STOCK BASED ON SELECTED COMBINATION)
     if (!productData) return;
     if (!productData.hasVariant && !productData.hasVariantCombination) {
+      const productStock = Number(productData.stockQuantity);
       setPrice(Number(productData.price));
-      setStock(Number(productData.stockQuantity));
-      setItemNotAvailable(false);
+      setStock(productStock);
+      setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
       return;
     }
     // --- 2️⃣ PRODUCT WITH SINGLE VARIANTS ---
@@ -118,9 +122,10 @@ const Product = () => {
       const match = productVariantValues.find(pv => pv.productId === productData.ID && pv.value === formatted);
 
       if (match) {
-        setPrice(Number(match.price || productData.price));
-        setStock(Number(match.stock || productData.stockQuantity));
-        setItemNotAvailable(false);
+        const productStock = Number(match.stock);
+        setPrice(Number(match.price));
+        setStock(productStock);
+        setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
       } else {
         setItemNotAvailable(true);
         setPrice(Number(productData.price));
@@ -137,9 +142,10 @@ const Product = () => {
       );
 
       if (matchCombo) {
-        setPrice(Number(matchCombo.price || productData.price));
-        setStock(Number(matchCombo.stock || productData.stockQuantity));
-        setItemNotAvailable(false);
+        const productStock = Number(matchCombo.stock);
+        setPrice(Number(matchCombo.price));
+        setStock(productStock);
+        setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
       } else {
         setItemNotAvailable(true);
         setPrice(Number(productData.price));
@@ -294,7 +300,6 @@ const Product = () => {
                   <p className='select-size-text'>Select {vName}</p>
                   <div className='ss-list'>
                     {variantGroups[vName].map((opt) => (
-                      //className={`sizes-none ${selectedVariants.includes(opt.value) ? 'sizes-pick' : ''}`
                       <button
                         onClick={() => handleVariantSelect(vName, opt.ID)}
                         className={`sizes-none ${selectedVariants.split(', ').includes(opt.value) ? 'sizes-pick' : ''}`}
@@ -314,13 +319,15 @@ const Product = () => {
                 <div className="quantity-semi">
                     <p className='select-size-text'>Select Quantity</p>
                     <p className='available-stk'>
-                      Available Stocks: {stock > 0 ? stock : productData.stockQuantity}
+                      { !isActionDisabled &&
+                        `Available Stocks: ${stock}`
+                      }
                     </p>
                 </div>
                 <div className="quantity-controls">
                   <button onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))} className="quantity-btn" disabled={isActionDisabled}><FiMinus className='minus'/></button>
-                  <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} className="quantity-input" min={1} max={stock > 0 ? stock : productData.stockQuantity} disabled={isActionDisabled}/>
-                  <button onClick={() => setQuantity((prev) => Math.min(prev + 1, stock > 0 ? stock : productData.stockQuantity))} className="quantity-btn" disabled={isActionDisabled}><FiPlus className='plus'/></button>
+                  <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} className="quantity-input" min={1} max={stock} disabled={isActionDisabled}/>
+                  <button onClick={() => setQuantity((prev) => Math.min(prev + 1, stock))} className="quantity-btn" disabled={isActionDisabled}><FiPlus className='plus'/></button>
                 </div>
               </div>
               <div className='buttons-container'>

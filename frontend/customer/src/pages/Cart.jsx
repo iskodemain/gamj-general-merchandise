@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import UnavailableNote from '../components/Notice/UnavailableNote.jsx';
 
 function Cart() {
-  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, subtotal, getSubtotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, productVariantCombination, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, orderData, setOrderData} = useContext(ShopContext)
+  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, orderSubTotal, getOrderSubTotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, productVariantCombination, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, setOrderItems} = useContext(ShopContext)
   const [cartData, setCartData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const allSelected = selectedItems.length === cartData.length && cartData.length > 0;
@@ -84,19 +84,36 @@ function Cart() {
   }, [cartItems, products]);
 
   useEffect(() => {
-    let price = 0;
+    let total = 0;
+
     selectedItems.forEach(cartMainId => {
-      const item = cartData.find(i => i.ID === cartMainId); 
+      const item = cartData.find(i => i.ID === cartMainId);
       if (!item) return;
 
-      const productData = products.find(product => product.ID === item.productId);
-      if (productData) {
-        price += productData.price * item.quantity;
+      const productData = products.find(p => p.ID === item.productId);
+      if (!productData) return;
+
+      // Use the same logic as your getItemPrice function
+      let itemPrice = productData.price;
+
+      if (productData.hasVariant && productData.hasVariantCombination) {
+        const combo = productVariantCombination.find(
+          pvc => pvc.productId === item.productId && pvc.combinations === item.value
+        );
+        if (combo) itemPrice = combo.price;
+      } else if (productData.hasVariant && !productData.hasVariantCombination) {
+        const variant = productVariantValues.find(
+          pv => pv.productId === item.productId && pv.value === item.value
+        );
+        if (variant) itemPrice = variant.price;
       }
+
+      total += itemPrice * item.quantity;
     });
 
-    getSubtotal(price);
-  }, [selectedItems, cartData, products]);
+    getOrderSubTotal(total);
+  }, [selectedItems, cartData, products, productVariantValues, productVariantCombination]);
+
 
   // TOTAL STOCKS
   const getTotalStockForValue = (productId, value, source) => {
@@ -159,6 +176,22 @@ function Cart() {
     deleteCartItem(cartMainId);
   };
 
+  const getItemPrice = (productData, item) => {
+    if (productData.hasVariant && productData.hasVariantCombination) {
+      const combo = productVariantCombination.find(
+        pvc => pvc.productId === item.productId && pvc.combinations === item.value
+      );
+      return combo ? combo.price : productData.price;
+    }
+    if (productData.hasVariant && !productData.hasVariantCombination) {
+      const variant = productVariantValues.find(
+        pv => pv.productId === item.productId && pv.value === item.value
+      );
+      return variant ? variant.price : productData.price;
+    }
+    return productData.price;
+  };
+
 
   const handleCheckout  = async () => {
     if (!token) {
@@ -178,6 +211,52 @@ function Cart() {
       toast.error("Add delivery information to proceed with checkout.", {...toastError});
       return;
     }
+
+    // ✅ Build orderItems based on selected items in the cart
+    const builtOrderItems = selectedItems.map(cartMainId => {
+      const item = cartData.find(i => i.ID === cartMainId);
+      if (!item) return null;
+
+      const productData = products.find(p => p.ID === item.productId);
+      if (!productData) return null;
+
+      const itemPrice = getItemPrice(productData, item);
+      const subTotal = itemPrice * item.quantity;
+
+      // Initialize variant IDs as null (if product doesn't have them)
+      let productVariantValueId = null;
+      let productVariantCombinationId = null;
+
+      // Assign the correct IDs if variants exist
+      if (productData.hasVariant && !productData.hasVariantCombination) {
+        const variant = productVariantValues.find(
+          pv => pv.productId === item.productId && pv.value === item.value
+        );
+        if (variant) productVariantValueId = variant.ID;
+      }
+
+      if (productData.hasVariant && productData.hasVariantCombination) {
+        const combo = productVariantCombination.find(
+          pvc => pvc.productId === item.productId && pvc.combinations === item.value
+        );
+        if (combo) productVariantCombinationId = combo.ID;
+      }
+
+      return {
+        productId: item.productId,
+        productVariantValueId,
+        productVariantCombinationId,
+        value: item.value || null,
+        quantity: item.quantity,
+        subTotal: parseFloat(subTotal.toFixed(2))
+      };
+    })
+
+    // ✅ Save to state (you said orderItems is managed in context)
+    setOrderItems(builtOrderItems);
+
+    // Optional: log for verification
+    console.log("✅ Order Items Built:", builtOrderItems);
 
     navigate('/place-order');
   }
@@ -263,7 +342,7 @@ function Cart() {
                             onChange={() => handleSelectItem(item.ID)}
                           />
                         </div>
-                        <p className='cart-price'>Price: {currency}{productData.price}</p>
+                        <p className='cart-price'>Price: {currency}{getItemPrice(productData, item)}</p>
                       </div>
                     </div>
                   )
@@ -274,7 +353,7 @@ function Cart() {
             <div className={`${showCartContent ? 'checkout-container' : 'hidden'}`}>
               {selectedItems.length > 0 && ( // ✅ only show if at least one checkbox selected
                 <p className='checkout-total-price'>
-                  Total Price: {currency}{subtotal.toFixed(2)}
+                  Total Price: {currency}{orderSubTotal.toFixed(2)}
                 </p>
               )}
             <div className='checkout-buttons'>

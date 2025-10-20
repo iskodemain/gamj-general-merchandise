@@ -38,20 +38,65 @@ const ShopContextProvider = (props) => {
     /*-----------------------CHECKOUT PROCESS-------------------------*/
 
     const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
+    const [orderItems, setOrderItems] = useState([]);
 
-    const [productIds, setProductIds] = useState([]);
-    const [values, setValues] = useState([]);
-    const [quantities, setQuantities] = useState([]);
-    const [subtotal, getSubtotal] = useState(0);
+    const [orderSubTotal, getOrderSubTotal] = useState(0);
     
     const [shippingFee, getShippingFee] = useState(0);
     const [totalPrice, getTotalPrice] = useState(0);
 
-    /*--------------------------ORDER DATA----------------------------*/
-    const orderData = {
-        paymentMethod: paymentMethod,
-        
+    /*--------------------------FETCH ORDERS----------------------------*/
+    const [fetchOrders, setFetchOrders] = useState([]);
+    const [fetchOrderItems, setFetchOrderItems] = useState([]);
+    const handleFetchOrders = async() => {
+        try {
+        const response = await axios.get(backendUrl + "/api/order/", {
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            setFetchOrders(response.data.orders);
+            setFetchOrderItems(response.data.orderItems);
+        }
+        else {
+            toast.error(response.data.message, { ...toastError });
+        }
+        } catch (error) {
+        console.log(error);
+        toast.error(error.message, {...toastError});
+        }
     }
+    useEffect(() => {
+        if (token) {
+        handleFetchOrders();
+        }
+    }, [token]);
+
+    /*--------------------------ADD ORDER----------------------------*/
+    const addOrder = async (paymentMethod, orderItems) => {
+        try {
+            const response = await axios.post(backendUrl + "/api/order/add", {
+                paymentMethod,
+                orderItems
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data.success) {
+                toast.success(response.data.message, { ...toastSuccess });
+                setOrderItems([]);
+                getOrderSubTotal(0);
+                getTotalPrice(0);
+                navigate('/orders');
+            } else {
+                toast.error(response.data.message, { ...toastError });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, { ...toastError });
+        }
+    };
 
     /*-----------------------FETCH DELIVERY INFO-------------------------*/
     const [poMedicalInstitutionName, setPoMedicalInstitutionName] = useState('');
@@ -646,7 +691,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, subtotal, getSubtotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productIds, setProductIds, values, setValues, quantities, setQuantities, productVariantCombination, setProductVariantCombination
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems
     }
 
     return (

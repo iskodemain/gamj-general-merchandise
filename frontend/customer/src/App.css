@@ -25,6 +25,7 @@
 }
 
 .up-scroll {
+  cursor: pointer;
   position: fixed;
   font-size: 1.5rem;
   top: 80%;
