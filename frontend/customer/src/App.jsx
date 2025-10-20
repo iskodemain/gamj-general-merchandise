@@ -33,7 +33,7 @@ import { IoIosArrowUp } from "react-icons/io";
 
 
 const App = () => {
-  const { token, loginToken, fpIdentifier, resetPasswordToken } = useContext(ShopContext);
+  const { token, loginToken, fpIdentifier, resetPasswordToken, orderItems } = useContext(ShopContext);
   const cannotResetPassword = token || !fpIdentifier || !resetPasswordToken;
   return(
     <div className="App">
@@ -52,7 +52,7 @@ const App = () => {
         <Route path="/login" element={token ? <Navigate to="/"/> : <Login/>}/>
         <Route path="/signup" element={token ? <Navigate to="/"/> : <SignUp/>}/>
         <Route path="/profile" element={token ? <Profile /> : <Navigate to="/login"/> } />
-        <Route path="/place-order" element={token ? <PlaceOrder/> : <Navigate to="/login"/> }/>
+        <Route path="/place-order" element={token ? (orderItems?.length > 0 ? <PlaceOrder /> : <Navigate to="/" />) : <Navigate to="/login" />}/>
         <Route path="/orders" element={token ? <Orders/> : <Navigate to="/login"/> }/>
         <Route path="/notification" element={token ? <Notification /> : <Navigate to="/login"/>} />
         <Route path="/login-verification" element={token || !loginToken ? <Navigate to="/"/> : <LoginCodeVerification/>}/>

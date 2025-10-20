@@ -35,13 +35,33 @@ const OrderItems = sequelize.define(
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
+    productVariantValueId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      references: {
+        model: 'productVariantValues',
+        key: 'ID',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+    productVariantCombinationId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      references: {
+        model: 'productVariantCombination',
+        key: 'ID',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
     orderStatus: {
       type: DataTypes.ENUM('Pending', 'Processing', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return/Refund'),
       allowNull: false,
       defaultValue: 'Pending',
     },
     value: {
-      type: DataTypes.JSON, // ✅ matches your CREATE TABLE value JSON
+      type: DataTypes.TEXT, // e.g. "M, Blue"
       allowNull: true,
     },
     quantity: {
@@ -71,6 +91,20 @@ OrderItems.associate = (models) => {
   OrderItems.belongsTo(models.Products, {
     foreignKey: 'productId',
     as: 'product',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+
+    OrderItems.belongsTo(models.ProductVariantValues, {
+    foreignKey: 'productVariantValueId',
+    as: 'variantValue',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+
+  OrderItems.belongsTo(models.ProductVariantCombination, {
+    foreignKey: 'productVariantCombinationId',
+    as: 'variantCombination',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });

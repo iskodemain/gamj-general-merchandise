@@ -14,13 +14,15 @@ import { useLocation } from 'react-router-dom'
 
 function PlaceOrder() {
   const location = useLocation();
-  const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, subtotal, handleFetchDeliveryInfo} = useContext(ShopContext);
+  const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder} = useContext(ShopContext);
 
   useEffect(() => {
     if (token) {
       handleFetchDeliveryInfo();
     }
   }, [location, token]);
+
+  console.log("Payment Method: " + paymentMethod)
 
   const handleDeliveryInfoButton = () => {
     setActiveStep(2);
@@ -44,14 +46,16 @@ function PlaceOrder() {
       return;
     }
 
-    if (subtotal <= 0) {
-      toast.error("No products found.", {...toastError});
-      return;
+    if (paymentMethod === "Cash On Delivery") {
+      addOrder(paymentMethod, orderItems);
+    }
+
+    if (paymentMethod === "Paypal") {
+      // Implement Paypal payment integration here (DON'T BOTHER FOR NOW)
+      // addOrder(paymentMethod, orderItems);
     }
     
   }
-
-  
 
   return (
     <div className='pl-main'>
@@ -144,8 +148,8 @@ function PlaceOrder() {
                   </div>
                   <p className='cashOnDelivery-text'>Cash On Delivery</p>
                 </div>
-                <div onClick={() => setPaymentMethod('paypal')} className={`paypal-main ${paymentMethod === 'paypal' ? 'ppline-active' : 'ppline-inactive'}`}>
-                  <p className={`paypal-circle ${paymentMethod === 'paypal' ? 'ppcircle-active' : 'ppcircle-inactive'}`}></p>
+                <div onClick={() => setPaymentMethod('Paypal')} className={`paypal-main ${paymentMethod === 'Paypal' ? 'ppline-active' : 'ppline-inactive'}`}>
+                  <p className={`paypal-circle ${paymentMethod === 'Paypal' ? 'ppcircle-active' : 'ppcircle-inactive'}`}></p>
                   <div className='paypal-imgtainer'>
                     <img src={assets.paypal_icon} alt="" className='paypal-imgs'/>
                   </div>
