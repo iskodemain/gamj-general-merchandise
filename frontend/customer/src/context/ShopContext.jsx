@@ -35,6 +35,67 @@ const ShopContextProvider = (props) => {
     const [nbProfileImage, setNbProfileImage] = useState(null);
     const navigate = useNavigate();
 
+    /*-----------------------CANCEL ORDER PROCESS-------------------------*/
+    const [cancelOrder, setCancelOrder] = useState(false);
+    const [paymentUsed, setPaymentUsed] = useState('');
+    const [orderItemId, setOrderItemId] = useState(null);
+    const [reasonForCancellation, setReasonForCancellation] = useState('');
+    const [cancelComments, setCancelComments] = useState('');
+    const [cancelPaypalEmail, setCancelPaypalEmail] = useState('');
+    const [cancelledBy, setCancelledBy] = useState('Customer');
+
+    /*--------------------------FETCH ORDERS----------------------------*/
+    const handleFetchCancelledOrders = async() => {
+        try {
+        const response = await axios.get(backendUrl + "/api/order/cancel-order/", {
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            // SET MO NALANG DITO YUNG MGA NEED NA DATA
+        }
+        else {
+            toast.error(response.data.message, { ...toastError });
+        }
+        } catch (error) {
+        console.log(error);
+        toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+            handleFetchCancelledOrders();
+        }
+    }, [token]);
+
+    /*--------------------------ADD ORDER----------------------------*/
+    const addCancelOrder = async (orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancelledBy) => {
+        try {
+            let payload = {
+                orderItemId,
+                reasonForCancellation, 
+                cancelComments, 
+                cancelPaypalEmail, 
+                cancelledBy
+            }
+            const response = await axios.post(backendUrl + "/api/order/cancel-order/add", payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data.success) {
+                toast.success(response.data.message, { ...toastSuccess });
+                setCancelOrder(false);
+
+            } else {
+                toast.error(response.data.message, { ...toastError });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, { ...toastError });
+        }
+    };
+
     /*-----------------------CHECKOUT PROCESS-------------------------*/
 
     const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
@@ -691,7 +752,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder
     }
 
     return (
