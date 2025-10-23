@@ -90,6 +90,7 @@
     margin-top: 1.25rem; 
     font-size: 1.875rem;
     line-height: 2.25rem; 
+    align-items: center;
 }
 
 .pi-description {

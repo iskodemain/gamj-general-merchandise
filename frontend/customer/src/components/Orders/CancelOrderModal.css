@@ -1,0 +1,206 @@
+.cancel-order-bg {
+  position: fixed;
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100vh;
+  background: rgba(0,0,0,0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.cancel-modal-card {
+  border: 1px solid #DADADA;
+  background: #fff;
+  border-radius: 1.2rem;
+  height: auto;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.535);
+  width: 40rem;
+  position: relative;
+  scrollbar-gutter: stable both-edges;
+}
+
+
+/* Optional: make scrollbar look clean */
+.cancel-modal-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.cancel-modal-card::-webkit-scrollbar-track {
+  background: transparent;
+  margin-top: 8px;     
+  margin-bottom: 8px;  
+}
+
+.cancel-modal-card::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 1.2rem;
+}
+
+.cancel-modal-card::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
+
+.close-cancel-btn {
+  font-size: 1.5rem;
+  color: #43A047;
+  cursor: pointer;
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+}
+
+.cancel-content-ctn {
+  margin: 3rem;
+}
+
+.cancel-content-ctn .cancel-title {
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #494949;
+  font-size: 1.3rem;
+  text-align: center ;
+  margin-bottom: 3rem;
+}
+
+.cancel-order-item {
+  border: 3px solid #7ED957;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.cancel-item-details {
+  display: flex;
+  align-items: center;
+}
+
+.cancel-payment {
+  display: flex;
+  justify-content: flex-end;
+  color: #494949;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.cancel-payment .pm-small {
+  font-weight: 500;
+}
+
+.cancel-item-details {
+  margin-top: 1.2rem;
+  margin-left: 1rem;
+}
+
+.cancel-item-info .vq-cancel-info {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cancel-item-info .vq-cancel-info .cancel-variant p,
+.cancel-item-info .vq-cancel-info .cancel-quantity p {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cancel-item-info .vq-cancel-info .cancel-variant p span,
+.cancel-item-info .vq-cancel-info .cancel-quantity p span {
+  font-size: 13px;
+  font-weight: 500;
+}
+.cancel-item-info p {
+  color: #494949;
+  font-size: 14px;
+}
+
+.cancel-item-info .cancel-product-name{
+  font-weight: 600;
+}
+
+.cancel-price {
+  display: flex;
+  align-items: center;
+}
+
+.cancel-form {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.paypal-form {
+  margin-top: 2rem;
+}
+
+.paypal-form input {
+  border-radius: 5px;
+  border: 1px solid #C5C5C5;
+  width: 100%;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-top: 1rem;
+}
+
+.paypal-form input:focus {
+  outline: 1.5px solid #43A047;
+}
+
+.cancel-form select {
+  border-radius: 5px;
+  border: 1px solid #C5C5C5;
+  width: 100%;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.cancel-form select:focus {
+  outline: 1.5px solid #43A047;
+}
+
+.cancel-form textarea {
+  border-radius: 5px;
+  border: 1px solid #C5C5C5;
+  width: 100%;
+  height: 10rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.cancel-form textarea:focus {
+  outline: 1.5px solid #43A047;
+}
+
+.cancel-submit-btn {
+  margin-top: 2rem;
+  cursor: pointer;
+  color: white;
+  background-color: #43A047;
+  width: 100%;
+  padding: 10px;
+  border-radius: 0.3rem;
+}
+
+.cancel-submit-btn:disabled {
+    background: #b6e2c6;
+    color: #fff;
+    cursor: default;
+}
