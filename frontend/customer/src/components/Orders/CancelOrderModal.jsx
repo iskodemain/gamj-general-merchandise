@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import './CancelOrderModal.css'
 
 const CancelOrderModal = () => {
-    const { orderItemId, products, fetchOrderItems, paymentUsed, setCancelOrder, currency, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancelledBy, addCancelOrder} = useContext(ShopContext);
+    const { orderItemId, products, fetchOrderItems, paymentUsed, setCancelOrder, currency, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancellationStatus, setCancellationStatus, cancelledBy, addCancelOrder} = useContext(ShopContext);
 
     const handleCloseButton = () => {
         setCancelOrder(false);
@@ -32,7 +32,15 @@ const CancelOrderModal = () => {
             return;
         }
 
-        addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancelledBy);
+        if (paymentUsed === 'Cash On Delivery' && cancelledBy === 'Customer') {
+            setCancellationStatus('Completed') 
+        }
+
+        if (paymentUsed === 'Paypal' && cancelledBy === 'Customer') {
+            setCancellationStatus('Processing') 
+        }
+
+        addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancellationStatus, cancelledBy);
     }
 
     return (
@@ -85,7 +93,7 @@ const CancelOrderModal = () => {
                     {paymentUsed === "Paypal" && (
                         <>
                         <label>2. Give your PayPal email address for a refund</label>
-                        <input type="email" value={cancelPaypalEmail} onChange={(e) => setCancelPaypalEmail(e.target.value)} className='cancel-input' placeholder="Enter your PayPal account email address."/>
+                        <input type="text" value={cancelPaypalEmail} onChange={(e) => setCancelPaypalEmail(e.target.value)} className='cancel-input' placeholder="Enter your PayPal account email address."/>
                         </>
                     )}
                     </div>
@@ -100,7 +108,3 @@ const CancelOrderModal = () => {
 }
 
 export default CancelOrderModal
-
-
-// CANCEL ORDER POPUP
-  

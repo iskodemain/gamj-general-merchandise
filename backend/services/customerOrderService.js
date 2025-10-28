@@ -6,6 +6,7 @@ import ProductVariantCombination from "../models/productVariantCombination.js";
 import Customer from "../models/customer.js";
 import OrderCancel from "../models/orderCancel.js"
 import { Op } from "sequelize";
+import { io } from "../server.js";
 
 
 // CUSTOMER SIDE
@@ -183,7 +184,7 @@ export const fetchOrdersService = async (customerId) => {
 }
 
 
-export const cancelOrderService = async (customerId, orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancelledBy) => {
+export const cancelOrderService = async (customerId, orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancellationStatus, cancelledBy) => {
     try {
       const user = await Customer.findByPk(customerId);
       if (!user) {
@@ -267,6 +268,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         reasonForCancellation,
         cancelComments: cancelComments || null,
         cancelPaypalEmail: cancelPaypalEmail || null,
+        cancellationStatus,
         cancelledBy,
       }, {
         fields: [
@@ -275,6 +277,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
           'reasonForCancellation',
           'cancelComments',
           'cancelPaypalEmail',
+          'cancellationStatus',
           'cancelledBy'
         ]
       });
@@ -322,4 +325,57 @@ export const fetchOrderCancelService = async (customerId) => {
         throw new Error(error.message);
     }
 }
+
+
+export const removeCancelOrderService = async (customerId, orderItemId) => {
+  try {
+    // 1️⃣ Validate customer
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    // 2️⃣ Find order(s) belonging to this customer
+    const order = await Orders.findOne({ where: { customerId } });
+    if (!order) {
+      return {
+        success: false,
+        message: "No order found for this customer.",
+      };
+    }
+
+    // 3️⃣ Find the order item that belongs to this order
+    const orderItem = await OrderItems.findOne({
+      where: { ID: orderItemId, orderId: order.ID },
+    });
+
+    if (!orderItem) {
+      return {
+        success: false,
+        message: "Order item not found for this customer.",
+      };
+    }
+
+    // 4️⃣ Update flag
+    await orderItem.update({ isDeletedByCustomer: true });
+
+    io.emit("orderItemRemoved", { 
+      orderItemId, 
+      customerId,
+      message: "Order item removed by customer"
+    });
+
+    return {
+      success: true,
+      message: "Removed Item Successfully.",
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
 

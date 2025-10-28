@@ -3,14 +3,27 @@ import { ShopContext } from '../context/ShopContext'
 import './Orders.css';
 import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets';
+import { RiDeleteBinFill } from "react-icons/ri";
+// import { toast } from "react-toastify";
 
 import CancelOrderModal from '../components/Orders/CancelOrderModal';
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder } = useContext(ShopContext);
   const [activeStep, setActiveStep] = useState(0);
   
   
+  const getCancelStatusForItem = (orderItemId) => {
+    return fetchCancelledOrders.find(cancel => cancel.orderItemId === orderItemId);
+  };
+
+  const handleViewReceipt = (orderItemId) => {
+    console.log("Viewing receipt for:", orderItemId);
+  };
+
+  const handleReview = (orderItemId) => {
+    console.log("Opening review for:", orderItemId);
+  };
 
 
   const steps = [
@@ -23,7 +36,7 @@ function Orders() {
   // 🔹 Combine order + its orderItems
   const combinedOrders = fetchOrders.map(order => ({
     ...order,
-    items: fetchOrderItems.filter(item => item.orderId === order.ID).map(item => {
+    items: fetchOrderItems.filter(item => item.orderId === order.ID && item.isDeletedByCustomer === false).map(item => {
         const product = products.find(p => p.ID === item.productId);
         return {
           ...item,
@@ -96,15 +109,14 @@ function Orders() {
       setOrderItemId(item.ID);
       setPaymentUsed(order.paymentMethod);
       setCancelOrder(true);
-    } else if (['Cancelled Order', 'Delivered'].includes(item.orderStatus)) {
-      handleRemove(item.ID);
     }
   };
 
 
   const handleRemove = async (orderItemId) => {
     console.log("Remove order item:", orderItemId);
-    // your remove API logic
+    removeOrder(orderItemId);
+    
   };
 
 
@@ -133,11 +145,9 @@ function Orders() {
                 {order.items.map(item => (
                   <div
                     key={item.ID}
-                    className={`list-order-items ${
-                      item.orderStatus === 'Cancelled' ? 'cancelled-item' : ''
-                    }`}
+                    className={`list-order-items`}
                   >
-                    <div className="ls-ctn-order">
+                    <div className={`ls-ctn-order ${item.orderStatus === 'Cancelled' ? 'cancelled-item' : ''}`}>
                       <NavLink to={`/product/${item.productId}`} className="cursor-pointer">
                         <img
                           className="w-16 sm:w-20" src={item.image} alt=""
@@ -163,7 +173,7 @@ function Orders() {
                       </div>
                     </div>
 
-                    <div className="md:1/2 flex justify-between">
+                    <div className={`md:1/2 flex justify-between ${item.orderStatus === 'Cancelled' ? 'cancelled-item' : ''}`}>
                       <div className="flex items-center gap-2">
                         <p
                           className={`min-w-2 h-2 rounded-full ${
@@ -183,10 +193,60 @@ function Orders() {
                         <p className="pending-text">{item.orderStatus}</p>
                       </div>
                     </div>
+                    
+                    {(() => {
+                    // Check if this item exists in the cancelled list
+                    const cancelInfo = getCancelStatusForItem(item.ID);
 
-                    <button className={`order-button-container ${item.orderStatus === 'Pending' ? '' : 'disabled-button'}`} onClick={() => handleButtonClick(item, order)}>
-                      {item.orderStatus === 'Pending' ? 'Cancel' : ['Cancelled', 'Delivered'].includes(item.orderStatus) ? 'Remove' : 'Processing'}
-                    </button>
+                    // CASE 1: If cancelled order is found in the table
+                    if (cancelInfo) {
+                      if (cancelInfo.cancellationStatus === "Completed") {
+                        return (
+                          <button className="delete-btn-ctn">
+                            <RiDeleteBinFill className="delete-btn" onClick={() => handleRemove(item.ID)}/>
+                          </button>
+                        );
+                      }
+
+                      if (cancelInfo.cancellationStatus === "Processing") {
+                        return (
+                          <button
+                            className="order-button-container review-btn"
+                            onClick={() => console.log("Open Review Modal for:", item.ID)}
+                          >
+                            Review
+                          </button>
+                        );
+                      }
+
+                      if (cancelInfo.cancellationStatus === "Refunded") {
+                        return (
+                          <button
+                            className="order-button-container receipt-btn"
+                            onClick={() => console.log("View Receipt for:", item.ID)}
+                          >
+                            View Receipt
+                          </button>
+                        );
+                      }
+                    }
+
+                    // CASE 2: Default logic if not found in cancelled list
+                    return (
+                      <button
+                        className={`order-button-container ${item.orderStatus === 'Pending' ? '' : 'disabled-button'}`}
+                        onClick={() => handleButtonClick(item, order)}
+                        disabled={item.orderStatus !== 'Pending'}
+                      >
+                        {item.orderStatus === 'Pending'
+                          ? 'Cancel'
+                          : ['Cancelled', 'Delivered'].includes(item.orderStatus)
+                          ? 'Remove'
+                          : 'Processing'}
+                      </button>
+                    );
+                  })()}
+
                   </div>
                 ))}
               </div>

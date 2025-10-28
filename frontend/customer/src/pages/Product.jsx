@@ -16,7 +16,7 @@ import UnavailableNote from '../components/Notice/UnavailableNote';
 import Loading from '../components/Loading';
 const Product = () => {
   const { productId } = useParams();
-  const { products, productVariantValues, variantName, currency, addToCart, toastError, navigate, addToWishlist, removeFromWishlist, isInWishlist, cartItems, showUnavailableNote, setShowUnavailableNote, verifiedUser, productVariantCombination} = useContext(ShopContext);
+  const { products, productVariantValues, variantName, currency, addToCart, toastError, navigate, addToWishlist, removeFromWishlist, isInWishlist, cartItems, showUnavailableNote, setShowUnavailableNote, verifiedUser, productVariantCombination, token} = useContext(ShopContext);
   const [selectedVariants, setSelectedVariants] = useState('');
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
@@ -162,6 +162,10 @@ const Product = () => {
 
   // ADD TO CART
   const handleAddToCart = (productStocks, activeProduct, isOutOfStock) => {
+    if (!token) {
+      toast.error("Please log in first to add to cart.", { ...toastError });
+      navigate("/login")
+    }
     // Block if product has variants but none selected
     if (productData.hasVariant && !allVariantsSelected) {
       toast.error("Please select all product options before adding to cart.", { ...toastError });
@@ -199,6 +203,10 @@ const Product = () => {
 
   // BUY NOW
   const handleBuyNow = (productStocks, activeProduct) => {
+    if (!token) {
+      toast.error("Please log in first to buy the product.", { ...toastError });
+      navigate("/login")
+    }
     
     if (verifiedUser === false) {
       setShowUnavailableNote(true);

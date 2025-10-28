@@ -5,10 +5,13 @@ import { TbCurrencyPeso } from "react-icons/tb";
 import './ShopContext.css'
 import { Bounce, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+
 export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
     const currency = <TbCurrencyPeso className="peso-sign"/>; 
     const backendUrl = import.meta.env.VITE_BACKEND_URL
+    const socket = io(backendUrl);
     
     /*--------------------------USE STATE--------------------------*/
     const [token, setToken] = useState(() => localStorage.getItem('authToken') || '');
@@ -41,23 +44,47 @@ const ShopContextProvider = (props) => {
     const [orderItemId, setOrderItemId] = useState(null);
     const [reasonForCancellation, setReasonForCancellation] = useState('');
     const [cancelComments, setCancelComments] = useState('');
-    const [cancelPaypalEmail, setCancelPaypalEmail] = useState('');
+    const [cancelPaypalEmail, setCancelPaypalEmail] = useState(''); 
+    const [cancellationStatus, setCancellationStatus] = useState('Processing'); 
     const [cancelledBy, setCancelledBy] = useState('Customer');
 
+    /*--------------------------REMOVE ORDERS----------------------------*/
+    const removeOrder = async (orderItemId) => {
+        if (token) {
+            try {
+                const response = await axios.put(backendUrl + "/api/order/remove-order", { orderItemId }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (response.data.success) {
+                    toast.success(response.data.message, { ...toastSuccess });
+
+                } else {
+                    toast.error(response.data.message, { ...toastError });
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, { ...toastError });
+            }
+        }
+    };
+
     /*--------------------------FETCH ORDERS----------------------------*/
+    const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
     const handleFetchCancelledOrders = async() => {
         try {
-        const response = await axios.get(backendUrl + "/api/order/cancel-order/", {
-            headers: {
-            Authorization: `Bearer ${token}`
+            const response = await axios.get(backendUrl + "/api/order/cancel-order", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                // SET MO NALANG DITO YUNG MGA NEED NA DATA
+                setFetchCancelledOrders(response.data.orderCancel);
             }
-        });
-        if (response.data.success) {
-            // SET MO NALANG DITO YUNG MGA NEED NA DATA
-        }
-        else {
-            toast.error(response.data.message, { ...toastError });
-        }
+            else {
+                toast.error(response.data.message, { ...toastError });
+            }
         } catch (error) {
         console.log(error);
         toast.error(error.message, {...toastError});
@@ -70,29 +97,32 @@ const ShopContextProvider = (props) => {
     }, [token]);
 
     /*--------------------------ADD ORDER----------------------------*/
-    const addCancelOrder = async (orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancelledBy) => {
-        try {
-            let payload = {
-                orderItemId,
-                reasonForCancellation, 
-                cancelComments, 
-                cancelPaypalEmail, 
-                cancelledBy
-            }
-            const response = await axios.post(backendUrl + "/api/order/cancel-order/add", payload, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+    const addCancelOrder = async (orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancellationStatus, cancelledBy) => {
+        if (token) {
+            try {
+                let payload = {
+                    orderItemId,
+                    reasonForCancellation, 
+                    cancelComments, 
+                    cancelPaypalEmail, 
+                    cancellationStatus,
+                    cancelledBy
+                }
+                const response = await axios.post(backendUrl + "/api/order/cancel-order/add", payload, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
-            if (response.data.success) {
-                toast.success(response.data.message, { ...toastSuccess });
-                setCancelOrder(false);
+                if (response.data.success) {
+                    toast.success(response.data.message, { ...toastSuccess });
+                    setCancelOrder(false);
 
-            } else {
-                toast.error(response.data.message, { ...toastError });
+                } else {
+                    toast.error(response.data.message, { ...toastError });
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, { ...toastError });
             }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, { ...toastError });
         }
     };
 
@@ -136,26 +166,28 @@ const ShopContextProvider = (props) => {
 
     /*--------------------------ADD ORDER----------------------------*/
     const addOrder = async (paymentMethod, orderItems) => {
-        try {
-            const response = await axios.post(backendUrl + "/api/order/add", {
-                paymentMethod,
-                orderItems
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+        if (token) {
+            try {
+                const response = await axios.post(backendUrl + "/api/order/add", {
+                    paymentMethod,
+                    orderItems
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
-            if (response.data.success) {
-                toast.success(response.data.message, { ...toastSuccess });
-                setOrderItems([]);
-                getOrderSubTotal(0);
-                getTotalPrice(0);
-                navigate('/orders');
-            } else {
-                toast.error(response.data.message, { ...toastError });
+                if (response.data.success) {
+                    toast.success(response.data.message, { ...toastSuccess });
+                    setOrderItems([]);
+                    getOrderSubTotal(0);
+                    getTotalPrice(0);
+                    navigate('/orders');
+                } else {
+                    toast.error(response.data.message, { ...toastError });
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, { ...toastError });
             }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, { ...toastError });
         }
     };
 
@@ -480,19 +512,21 @@ const ShopContextProvider = (props) => {
             setWishListItems([...wishlistItems, { productId }]);
         }
 
-        try {
-            const response = await axios.post(backendUrl + "/api/wishlist/add", { productId }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.data.success) {
-                toast.success(response.data.message, {...toastSuccess});
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        } 
+        if (token) {
+            try {
+                const response = await axios.post(backendUrl + "/api/wishlist/add", { productId }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message, {...toastSuccess});
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, {...toastError});
+            } 
+        }
     }
 
     const removeFromWishlist = async (productId) => {
@@ -504,20 +538,22 @@ const ShopContextProvider = (props) => {
 
         setWishListItems(wishlistItems.filter(item => item.productId !== productId));
         
-        try {
-            const response = await axios.delete(backendUrl + "/api/wishlist/delete", {
-                headers: { Authorization: `Bearer ${token}` },
-                data: { productId }
-            });
-            if (response.data.success) {
-                toast.success(response.data.message, {...toastSuccess});
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        } 
+        if (token) {
+            try {
+                const response = await axios.delete(backendUrl + "/api/wishlist/delete", {
+                    headers: { Authorization: `Bearer ${token}` },
+                    data: { productId }
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message, {...toastSuccess});
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, {...toastError});
+            } 
+        }
     };
 
     
@@ -559,95 +595,102 @@ const ShopContextProvider = (props) => {
 
 
     const addToCart = async (productId, value, quantity) => {
-
-        try {
-            let payload = {
-                productId,
-                value,
-                quantity
-            }
-            const response = await axios.post(backendUrl + "/api/cart/add", payload, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.data.success) {
-                await getUserCart();
-                toast.success(response.data.message, {...toastSuccess});
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        } 
+        if (token) {
+            try {
+                let payload = {
+                    productId,
+                    value,
+                    quantity
+                }
+                const response = await axios.post(backendUrl + "/api/cart/add", payload, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (response.data.success) {
+                    await getUserCart();
+                    toast.success(response.data.message, {...toastSuccess});
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, {...toastError});
+            } 
+        }
 
     };
 
 
     // UPDATE CART ITEM
     const updateQuantity = async (productId, value, quantity) => {
-        let cartData = cartItems.map((item) => {
-            if (item.productId === productId && item.value === value) {
-                return { ...item, quantity };
-            }
-            return item;
-        }).filter(item => item.quantity > 0);
+        if (token) {
+            let cartData = cartItems.map((item) => {
+                if (item.productId === productId && item.value === value) {
+                    return { ...item, quantity };
+                }
+                return item;
+            }).filter(item => item.quantity > 0);
 
-        setCartItems(cartData);
+            setCartItems(cartData);
 
-        try {
-            let payload = {
-                productId,
-                value,
-                quantity
-            }
-            const response = await axios.put(backendUrl + "/api/cart/update", payload, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.data.success) {
-                // toast.success(response.data.message, {...toastSuccess});
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        } 
+            try {
+                let payload = {
+                    productId,
+                    value,
+                    quantity
+                }
+                const response = await axios.put(backendUrl + "/api/cart/update", payload, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (response.data.success) {
+                    // toast.success(response.data.message, {...toastSuccess});
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, {...toastError});
+            } 
+        }
     }
 
     const deleteCartItem = async (cartMainId) => {
-        setCartItems(prevCart => prevCart.filter(item => item.ID !== cartMainId));
+        if (token) {
+            setCartItems(prevCart => prevCart.filter(item => item.ID !== cartMainId));
 
-        try {
-            const response = await axios.delete(backendUrl + "/api/cart/delete", {
-                headers: { Authorization: `Bearer ${token}` },
-                data: { cartMainId }
-            });
-            if (response.data.success) {
-                toast.success(response.data.message, {...toastSuccess});
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        } 
+            try {
+                const response = await axios.delete(backendUrl + "/api/cart/delete", {
+                    headers: { Authorization: `Bearer ${token}` },
+                    data: { cartMainId }
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message, {...toastSuccess});
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, {...toastError});
+            } 
+        }
     }
 
     const deleteMultipleCartItem = async (cartIds) => {
-        try {
-            const response = await axios.delete(backendUrl + "/api/cart/delete-multiple", {
-                headers: { Authorization: `Bearer ${token}` },
-                data: { cartIds }
-            });
-            if (response.data.success) {
-                toast.success(response.data.message, {...toastSuccess});
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
+        if (token) {
+            try {
+                const response = await axios.delete(backendUrl + "/api/cart/delete-multiple", {
+                    headers: { Authorization: `Bearer ${token}` },
+                    data: { cartIds }
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message, {...toastSuccess});
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, {...toastError});
         } 
+        }
     }
     
     const getCartCount = () => {
@@ -750,9 +793,27 @@ const ShopContextProvider = (props) => {
         }
     }, [resetPasswordToken]);
 
+    // SOCKET IO CONNECTION
+    useEffect(() => {
+        socket.on("orderItemRemoved", (data) => {
+            console.log("Received orderItemRemoved event:", data);
+
+            // update local state in real time:
+            setFetchOrderItems(prev =>
+            prev.filter(item => item.ID !== data.orderItemId)
+            );
+        });
+
+        // cleanup when component unmounts
+        return () => {
+            socket.off("orderItemRemoved");
+        };
+    }, []);
+
+
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder
     }
 
     return (
