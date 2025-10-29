@@ -39,6 +39,9 @@ const CancelOrderModal = () => {
 
     const handleSubmitCancelOrder = async (e) => {
         e.preventDefault();
+
+        let statusToUse = cancellationStatus;
+
         if (!reasonForCancellation) {
             toast.error("Reason for cancellation is required", {...toastError});
             return;
@@ -50,14 +53,18 @@ const CancelOrderModal = () => {
         }
 
         if (paymentUsed === 'Cash On Delivery' && cancelledBy === 'Customer') {
-            setCancellationStatus('Completed') 
+            statusToUse = 'Completed';
         }
 
         if (paymentUsed === 'Paypal' && cancelledBy === 'Customer') {
-            setCancellationStatus('Processing') 
+            statusToUse = 'Processing';
         }
 
-        addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancellationStatus, cancelledBy);
+        setCancellationStatus(statusToUse);
+
+        addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, statusToUse, cancelledBy);
+
+        console.log("Final status used:", statusToUse, "\nfor payment:", paymentUsed);
     }
 
     // 🔹 Cancel Request (remove existing cancel)
@@ -77,6 +84,11 @@ const CancelOrderModal = () => {
         if (!existingCancel) return;
         const { ID } = existingCancel;
         markRefundReceived(ID);
+        setExistingCancel(null);
+        setCancelOrder(false);
+        setReasonForCancellation('');
+        setCancelComments('');
+        setCancelPaypalEmail('');
     };
 
     return (

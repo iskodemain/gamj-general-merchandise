@@ -117,6 +117,7 @@ function Orders() {
 
 
   const handleRemove = async (orderItemId) => {
+    console.log("Removing order item:", orderItemId);
     removeOrder(orderItemId);
   };
 
