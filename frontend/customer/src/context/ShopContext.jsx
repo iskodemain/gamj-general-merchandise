@@ -50,10 +50,10 @@ const ShopContextProvider = (props) => {
     
 
     /*--------------------------MARK REFUND RECEIVED----------------------------*/
-    const markRefundReceived = async (cancelId) => {
+    const markRefundReceived = async (orderCancelId) => {
         if (token) {
             try {
-                const response = await axios.put(backendUrl + "/api/order/mark-refund", { cancelId }, {
+                const response = await axios.put(backendUrl + "/api/order/mark-refund-received", { orderCancelId }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -116,33 +116,7 @@ const ShopContextProvider = (props) => {
         }
     };
 
-    /*--------------------------FETCH ORDERS----------------------------*/
-    const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
-    const handleFetchCancelledOrders = async() => {
-        try {
-            const response = await axios.get(backendUrl + "/api/order/cancel-order", {
-                headers: {
-                Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.data.success) {
-                // SET MO NALANG DITO YUNG MGA NEED NA DATA
-                setFetchCancelledOrders(response.data.orderCancel);
-            }
-            else {
-                toast.error(response.data.message, { ...toastError });
-            }
-        } catch (error) {
-        console.log(error);
-        toast.error(error.message, {...toastError});
-        }
-    }
-    useEffect(() => {
-        if (token) {
-            handleFetchCancelledOrders();
-        }
-    }, [token]);
-
+    
     /*--------------------------ADD ORDER----------------------------*/
     const addCancelOrder = async (orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancellationStatus, cancelledBy) => {
         if (token) {
@@ -210,6 +184,34 @@ const ShopContextProvider = (props) => {
         handleFetchOrders();
         }
     }, [token]);
+
+    /*--------------------------FETCH CANCELLED ORDERS----------------------------*/
+    const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
+    const handleFetchCancelledOrders = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/order/cancel-order", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                // SET MO NALANG DITO YUNG MGA NEED NA DATA
+                setFetchCancelledOrders(response.data.orderCancel);
+            }
+            else {
+                toast.error(response.data.message, { ...toastError });
+            }
+        } catch (error) {
+        console.log(error);
+        toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+            handleFetchCancelledOrders();
+        }
+    }, [token]);
+
 
     /*--------------------------ADD ORDER----------------------------*/
     const addOrder = async (paymentMethod, orderItems) => {
@@ -829,7 +831,7 @@ const ShopContextProvider = (props) => {
         }
     }, [resetPasswordToken]);
 
-    
+
     // (SOCKET IO) - ADD CANCEL ORDER
     useEffect(() => {
         socket.on("addCancelOrder", (data) => {
@@ -914,6 +916,33 @@ const ShopContextProvider = (props) => {
             socket.off("orderCancelledUpdate");
         };
     }, []);
+
+    // (SOCKET IO) - MARK REFUND RECEIVED
+    useEffect(() => {
+        socket.on("refundMarkedAsCompleted", (data) => {
+            setFetchCancelledOrders((prev) =>
+                prev.map((cancel) =>
+                    cancel.ID === data.orderCancelId
+                    ? { ...cancel, cancellationStatus: data.cancellationStatus }
+                    : cancel
+                )
+            );
+
+
+            // setFetchOrderItems((prev) =>
+            //     prev.map((item) =>
+            //         item.ID === data.orderItemId
+            //         ? { ...item, orderStatus: "Cancelled" } // or "Completed" or whatever your logic is
+            //         : item
+            //     )
+            // );
+        });
+
+        return () => {
+            socket.off("refundMarkedAsCompleted");
+        };
+    }, []);
+
 
 
     /*----------------------------VALUE ACCESS-----------------------------*/

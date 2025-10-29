@@ -47,7 +47,7 @@ const Barangays = sequelize.define(
 );
 
 // Optional: Define associations for convenience
-Barangays.associate = function (models) {
+Barangays.associate = (models) => {
   Barangays.belongsTo(models.Provinces, {
     foreignKey: 'provinceId',
     as: 'province',

@@ -340,7 +340,7 @@ export const fetchOrderCancelService = async (customerId) => {
 
 
 export const removeCancelOrderService = async (customerId, orderItemId) => {
-  try {
+  try {  
     // 1️⃣ Validate customer
     const user = await Customer.findByPk(customerId);
     if (!user) {
@@ -350,24 +350,29 @@ export const removeCancelOrderService = async (customerId, orderItemId) => {
       };
     }
 
-    // 2️⃣ Find order(s) belonging to this customer
-    const order = await Orders.findOne({ where: { customerId } });
-    if (!order) {
-      return {
-        success: false,
-        message: "No order found for this customer.",
-      };
-    }
-
-    // 3️⃣ Find the order item that belongs to this order
-    const orderItem = await OrderItems.findOne({
-      where: { ID: orderItemId, orderId: order.ID },
-    });
-
+    // 2️⃣ Find the order item and its related order manually (no include)
+    const orderItem = await OrderItems.findByPk(orderItemId);
     if (!orderItem) {
       return {
         success: false,
-        message: "Order item not found for this customer.",
+        message: "Order item not found.",
+      };
+    }
+
+    // 3️⃣ Fetch the related order to validate it belongs to this customer
+    const order = await Orders.findByPk(orderItem.orderId);
+    if (!order) {
+      return {
+        success: false,
+        message: "Order not found for this order item.",
+      };
+    }
+
+    // 4️⃣ Ensure that the order actually belongs to this customer
+    if (order.customerId !== customerId) {
+      return {
+        success: false,
+        message: "This order item does not belong to the current customer.",
       };
     }
 
@@ -425,7 +430,7 @@ export const cancelOrderRequestService = async (customerId, orderItemId, orderCa
 
     return {
       success: true,
-      message: "Removed Item Successfully.",
+      message: "Cancellation request removed successfully.",
     };
   } catch (error) {
     console.error(error);
@@ -433,4 +438,46 @@ export const cancelOrderRequestService = async (customerId, orderItemId, orderCa
   }
 };
 
+
+export const markRefundReceivedService = async (customerId, orderCancelId) => {
+  try {
+    // 1️⃣ Validate customer
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+      return {
+        success: false,
+        message: "Customer not found.",
+      };
+    }
+
+    // 2️⃣ Check if cancellation record exists for this customer
+    const orderCancel = await OrderCancel.findOne({
+      where: { ID: orderCancelId, customerId },
+    });
+
+    if (!orderCancel) {
+      return {
+        success: false,
+        message: "No cancellation record found for this customer.",
+      };
+    }
+
+    // 3️⃣ Update refund status
+    await orderCancel.update({ cancellationStatus: "Completed" });
+
+    // 4️⃣ Notify clients via socket
+    io.emit("refundMarkedAsCompleted", {
+      orderCancelId,
+      cancellationStatus: "Completed",
+    });
+
+    return {
+      success: true,
+      message: "Refund has been marked as received successfully.",
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 

@@ -101,21 +101,21 @@ DeliveryInfo.associate = (models) => {
     onUpdate: 'CASCADE',
   });
 
-  DeliveryInfo.belongsTo(models.Province, {
+  DeliveryInfo.belongsTo(models.Provinces, {
     foreignKey: 'provinceId',
     as: 'province',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });
 
-  DeliveryInfo.belongsTo(models.City, {
+  DeliveryInfo.belongsTo(models.Cities, {
     foreignKey: 'cityId',
     as: 'city',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });
 
-  DeliveryInfo.belongsTo(models.Barangay, {
+  DeliveryInfo.belongsTo(models.Barangays, {
     foreignKey: 'barangayId',
     as: 'barangay',
     onDelete: 'CASCADE',
