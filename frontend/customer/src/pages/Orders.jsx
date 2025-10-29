@@ -21,14 +21,17 @@ function Orders() {
     console.log("Viewing receipt for:", orderItemId);
   };
 
-  const handleReview = (orderItemId) => {
-    console.log("Opening review for:", orderItemId);
+  const handleReview = (orderItemId, paymentMethod) => {
+    setOrderItemId(orderItemId);
+    setPaymentUsed(paymentMethod);
+    setCancelOrder(true);
   };
+
 
 
   const steps = [
     { id: 0, name: 'Pending', icon: assets.pending_icon, aicon: assets.wpending_icon, status: 'Pending' },
-    { id: 1, name: 'Processing', icon: assets.processing_icon, aicon: assets.wprocessing_icon, status: 'Packing' },
+    { id: 1, name: 'Processing', icon: assets.processing_icon, aicon: assets.wprocessing_icon, status: 'Processing' },
     { id: 2, name: 'Out for Delivery', icon: assets.outfordelivery_icon, aicon: assets.woutfordelivery_icon, status: 'Out for Delivery' },
     { id: 3, name: 'Delivered', icon: assets.delivered_icon, aicon: assets.wdelivered_icon, status: 'Delivered' }
   ];
@@ -114,9 +117,7 @@ function Orders() {
 
 
   const handleRemove = async (orderItemId) => {
-    console.log("Remove order item:", orderItemId);
     removeOrder(orderItemId);
-    
   };
 
 
@@ -190,7 +191,23 @@ function Orders() {
                               : ''
                           }`}
                         ></p>
-                        <p className="pending-text">{item.orderStatus}</p>
+                        <p className="pending-text">
+                          {item.orderStatus === 'Cancelled' ? (
+                            (() => {
+                              const cancelInfo = getCancelStatusForItem(item.ID);
+                              if (!cancelInfo) return 'Cancelled'; // fallback
+
+                              return (
+                                <>
+                                  Cancelled by {cancelInfo.cancelledBy === 'Customer' ? 'You' : cancelInfo.cancelledBy} {' '} (<strong>{cancelInfo.cancellationStatus}</strong>)
+                                </>
+                              );
+                            })()
+                          ) : (
+                            item.orderStatus
+                          )}
+
+                        </p>
                       </div>
                     </div>
                     
@@ -212,7 +229,7 @@ function Orders() {
                         return (
                           <button
                             className="order-button-container review-btn"
-                            onClick={() => console.log("Open Review Modal for:", item.ID)}
+                            onClick={() => handleReview(item.ID, order.paymentMethod)}
                           >
                             Review
                           </button>
@@ -242,7 +259,12 @@ function Orders() {
                           ? 'Cancel'
                           : ['Cancelled', 'Delivered'].includes(item.orderStatus)
                           ? 'Remove'
-                          : 'Processing'}
+                          : ['Processing'].includes(item.orderStatus) 
+                          ? 'Processing...'
+                          : ['Out for Delivery'].includes(item.orderStatus)
+                          ? 'On the way...'
+                          : ''
+                      }
                       </button>
                     );
                   })()}

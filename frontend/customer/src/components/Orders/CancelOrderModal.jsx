@@ -1,11 +1,17 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ShopContext } from '../../context/ShopContext';
 import { IoCloseOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import './CancelOrderModal.css'
 
 const CancelOrderModal = () => {
-    const { orderItemId, products, fetchOrderItems, paymentUsed, setCancelOrder, currency, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancellationStatus, setCancellationStatus, cancelledBy, addCancelOrder} = useContext(ShopContext);
+    const { orderItemId, products, fetchOrderItems, paymentUsed, setCancelOrder, currency, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancellationStatus, setCancellationStatus, cancelledBy, addCancelOrder, fetchCancelledOrders, cancelOrderRequest, markRefundReceived} = useContext(ShopContext);
+
+    const [existingCancel, setExistingCancel] = useState(null);
+
+    // ✅ Find the selected item
+    const cancelItem = fetchOrderItems.find(item => item.ID === orderItemId);
+    const relatedProduct = cancelItem ? products.find(p => p.ID === cancelItem.productId) : null;
 
     const handleCloseButton = () => {
         setCancelOrder(false);
@@ -14,9 +20,20 @@ const CancelOrderModal = () => {
         setCancelPaypalEmail('');
     }
 
-    // ✅ Find the selected item
-    const cancelItem = fetchOrderItems.find(item => item.ID === orderItemId);
-    const relatedProduct = cancelItem ? products.find(p => p.ID === cancelItem.productId) : null;
+    // ✅ On modal open, check if this order item already has a cancel record
+    useEffect(() => {
+        if (!orderItemId || !fetchCancelledOrders?.length) return;
+        const found = fetchCancelledOrders.find(c => c.orderItemId === orderItemId);
+        if (found) {
+            setExistingCancel(found);
+            setReasonForCancellation(found.reasonForCancellation || '');
+            setCancelComments(found.cancelComments || '');
+            setCancelPaypalEmail(found.cancelPaypalEmail || '');
+            setCancellationStatus(found.cancellationStatus || '');
+        } else {
+            setExistingCancel(null);
+        }
+    }, [orderItemId, fetchCancelledOrders]);
 
     if (!cancelItem || !relatedProduct) return null;
 
@@ -42,6 +59,25 @@ const CancelOrderModal = () => {
 
         addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancellationStatus, cancelledBy);
     }
+
+    // 🔹 Cancel Request (remove existing cancel)
+    const handleCancelRequest = async () => {
+        if (!existingCancel) return;
+        const { ID, orderItemId } = existingCancel;
+        cancelOrderRequest(orderItemId, ID);
+        setExistingCancel(null);
+        setCancelOrder(false);
+        setReasonForCancellation('');
+        setCancelComments('');
+        setCancelPaypalEmail('');
+    };
+
+    // 🔹 Mark refund as received
+    const handleReceivedRefund = async () => {
+        if (!existingCancel) return;
+        const { ID } = existingCancel;
+        markRefundReceived(ID);
+    };
 
     return (
         <div className='cancel-order-bg'>
@@ -99,8 +135,25 @@ const CancelOrderModal = () => {
                     </div>
                 </div>
 
-                {/* SUBMIT BUTTON */}
-                <button className='cancel-submit-btn' type='submit' disabled={!reasonForCancellation || (paymentUsed === 'Paypal' && !cancelPaypalEmail)}>Submit</button>
+                {/* BUTTON */}
+                {!existingCancel ? (
+                    <button
+                    className='cancel-submit-btn'
+                    type='submit'
+                    disabled={!reasonForCancellation || (paymentUsed === 'Paypal' && !cancelPaypalEmail)}
+                    >
+                    Submit
+                    </button>
+                ) : (
+                    <div className="existing-cancel-btns">
+                    <button type="button" className="cancel-request-btn" onClick={handleCancelRequest}>
+                        Cancel Request
+                    </button>
+                    <button type="button" className="refund-received-btn" onClick={handleReceivedRefund}>
+                        I’ve already received my refund
+                    </button>
+                    </div>
+                )}
                 </div>
             </form>
         </div>

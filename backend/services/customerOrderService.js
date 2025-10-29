@@ -262,7 +262,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
       // ✅ 6. Update order item status to Cancelled
       await orderItem.update({ orderStatus: "Cancelled" });
 
-      await OrderCancel.create({
+      const cancelRecord = await OrderCancel.create({
         orderItemId,
         customerId,
         reasonForCancellation,
@@ -281,7 +281,19 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
           'cancelledBy'
         ]
       });
-      
+
+      io.emit("addCancelOrder", {
+        orderCancelId: cancelRecord.ID,
+        orderItemId,
+        customerId,
+        reasonForCancellation: cancelRecord.reasonForCancellation,
+        cancelComments: cancelRecord.cancelComments,
+        cancelPaypalEmail: cancelRecord.cancelPaypalEmail,
+        cancellationStatus: cancelRecord.cancellationStatus,
+        cancelledBy: cancelRecord.cancelledBy,
+        newStatus: "Cancelled"
+      });
+        
 
       return {
           success: true,
@@ -362,11 +374,54 @@ export const removeCancelOrderService = async (customerId, orderItemId) => {
     // 4️⃣ Update flag
     await orderItem.update({ isDeletedByCustomer: true });
 
-    io.emit("orderItemRemoved", { 
-      orderItemId, 
-      customerId,
-      message: "Order item removed by customer"
+    io.emit("orderItemRemoved", {orderItemId, customerId});
+
+    return {
+      success: true,
+      message: "Removed Item Successfully.",
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+export const cancelOrderRequestService = async (customerId, orderItemId, orderCancelId) => {
+  try {
+    // 1️⃣ Validate customer
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    const orderItem = await OrderItems.findByPk(orderItemId);
+    if (!orderItem) {
+      return {
+        success: false,
+        message: "Order item not found for this customer.",
+      };
+    }
+
+    const cancelRequest = await OrderCancel.findOne({
+      where: { ID: orderCancelId, orderItemId, customerId },
     });
+    if (!cancelRequest) {
+      return {
+        success: false,
+        message: "Cancel request not found for this customer.",
+      };
+    }
+
+    // 4️⃣ Delete the cancel request
+    await cancelRequest.destroy();
+
+    // 5️⃣ Reset the order item status if needed
+    await orderItem.update({ orderStatus: 'Pending' });
+
+    io.emit("orderCancelledUpdate", {orderCancelId, orderItemId, customerId, newStatus: "Pending"});
 
     return {
       success: true,
