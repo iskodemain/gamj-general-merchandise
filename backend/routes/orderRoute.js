@@ -1,6 +1,6 @@
 import express from 'express';
 import customerAuth from '../middleware/customerAuth.js'
-import { addOrder, fetchOrders, cancelOrder, fetchOrderCancel, removeCancelOrder, cancelOrderRequest, markRefundReceived } from '../controllers/customerOrderController.js';
+import { addOrder, fetchOrders, cancelOrder, fetchOrderCancel, removeCancelOrder, cancelOrderRequest, markRefundReceived, fetchRefundProof } from '../controllers/customerOrderController.js';
 
 const orderRouter = express.Router();
 
@@ -25,5 +25,8 @@ orderRouter.put('/cancel-order-request', customerAuth, cancelOrderRequest);
 
 // MARK REFUND RECEIVED
 orderRouter.put('/mark-refund-received', customerAuth, markRefundReceived);
+
+// FETCH REFUND PROOF
+orderRouter.get('/refund-proof', customerAuth, fetchRefundProof);
 
 export default orderRouter;

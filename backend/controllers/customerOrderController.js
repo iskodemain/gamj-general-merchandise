@@ -1,4 +1,4 @@
-import { addOrderService, fetchOrdersService, cancelOrderService, fetchOrderCancelService, removeCancelOrderService, cancelOrderRequestService, markRefundReceivedService } from '../services/customerOrderService.js';
+import { addOrderService, fetchOrdersService, cancelOrderService, fetchOrderCancelService, removeCancelOrderService, cancelOrderRequestService, markRefundReceivedService, fetchRefundProofService } from '../services/customerOrderService.js';
 
 export const addOrder = async (req, res) => {
     try {
@@ -78,6 +78,17 @@ export const markRefundReceived = async (req, res) => {
         const { ID } = req.user;
         const { orderCancelId } = req.body;
         const result = await markRefundReceivedService(ID, orderCancelId);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const fetchRefundProof = async (req, res) => {
+    try {
+        const { ID } = req.user;
+        const result = await fetchRefundProofService(ID);
         res.json(result);
     } catch (error) {
         console.log(error);

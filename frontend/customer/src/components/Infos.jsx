@@ -10,10 +10,10 @@ function Infos() {
             </div>
             <p className='infos-text'>GAMJ General Merchandise – Your trusted supplier of quality hospital <br />supplies since 2006. Based in Villa Alegre Mabuhay, Carmona, Cavite, <br />we serve hospitals with essential medical products, ensuring seamless <br />ordering and reliable delivery. For inquiries, reach us via phone, Gmail, <br />Viber, or Messenger.</p>
             <div className='img-socials'>
-                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.gmail_icon} alt="" className='insta-img'/></a>
-                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.viber_icon} alt="" className='insta-img'/></a>
-                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.call_icon} alt="" className='insta-img'/></a>
-                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.messenger_icon} alt="" className='insta-img'/></a>
+                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.gmail_icon} alt="" className='socials-img'/></a>
+                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.viber_icon} alt="" className='socials-img'/></a>
+                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.call_icon} alt="" className='socials-img'/></a>
+                <a href="" target='blank' rel="noopener noreferrer"><img src={assets.messenger_icon} alt="" className='socials-img'/></a>
             </div>
         </div>
     </div>
