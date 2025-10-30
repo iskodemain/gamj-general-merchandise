@@ -15,6 +15,16 @@ const RefundProof = sequelize.define(
       unique: true,
       allowNull: false,
     },
+    customerId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: 'customer',
+        key: 'ID',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
     cancelId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
@@ -34,6 +44,10 @@ const RefundProof = sequelize.define(
       },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
+    },
+    refundAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
     },
     receiptImage: {
       type: DataTypes.TEXT,
@@ -56,6 +70,13 @@ const RefundProof = sequelize.define(
 
 // Associations
 RefundProof.associate = (models) => {
+  RefundProof.belongsTo(models.Customer, {
+    foreignKey: 'customerId',
+    as: 'customer',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+  
   RefundProof.belongsTo(models.OrderCancel, {
     foreignKey: 'cancelId',
     as: 'orderCancel',

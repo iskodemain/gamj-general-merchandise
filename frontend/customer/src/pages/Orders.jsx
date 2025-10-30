@@ -4,21 +4,21 @@ import './Orders.css';
 import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { RiDeleteBinFill } from "react-icons/ri";
-// import { toast } from "react-toastify";
-
 import CancelOrderModal from '../components/Orders/CancelOrderModal';
+import RefundReceiptModal from '../components/Orders/RefundReceiptModal';
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt } = useContext(ShopContext);
+
   const [activeStep, setActiveStep] = useState(0);
-  
-  
+
   const getCancelStatusForItem = (orderItemId) => {
     return fetchCancelledOrders.find(cancel => cancel.orderItemId === orderItemId);
   };
 
   const handleViewReceipt = (orderItemId) => {
-    console.log("Viewing receipt for:", orderItemId);
+    setOrderItemId(orderItemId);
+    setViewRefundReceipt(true);
   };
 
   const handleReview = (orderItemId, paymentMethod) => {
@@ -125,6 +125,7 @@ function Orders() {
   return (
     <div className="main-ctn-orders">
       { cancelOrder && (<CancelOrderModal/>) }
+      { viewRefundReceipt && (<RefundReceiptModal/>) }
       <div className="spc-above">
         <div className="orders-title-ctn">
           <p className='mytext'>MY <span className='ordertext'>ORDERS</span></p>
@@ -241,7 +242,7 @@ function Orders() {
                         return (
                           <button
                             className="order-button-container receipt-btn"
-                            onClick={() => console.log("View Receipt for:", item.ID)}
+                            onClick={() => handleViewReceipt(item.ID)}
                           >
                             View Receipt
                           </button>

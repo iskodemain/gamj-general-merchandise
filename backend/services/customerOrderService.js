@@ -5,6 +5,7 @@ import ProductVariantValues from "../models/productVariantValues.js";
 import ProductVariantCombination from "../models/productVariantCombination.js";
 import Customer from "../models/customer.js";
 import OrderCancel from "../models/orderCancel.js"
+import RefundProof from "../models/refundProof.js";
 import { Op } from "sequelize";
 import { io } from "../server.js";
 
@@ -480,4 +481,38 @@ export const markRefundReceivedService = async (customerId, orderCancelId) => {
     throw new Error(error.message);
   }
 };
+
+
+export const fetchRefundProofService = async (customerId) => {
+    try {
+      const user = await Customer.findByPk(customerId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const refundProof = await RefundProof.findAll({ where: { customerId: user.ID } });
+      if (refundProof.length === 0) {
+        return {
+          success: false,
+          message: "No refund proof found.",
+          refundProof: []
+        };
+      }
+
+      return {
+          success: true,
+          message: "Refund proof fetched successfully.",
+          refundProof
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+
 
