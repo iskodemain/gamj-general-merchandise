@@ -167,6 +167,26 @@
     opacity: 0.6;
 }
 
+.delivered-btn-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.delivered-btn-duo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.valid-date-text {
+    font-size: 0.6rem;
+    color: #989898;
+    margin-left: 3.1rem;
+    margin-top: 0.2rem;
+}
+
+
 /* --- Progress Tracker --- */
 .order-progress-tracker {
   width: 100%;
@@ -497,4 +517,8 @@
   .order-type-status {
     font-size: 1.25rem;
   }
+  .valid-date-text {
+    font-size: 0.7rem;
+  }
+
 }

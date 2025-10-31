@@ -8,7 +8,7 @@ import CancelOrderModal from '../components/Orders/CancelOrderModal';
 import RefundReceiptModal from '../components/Orders/RefundReceiptModal';
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder } = useContext(ShopContext);
 
   const [activeStep, setActiveStep] = useState(0);
 
@@ -25,6 +25,12 @@ function Orders() {
     setOrderItemId(orderItemId);
     setPaymentUsed(paymentMethod);
     setCancelOrder(true);
+  };
+
+  // NEXT STEP: HANDLE ORDER REFUND
+  const handleOrderRefund = (orderItemId) => {
+    setOrderItemId(orderItemId);
+    setRefundOrder(true);
   };
 
 
@@ -121,6 +127,15 @@ function Orders() {
     removeOrder(orderItemId);
   };
 
+  const isReturnValid = (deliveredDate) => {
+    if (!deliveredDate) return false; // prevent NaN days
+    const deliveryDate = new Date(deliveredDate);
+    const today = new Date();
+    const diffTime = today - deliveryDate;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= 7;
+  };
+
 
   return (
     <div className="main-ctn-orders">
@@ -212,8 +227,32 @@ function Orders() {
                         </p>
                       </div>
                     </div>
-                    
+                
                     {(() => {
+                      const validForReturn = isReturnValid(item.dateDelivered);
+                      console.log("Item ID:", item.ID, "Delivered Date:", item.dateDelivered, "Valid for Return:", validForReturn);
+                      if (item.orderStatus === 'Delivered') {
+                        // 🔹 Show Return/Refund if within 7 days
+                        if (validForReturn) {
+                          return (
+                            <div className="delivered-btn-group">
+                              <div className='delivered-btn-duo'>
+                                <RiDeleteBinFill className="delete-btn" onClick={() => handleRemove(item.ID)} />
+                                <button className="order-button-container return-btn" onClick={() => handleOrderRefund(item.ID, )}>Return / Refund</button>
+                              </div>
+                              <p className="valid-date-text">Date valid: 7 days</p>
+                            </div>
+                          );
+                        } else {
+                          // 🔹 Expired: show only delete icon
+                          return (
+                            <button className="delete-btn-ctn">
+                              <RiDeleteBinFill className="delete-btn" onClick={() => handleRemove(item.ID)} />
+                            </button>
+                          );
+                        }
+                      }
+
                     // Check if this item exists in the cancelled list
                     const cancelInfo = getCancelStatusForItem(item.ID);
 
@@ -259,14 +298,14 @@ function Orders() {
                       >
                         {item.orderStatus === 'Pending'
                           ? 'Cancel'
-                          : ['Cancelled', 'Delivered'].includes(item.orderStatus)
-                          ? 'Remove'
-                          : ['Processing'].includes(item.orderStatus) 
+                          : item.orderStatus === 'Processing'
                           ? 'Processing...'
-                          : ['Out for Delivery'].includes(item.orderStatus)
+                          : item.orderStatus === 'Out for Delivery'
                           ? 'On the way...'
+                          : item.orderStatus === 'Cancelled'
+                          ? 'Remove'
                           : ''
-                      }
+                          }
                       </button>
                     );
                   })()}

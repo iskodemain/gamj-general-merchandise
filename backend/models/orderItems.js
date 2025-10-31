@@ -87,6 +87,10 @@ const OrderItems = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    dateDelivered: {
+      type: DataTypes.DATEONLY, // stores YYYY-MM-DD only
+      allowNull: true,
+    },
   },
   {
     tableName: 'orderItems',
