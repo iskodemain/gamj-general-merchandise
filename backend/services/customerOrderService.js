@@ -6,9 +6,11 @@ import ProductVariantCombination from "../models/productVariantCombination.js";
 import Customer from "../models/customer.js";
 import OrderCancel from "../models/orderCancel.js"
 import RefundProof from "../models/refundProof.js";
+import OrderRefund from "../models/orderRefund.js";
 import { Op } from "sequelize";
 import { io } from "../server.js";
-
+import {v2 as cloudinary} from 'cloudinary';
+import fs from 'fs/promises';
 
 // CUSTOMER SIDE
 export const addOrderService = async (customerId, paymentMethod, orderItems) => {
@@ -506,6 +508,143 @@ export const fetchRefundProofService = async (customerId) => {
           success: true,
           message: "Refund proof fetched successfully.",
           refundProof
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+
+
+export const addOrderRefundService = async (customerId, orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus) => {
+    try {
+      const user = await Customer.findByPk(customerId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      orderItemId = Number(orderItemId);
+      const orderItem = await OrderItems.findByPk(orderItemId);
+      if (!orderItem) {
+        return {
+          success: false,
+          message: "Order item not found",
+        };
+      }
+
+      // Upload to clodinary
+      const [upload1, upload2] = await Promise.all([
+        cloudinary.uploader.upload(imageProof1.path, {
+          folder: 'gamj/orderRefund',
+          resource_type: 'image',
+        }),
+        cloudinary.uploader.upload(imageProof2.path, {
+          folder: 'gamj/orderRefund',
+          resource_type: 'image',
+        }),
+      ]);
+      
+      // Delete local file
+      try {
+        await Promise.all([
+          fs.unlink(imageProof1.path),
+          fs.unlink(imageProof2.path),
+        ]);
+      } catch (unlinkError) {
+        console.error('Warning: Failed to delete temp image(s):', unlinkError.message);
+      }
+
+      const newOrderRefund = await OrderRefund.create(
+        {
+          customerId,
+          orderItemId,
+          reasonForRefund,
+          refundComments: refundComments || null,
+          imageProof1: upload1.secure_url,
+          imageProof2: upload2.secure_url,
+          refundResolution,
+          otherReason: otherReason || null,
+          refundMethod: refundMethod || null,
+          refundPaypalEmail: refundPaypalEmail || null,
+          refundStatus: refundStatus || 'Pending',
+          dateRequest: new Date(),
+        }, {
+          fields: [
+            'customerId',
+            'orderItemId',
+            'reasonForRefund',
+            'refundComments',
+            'imageProof1',
+            'imageProof2',
+            'refundResolution',
+            'otherReason',
+            'refundMethod',
+            'refundPaypalEmail',
+            'refundStatus',
+            'dateRequest'
+          ]
+      });
+
+      // 5️⃣ Reset the order item status if needed
+      await orderItem.update({ orderStatus: 'Return/Refund' });
+
+      io.emit("addOrderRefund", {
+        refundId: newOrderRefund.ID,
+        orderItemId,
+        customerId,  
+        reasonForRefund: newOrderRefund.reasonForRefund,  
+        refundComments: newOrderRefund.refundComments,    
+        imageProof1: newOrderRefund.imageProof1,          
+        imageProof2: newOrderRefund.imageProof2,          
+        refundResolution: newOrderRefund.refundResolution,
+        otherReason: newOrderRefund.otherReason,          
+        refundMethod: newOrderRefund.refundMethod,        
+        refundPaypalEmail: newOrderRefund.refundPaypalEmail, 
+        refundStatus: newOrderRefund.refundStatus,
+        orderStatus: "Return/Refund",
+        dateRequest: newOrderRefund.dateRequest,          
+      });
+
+      return {
+        success: true,
+        message: "Refund request submitted successfully",
+        newOrderRefund
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+export const fetchOrderRefundService = async (customerId) => {
+    try {
+      const user = await Customer.findByPk(customerId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const orderRefund = await OrderRefund.findAll({ where: { customerId } });
+      if (orderRefund.length === 0) {
+        return {
+          success: false,
+          message: "No refund proof found.",
+          orderRefund: []
+        };
+      }
+
+      return {
+          success: true,
+          message: "Refund proof fetched successfully.",
+          orderRefund
       };
 
     } catch (error) {

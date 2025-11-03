@@ -59,12 +59,8 @@ const CancelOrderModal = () => {
         if (paymentUsed === 'Paypal' && cancelledBy === 'Customer') {
             statusToUse = 'Processing';
         }
-
         setCancellationStatus(statusToUse);
-
         addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, statusToUse, cancelledBy);
-
-        console.log("Final status used:", statusToUse, "\nfor payment:", paymentUsed);
     }
 
     // 🔹 Cancel Request (remove existing cancel)

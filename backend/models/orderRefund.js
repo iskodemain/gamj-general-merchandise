@@ -55,10 +55,15 @@ const OrderRefund = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    otherReason: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     refundMethod: {
       type: DataTypes.ENUM(
         'PayPal Refund — Refund will be processed to your PayPal account.',
-        'Cash Refund — Receive your refund in cash.'
+        'Cash Refund — Receive your refund in cash.',
+        'No Refund Needed — I don\'t need a refund'
       ),
       allowNull: true,
     },
