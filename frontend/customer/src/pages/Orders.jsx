@@ -24,7 +24,7 @@ function Orders() {
 
   const handleViewReceipt = (orderItemId) => {
     setOrderItemId(orderItemId);
-    setViewRefundReceipt(true);
+    setViewRefundReceipt(true); // FOR CANCEL AND RETURN/REFUND ORDERS
   };
 
   const handleReview = (orderItemId, paymentMethod) => {
@@ -35,18 +35,12 @@ function Orders() {
 
   const handleReviewRefund = (orderItemId) => {
     setOrderItemId(orderItemId);
-    setRefundOrder(true); // Open refund modal for review
-  };
-
-  const handleViewRefundReceipt = (orderItemId) => {
-    setOrderItemId(orderItemId);
-    setViewRefundReceipt(true); // Open receipt modal
+    setRefundOrder(true); 
   };
 
   const handleRejectedRefund = (orderItemId) => {
     setOrderItemId(orderItemId);
-    // later open modal for reason display
-    setRefundOrder(true);
+    // CREATE YOU OWN MODAL IN HERE
   };
 
   // NEXT STEP: HANDLE ORDER REFUND
@@ -327,7 +321,7 @@ function Orders() {
 
                         if (refundInfo.refundStatus === 'Successfully Processed') {
                           return (
-                            <button className="order-button-container receipt-btn" onClick={() => handleViewRefundReceipt(item.ID)}>
+                            <button className="order-button-container receipt-btn" onClick={() => handleViewReceipt(item.ID)}>
                               View Receipt
                             </button>
                           );

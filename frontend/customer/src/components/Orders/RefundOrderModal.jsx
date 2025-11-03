@@ -7,10 +7,58 @@ import { toast } from 'react-toastify';
 import Loading from '../Loading';
 
 const RefundOrderModal = () => {
-    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund } = useContext(ShopContext);
+    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setViewRefundReceipt } = useContext(ShopContext);
 
     const [refundInfoComplete, setRefundInfoComplete] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [existingRefund, setExistingRefund] = useState(null);
+    const [modalLoading, setModalLoading] = useState(false);
+
+    /* ✅ On modal open: find if there's already a refund for this orderItemId */
+    useEffect(() => {
+        if (!orderItemId || !fetchOrderRefund?.length) return;
+
+        const found = fetchOrderRefund.find(
+        (r) => r.orderItemId === orderItemId && ['Pending', 'Processing', 'Successfully Processed', 'Rejected'].includes(r.refundStatus)
+        );
+
+        if (found) {
+            // Only show loading when existing refund found
+            setModalLoading(true);
+            setExistingRefund(found);
+
+            // Populate fields
+            setReasonForRefund(found.reasonForRefund || '');
+            setRefundComments(found.refundComments || '');
+            setRefundResolution(found.refundResolution || '');
+            setRefundMethod(found.refundMethod || '');
+            setRefundPaypalEmail(found.refundPaypalEmail || '');
+            setRefundStatus(found.refundStatus || 'Pending');
+            setOtherReason(found.otherReason || '');
+            // proofs: backend urls (keep as null for now since files can't be refetched easily)
+            setImageProof1(found.imageProof1 || null);
+            setImageProof2(found.imageProof2 || null);
+            
+            // Simulate small load time then hide loader
+            const timeout = setTimeout(() => setModalLoading(false), 300);
+            return () => clearTimeout(timeout);
+        } else {
+            setExistingRefund(null);
+            setReasonForRefund('');
+            setRefundComments('');
+            setRefundResolution('');
+            setRefundMethod('');
+            setRefundPaypalEmail('');
+            setRefundStatus('Pending');
+            setOtherReason('');
+            setImageProof1(null);
+            setImageProof2(null);
+        }
+        
+    }, [orderItemId, fetchOrderRefund]);
+
+
+
 
     // FORM COMPLETION 
     useEffect(() => {
@@ -86,11 +134,43 @@ const RefundOrderModal = () => {
         handleCloseButton();
     }
 
+    /* ✅ Cancel Request */
+    const handleCancelRefundRequest = () => {
+        toast.info("Cancel Request functionality to be implemented later.");
+        setRefundOrder(false);
+    };
+
+    const renderButton = () => {
+        if (!existingRefund) {
+            return (
+            <button type="submit" className="refund-request-btn" disabled={!refundInfoComplete}>
+                Submit Return Request
+            </button>
+            );
+        }
+
+        if (existingRefund.refundStatus === 'Pending') {
+            return (
+            <button type="button" className="refund-request-btn cancel-btn" onClick={handleCancelRefundRequest}>
+                Cancel Request
+            </button>
+            );
+        } 
+        else if (existingRefund.refundStatus === 'Processing') {
+            return (
+            <button type="button" className="refund-request-btn waiting-btn" disabled>
+                Waiting for Approval...
+            </button>
+            );
+        } 
+    };
+
+
 
 
   return (
     <div className='refund-order-bg'>
-        {loading && <Loading />}
+        {(loading || modalLoading) && <Loading />}
         <form onSubmit={handleSubmitRefundOrder}  className='refund-modal-card'>
             <IoCloseOutline className="close-refund-btn" onClick={handleCloseButton}/>
             <div className='refund-content-ctn'>
@@ -114,12 +194,12 @@ const RefundOrderModal = () => {
 
                     <div className='refund-image-upload-ctn'>
                         <label htmlFor='imageProof1' className={`${imageProof1 ? 'has-image' : ''}`}>
-                            <img src={imageProof1 ? URL.createObjectURL(imageProof1) :  assets.refund_img_uploader} alt="" />
+                            <img src={imageProof1 instanceof File ? URL.createObjectURL(imageProof1): imageProof1 || assets.refund_img_uploader} alt="" />
                             <input id="imageProof1" type="file" accept="image/*" onChange={(e) => setImageProof1(e.target.files[0])} hidden/>
                         </label>
 
                         <label htmlFor='imageProof2' className={`${imageProof2 ? 'has-image' : ''}`}>
-                            <img src={imageProof2 ? URL.createObjectURL(imageProof2) :  assets.refund_img_uploader} alt="" />
+                            <img src={ imageProof2 instanceof File ? URL.createObjectURL(imageProof2) : imageProof2 || assets.refund_img_uploader} alt="" />
                             <input id="imageProof2" type="file" accept="image/*" onChange={(e) => setImageProof2(e.target.files[0])} hidden/>
                         </label>
                     </div>
@@ -184,7 +264,7 @@ const RefundOrderModal = () => {
                     }
                 </div>
 
-                <button type="submit" className="refund-request-btn" disabled={!refundInfoComplete}>Submit Return Request</button>
+                {renderButton()}
             </div>
         </form>
     </div>
