@@ -80,6 +80,7 @@ import wdelivered_icon from './wdelivered_icon.png'
 import uploaded_file_icon from './uploaded-file-icon.png'
 import view_receipt_icon from './view-receipt-icon.png'
 import transaction_id_icon from './transaction-id-icon.png'
+import refund_img_uploader from './refund-img-uploader.png'
 
 export const assets = {
     cart_icon,
@@ -111,7 +112,8 @@ export const assets = {
     wdelivered_icon,
     uploaded_file_icon,
     view_receipt_icon,
-    transaction_id_icon
+    transaction_id_icon,
+    refund_img_uploader
 }
 
 export const products = [

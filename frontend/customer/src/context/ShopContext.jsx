@@ -37,16 +37,88 @@ const ShopContextProvider = (props) => {
     const [hasDeliveryInfo, setHasDeliveryInfo] = useState(false);
     const [nbProfileImage, setNbProfileImage] = useState(null);
     const navigate = useNavigate();
+    const [orderItemId, setOrderItemId] = useState(null); // For cancel and refund order modals
+
+
 
     /*--------------------RETURN/REFUND ORDER PROCESS---------------------*/
     const [viewRefundReceipt, setViewRefundReceipt] = useState(false); // CANCEL & RETURN/REFUND ORDERS
     const [refundOrder, setRefundOrder] = useState(false);
-    
+    const [reasonForRefund, setReasonForRefund] = useState('');
+    const [refundComments, setRefundComments] = useState('');
+    const [imageProof1, setImageProof1] = useState(null);
+    const [imageProof2, setImageProof2] = useState(null);
+    const [refundResolution, setRefundResolution] = useState('');
+    const [otherReason, setOtherReason] = useState('');
+    const [refundMethod, setRefundMethod] = useState('');
+    const [refundPaypalEmail, setRefundPaypalEmail] = useState('');
+    const [refundStatus, setRefundStatus] = useState('Pending');
+
+    /*--------------------------FETCH ORDER REFUND----------------------------*/
+    const [fetchOrderRefund, setFetchOrderRefund] = useState([]);
+    const handleFetchOrderRefund = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/order/order-refund", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setFetchOrderRefund(response.data.orderRefund);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+            handleFetchOrderRefund();
+        }
+    }, [token]);
+
+    /*--------------------------ADD ORDER REFUND----------------------------*/
+    const addOrderRefund = async (orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus) => {
+        if (token) {
+            try {
+                const formData = new FormData();
+                formData.append('orderItemId', orderItemId);
+                formData.append('reasonForRefund', reasonForRefund);
+                formData.append('refundComments', refundComments || '');
+                formData.append('refundResolution', refundResolution);
+                formData.append('otherReason', otherReason || '');
+                formData.append('refundMethod', refundMethod || '');
+                formData.append('refundPaypalEmail', refundPaypalEmail || '');
+                formData.append('refundStatus', refundStatus || '');
+                if (imageProof1 instanceof File) {
+                    formData.append("imageProof1", imageProof1);
+                }
+                if (imageProof2 instanceof File) {
+                    formData.append("imageProof2", imageProof2);
+                }
+
+                const response = await axios.post(backendUrl + "/api/order/order-refund/add", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message, {...toastSuccess});
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, { ...toastError });
+            }
+        }
+    };
 
     /*-----------------------CANCEL ORDER PROCESS-------------------------*/
     const [cancelOrder, setCancelOrder] = useState(false);
     const [paymentUsed, setPaymentUsed] = useState('');
-    const [orderItemId, setOrderItemId] = useState(null);
+    
     const [reasonForCancellation, setReasonForCancellation] = useState('');
     const [cancelComments, setCancelComments] = useState('');
     const [cancelPaypalEmail, setCancelPaypalEmail] = useState(''); 
@@ -64,9 +136,6 @@ const ShopContextProvider = (props) => {
             });
             if (response.data.success) {
                 setFetchRefundProof(response.data.refundProof);
-            }
-            else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
         console.log(error);
@@ -193,21 +262,18 @@ const ShopContextProvider = (props) => {
     const [fetchOrderItems, setFetchOrderItems] = useState([]);
     const handleFetchOrders = async() => {
         try {
-        const response = await axios.get(backendUrl + "/api/order/", {
-            headers: {
-            Authorization: `Bearer ${token}`
+            const response = await axios.get(backendUrl + "/api/order/", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setFetchOrders(response.data.orders);
+                setFetchOrderItems(response.data.orderItems);
             }
-        });
-        if (response.data.success) {
-            setFetchOrders(response.data.orders);
-            setFetchOrderItems(response.data.orderItems);
-        }
-        else {
-            toast.error(response.data.message, { ...toastError });
-        }
         } catch (error) {
-        console.log(error);
-        toast.error(error.message, {...toastError});
+            console.log(error);
+            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -228,9 +294,6 @@ const ShopContextProvider = (props) => {
             if (response.data.success) {
                 // SET MO NALANG DITO YUNG MGA NEED NA DATA
                 setFetchCancelledOrders(response.data.orderCancel);
-            }
-            else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
         console.log(error);
@@ -280,31 +343,31 @@ const ShopContextProvider = (props) => {
 
     const handleFetchDeliveryInfo = async() => {
         try {
-        const response = await axios.get(backendUrl + "/api/customer/profile/delivery-info", {
-            headers: {
-            Authorization: `Bearer ${token}`
+            const response = await axios.get(backendUrl + "/api/customer/profile/delivery-info", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setPoMedicalInstitutionName(response.data.user.medicalInstitutionName)
+                setPoEmailAddress(response.data.user.emailAddress);
+                setPoDetailedAddress(response.data.user.detailedAddress);
+                setPoZipCode(response.data.user.zipCode);
+                setPoContactNumber(response.data.user.contactNumber);
+
+                // Use context states instead of local ones
+                setSelectedProvince(response.data.user.provinceId);
+                setSelectedCity(response.data.user.cityId);
+                setSelectedBarangay(response.data.user.barangayId); 
+
+                setHasDeliveryInfo(true);
             }
-        });
-        if (response.data.success) {
-            setPoMedicalInstitutionName(response.data.user.medicalInstitutionName)
-            setPoEmailAddress(response.data.user.emailAddress);
-            setPoDetailedAddress(response.data.user.detailedAddress);
-            setPoZipCode(response.data.user.zipCode);
-            setPoContactNumber(response.data.user.contactNumber);
-
-            // Use context states instead of local ones
-            setSelectedProvince(response.data.user.provinceId);
-            setSelectedCity(response.data.user.cityId);
-            setSelectedBarangay(response.data.user.barangayId); 
-
-            setHasDeliveryInfo(true);
-        }
-        else {
-            setHasDeliveryInfo(false);
-        }
+            else {
+                setHasDeliveryInfo(false);
+            }
         } catch (error) {
-        console.log(error);
-        toast.error(error.message, {...toastError});
+            console.log(error);
+            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -371,10 +434,7 @@ const ShopContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/product/category");
             if (response.data.success) {
                 setProductCategory(response.data.productCategory);
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-            
+            } 
         } catch (error) {
             console.log(error);
             toast.error(error.message, {...toastError});
@@ -390,10 +450,7 @@ const ShopContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/product/list");
             if (response.data.success) {
                 setProducts(response.data.products);
-            } else {
-                toast.error(response.data.message, {...toastError});
-            }
-            
+            } 
         } catch (error) {
             console.log(error);
             toast.error(error.message, {...toastError});
@@ -409,9 +466,7 @@ const ShopContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/product/product-variant-combination");
             if (response.data.success) {
                 setProductVariantCombination(response.data.productVariantCombination);
-            } else {
-                toast.error(response.data.message, { ...toastError });
-            }
+            } 
         } catch (error) {
             console.log(error);
             toast.error(error.message, { ...toastError });
@@ -427,8 +482,6 @@ const ShopContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/product/product-variant-values");
             if (response.data.success) {
                 setProductVariantValues(response.data.productVariantValues);
-            } else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
             console.log(error);
@@ -445,8 +498,6 @@ const ShopContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/product/variant-name");
             if (response.data.success) {
                 setVariantName(response.data.variantName);
-            } else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
             console.log(error);
@@ -478,12 +529,10 @@ const ShopContextProvider = (props) => {
             });
 
             if (response.data.success) {
-            setProvinces(response.data.provinces || []);
-            setCities(response.data.cities || []);
-            setBarangays(response.data.barangays || []);
-            } else {
-            toast.error(response.data.message, { ...toastError });
-            }
+                setProvinces(response.data.provinces || []);
+                setCities(response.data.cities || []);
+                setBarangays(response.data.barangays || []);
+            } 
         } catch (error) {
             console.log(error);
             toast.error(error.message, { ...toastError });
@@ -557,8 +606,6 @@ const ShopContextProvider = (props) => {
             });
             if (response.data.success) {
                 setWishListItems(response.data.wishlistItems);
-            } else {
-                toast.error(response.data.message, {...toastError});
             }
         } catch (error) {
             console.log(error);
@@ -649,8 +696,6 @@ const ShopContextProvider = (props) => {
             });
             if (response.data.success) {
                 setCartItems(response.data.cartItems);
-            } else {
-                // console.error(response.data.message, {...toastError});
             }
         } catch (error) {
             console.log(error);
@@ -867,39 +912,39 @@ const ShopContextProvider = (props) => {
     useEffect(() => {
         socket.on("addCancelOrder", (data) => {
             setFetchCancelledOrders((prev) => {
-            const existingIndex = prev.findIndex(
-                (cancel) => cancel.orderItemId === data.orderItemId
-            );
+                const existingIndex = prev.findIndex(
+                    (cancel) => cancel.orderItemId === data.orderItemId
+                );
 
-            const newCancel = {
-                ID: data.orderCancelId,
-                orderItemId: data.orderItemId,
-                customerId: data.customerId,
-                reasonForCancellation: data.reasonForCancellation,
-                cancelComments: data.cancelComments || '',
-                cancelPaypalEmail: data.cancelPaypalEmail || '',
-                cancellationStatus: data.cancellationStatus,
-                cancelledBy: data.cancelledBy,
-            };
+                const newCancel = {
+                    ID: data.orderCancelId,
+                    orderItemId: data.orderItemId,
+                    customerId: data.customerId,
+                    reasonForCancellation: data.reasonForCancellation,
+                    cancelComments: data.cancelComments || '',
+                    cancelPaypalEmail: data.cancelPaypalEmail || '',
+                    cancellationStatus: data.cancellationStatus,
+                    cancelledBy: data.cancelledBy,
+                };
 
-            if (existingIndex !== -1) {
-                // ✅ Update existing cancel record
-                const updated = [...prev];
-                updated[existingIndex] = newCancel;
-                return updated;
-            } else {
-                // ✅ Add new cancel record
-                return [...prev, newCancel];
-            }
+                if (existingIndex !== -1) {
+                    // ✅ Update existing cancel record
+                    const updated = [...prev];
+                    updated[existingIndex] = newCancel;
+                    return updated;
+                } else {
+                    // ✅ Add new cancel record
+                    return [...prev, newCancel];
+                }
             });
 
             // ✅ Update order item status
             setFetchOrderItems((prev) =>
-            prev.map((item) =>
-                item.ID === data.orderItemId
-                ? { ...item, orderStatus: data.newStatus }
-                : item
-            )
+                prev.map((item) =>
+                    item.ID === data.orderItemId
+                    ? { ...item, orderStatus: data.newStatus }
+                    : item
+                )
             );
         });
 
@@ -958,15 +1003,6 @@ const ShopContextProvider = (props) => {
                     : cancel
                 )
             );
-
-
-            // setFetchOrderItems((prev) =>
-            //     prev.map((item) =>
-            //         item.ID === data.orderItemId
-            //         ? { ...item, orderStatus: "Cancelled" } // or "Completed" or whatever your logic is
-            //         : item
-            //     )
-            // );
         });
 
         return () => {
@@ -975,10 +1011,63 @@ const ShopContextProvider = (props) => {
     }, []);
 
 
+    // (SOCKET IO) - ADD ORDER REFUND
+    useEffect(() => {
+        socket.on("addOrderRefund", (data) => {
+            console.log("✅ Received addOrderRefund:", data);
+            // ✅ 1. Update fetchOrderRefund (add or update)
+            setFetchOrderRefund((prev) => {
+                const existingIndex = prev.findIndex(
+                    (refund) => refund.orderItemId === data.orderItemId
+                );
+
+                const newRefund = {
+                    ID: data.refundId,
+                    orderItemId: data.orderItemId,
+                    customerId: data.customerId,  
+                    reasonForRefund: data.reasonForRefund,  
+                    refundComments: data.refundComments || null, 
+                    imageProof1: data.imageProof1,  
+                    imageProof2: data.imageProof2, 
+                    refundResolution: data.refundResolution,  
+                    otherReason: data.otherReason || null,  
+                    refundMethod: data.refundMethod || null,  
+                    refundPaypalEmail: data.refundPaypalEmail || null,  
+                    refundStatus: data.refundStatus,
+                    dateRequest: data.dateRequest,  
+                };
+
+                if (existingIndex !== -1) {
+                    const updated = [...prev];
+                    updated[existingIndex] = newRefund;
+                    return updated;
+                } else {
+                    return [...prev, newRefund];
+                }
+            });
+
+            // ✅ 2. Update order item list to show “Return/Refund” status in real time
+            setFetchOrderItems((prev) =>
+                prev.map((item) =>
+                    item.ID === data.orderItemId
+                        ? { ...item, orderStatus: data.orderStatus }
+                        : item
+                )
+            );
+        });
+
+        return () => {
+            socket.off("addOrderRefund");
+        };
+    }, []);
+
+
+
+
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, setFetchOrderItems
     }
 
     return (

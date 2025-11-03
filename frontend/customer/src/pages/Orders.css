@@ -152,6 +152,10 @@
     background-color: #D10000;
 }
 
+.refund-circle {
+  background-color: #FF3333;
+}
+
 .cancelled-item {
     opacity: 0.6;
 }
