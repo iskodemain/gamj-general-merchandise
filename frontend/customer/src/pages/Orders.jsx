@@ -339,6 +339,16 @@ function Orders() {
                             </div>
                           );
                         }
+
+                        if (refundInfo.refundStatus === 'Refunded') {
+                          return (
+                            <div className="delivered-btn-group">
+                              <div className="delivered-btn-duo">
+                                <RiDeleteBinFill className="delete-btn" onClick={() => handleRemove(item.ID)}/>
+                              </div>
+                            </div>
+                          );
+                        }
                       }
                       // Check if this item exists in the cancelled list
                       const cancelInfo = getCancelStatusForItem(item.ID);

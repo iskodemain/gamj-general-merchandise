@@ -3,11 +3,13 @@ import { ShopContext } from '../../context/ShopContext';
 import { IoCloseOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import './CancelOrderModal.css'
+import Loading from '../Loading';
 
 const CancelOrderModal = () => {
     const { orderItemId, products, fetchOrderItems, paymentUsed, setCancelOrder, currency, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancellationStatus, setCancellationStatus, cancelledBy, addCancelOrder, fetchCancelledOrders, cancelOrderRequest, markRefundReceived} = useContext(ShopContext);
 
     const [existingCancel, setExistingCancel] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     // ✅ Find the selected item
     const cancelItem = fetchOrderItems.find(item => item.ID === orderItemId);
@@ -60,7 +62,10 @@ const CancelOrderModal = () => {
             statusToUse = 'Processing';
         }
         setCancellationStatus(statusToUse);
-        addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, statusToUse, cancelledBy);
+        setLoading(true); 
+        await addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, statusToUse, cancelledBy);
+        setLoading(false); 
+        handleCloseButton();
     }
 
     // 🔹 Cancel Request (remove existing cancel)
@@ -87,8 +92,12 @@ const CancelOrderModal = () => {
         setCancelPaypalEmail('');
     };
 
+    // ✅ Disable inputs when existingCancel exists
+    const isDisabled = Boolean(existingCancel);
+
     return (
         <div className='cancel-order-bg'>
+            {loading&& <Loading />}
             <form onSubmit={handleSubmitCancelOrder}  className='cancel-modal-card'>
                 <IoCloseOutline className="close-cancel-btn" onClick={handleCloseButton}/>
                 <div className='cancel-content-ctn'>
@@ -122,7 +131,7 @@ const CancelOrderModal = () => {
                     </div>
                 </div>
                 {/* SECOND CONTENT */}
-                <div className='cancel-form'>
+                <div className={`cancel-form ${isDisabled ? 'disabled-cancel-section': ''}`}>
                     <label>1. Select a Reason for Cancellation</label>
                     <select value={reasonForCancellation} onChange={(e) => setReasonForCancellation(e.target.value)} className='cancel-input'>
                     <option value="" disabled hidden>Select Reason</option>

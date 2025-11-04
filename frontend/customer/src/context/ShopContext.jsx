@@ -173,10 +173,11 @@ const ShopContextProvider = (props) => {
     
 
     /*--------------------------MARK REFUND RECEIVED----------------------------*/
-    const markRefundReceived = async (orderCancelId) => {
+    const markRefundReceived = async (orderCancelId, orderRefundId) => {
         if (token) {
             try {
-                const response = await axios.put(backendUrl + "/api/order/mark-refund-received", { orderCancelId }, {
+                const payload = {orderCancelId, orderRefundId};
+                const response = await axios.put(backendUrl + "/api/order/mark-refund-received", payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -1019,13 +1020,25 @@ const ShopContextProvider = (props) => {
     // (SOCKET IO) - MARK REFUND RECEIVED
     useEffect(() => {
         socket.on("refundMarkedAsCompleted", (data) => {
-            setFetchCancelledOrders((prev) =>
-                prev.map((cancel) =>
+            if (data.orderCancelId) {
+                setFetchCancelledOrders((prev) =>
+                    prev.map((cancel) =>
                     cancel.ID === data.orderCancelId
-                    ? { ...cancel, cancellationStatus: data.cancellationStatus }
-                    : cancel
-                )
-            );
+                        ? { ...cancel, cancellationStatus: data.cancellationStatus }
+                        : cancel
+                    )
+                );
+            }
+
+            if (data.orderRefundId) {
+                setFetchOrderRefund((prev) =>
+                    prev.map((refund) =>
+                    refund.ID === data.orderRefundId
+                        ? { ...refund, refundStatus: data.refundStatus }
+                        : refund
+                    )
+                );
+            }
         });
 
         return () => {

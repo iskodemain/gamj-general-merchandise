@@ -442,7 +442,7 @@ export const cancelOrderRequestService = async (customerId, orderItemId, orderCa
 };
 
 
-export const markRefundReceivedService = async (customerId, orderCancelId) => {
+export const markRefundReceivedService = async (customerId, orderCancelId, orderRefundId) => {
   try {
     // 1️⃣ Validate customer
     const user = await Customer.findByPk(customerId);
@@ -453,31 +453,72 @@ export const markRefundReceivedService = async (customerId, orderCancelId) => {
       };
     }
 
-    // 2️⃣ Check if cancellation record exists for this customer
-    const orderCancel = await OrderCancel.findOne({
-      where: { ID: orderCancelId, customerId },
-    });
+    // ORDER CANCEL ID
+    if (orderCancelId) {
+      const orderCancel = await OrderCancel.findOne({
+        where: { ID: orderCancelId, customerId },
+      });
 
-    if (!orderCancel) {
+      if (!orderCancel) {
+        return {
+          success: false,
+          message: "No cancellation record found for this customer.",
+        };
+      }
+
+      await orderCancel.update({ cancellationStatus: "Completed" });
+      await RefundProof.destroy({
+        where: {
+          cancelId: orderCancelId,
+          refundId: null, // ensure only cancel-related proof is removed
+        },
+      });
+
+      io.emit("refundMarkedAsCompleted", {
+        orderCancelId,
+        cancellationStatus: "Completed",
+      });
+
       return {
-        success: false,
-        message: "No cancellation record found for this customer.",
+        success: true,
+        message: "Cancellation refund marked as received successfully.",
       };
     }
 
-    // 3️⃣ Update refund status
-    await orderCancel.update({ cancellationStatus: "Completed" });
+    // ORDER REFUND ID
+    if (orderRefundId) {
+      const orderRefund = await OrderRefund.findOne({
+        where: { ID: orderRefundId, customerId },
+      });
 
-    // 4️⃣ Notify clients via socket
-    io.emit("refundMarkedAsCompleted", {
-      orderCancelId,
-      cancellationStatus: "Completed",
-    });
+      if (!orderRefund) {
+        return {
+          success: false,
+          message: "No refund record found for this customer.",
+        };
+      }
 
-    return {
-      success: true,
-      message: "Refund has been marked as received successfully.",
-    };
+      await orderRefund.update({ refundStatus: "Refunded" });
+      await RefundProof.destroy({
+        where: {
+          refundId: orderRefundId,
+          cancelId: null, // ensure only refund-related proof is removed
+        },
+      });
+
+      io.emit("refundMarkedAsCompleted", {
+        orderRefundId,
+        refundStatus: "Refunded",
+      });
+
+      return {
+        success: true,
+        message: "Return/Refund marked as received successfully.",
+      };
+    }
+
+    return { success: false, message: "Invalid request" };
+    
   } catch (error) {
     console.error(error);
     throw new Error(error.message);
@@ -515,7 +556,6 @@ export const fetchRefundProofService = async (customerId) => {
         throw new Error(error.message);
     }
 }
-
 
 
 export const addOrderRefundService = async (customerId, orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus) => {

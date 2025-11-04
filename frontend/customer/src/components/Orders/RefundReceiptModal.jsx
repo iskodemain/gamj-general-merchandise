@@ -6,38 +6,63 @@ import { IoCloseOutline } from "react-icons/io5";
 import Loading from '../Loading'
 
 const RefundReceiptModal = () => {
-    const { currency, setViewRefundReceipt, markRefundReceived, fetchCancelledOrders, orderItemId, fetchRefundProof } = useContext(ShopContext);
+    const { currency, setViewRefundReceipt, markRefundReceived, fetchCancelledOrders, fetchOrderRefund, orderItemId, fetchRefundProof } = useContext(ShopContext);
 
     const [viewReceiptImage, setViewReceiptImage] = useState(false);
-    const [cancelRecord, setCancelRecord] = useState(null);
+    const [record, setRecord] = useState(null); // can be cancel or refund record
     const [refundProofData, setRefundProofData] = useState(null);
+    const [isCancel, setIsCancel] = useState(false);
 
-    // 🧩 Find the cancel record for this order item
+    // 🔹 Step 1: Identify whether the selected orderItem belongs to cancel or refund
     useEffect(() => {
-        if (!orderItemId || !fetchCancelledOrders?.length) return;
-        const found = fetchCancelledOrders.find(c => c.orderItemId === orderItemId);
-        setCancelRecord(found || null);
-    }, [orderItemId, fetchCancelledOrders]);
+        if (!orderItemId) return;
+
+        // Try find in cancelledOrders
+        const cancelFound = fetchCancelledOrders?.find(c => c.orderItemId === orderItemId);
+        if (cancelFound) {
+            setRecord(cancelFound);
+            setIsCancel(true);
+            return;
+        }
+
+        // Try find in refundOrders (for Return/Refund)
+        const refundFound = fetchOrderRefund?.find(r => r.orderItemId === orderItemId);
+        if (refundFound) {
+            setRecord(refundFound);
+            setIsCancel(false);
+            return;
+        }
+
+        setRecord(null);
+    }, [orderItemId, fetchCancelledOrders, fetchOrderRefund]);
 
 
-     /* 🔹 Step 2: Once cancelRecord is known, find matching refund proof */
+     // 🔹 Step 2: Find matching refund proof (either by cancelId or refundId)
     useEffect(() => {
-        if (!cancelRecord || !fetchRefundProof?.length) {
+        if (!record || !fetchRefundProof?.length) {
             setRefundProofData(null);
             return;
         }
-        const proof = fetchRefundProof.find(p => p.cancelId === cancelRecord.ID);
+
+        let proof = null;
+
+        if (isCancel) {
+            proof = fetchRefundProof.find(p => p.cancelId === record.ID && p.refundId === null);
+        } else {
+            proof = fetchRefundProof.find(p => p.refundId === record.ID && p.cancelId === null);
+        }
+
         setRefundProofData(proof || null);
-    }, [cancelRecord, fetchRefundProof]);
+    }, [record, fetchRefundProof, isCancel]);
 
 
     const handleMarkAsReceived = () => {
-        if (!cancelRecord) {
-            console.warn("No matching cancel record found for this order item.");
-            return;
-        }
+        if (!record) return;
+        
+        const cancelId = isCancel ? record.ID : null;
+        const refundId = !isCancel ? record.ID : null;
 
-        markRefundReceived(cancelRecord.ID);
+        markRefundReceived(cancelId, refundId);
         setViewRefundReceipt(false);
     };
 
@@ -60,9 +85,12 @@ const RefundReceiptModal = () => {
     };
 
 
-    if (!cancelRecord || !refundProofData) {
+    // If not ready yet
+    if (!record || !refundProofData) {
         return <Loading />;
     }
+
+
   return (
     <div className="refund-receipt-bg">
         {viewReceiptImage && <ViewReceiptImage />}
