@@ -7,9 +7,10 @@ import { RiDeleteBinFill } from "react-icons/ri";
 import CancelOrderModal from '../components/Orders/CancelOrderModal';
 import RefundReceiptModal from '../components/Orders/RefundReceiptModal';
 import RefundOrderModal from '../components/Orders/RefundOrderModal';
+import RejectedRefundModal from '../components/Orders/RejectedRefundModal';
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund } = useContext(ShopContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [timeUpdated, setTimeUpdated] = useState(Date.now());
@@ -40,6 +41,7 @@ function Orders() {
 
   const handleRejectedRefund = (orderItemId) => {
     setOrderItemId(orderItemId);
+    setShowRejectedRefund(true);
     // CREATE YOU OWN MODAL IN HERE
   };
 
@@ -179,7 +181,8 @@ function Orders() {
     <div className="main-ctn-orders">
       { cancelOrder && (<CancelOrderModal/>) }
       { viewRefundReceipt && (<RefundReceiptModal/>) }
-      { refundOrder && (<RefundOrderModal/>) }
+      { refundOrder && (<RefundOrderModal/>) } 
+      { showRejectedRefund && (<RejectedRefundModal/>) } 
       <div className="spc-above">
         <div className="orders-title-ctn">
           <p className='mytext'>MY <span className='ordertext'>ORDERS</span></p>

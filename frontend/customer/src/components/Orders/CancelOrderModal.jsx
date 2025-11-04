@@ -97,7 +97,7 @@ const CancelOrderModal = () => {
 
     return (
         <div className='cancel-order-bg'>
-            {loading&& <Loading />}
+            {loading && <Loading />}
             <form onSubmit={handleSubmitCancelOrder}  className='cancel-modal-card'>
                 <IoCloseOutline className="close-cancel-btn" onClick={handleCloseButton}/>
                 <div className='cancel-content-ctn'>
