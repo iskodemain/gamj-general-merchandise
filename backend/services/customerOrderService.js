@@ -653,5 +653,61 @@ export const fetchOrderRefundService = async (customerId) => {
     }
 }
 
+export const cancelOrderRefundRequestService = async (customerId, orderRefundId, orderItemId) => {
+  try {
+    // 1️⃣ Validate customer
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    // 2️⃣ Validate refund request
+    const orderRefund = await OrderRefund.findOne({
+      where: { ID: orderRefundId, customerId },
+    });
+    if (!orderRefund) {
+      return {
+        success: false,
+        message: "Refund request not found.",
+      };
+    }
+
+    // 3️⃣ Validate related order item
+    const orderItem = await OrderItems.findByPk(orderItemId);
+    if (!orderItem) {
+      return {
+        success: false,
+        message: "Order item not found for this customer.",
+      };
+    }
+
+    // 5️⃣ Reset order item status
+    await orderItem.update({ orderStatus: "Delivered" });
+
+    // 4️⃣ Delete the refund request
+    await orderRefund.destroy();
+
+  
+    // 6️⃣ Emit event to update frontend in real-time
+    io.emit("cancelOrderRefundRequest", {
+      orderRefundId,
+      orderItemId,
+      customerId,
+      orderStatus: "Delivered",
+    });
+
+    return {
+      success: true,
+      message: "Refund request cancelled successfully.",
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
 
 

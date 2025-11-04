@@ -7,12 +7,14 @@ import { toast } from 'react-toastify';
 import Loading from '../Loading';
 
 const RefundOrderModal = () => {
-    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setViewRefundReceipt } = useContext(ShopContext);
+    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setViewRefundReceipt, cancelOrderRefundRequest } = useContext(ShopContext);
 
     const [refundInfoComplete, setRefundInfoComplete] = useState(false);
     const [loading, setLoading] = useState(false);
     const [existingRefund, setExistingRefund] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
+
+    const isDisabled = existingRefund && (existingRefund.refundStatus === 'Pending' || existingRefund.refundStatus === 'Processing');
 
     /* ✅ On modal open: find if there's already a refund for this orderItemId */
     useEffect(() => {
@@ -134,9 +136,16 @@ const RefundOrderModal = () => {
         handleCloseButton();
     }
 
-    /* ✅ Cancel Request */
-    const handleCancelRefundRequest = () => {
-        toast.info("Cancel Request functionality to be implemented later.");
+    /* Cancel Order Refund Request */
+    const handleCancelRefundRequest = async (orderRefundId, orderItemId) => {
+        if (!orderRefundId || !orderItemId) {
+            toast.error("No refund request found to cancel.");
+            return;
+        }
+
+        setLoading(true); 
+        await cancelOrderRefundRequest(orderRefundId, orderItemId);
+        setLoading(false); 
         setRefundOrder(false);
     };
 
@@ -151,8 +160,8 @@ const RefundOrderModal = () => {
 
         if (existingRefund.refundStatus === 'Pending') {
             return (
-            <button type="button" className="refund-request-btn cancel-btn" onClick={handleCancelRefundRequest}>
-                Cancel Request
+            <button type="button" className="refund-request-btn cancel-btn" onClick={() => handleCancelRefundRequest(existingRefund.ID, existingRefund.orderItemId)}>
+                {loading ? "Cancelling..." : "Cancel Request"}
             </button>
             );
         } 
@@ -173,41 +182,41 @@ const RefundOrderModal = () => {
         {(loading || modalLoading) && <Loading />}
         <form onSubmit={handleSubmitRefundOrder}  className='refund-modal-card'>
             <IoCloseOutline className="close-refund-btn" onClick={handleCloseButton}/>
-            <div className='refund-content-ctn'>
+            <div className="refund-content-ctn">
                 <p className='refund-title'>Return/Refund Request</p>
                 {/* FIRST CONTENT */}
-                <div className='refund-form'>
+                <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                     <label>1. Select the reason for your return</label>
-                    <select value={reasonForRefund} onChange={(e) => setReasonForRefund(e.target.value)} className='cancel-input'>
+                    <select value={reasonForRefund} onChange={(e) => setReasonForRefund(e.target.value)} className='cancel-input' disabled={isDisabled}>
                     <option value="" disabled hidden>Select Reason</option>
                     <option value="Change of mind">Change of mind</option>
                     <option value="Ordered by mistake">Ordered by mistake</option>
                     <option value="Found a better price">Found a better price</option>
                     <option value="Other">Other</option>
                     </select>
-                    <textarea value={refundComments} onChange={(e) => setRefundComments(e.target.value)} className='refund-textarea' placeholder="Additional Comments (optional)"/>
+                    <textarea value={refundComments} onChange={(e) => setRefundComments(e.target.value)} className='refund-textarea' placeholder="Additional Comments (optional)" disabled={isDisabled}/>
                 </div>
 
                 {/* SECOND CONTENT */}
-                <div className='refund-form'>
+                <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                     <label>2. Select at least two images as proof.</label>
 
                     <div className='refund-image-upload-ctn'>
                         <label htmlFor='imageProof1' className={`${imageProof1 ? 'has-image' : ''}`}>
                             <img src={imageProof1 instanceof File ? URL.createObjectURL(imageProof1): imageProof1 || assets.refund_img_uploader} alt="" />
-                            <input id="imageProof1" type="file" accept="image/*" onChange={(e) => setImageProof1(e.target.files[0])} hidden/>
+                            <input id="imageProof1" type="file" accept="image/*" onChange={(e) => setImageProof1(e.target.files[0])} hidden disabled={isDisabled}/>
                         </label>
 
                         <label htmlFor='imageProof2' className={`${imageProof2 ? 'has-image' : ''}`}>
                             <img src={ imageProof2 instanceof File ? URL.createObjectURL(imageProof2) : imageProof2 || assets.refund_img_uploader} alt="" />
-                            <input id="imageProof2" type="file" accept="image/*" onChange={(e) => setImageProof2(e.target.files[0])} hidden/>
+                            <input id="imageProof2" type="file" accept="image/*" onChange={(e) => setImageProof2(e.target.files[0])} hidden disabled={isDisabled}/>
                         </label>
                     </div>
                 </div>
 
 
                 {/* THIRD CONTENT */}
-                <div className='refund-form'>
+                <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                     <label>3. Select a return request solutions</label>
                     <select 
                         value={refundResolution} 
@@ -218,6 +227,7 @@ const RefundOrderModal = () => {
                             setRefundPaypalEmail('');
                         }}
                         className='cancel-input'
+                        disabled={isDisabled}
                     >
                     <option value="" disabled hidden>Select Return Request</option>
                     <option value="Return and Refund">Return and Refund</option>
@@ -228,7 +238,7 @@ const RefundOrderModal = () => {
                     </select>
                     { 
                         refundResolution === 'Other (please specify)' && 
-                        <input type="text" placeholder='Please specify' value={otherReason} onChange={(e) => setOtherReason(e.target.value)} />
+                        <input type="text" placeholder='Please specify' value={otherReason} onChange={(e) => setOtherReason(e.target.value)} disabled={isDisabled}/>
                     }
                 </div>
 
@@ -236,9 +246,9 @@ const RefundOrderModal = () => {
                 {/* FOURTH CONTENT */}
                     {
                         (refundResolution === 'Other (please specify)' || refundResolution === 'Return and Refund') && (
-                            <div className='refund-form'>
+                            <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                                 <label>4. Select your preferred refund method</label>
-                                <select value={refundMethod} onChange={(e) => setRefundMethod(e.target.value)} className='cancel-input'>
+                                <select value={refundMethod} onChange={(e) => setRefundMethod(e.target.value)} className='cancel-input' disabled={isDisabled}>
                                     <option value="" disabled hidden>Select Refund Method</option>
                                     <option value="PayPal Refund — Refund will be processed to your PayPal account.">PayPal Refund — Refund will be processed to your PayPal account.</option>
                                     <option value="Cash Refund — Receive your refund in cash.">Cash Refund — Receive your refund in cash.</option>
@@ -253,12 +263,12 @@ const RefundOrderModal = () => {
                
 
                 {/* FIFTH CONTENT */}
-                <div className='refund-form'>
+                <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                     {
                         refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && (refundResolution === 'Return and Refund' || refundResolution === 'Other (please specify)') && (
                             <>
                                 <label>5. Give your PayPal email address.</label>
-                                <input type="email" placeholder='Enter your PayPal account email address.' value={refundPaypalEmail} onChange={(e) => setRefundPaypalEmail(e.target.value)} required/>
+                                <input type="email" placeholder='Enter your PayPal account email address.' value={refundPaypalEmail} onChange={(e) => setRefundPaypalEmail(e.target.value)} required disabled={isDisabled}/>
                             </>
                         )
                     }
