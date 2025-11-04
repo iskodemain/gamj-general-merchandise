@@ -1,3 +1,8 @@
+.disabled-refund-section {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .refund-order-bg {
   position: fixed;
   top: 0; 

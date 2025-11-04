@@ -1,6 +1,6 @@
 import express from 'express';
 import customerAuth from '../middleware/customerAuth.js'
-import { addOrder, fetchOrders, cancelOrder, fetchOrderCancel, removeCancelOrder, cancelOrderRequest, markRefundReceived, fetchRefundProof, addOrderRefund, fetchOrderRefund } from '../controllers/customerOrderController.js';
+import { addOrder, fetchOrders, cancelOrder, fetchOrderCancel, removeCancelOrder, cancelOrderRequest, markRefundReceived, fetchRefundProof, addOrderRefund, fetchOrderRefund, cancelOrderRefundRequest } from '../controllers/customerOrderController.js';
 
 import upload from '../middleware/multer.js';
 
@@ -44,5 +44,8 @@ orderRouter.post(
 
 // FETCH REFUND PROOF
 orderRouter.get('/order-refund', customerAuth, fetchOrderRefund);
+
+// CANCEL ORDER REFUND
+orderRouter.patch('/cancel-refund-request', customerAuth, cancelOrderRefundRequest);
 
 export default orderRouter;
