@@ -72,7 +72,7 @@ const OrderRefund = sequelize.define(
       allowNull: true,
     },
     refundStatus: {
-      type: DataTypes.ENUM('Pending', 'Processing', 'Successfully Processed', 'Rejected'),
+      type: DataTypes.ENUM('Pending', 'Processing', 'Successfully Processed', 'Rejected', 'Refunded'),
       allowNull: false,
       defaultValue: 'Pending',
     },

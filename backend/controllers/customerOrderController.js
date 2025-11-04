@@ -76,8 +76,8 @@ export const cancelOrderRequest = async (req, res) => {
 export const markRefundReceived = async (req, res) => {
     try {
         const { ID } = req.user;
-        const { orderCancelId } = req.body;
-        const result = await markRefundReceivedService(ID, orderCancelId);
+        const { orderCancelId, orderRefundId } = req.body;
+        const result = await markRefundReceivedService(ID, orderCancelId, orderRefundId);
         res.json(result);
     } catch (error) {
         console.log(error);
