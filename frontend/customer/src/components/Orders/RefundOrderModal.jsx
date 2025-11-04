@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import Loading from '../Loading';
 
 const RefundOrderModal = () => {
-    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setViewRefundReceipt, cancelOrderRefundRequest } = useContext(ShopContext);
+    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, cancelOrderRefundRequest } = useContext(ShopContext);
 
     const [refundInfoComplete, setRefundInfoComplete] = useState(false);
     const [loading, setLoading] = useState(false);
