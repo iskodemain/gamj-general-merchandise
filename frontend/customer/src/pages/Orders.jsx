@@ -113,6 +113,12 @@ function Orders() {
 
   const filteredOrders = getFilteredOrders();
 
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    const dateA = new Date(a.dateOrdered);
+    const dateB = new Date(b.dateOrdered);
+    return dateB - dateA; // Descending order: newest first
+  });
+
   // --- Progress Tracker Component ---
   const ProgressTracker = () => (
     <div className="order-progress-tracker">
@@ -200,7 +206,7 @@ function Orders() {
           <p className="empty-order-message">No ordered list.</p>
         ) : (
           <>
-            {filteredOrders.map(order => (
+            {sortedOrders.map(order => (
               <div key={order.ID}>
                 {order.items.map(item => (
                   <div

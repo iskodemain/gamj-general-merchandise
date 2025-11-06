@@ -38,7 +38,30 @@ const ShopContextProvider = (props) => {
     const [nbProfileImage, setNbProfileImage] = useState(null);
     const navigate = useNavigate();
     const [orderItemId, setOrderItemId] = useState(null); // For cancel and refund order modals
+    const [cartItemsToDelete, setCartItemsToDelete] = useState([]);
 
+    /*----------------------FETCH NOTIFICATION PAGE-----------------------*/
+    const [fetchNotifications, setFetchNotifications] = useState([]);
+    const handleFetchNotification = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/notification/", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setFetchNotifications(response.data.notifications);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+            handleFetchNotification();
+        }
+    }, [token]);
 
 
     /*--------------------RETURN/REFUND ORDER PROCESS---------------------*/
@@ -333,12 +356,13 @@ const ShopContextProvider = (props) => {
 
 
     /*--------------------------ADD ORDER----------------------------*/
-    const addOrder = async (paymentMethod, orderItems) => {
+    const addOrder = async (paymentMethod, orderItems, cartItemsToDelete) => {
         if (token) {
             try {
                 const response = await axios.post(backendUrl + "/api/order/add", {
                     paymentMethod,
-                    orderItems
+                    orderItems,
+                    cartItemsToDelete
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -348,13 +372,15 @@ const ShopContextProvider = (props) => {
                     setOrderItems([]);
                     getOrderSubTotal(0);
                     getTotalPrice(0);
-                    navigate('/orders');
+                    return true;
                 } else {
                     toast.error(response.data.message, { ...toastError });
+                    return false;
                 }
             } catch (error) {
                 console.log(error);
                 toast.error(error.message, { ...toastError });
+                return false;
             }
         }
     };
@@ -933,6 +959,42 @@ const ShopContextProvider = (props) => {
     }, [resetPasswordToken]);
 
 
+
+    // (SOCKET IO) - Add Order
+    useEffect(() => {
+        // When a new order is placed (for Admin/Staff dashboards)
+        socket.on("newOrder", (data) => {
+            console.log("📦 New Order Received:", data);
+            setFetchOrders((prev) => [data.order, ...prev]);
+            setFetchOrderItems((prev) => [...data.orderItems, ...prev]);
+        });
+
+        // For customer notifications only
+        socket.on("newNotification_Customer", (notif) => {
+            console.log("🔔 Customer Notification:", notif);
+            setFetchNotifications((prev) => [notif, ...prev]);
+        });
+
+        socket.on("cartUpdated", (data) => {
+            setCartItems(prev => 
+                prev.map(item => {
+                    // Only remove items that match the deleted IDs **and** customerId
+                    if (item.customerId === data.customerId && data.deletedIds.includes(item.ID)) {
+                        return null; // filter out later
+                    }
+                    return item;
+                }).filter(Boolean)
+            );
+        });
+
+
+        return () => {
+            socket.off("newOrder");
+            socket.off("newNotification_Customer");
+            socket.off("cartUpdated");
+        };
+    }, []);
+
     // (SOCKET IO) - ADD CANCEL ORDER
     useEffect(() => {
         socket.on("addCancelOrder", (data) => {
@@ -977,7 +1039,6 @@ const ShopContextProvider = (props) => {
             socket.off("addCancelOrder");
         };
     }, []);
-
 
     // (SOCKET IO) - REMOVE ORDER
     useEffect(() => {
@@ -1046,7 +1107,6 @@ const ShopContextProvider = (props) => {
             socket.off("refundMarkedAsCompleted");
         };
     }, []);
-
 
     // (SOCKET IO) - ADD ORDER REFUND
     useEffect(() => {
@@ -1125,7 +1185,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund, fetchNotifications, setFetchNotifications, cartItemsToDelete, setCartItemsToDelete
     }
 
     return (

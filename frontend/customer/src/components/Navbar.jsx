@@ -11,7 +11,7 @@ import { ShopContext } from "../context/ShopContext.jsx";
 import '../pages/Notification.css' // Import the notification styles
 
 function Navbar() {
-  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, navigate, toastSuccess, nbProfileImage, setWishListItems, fetchVerifiedCustomer} = useContext(ShopContext);
+  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, navigate, toastSuccess, nbProfileImage, setWishListItems, fetchVerifiedCustomer, fetchNotifications} = useContext(ShopContext);
   const cartCount = getCartCount();
   const wishlistCount = getWishlistCount();
   const [sidebar, setSideBar] = useState(false)
@@ -42,46 +42,6 @@ function Navbar() {
   
   const showSidebar = () => setSideBar(!sidebar)
   
-  useEffect(() => {
-    // const cartQuantityElement = document.querySelector(".cart-quantity");
-
-    // // Only modify the cart quantity display if it is updated
-    // const cartTextContent = cartQuantityElement.textContent;
-    // const cartLowValue = Number(cartTextContent);
-
-    // if (cartTextContent > 99999) {
-    //   cartQuantityElement.style.height = "20px";
-    //   cartQuantityElement.style.color = "white";
-    //   cartQuantityElement.style.backgroundColor = "#fc9a9a";
-    //   cartQuantityElement.textContent = "❗";
-    // }
-    // else if (cartLowValue > 9999) {
-    //   if (Number(cartTextContent[4]) > 0) {
-    //     cartQuantityElement.style.height = "24px";
-    //     cartQuantityElement.textContent = cartTextContent.slice(0, 2) + "k+";
-    //   }
-    //   else {
-    //     cartQuantityElement.style.height = "21px";
-    //     cartQuantityElement.textContent = cartTextContent.slice(0, 2) + "k";
-    //   }
-    // }
-    // else if (cartLowValue > 999) {
-    //   if (Number(cartTextContent[3]) > 0) {
-    //     cartQuantityElement.style.minHeight = "21px";
-    //     cartQuantityElement.textContent = cartTextContent[0] + "k+";
-    //   }
-    //   else {
-    //     cartQuantityElement.style.minHeight = "18px";
-    //     cartQuantityElement.textContent = cartTextContent[0] + "k";
-    //   }
-    // }
-    // else if (cartLowValue > 99) {
-    //   cartQuantityElement.style.minHeight = "22px";
-    // }
-    // else {
-    //   cartQuantityElement.style.minHeight = "18px";
-    // }
-  }, [getCartCount]);
   
   // CLOSE CLICK OUTSIDE
   useEffect(() => {
@@ -121,6 +81,10 @@ function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const handleReadNotification = (ID) => {
+    // LATER THIS LOGIC
+  }
   
   return (
     <>
@@ -148,65 +112,65 @@ function Navbar() {
             <CiSearch className="nav-icon searchcon"/>
           </div>
         )}
-        <div className='icon-button' ref={notifRef} style={{ position: 'relative' }}>
-          {token && 
-            <IoIosNotificationsOutline className="nav-icon notifcon" onClick={() => setShowNotifications((prev) => !prev)} style={{ cursor: 'pointer' }}/>
-          }
-          {showNotifications && (
-            <div className="notification-container notification-dropdown">
-              <h1 className="notification-title">Notifications</h1>
-              <div className="notification-panel">
-                <ul className="notification-list">
-                  {[
-                    { id: 1, action: 'place an order #254845', timestamp: '9 hours ago' },
-                    { id: 2, action: 'edit email address', timestamp: '2 days ago' },
-                    { id: 3, action: 'cancel order', timestamp: '3 days ago' },
-                    { id: 4, action: 'order processing', timestamp: '5 days ago' },
-                  ].map((notif) => (
-                    <li className="notification-item" key={notif.id}>
-                      <div className="notification-avatar">
-                        <img
-                          src="https://ui-avatars.com/api/?name=Medical+Hospital+Cavite&background=43A047&color=fff&rounded=true"
-                          alt="avatar"
-                        />
+
+        {/* NOTIFICATION */}
+        <div className="icon-button" ref={notifRef} style={{ position: 'relative' }}>
+          {token && (
+            <>
+              <IoIosNotificationsOutline
+                className="nav-icon notifcon"
+                onClick={() => setShowNotifications((prev) => !prev)}
+                style={{ cursor: 'pointer' }}
+              />
+              {showNotifications && (
+                <div className="navbarNotif-dropdown">
+                  <h3 className="navbarNotif-title">Notification</h3>
+
+                  <div className="navbarNotif-list">
+                    {fetchNotifications && fetchNotifications.length > 0 ? (
+                      [...fetchNotifications].sort((a, b) => new Date(b.createAt) - new Date(a.createAt)).slice(0, 6).map((notif) => (
+                        <div key={notif.ID} onClick={() => handleReadNotification(notif.ID)} className="navbarNotif-item">
+                          <div className="navbarNotif-avatar">
+                            <img src={assets.notification_icon} alt="avatar" />
+                            {!notif.isRead && <span className="navbarNotif-dot"></span>}
+                          </div>
+                          <div className="navbarNotif-info">
+                            <p className="navbarNotif-text">
+                              <strong>{notif.title}</strong>{" "}
+                              <span className={`navbarNotif-action ${notif.isRead ? "read" : "unread"}`}>
+                                {notif.message}
+                              </span>
+                            </p>
+                            <p className="navbarNotif-time">
+                              {new Date(notif.createAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              })}{" "}
+                              ago
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="navbarNotif-empty">
+                        <p>No notifications available</p>
                       </div>
-                      <div className="notification-content">
-                        <span className="notification-name">
-                          <b>Medical Hospital Cavite</b>
-                        </span>
-                        <span
-                          className="notification-action"
-                          dangerouslySetInnerHTML={{
-                            __html: notif.action.replace(
-                              /#\d+/g,
-                              (match) =>
-                                `<span class="action-highlight ${match.toLowerCase()}">${match}</span>`
-                            ),
-                          }}
-                        />
-                        <span className="notification-time">{notif.timestamp}</span>
-                      </div>
-                      <button
-                        className="notification-dismiss"
-                        onClick={() => {/* implement dismiss logic if needed */}}
-                        aria-label="Dismiss"
-                      >
-                        ×
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <button
-                className="notification-all-btn"
-                onClick={() => {
-                  setShowNotifications(false);
-                  navigate('/notification');
-                }}
-              >
-                All Notifications
-              </button>
-            </div>
+                    )}
+                  </div>
+
+                  <button
+                    className="navbarNotif-viewAll"
+                    onClick={() => {
+                      setShowNotifications(false);
+                      navigate("/notification");
+                    }}
+                  >
+                    All Notification
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
         <div className='icon-button'>

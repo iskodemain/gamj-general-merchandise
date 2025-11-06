@@ -11,10 +11,13 @@ import { toast } from "react-toastify";
 import { assets } from '../assets/assets'
 import UnavailableNote from '../components/Notice/UnavailableNote'
 import { useLocation } from 'react-router-dom'
+import Loading from '../components/Loading'
 
 function PlaceOrder() {
   const location = useLocation();
-  const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder} = useContext(ShopContext);
+  const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder, cartItemsToDelete} = useContext(ShopContext);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -46,8 +49,16 @@ function PlaceOrder() {
       return;
     }
 
+    if (!orderItems || orderItems.length === 0) {
+      toast.error("No items found in your order.", {...toastError});
+      return;
+    }
+
     if (paymentMethod === "Cash On Delivery") {
-      addOrder(paymentMethod, orderItems);
+      setLoading(true); 
+      const success = await addOrder(paymentMethod, orderItems, cartItemsToDelete);
+      setLoading(false); 
+      if (success) navigate('/orders');
     }
 
     if (paymentMethod === "Paypal") {
@@ -59,6 +70,7 @@ function PlaceOrder() {
 
   return (
     <div className='pl-main'>
+      {loading && <Loading />}
       {!verifiedUser && <UnavailableNote/>}
       <form onSubmit={onSubmitHandler} className='pl-form'>
         {/* DELIVERY INFORMATION */}
