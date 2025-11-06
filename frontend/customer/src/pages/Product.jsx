@@ -16,7 +16,7 @@ import UnavailableNote from '../components/Notice/UnavailableNote';
 import Loading from '../components/Loading';
 const Product = () => {
   const { productId } = useParams();
-  const { products, productVariantValues, variantName, currency, addToCart, toastError, navigate, addToWishlist, removeFromWishlist, isInWishlist, cartItems, showUnavailableNote, setShowUnavailableNote, verifiedUser, productVariantCombination, token} = useContext(ShopContext);
+  const { products, productVariantValues, variantName, currency, addToCart, toastError, navigate, addToWishlist, removeFromWishlist, isInWishlist, cartItems, showUnavailableNote, setShowUnavailableNote, verifiedUser, productVariantCombination, token, setOrderItems, getOrderSubTotal} = useContext(ShopContext);
   const [selectedVariants, setSelectedVariants] = useState('');
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
@@ -117,7 +117,7 @@ const Product = () => {
       setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
       return;
     }
-    // --- 2️⃣ PRODUCT WITH SINGLE VARIANTS ---
+    // --- 2️ PRODUCT WITH SINGLE VARIANTS ---
     if (productData.hasVariant && !productData.hasVariantCombination) {
       const match = productVariantValues.find(pv => pv.productId === productData.ID && pv.value === formatted);
 
@@ -133,7 +133,7 @@ const Product = () => {
       }
       return;
     }
-    // --- 3️⃣ PRODUCT WITH VARIANT COMBINATIONS ---
+    // --- 3 PRODUCT WITH VARIANT COMBINATIONS ---
     if (productData.hasVariant && productData.hasVariantCombination) {
       const matchCombo = productVariantCombination.find(
         combo =>
@@ -221,9 +221,44 @@ const Product = () => {
     if (activeProduct) {
       if (quantity > productStocks) {
         toast.error("You've reached the maximum quantity available for this product.", { ...toastError });
-      } else {
-        addToCart(productData.ID, selectedVariants, quantity);
+      } 
+
+      // Compute price based on selected variant/combination
+      let itemPrice = productData.price;
+      let productVariantValueId = null;
+      let productVariantCombinationId = null;
+
+      if (productData.hasVariant && productData.hasVariantCombination) {
+        const combo = productVariantCombination.find(pvc => pvc.productId === productData.ID && pvc.combinations.split(", ").sort().join(", ") === selectedVariants.split(", ").sort().join(", "));
+        if (combo) {
+          itemPrice = combo.price;
+          productVariantCombinationId = combo.ID;
+        }
+      } else if (productData.hasVariant && !productData.hasVariantCombination) {
+        const variant = productVariantValues.find(pv => pv.productId === productData.ID && pv.value === selectedVariants);
+        if (variant) {
+          itemPrice = variant.price;
+          productVariantValueId = variant.ID;
+        }
       }
+
+      const subTotal = itemPrice * quantity;
+
+      // Build single order item
+      const builtOrderItem = [
+        {
+          productId: productData.ID,
+          productVariantValueId,
+          productVariantCombinationId,
+          value: selectedVariants || null,
+          quantity,
+          subTotal: parseFloat(subTotal.toFixed(2)),
+        },
+      ];
+
+      getOrderSubTotal(subTotal)
+      setOrderItems(builtOrderItem);
+      navigate("/place-order");
 
     } else {
       toast.error("This product is unavailable.", { ...toastError });
