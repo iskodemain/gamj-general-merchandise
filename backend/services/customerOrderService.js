@@ -7,13 +7,15 @@ import Customer from "../models/customer.js";
 import OrderCancel from "../models/orderCancel.js"
 import RefundProof from "../models/refundProof.js";
 import OrderRefund from "../models/orderRefund.js";
+import Notifications from "../models/notifications.js";
+import Cart from "../models/cart.js";
 import { Op } from "sequelize";
 import { io } from "../server.js";
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 
 // CUSTOMER SIDE
-export const addOrderService = async (customerId, paymentMethod, orderItems) => {
+export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete) => {
   try {
     const user = await Customer.findByPk(customerId);
     if (!user) {
@@ -121,12 +123,70 @@ export const addOrderService = async (customerId, paymentMethod, orderItems) => 
           isOutOfStock: newStock <= 0 ? true : false,
         });
       }
-
     }
+
+    // Fetch the complete order record to include auto-generated orderId
+    const fullOrder = await Orders.findByPk(order.ID);
+
+    // ✅ Create notification for both Admin & Staff
+    const notificationMessage = `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`;
+    const title = user.medicalInstitutionName;
+    const receivers = ["Admin", "Staff", 'Customer'];
+    const createdNotifications = [];
+
+    for (const receiverType of receivers) {
+      const notification = await Notifications.create({
+        senderId: customerId,
+        receiverType,
+        senderType: "System",
+        notificationType: "Transaction",
+        title,
+        message: notificationMessage,
+        isRead: false,
+        createAt: new Date()
+      }, {
+        fields: [ 
+          "senderId", 
+          "receiverType", 
+          "senderType", 
+          "notificationType", 
+          "title", 
+          "message", 
+          "isRead", 
+          "createAt"
+        ]
+      });
+      createdNotifications.push(notification);
+
+      io.emit(`newNotification_${receiverType}`, notification);
+    }
+
+    // ✅ Fetch all order items
+    const fullOrderItems = await OrderItems.findAll({
+      where: { orderId: fullOrder.ID },
+    });
+
+    // ✅ Emit full order
+    io.emit("newOrder", {
+      order: fullOrder,
+      orderItems: fullOrderItems,
+      customer: user,
+    });
+
+    // ✅ Delete selected cart items after successful order placement
+    if (cartItemsToDelete && Array.isArray(cartItemsToDelete) && cartItemsToDelete.length > 0) {
+      await Cart.destroy({
+        where: { ID: cartItemsToDelete }
+      }); 
+
+      io.emit("cartUpdated", { customerId, deletedIds: cartItemsToDelete });
+    }
+    
 
     return {
       success: true,
       message: "Order placed successfully",
+      notifications: createdNotifications
     };
 
   } catch (error) {

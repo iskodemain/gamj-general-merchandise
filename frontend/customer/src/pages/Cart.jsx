@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import UnavailableNote from '../components/Notice/UnavailableNote.jsx';
 
 function Cart() {
-  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, orderSubTotal, getOrderSubTotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, productVariantCombination, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, setOrderItems} = useContext(ShopContext)
+  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, orderSubTotal, getOrderSubTotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, productVariantCombination, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, setOrderItems, setCartItemsToDelete} = useContext(ShopContext)
   const [cartData, setCartData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const allSelected = selectedItems.length === cartData.length && cartData.length > 0;
@@ -252,11 +252,16 @@ function Cart() {
       };
     })
 
+    // 🆕 Collect selected cart item IDs for deletion after successful order
+    setCartItemsToDelete(selectedItems);
+
     // ✅ Save to state (you said orderItems is managed in context)
     setOrderItems(builtOrderItems);
 
     // Optional: log for verification
     console.log("✅ Order Items Built:", builtOrderItems);
+
+    console.log("🛒 Cart IDs to Delete:", selectedItems);
 
     navigate('/place-order');
   }

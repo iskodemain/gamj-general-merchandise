@@ -15,10 +15,6 @@ const Notifications = sequelize.define(
       unique: true,
       allowNull: false,
     },
-    receiverId: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-    },
     senderId: {
       type: DataTypes.STRING(50),
       allowNull: true,
@@ -44,9 +40,9 @@ const Notifications = sequelize.define(
       allowNull: false,
     },
     isRead: {
-      type: DataTypes.TINYINT,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     createAt: {
       type: DataTypes.DATE,

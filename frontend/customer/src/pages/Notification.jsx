@@ -1,88 +1,101 @@
 import React, { useState } from 'react'
 import './Notification.css'
+import { assets } from '../assets/assets'
+import { useContext } from 'react'
+import { ShopContext } from '../context/ShopContext'
+import Loading from '../components/Loading'
+import { useEffect } from 'react'
+import { IoCloseOutline } from "react-icons/io5";
 
-const notificationData = [
-  {
-    id: 1,
-    action: 'place an order #254845',
-    timestamp: '9 hours ago',
-    unread: true,
-  },
-  {
-    id: 2,
-    action: 'edit email address',
-    timestamp: '2 days ago',
-    unread: false,
-  },
-  {
-    id: 3,
-    action: 'cancel order #254845434',
-    timestamp: '3 days ago',
-    unread: true,
-  },
-  {
-    id: 4,
-    action: 'order processing',
-    timestamp: '5 days ago',
-    unread: false,
-  },
- 
-]
+// 🔹 Helper to format date & time like "Nov 6, 2025 • 12:20 PM"
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString);
+  const options = {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  };
+  const timeOptions = {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  };
+  const formattedDate = date.toLocaleDateString('en-US', options);
+  const formattedTime = date.toLocaleTimeString('en-US', timeOptions).toLowerCase();
+  return `${formattedDate} • ${formattedTime}`;
+};
 
-const highlightAction = (action) => {
-  // Highlight "place" and "cancel" keywords
-  return action.replace(
-    
-    (match) =>
-      `<span class="action-highlight">${match}</span>`
-  )
-}
 
 const Notification = () => {
-  const [notifications, setNotifications] = useState(notificationData)
+  const { fetchNotifications } = useContext(ShopContext);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDismiss = (id) => {
-    setNotifications(notifications.filter((n) => n.id !== id))
+  useEffect(() => {
+    if (fetchNotifications && Array.isArray(fetchNotifications)) {
+      const sortedNotifications = [...fetchNotifications].sort((a, b) => {
+        const dateA = new Date(a.createAt);
+        const dateB = new Date(b.createAt);
+        return dateB - dateA; // Newest first
+      });
+      setNotifications(sortedNotifications);
+      setLoading(false);
+    }
+  }, [fetchNotifications]);
+
+
+  const handleDeleteNotification = (ID) => {
+    // LATER THIS LOGIC
   }
 
+  const handleReadNotification = (ID) => {
+    // LATER THIS LOGIC
+  }
+
+  if (loading) return <Loading />;
+
   return (
-    <div className="notification-container">
-      <div className="notification-title">Notifications</div>
-      <ul className="notification-list">
-        {notifications.map((notif) => (
-          <li
-            className={`notification-item${/place|cancel/i.test(notif.action) ? ' highlighted' : ''}`}
-            key={notif.id}
-          >
-            <div className="notification-avatar">
-              <img
-                src="https://ui-avatars.com/api/?name=Medical+Hospital+Cavite&background=red&color=fff&rounded=true"
-                alt="avatar"
-              />
-              {notif.unread && <span className="notification-dot" />}
-            </div>
-            <div className="notification-content">
-              <span className="notification-title-row">
-                <b>Medical Hospital Cavite</b>
-                <span
-                  className="notification-action"
-                  dangerouslySetInnerHTML={{
-                    __html: highlightAction(notif.action),
-                  }}
-                />
-              </span>
-              <span className="notification-time">{notif.timestamp}</span>
-            </div>
-            <button
-              className="notification-dismiss"
-              onClick={() => handleDismiss(notif.id)}
-              aria-label="Dismiss"
+    <div className="custNotif-container">
+      <div className="custNotif-header">
+        <p className="custNotif-title">Notifications</p>
+      </div>
+
+      {notifications.length === 0 ? (
+        <div className="custNotif-empty">
+          <p>No notifications available</p>
+        </div>
+      ) : (
+        <ul className="custNotif-list">
+          {notifications.map((notif) => (
+            <li
+              key={notif.ID}
+              className={`custNotif-item ${notif.isRead ? 'read' : 'unread'}`}
+              onClick={() => handleReadNotification(notif.ID)}
             >
-              ×
-            </button>
-          </li>
-        ))}
-      </ul>
+              <div className="custNotif-avatar">
+                <img src={assets.notification_icon} alt="Notification" />
+                {!notif.isRead && <span className="custNotif-dot" />}
+              </div>
+
+              <div className="custNotif-content">
+                <div className="custNotif-titleRow">
+                  <b>{notif.title}</b>
+                </div>
+                <p className="custNotif-message">{notif.message}</p>
+                <span className="custNotif-time">{formatDateTime(notif.createAt)}</span>
+              </div>
+
+              <button
+                className="custNotif-dismiss"
+                onClick={() => handleDeleteNotification(notif.ID)}
+                aria-label="Dismiss"
+              >
+                <IoCloseOutline />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

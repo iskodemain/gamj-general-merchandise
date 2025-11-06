@@ -1,3 +1,152 @@
+/* ================================
+   Navbar Notification Dropdown
+   (Isolated from Notification.jsx)
+==================================*/
+
+.navbarNotif-dropdown {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  width: 360px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e5e5e5;
+  overflow: hidden;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  font-family: "Poppins", sans-serif;
+}
+
+.navbarNotif-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.navbarNotif-list {
+  max-height: 330px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #43a047 #f5f7fa;
+}
+
+.navbarNotif-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.navbarNotif-list::-webkit-scrollbar-thumb {
+  background: #43a047;
+  border-radius: 5px;
+}
+
+.navbarNotif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s ease;
+}
+
+.navbarNotif-item:hover {
+  background: #f9f9f9;
+}
+
+.navbarNotif-dropdown .navbarNotif-list .navbarNotif-avatar {
+  position: relative;
+  width: 50px;  
+  height: 50px; 
+}
+
+/* ✅ FIX: Image - make it fill the container */
+.navbarNotif-dropdown .navbarNotif-list .navbarNotif-avatar img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  display: block;
+}
+
+.navbarNotif-dropdown .navbarNotif-list .navbarNotif-avatar .navbarNotif-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  background: #ff4b4b;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.navbarNotif-info {
+  flex: 1;
+  min-width: 0; /* ✅ Prevent text overflow */
+}
+
+.navbarNotif-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #333;
+  line-height: 1.4; /* ✅ Slightly increased for readability */
+  word-wrap: break-word; /* ✅ Prevent text overflow */
+}
+
+.navbarNotif-text strong {
+  color: #000;
+}
+
+.navbarNotif-action {
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+
+.navbarNotif-action.unread {
+  color: #2e7d32;
+}
+
+
+.navbarNotif-action.read {
+  color: #969696;
+  font-weight: 500; 
+}
+
+.navbarNotif-time {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.navbarNotif-empty {
+  text-align: center;
+  padding: 25px 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.navbarNotif-viewAll {
+  background: none;
+  border: none;
+  color: #2e7d32;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: color 0.2s;
+  border-top: 1px solid #eee;
+}
+
+.navbarNotif-viewAll:hover {
+  color: #1b5e20;
+}
+
+
+
+
+/* OTHERS */
 img {
     display: block;
 }
@@ -25,16 +174,6 @@ img {
 }
 
 
-.notification-all-btn {
-    margin: 20px auto 0;
-    display: block;
-    padding: 10px 24px;
-    border-radius: 6px;
-    border: none;
-    color: #43A047;
-    font-weight: bold;
-    cursor: pointer;
-}
 .navContainer {
     padding: 1rem 2.5rem;
     display: flex;
@@ -352,76 +491,5 @@ img {
 .profile-dropdown-item.logout {
   color: #d32f2f;
 }
-.notification-dropdown{
-    position: absolute;
-    top: 20px;
-    right: 0;
-    z-index: 1000;
-    width: 350px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow:   0 5px 8px rgba(0,0,0,0.12);
-}
-.notification-panel{
-    max-height: 350px;
-    overflow-y: auto;
-    background: #fff;
-    padding: 0 8px;
-    scrollbar-width: thin;
-    scrollbar-color: #43A047 #f5f7fa;
-}
 
-.notification-panel::-webkit-scrollbar {
-    width: 6px;
-    background-color: #f5f7fa;
-  }
-  
-  .notification-panel::-webkit-scrollbar-thumb {
-    background-color: #43A047;
-    border-radius: 4px;
-  }
-  .notification-list{
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .notification-item{
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    padding: 12px 8px;
-    position: relative;
-    transition: background 0.2s;
-  }
-  .notification-avatar img{
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #f5f7fa;
-    border: 2px solid #43A047;
-    
-  }
-  .notification-content{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding-left: 1rem;
-  }
-  .notification-name{
-    font-weight: bold;
-    color: #222;
-    font-size: 1rem;
-  }
-  .notification-action{
-    margin-bottom: 4px;
-    font-size: 1rem;
-    color: #444;
-}
-.action-highlight{
-    font-size: bold;
-    
-    border-radius: 4px;
-}
 
