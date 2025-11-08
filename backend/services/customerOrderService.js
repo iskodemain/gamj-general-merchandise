@@ -13,6 +13,8 @@ import { Op } from "sequelize";
 import { io } from "../server.js";
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
+import { orderSendMail } from "../utils/mailer.js";
+import { placeOrderTemplate } from "../utils/emailTemplates.js";
 
 // CUSTOMER SIDE
 export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete) => {
@@ -181,7 +183,14 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
 
       io.emit("cartUpdated", { customerId, deletedIds: cartItemsToDelete });
     }
-    
+
+    // Send email
+    await orderSendMail({
+        to: user.loginEmail ? user.loginEmail : user.emailAddress,
+        subject: 'Your order has been placed.',
+        html: placeOrderTemplate(user.medicalInstitutionName, 'Pending', fullOrder.paymentMethod, fullOrder.orderId),
+        attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+    });
 
     return {
       success: true,
