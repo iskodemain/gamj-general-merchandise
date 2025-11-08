@@ -18,3 +18,13 @@ export const sendMail = async ({ to, subject, html, attachments }) => {
     attachments,
   });
 };
+
+export const orderSendMail = async ({ to, subject, html, attachments }) => {
+  return transporter.sendMail({
+    from: `Order Status ${process.env.GAMJ_EMAIL}`,
+    to,
+    subject,
+    html,
+    attachments,
+  });
+};
