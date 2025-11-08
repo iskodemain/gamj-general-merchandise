@@ -27,7 +27,7 @@ const formatDateTime = (dateString) => {
 
 
 const Notification = () => {
-  const { fetchNotifications } = useContext(ShopContext);
+  const { fetchNotifications, deleteNotification } = useContext(ShopContext);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,8 +44,12 @@ const Notification = () => {
   }, [fetchNotifications]);
 
 
-  const handleDeleteNotification = (ID) => {
-    // LATER THIS LOGIC
+  const handleDeleteNotification = async (ID) => {
+    if (ID) {
+      setLoading(true);
+      await deleteNotification(ID);
+      setLoading(false);
+    }
   }
 
   const handleReadNotification = (ID) => {
