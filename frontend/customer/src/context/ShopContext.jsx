@@ -1012,6 +1012,11 @@ const ShopContextProvider = (props) => {
             setFetchNotifications((prev) => [notif, ...prev]);
         });
 
+        socket.on("stockRestoration", (notif) => {
+            console.log("🔔 Customer Notification:", notif);
+            setFetchNotifications((prev) => [notif, ...prev]);
+        });
+
         socket.on("cartUpdated", (data) => {
             setCartItems(prev => 
                 prev.map(item => {
