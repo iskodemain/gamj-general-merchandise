@@ -1007,6 +1007,11 @@ const ShopContextProvider = (props) => {
             setFetchNotifications((prev) => [notif, ...prev]);
         });
 
+        socket.on("lowStockAlert", (notif) => {
+            console.log("🔔 Customer Notification:", notif);
+            setFetchNotifications((prev) => [notif, ...prev]);
+        });
+
         socket.on("cartUpdated", (data) => {
             setCartItems(prev => 
                 prev.map(item => {
@@ -1023,6 +1028,7 @@ const ShopContextProvider = (props) => {
         return () => {
             socket.off("newOrder");
             socket.off("newNotification_Customer");
+            socket.off("lowStockAlert");
             socket.off("cartUpdated");
         };
     }, []);
