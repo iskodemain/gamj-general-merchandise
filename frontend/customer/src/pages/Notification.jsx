@@ -52,10 +52,6 @@ const Notification = () => {
     }
   }
 
-  const handleReadNotification = (ID) => {
-    // LATER THIS LOGIC
-  }
-
   if (loading) return <Loading />;
 
   return (
@@ -71,11 +67,7 @@ const Notification = () => {
       ) : (
         <ul className="custNotif-list">
           {notifications.map((notif) => (
-            <li
-              key={notif.ID}
-              className={`custNotif-item ${notif.isRead ? 'read' : 'unread'}`}
-              onClick={() => handleReadNotification(notif.ID)}
-            >
+            <li key={notif.ID} className={`custNotif-item ${notif.isRead ? 'read' : 'unread'}`}>
               <div className="custNotif-avatar">
                 <img src={assets.notification_icon} alt="Notification" />
                 {!notif.isRead && <span className="custNotif-dot" />}

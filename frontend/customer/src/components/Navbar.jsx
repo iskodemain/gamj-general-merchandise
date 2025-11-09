@@ -11,7 +11,7 @@ import { ShopContext } from "../context/ShopContext.jsx";
 import '../pages/Notification.css' // Import the notification styles
 
 function Navbar() {
-  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, navigate, toastSuccess, nbProfileImage, setWishListItems, fetchVerifiedCustomer, fetchNotifications} = useContext(ShopContext);
+  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, navigate, toastSuccess, nbProfileImage, setWishListItems, fetchVerifiedCustomer, fetchNotifications, readNotification} = useContext(ShopContext);
   const cartCount = getCartCount();
   const wishlistCount = getWishlistCount();
   const [sidebar, setSideBar] = useState(false)
@@ -22,6 +22,17 @@ function Navbar() {
   const profileRef = useRef(null);
   const location = useLocation() // Get the current location
   const isShopPath = location.pathname === "/shop"; // Check if the path is "/shop"
+
+  const [hasUnread, setHasUnread] = useState(false);
+
+  useEffect(() => {
+    if (fetchNotifications && fetchNotifications.length > 0) {
+      const hasUnreadNotif = fetchNotifications.some((notif) => !notif.isRead);
+      setHasUnread(hasUnreadNotif);
+    } else {
+      setHasUnread(false);
+    }
+  }, [fetchNotifications]);
 
   useEffect(() => {
       if (token) {
@@ -82,8 +93,12 @@ function Navbar() {
     };
   }, []);
 
-  const handleReadNotification = (ID) => {
+  const handleReadNotification = async () => {
     // LATER THIS LOGIC
+    await readNotification();
+    setHasUnread(false);
+    setShowNotifications(false);
+    navigate("/notification");
   }
   
   return (
@@ -122,14 +137,17 @@ function Navbar() {
                 onClick={() => setShowNotifications((prev) => !prev)}
                 style={{ cursor: 'pointer' }}
               />
+
+              {hasUnread && <span className="notif-dot"></span>}
+
               {showNotifications && (
                 <div className="navbarNotif-dropdown">
                   <h3 className="navbarNotif-title">Notification</h3>
 
                   <div className="navbarNotif-list">
-                    {fetchNotifications && fetchNotifications.length > 0 ? (
+                    {fetchNotifications?.length > 0 ? (
                       [...fetchNotifications].sort((a, b) => new Date(b.createAt) - new Date(a.createAt)).slice(0, 6).map((notif) => (
-                        <div key={notif.ID} onClick={() => handleReadNotification(notif.ID)} className="navbarNotif-item">
+                        <div key={notif.ID} onClick={() => handleReadNotification()} className="navbarNotif-item">
                           <div className="navbarNotif-avatar">
                             <img src={assets.notification_icon} alt="avatar" />
                             {!notif.isRead && <span className="navbarNotif-dot"></span>}
@@ -159,15 +177,7 @@ function Navbar() {
                     )}
                   </div>
 
-                  <button
-                    className="navbarNotif-viewAll"
-                    onClick={() => {
-                      setShowNotifications(false);
-                      navigate("/notification");
-                    }}
-                  >
-                    All Notification
-                  </button>
+                  <button className="navbarNotif-viewAll" onClick={() => handleReadNotification()}>All Notification</button>
                 </div>
               )}
             </>
