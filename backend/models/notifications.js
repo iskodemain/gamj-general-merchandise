@@ -32,7 +32,7 @@ const Notifications = sequelize.define(
       allowNull: false,
     },
     notificationType: {
-      type: DataTypes.ENUM('Transaction', 'User Activity', 'Product Update', 'Security', 'General'),
+      type: DataTypes.ENUM('Transaction', 'Product Update', 'Order Cancellation', 'Order Return/Refund'),
       allowNull: false,
     },
     title: {

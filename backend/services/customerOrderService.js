@@ -444,6 +444,112 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         ]
       });
 
+      // Notify the CUSTOMER (stock restoration)
+      const stockRestoration = await Notifications.create({
+        senderId: null,
+        receiverId: customerId,
+        receiverType: "Customer",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: "Stock Restored",
+        message: `Your cancelled order for "${product.productName}" has been processed. ${quantityToRestore} stock has been restored.`,
+        isRead: false,
+        createAt: new Date()
+      }, {
+          fields: [ 
+            "senderId", 
+            "receiverId",
+            "receiverType", 
+            "senderType", 
+            "notificationType", 
+            "title", 
+            "message", 
+            "isRead", 
+            "createAt"
+          ]
+      });
+
+      // Fetch the complete order record to include auto-generated orderId
+      const fullOrder = await Orders.findByPk(orderItem.orderId);
+
+      const userName = user.medicalInstitutionName;
+
+      // 1️⃣ CUSTOMER NOTIFICATION (specific customer only)
+      const customerNotification = await Notifications.create({
+        senderId: customerId, 
+        receiverId: customerId,
+        receiverType: "Customer",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: "Order Cancellation",
+        message: `You cancelled your ${product.productName} order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
+        isRead: false,
+        createAt: new Date()
+      }, {
+        fields: [ 
+          "senderId", 
+          "receiverId",
+          "receiverType", 
+          "senderType", 
+          "notificationType", 
+          "title", 
+          "message", 
+          "isRead", 
+          "createAt"
+        ]
+      });
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const adminNotification = await Notifications.create({
+        senderId: customerId,  // ✅ Who triggered this
+        receiverId: null,      // ✅ null = broadcast to ALL admins
+        receiverType: "Admin",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: `${userName} - Order Cancelled`,
+        message: `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
+        isRead: false,
+        createAt: new Date()
+      }, {
+        fields: [ 
+          "senderId", 
+          "receiverId",
+          "receiverType", 
+          "senderType", 
+          "notificationType", 
+          "title", 
+          "message", 
+          "isRead", 
+          "createAt"
+        ]
+      });
+      
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const staffNotification = await Notifications.create({
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Staff",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: `${userName} - Order Cancelled`,
+        message: `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
+        isRead: false,
+        createAt: new Date(),
+      }, {
+        fields: [ 
+          "senderId", 
+          "receiverId",
+          "receiverType", 
+          "senderType", 
+          "notificationType", 
+          "title", 
+          "message", 
+          "isRead", 
+          "createAt"
+        ]
+      });
+
       io.emit("addCancelOrder", {
         orderCancelId: cancelRecord.ID,
         orderItemId,
@@ -455,6 +561,13 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         cancelledBy: cancelRecord.cancelledBy,
         newStatus: "Cancelled"
       });
+
+      io.emit("newNotification_Customer", customerNotification);
+      io.emit("newNotification_Admin", adminNotification);
+      io.emit("newNotification_Staff", staffNotification);
+
+
+      io.emit("stockRestoration", stockRestoration);
         
 
       return {
