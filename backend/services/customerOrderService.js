@@ -96,72 +96,163 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
         }
       );
 
+      let newStock = 0;
+      let productName = "";
+
        // ✅ Update stock
       if (productVariantCombinationId) {
         const variantCombo = await ProductVariantCombination.findByPk(productVariantCombinationId);
-        const newStock = Math.max((variantCombo.stock || 0) - quantity, 0);
+        newStock = Math.max((variantCombo.stock || 0) - quantity, 0);
         await variantCombo.update({ stock: newStock });
 
         const product = await Products.findByPk(productId);
+        productName = product.productName; // FOR NOTIFICATION
         const allVariantCombos = await ProductVariantCombination.findAll({ where: { productId } });
         const hasStock = allVariantCombos.some(v => v.stock > 0);
         await product.update({ isOutOfStock: !hasStock });
       } 
       else if (productVariantValueId) {
         const variantValue = await ProductVariantValues.findByPk(productVariantValueId);
-        const newStock = Math.max((variantValue.stock || 0) - quantity, 0);
+        newStock = Math.max((variantValue.stock || 0) - quantity, 0);
         await variantValue.update({ stock: newStock });
 
         const product = await Products.findByPk(productId);
+        productName = product.productName; // FOR NOTIFICATION
         const allVariantValues = await ProductVariantValues.findAll({ where: { productId } });
         const hasStock = allVariantValues.some(v => v.stock > 0);
         await product.update({ isOutOfStock: !hasStock });
       } 
       else {
         const product = await Products.findByPk(productId);
-        const newStock = Math.max((product.stockQuantity || 0) - quantity, 0);
+        newStock = Math.max((product.stockQuantity || 0) - quantity, 0);
         await product.update({
           stockQuantity: newStock,
           isOutOfStock: newStock <= 0 ? true : false,
         });
+        productName = product.productName; // FOR NOTIFICATION
+      }
+
+      // NEW SECTION: LOW STOCK ALERT
+      if (newStock <= 10) {
+        const lowStockMessage = newStock === 0 ? `⚠️ The product "${productName}" is now OUT OF STOCK.` : `⚠️ The product "${productName}" is running low. Only ${newStock} left in stock!`;
+
+        const lowStockNotification = await Notifications.create({
+          senderId: null,
+          receiverId: null,               // ✅ null = broadcast to all users
+          receiverType: "All",            // ✅ notify all types
+          senderType: "System",
+          notificationType: "Product Update",
+          title: "Low Stock Alert",
+          message: lowStockMessage,
+          isRead: false,
+          createAt: new Date()
+        }, {
+          fields: [ 
+            "senderId", 
+            "receiverId",
+            "receiverType", 
+            "senderType", 
+            "notificationType", 
+            "title", 
+            "message", 
+            "isRead", 
+            "createAt"
+          ]
+        });
+
+        io.emit("lowStockAlert", lowStockNotification);
       }
     }
 
+    
     // Fetch the complete order record to include auto-generated orderId
     const fullOrder = await Orders.findByPk(order.ID);
 
     // ✅ Create notification for both Admin & Staff
     const notificationMessage = `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`;
-    const title = user.medicalInstitutionName;
-    const receivers = ["Admin", "Staff", 'Customer'];
-    const createdNotifications = [];
+    const userName = user.medicalInstitutionName;
 
-    for (const receiverType of receivers) {
-      const notification = await Notifications.create({
-        senderId: customerId,
-        receiverType,
-        senderType: "System",
-        notificationType: "Transaction",
-        title,
-        message: notificationMessage,
-        isRead: false,
-        createAt: new Date()
-      }, {
-        fields: [ 
-          "senderId", 
-          "receiverType", 
-          "senderType", 
-          "notificationType", 
-          "title", 
-          "message", 
-          "isRead", 
-          "createAt"
-        ]
-      });
-      createdNotifications.push(notification);
+    // 1️⃣ CUSTOMER NOTIFICATION (specific customer only)
+    const customerNotification = await Notifications.create({
+      senderId: null, // because it system
+      receiverId: customerId,
+      receiverType: "Customer",
+      senderType: "System",
+      notificationType: "Transaction",
+      title: userName,
+      message: notificationMessage,
+      isRead: false,
+      createAt: new Date()
+    }, {
+      fields: [ 
+        "senderId", 
+        "receiverId",
+        "receiverType", 
+        "senderType", 
+        "notificationType", 
+        "title", 
+        "message", 
+        "isRead", 
+        "createAt"
+      ]
+    });
 
-      io.emit(`newNotification_${receiverType}`, notification);
-    }
+    // 2️⃣ ADMIN NOTIFICATION (all admins)
+    const adminNotification = await Notifications.create({
+      senderId: customerId,  // ✅ Who triggered this
+      receiverId: null,      // ✅ null = broadcast to ALL admins
+      receiverType: "Admin",
+      senderType: "System",
+      notificationType: "Transaction",
+      title: userName,
+      message: `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
+      isRead: false,
+      createAt: new Date()
+    }, {
+      fields: [ 
+        "senderId", 
+        "receiverId",
+        "receiverType", 
+        "senderType", 
+        "notificationType", 
+        "title", 
+        "message", 
+        "isRead", 
+        "createAt"
+      ]
+    });
+    
+
+    // 2️⃣ ADMIN NOTIFICATION (all admins)
+    const staffNotification = await Notifications.create({
+      senderId: customerId,  // ✅ Who triggered this
+      receiverId: null,      // ✅ null = broadcast to ALL admins
+      receiverType: "Staff",
+      senderType: "System",
+      notificationType: "Transaction",
+      title: userName,
+      message: `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
+      isRead: false,
+      createAt: new Date()
+    }, {
+      fields: [ 
+        "senderId", 
+        "receiverId",
+        "receiverType", 
+        "senderType", 
+        "notificationType", 
+        "title", 
+        "message", 
+        "isRead", 
+        "createAt"
+      ]
+    });
+
+
+    // SOCKET.IO EMITS
+    io.emit("newNotification_Customer", customerNotification);
+    io.emit("newNotification_Admin", adminNotification);
+    io.emit("newNotification_Staff", staffNotification);
 
     // ✅ Fetch all order items
     const fullOrderItems = await OrderItems.findAll({
@@ -194,8 +285,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
 
     return {
       success: true,
-      message: "Order placed successfully",
-      notifications: createdNotifications
+      message: "Order placed successfully"
     };
 
   } catch (error) {

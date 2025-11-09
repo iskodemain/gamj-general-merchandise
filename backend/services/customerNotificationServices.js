@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import Customer from '../models/customer.js';
 import Notifications from '../models/notifications.js';
 import { io } from "../server.js";
@@ -12,7 +13,14 @@ export const fetchCustomerNotificationService = async (customerId) => {
         };
       }
 
-      const notifications = await Notifications.findAll({where: { senderId: customerId, receiverType: "Customer" }});
+      const notifications = await Notifications.findAll({
+        where: { 
+          [Op.or]: [
+            { receiverId: customerId, receiverType: "Customer" },
+            { receiverId: null, receiverType: "All" }
+          ]
+        },
+      });
 
       if (notifications.length === 0) {
         return {
@@ -49,7 +57,7 @@ export const deleteCustomerNotificationService = async (customerId, notification
       const notification = await Notifications.findOne({
         where: {
           ID: notificationID,
-          senderId: customerId,
+          receiverId: customerId,
           receiverType: 'Customer'
         },
       });
@@ -92,8 +100,9 @@ export const readCustomerNotificationService = async (customerId) => {
       // ✅ 2. Find the notification that belongs to this customer
       const notification = await Notifications.findOne({
         where: {
-          senderId: customerId,
-          receiverType: 'Customer'
+          receiverId: customerId,
+          receiverType: 'Customer',
+          isRead: false
         },
       });
 
@@ -109,8 +118,9 @@ export const readCustomerNotificationService = async (customerId) => {
         { isRead: true },
         {
           where: {
-            senderId: customerId,
+            receiverId: customerId,
             receiverType: 'Customer',
+            isRead: false
           },
         }
       );

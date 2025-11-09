@@ -35,9 +35,8 @@
 }
 
 .custNotif-item.unread {
-  background: #43a047;
+  background: rgb(79, 165, 83);
   color: white;
-  cursor: pointer;
 }
 
 .custNotif-item.read {

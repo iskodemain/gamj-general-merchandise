@@ -81,13 +81,11 @@ const Notification = () => {
                 <span className="custNotif-time">{formatDateTime(notif.createAt)}</span>
               </div>
 
-              <button
-                className="custNotif-dismiss"
-                onClick={() => handleDeleteNotification(notif.ID)}
-                aria-label="Dismiss"
-              >
-                <IoCloseOutline />
-              </button>
+             {notif.receiverType === "Customer" && notif.receiverId !== null && (
+                <button className="custNotif-dismiss" onClick={() => handleDeleteNotification(notif.ID)} aria-label="Dismiss">
+                  <IoCloseOutline />
+                </button>
+              )}
             </li>
           ))}
         </ul>

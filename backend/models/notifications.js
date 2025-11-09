@@ -16,11 +16,15 @@ const Notifications = sequelize.define(
       allowNull: false,
     },
     senderId: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true, // Admin, staff, or system(null)
+    },
+    receiverId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true, // null means "for all users of that type"
     },
     receiverType: {
-      type: DataTypes.ENUM('Customer', 'Staff', 'Admin'),
+      type: DataTypes.ENUM('Customer', 'Staff', 'Admin', 'All'),
       allowNull: false,
     },
     senderType: {
