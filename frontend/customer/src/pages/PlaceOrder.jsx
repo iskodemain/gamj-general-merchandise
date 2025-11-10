@@ -12,12 +12,15 @@ import { assets } from '../assets/assets'
 import UnavailableNote from '../components/Notice/UnavailableNote'
 import { useLocation } from 'react-router-dom'
 import Loading from '../components/Loading'
+import PaypalModal from '../components/PaypalModal'
 
 function PlaceOrder() {
   const location = useLocation();
-  const {navigate, backendUrl, token, cartItems, overallPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder, cartItemsToDelete} = useContext(ShopContext);
+  const {navigate, backendUrl, token, cartItems, totalPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder, cartItemsToDelete, paypalClientId, showPaypalModal, setShowPaypalModal} = useContext(ShopContext);
 
   const [loading, setLoading] = useState(false);
+  
+
 
   useEffect(() => {
     if (token) {
@@ -25,7 +28,6 @@ function PlaceOrder() {
     }
   }, [location, token]);
 
-  console.log("Payment Method: " + paymentMethod)
 
   const handleDeliveryInfoButton = () => {
     setActiveStep(2);
@@ -62,9 +64,10 @@ function PlaceOrder() {
     }
 
     if (paymentMethod === "Paypal") {
-      // Implement Paypal payment integration here (DON'T BOTHER FOR NOW)
-      // addOrder(paymentMethod, orderItems);
+      setShowPaypalModal(true);
+      return;
     }
+
     
   }
 
@@ -72,6 +75,8 @@ function PlaceOrder() {
     <div className='pl-main'>
       {loading && <Loading />}
       {!verifiedUser && <UnavailableNote/>}
+      {showPaypalModal && <PaypalModal />}
+
       <form onSubmit={onSubmitHandler} className='pl-form'>
         {/* DELIVERY INFORMATION */}
         <div className='di-main'>

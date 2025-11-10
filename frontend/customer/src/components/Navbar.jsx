@@ -235,6 +235,15 @@ function Navbar() {
             </div>
           )}
         </div>
+
+        {/* BURGER MENU ICON (Visible only on mobile) */}
+        <div className="burger-menu" onClick={showSidebar}>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+
+
       </div>
     </div>
     <nav className={sidebar ? 'nav-menu active' : 'nav-menu'} ref={dropdownRef}>
@@ -247,19 +256,24 @@ function Navbar() {
           <li><NavLink to="/" onClick={showSidebar}>Home</NavLink></li>
           <li><NavLink to="/shop" onClick={showSidebar}>Shop</NavLink></li>
           <li><NavLink to="/about" onClick={showSidebar}>About</NavLink></li>
-          {!token && 
-            // <li className={`${orderData.length > 0 ? '' : 'hidden-orer'}`}>
-            //   <NavLink to="/orders" onClick={showSidebar}>Orders</NavLink>
-            // </li>
-            <li>
-              <NavLink to="/orders" onClick={showSidebar}>Orders</NavLink>
-            </li>
-          }
+          {token && (
+            <li><NavLink to="/orders" onClick={showSidebar}>Orders</NavLink></li>
+          )}
+          <li><NavLink to="/cart" onClick={showSidebar}>Cart</NavLink></li>
+          {token && (
+            <li><NavLink to="/profile" onClick={showSidebar}>Profile</NavLink></li>
+          )}
+          {token && (
+            <li><NavLink to="/notification" onClick={showSidebar}>Notifications</NavLink></li>
+          )}
           <li><NavLink to="/wishlist" onClick={showSidebar}>Wishlist</NavLink></li>
-          {token ?
-            <li onClick={()=>{logout(); showSidebar();}}>Logout</li> : 
-            <li onClick={()=>{navigate('/login'); showSidebar();}}><NavLink>Register / Sign In</NavLink></li>
-          }
+          {token ? (
+            <li><NavLink to="#" onClick={(e) => { e.preventDefault(); logout(); showSidebar(); }}>Logout</NavLink></li>
+          ) : (
+            <li>
+              <NavLink to="/login" onClick={showSidebar}>Register / Sign In</NavLink>
+            </li>
+          )}
         </ul>
       </nav>
     </>
