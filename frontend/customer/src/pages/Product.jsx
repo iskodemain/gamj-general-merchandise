@@ -208,60 +208,62 @@ const Product = () => {
       navigate("/login")
     }
     
-    if (verifiedUser === false) {
-      setShowUnavailableNote(true);
-      return;
-    }
-
-    if (productData.hasVariant && !allVariantsSelected) {
-      toast.error("Please select all product options before adding to cart.", { ...toastError });
-      return;
-    }
-
-    if (activeProduct) {
-      if (quantity > productStocks) {
-        toast.error("You've reached the maximum quantity available for this product.", { ...toastError });
-      } 
-
-      // Compute price based on selected variant/combination
-      let itemPrice = productData.price;
-      let productVariantValueId = null;
-      let productVariantCombinationId = null;
-
-      if (productData.hasVariant && productData.hasVariantCombination) {
-        const combo = productVariantCombination.find(pvc => pvc.productId === productData.ID && pvc.combinations.split(", ").sort().join(", ") === selectedVariants.split(", ").sort().join(", "));
-        if (combo) {
-          itemPrice = combo.price;
-          productVariantCombinationId = combo.ID;
-        }
-      } else if (productData.hasVariant && !productData.hasVariantCombination) {
-        const variant = productVariantValues.find(pv => pv.productId === productData.ID && pv.value === selectedVariants);
-        if (variant) {
-          itemPrice = variant.price;
-          productVariantValueId = variant.ID;
-        }
+    if (token) {
+      if (verifiedUser === false) {
+        setShowUnavailableNote(true);
+        return;
       }
 
-      const subTotal = itemPrice * quantity;
+      if (productData.hasVariant && !allVariantsSelected) {
+        toast.error("Please select all product options before adding to cart.", { ...toastError });
+        return;
+      }
 
-      // Build single order item
-      const builtOrderItem = [
-        {
-          productId: productData.ID,
-          productVariantValueId,
-          productVariantCombinationId,
-          value: selectedVariants || null,
-          quantity,
-          subTotal: parseFloat(subTotal.toFixed(2)),
-        },
-      ];
+      if (activeProduct) {
+        if (quantity > productStocks) {
+          toast.error("You've reached the maximum quantity available for this product.", { ...toastError });
+        } 
 
-      getOrderSubTotal(subTotal)
-      setOrderItems(builtOrderItem);
-      navigate("/place-order");
+        // Compute price based on selected variant/combination
+        let itemPrice = productData.price;
+        let productVariantValueId = null;
+        let productVariantCombinationId = null;
 
-    } else {
-      toast.error("This product is unavailable.", { ...toastError });
+        if (productData.hasVariant && productData.hasVariantCombination) {
+          const combo = productVariantCombination.find(pvc => pvc.productId === productData.ID && pvc.combinations.split(", ").sort().join(", ") === selectedVariants.split(", ").sort().join(", "));
+          if (combo) {
+            itemPrice = combo.price;
+            productVariantCombinationId = combo.ID;
+          }
+        } else if (productData.hasVariant && !productData.hasVariantCombination) {
+          const variant = productVariantValues.find(pv => pv.productId === productData.ID && pv.value === selectedVariants);
+          if (variant) {
+            itemPrice = variant.price;
+            productVariantValueId = variant.ID;
+          }
+        }
+
+        const subTotal = itemPrice * quantity;
+
+        // Build single order item
+        const builtOrderItem = [
+          {
+            productId: productData.ID,
+            productVariantValueId,
+            productVariantCombinationId,
+            value: selectedVariants || null,
+            quantity,
+            subTotal: parseFloat(subTotal.toFixed(2)),
+          },
+        ];
+
+        getOrderSubTotal(subTotal)
+        setOrderItems(builtOrderItem);
+        navigate("/place-order");
+
+      } else {
+        toast.error("This product is unavailable.", { ...toastError });
+      }
     }
 
   }
