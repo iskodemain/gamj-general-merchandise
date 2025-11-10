@@ -1012,11 +1012,6 @@ const ShopContextProvider = (props) => {
             setFetchNotifications((prev) => [notif, ...prev]);
         });
 
-        socket.on("stockRestoration", (notif) => {
-            console.log("🔔 Customer Notification:", notif);
-            setFetchNotifications((prev) => [notif, ...prev]);
-        });
-
         socket.on("cartUpdated", (data) => {
             setCartItems(prev => 
                 prev.map(item => {
@@ -1078,8 +1073,15 @@ const ShopContextProvider = (props) => {
             );
         });
 
+        // RESTORE STOCKS
+        socket.on("stockRestoration", (notif) => {
+            console.log("🔔 Customer Notification:", notif);
+            setFetchNotifications((prev) => [notif, ...prev]);
+        });
+
         return () => {
             socket.off("addCancelOrder");
+            socket.off("stockRestoration");
         };
     }, []);
 

@@ -14,7 +14,7 @@ import { io } from "../server.js";
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 import { orderSendMail } from "../utils/mailer.js";
-import { placeOrderTemplate } from "../utils/emailTemplates.js";
+import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate } from "../utils/emailTemplates.js";
 
 // CUSTOMER SIDE
 export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete) => {
@@ -566,9 +566,15 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
       io.emit("newNotification_Admin", adminNotification);
       io.emit("newNotification_Staff", staffNotification);
 
-
       io.emit("stockRestoration", stockRestoration);
-        
+
+      // Send email
+      await orderSendMail({
+          to: user.loginEmail ? user.loginEmail : user.emailAddress,
+          subject: 'Your order cancellation has been processed.',
+          html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'Cancelled', fullOrder.paymentMethod, fullOrder.orderId, product.productName),
+          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+      });
 
       return {
           success: true,
@@ -920,6 +926,115 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         refundStatus: newOrderRefund.refundStatus,
         orderStatus: "Return/Refund",
         dateRequest: newOrderRefund.dateRequest,          
+      });
+
+      let notificationMessage = '';
+      if (refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.') {
+        notificationMessage = 'The refund will be processed directly to your PayPal account';
+      } else if (refundMethod === 'Cash Refund — Receive your refund in cash.') {
+        notificationMessage = 'The refund will be issued in cash.';
+      } else if (refundMethod === 'No Refund Needed — I don\'t need a refund') {
+        notificationMessage = 'A refund is not needed.';
+      }
+
+      // Fetch the complete order record to include auto-generated orderId
+      const fullOrder = await Orders.findByPk(orderItem.orderId);
+      const userName = user.medicalInstitutionName;
+      // Fetch product info FOR NOTITICATION
+      const product = await Products.findByPk(orderItem.productId);
+      if (!product) {
+        return {
+          success: false,
+          message: "Product not found.",
+        };
+      }
+
+      // 1️⃣ CUSTOMER NOTIFICATION (specific customer only)
+      const customerNotification = await Notifications.create({
+        senderId: customerId, 
+        receiverId: customerId,
+        receiverType: "Customer",
+        senderType: "System",
+        notificationType: "Order Return/Refund",
+        title: "Order Return/Refund",
+        message: `You have requested a return/refund for ${product.productName} order #${fullOrder.orderId}. ${notificationMessage}`,
+        isRead: false,
+        createAt: new Date()
+      }, {
+        fields: [ 
+          "senderId", 
+          "receiverId",
+          "receiverType", 
+          "senderType", 
+          "notificationType", 
+          "title", 
+          "message", 
+          "isRead", 
+          "createAt"
+        ]
+      });
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const adminNotification = await Notifications.create({
+        senderId: customerId,  // ✅ Who triggered this
+        receiverId: null,      // ✅ null = broadcast to ALL admins
+        receiverType: "Admin",
+        senderType: "System",
+        notificationType: "Order Return/Refund",
+        title: `${userName} - Return/Refund Request`,
+        message: `${userName} has requested a return/refund for ${product.productName} (Order #${fullOrder.orderId}). Preferred refund method: ${refundMethod ? refundMethod : ''}.`,
+        isRead: false,
+        createAt: new Date()
+      }, {
+        fields: [ 
+          "senderId", 
+          "receiverId",
+          "receiverType", 
+          "senderType", 
+          "notificationType", 
+          "title", 
+          "message", 
+          "isRead", 
+          "createAt"
+        ]
+      });
+      
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const staffNotification = await Notifications.create({
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Staff",
+        senderType: "System",
+        notificationType: "Order Return/Refund",
+        title: `${userName} - Return/Refund Request`,
+        message: `${userName} has requested a return/refund for ${product.productName} (Order #${fullOrder.orderId}). Preferred refund method: ${refundMethod ? refundMethod : ''}.`,
+        isRead: false,
+        createAt: new Date(),
+      }, {
+        fields: [ 
+          "senderId", 
+          "receiverId",
+          "receiverType", 
+          "senderType", 
+          "notificationType", 
+          "title", 
+          "message", 
+          "isRead", 
+          "createAt"
+        ]
+      });
+
+      io.emit("newNotification_Customer", customerNotification);
+      io.emit("newNotification_Admin", adminNotification);
+      io.emit("newNotification_Staff", staffNotification);
+
+      // Send email
+      await orderSendMail({
+          to: user.loginEmail ? user.loginEmail : user.emailAddress,
+          subject: 'Your requested order return/refund has been processed.',
+          html: refundOrderTemplate(user.medicalInstitutionName, 'Return/Refund', refundMethod, fullOrder.orderId, product.productName),
+          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
       });
 
       return {
