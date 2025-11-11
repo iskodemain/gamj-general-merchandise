@@ -1,0 +1,124 @@
+import bcrypt from 'bcrypt';
+import Admin from '../../models/admin.js';
+import { generateLoginToken, createAdminToken } from '../../utils/token.js';
+import { generateVerificationCode } from '../../utils/codeGenerator.js';
+import { sendMail } from '../../utils/mailer.js'; 
+import { validateEmail, validatePhone } from '../../validators/userValidator.js';
+import { loginEmailTemplate } from '../../utils/emailTemplates.js';
+
+
+
+// ADMIN LOGIN INPUT
+export const loginAdminService = async (identifier, password) => {
+    try {
+        const isEmail = validateEmail(identifier);
+        const isPhone = validatePhone(identifier);
+
+        if (!isEmail && !isPhone) {
+            return {success: false, message: 'Invalid email or phone format.'};
+        }
+
+        const admin = await Admin.findOne({
+            where: isEmail ? {emailAddress: identifier} : {phoneNumber: identifier}
+        })
+
+        if (!admin) {
+            return {success: false, message: 'Your account and/or password is incorrect, please try again'};
+        }
+
+        // const isMatch = await bcrypt.compare(password, admin.loginPassword);  --- Do this later inside ofthe profile
+        const isMatch = password === admin.password;
+
+        if (!isMatch) {
+            return {success: false, message: 'Your account and/or password is incorrect, please try again'};
+        }
+        
+        // Generate Codes
+        const loginToken = generateLoginToken();
+        const code = generateVerificationCode();
+        const expirationTime = new Date(Date.now() + 10 * 60 * 1000); 
+        await admin.update({
+            verificationCode: code,
+            codeExpiresAt: expirationTime,
+            loginToken: loginToken,
+        })
+
+        // Send email (or SMS if phone)
+        if (admin.emailAddress) {
+            await sendMail({
+                to: admin.emailAddress,
+                subject: 'Login Verification Code',
+                html: loginEmailTemplate(admin.userName, code),
+                attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+            });
+        }
+
+        return {
+            success: true, 
+            message: 'Verification code sent. Please enter the code to complete login.',
+            loginToken: loginToken, // Process this to frontend local storage
+        };
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+// ADMIN LOGIN VERIFICATON CODE
+export const loginCodeVerifyService = async (loginToken, code) => {
+    try {
+        if (!loginToken || !code) {
+            return {
+                success: false,
+                message: 'Verification failed. Login session or verification code may have expired. Please try logging in again.'
+            }
+        }
+
+        const admin = await Admin.findOne({ where: { loginToken } });
+        if (!admin) {
+            return {
+                success: false,
+                message: 'Expired login session. Please log in again.'
+            }
+        }
+
+        if (admin.verificationCode !== code) {
+            return {
+                success: false,
+                message: 'Invalid verification code.'
+            }
+        }
+
+        if (new Date() > admin.codeExpiresAt) {
+            await admin.update({ 
+                verificationCode: null, 
+                codeExpiresAt: null,
+                loginToken: null,
+            });
+            return {
+                success: false,
+                message: 'Verification code expired. Please log in again.',
+                codeExpired: true
+            }
+        }
+
+        // Clear all after sucessfully validated
+        await admin.update({ 
+            verificationCode: null, 
+            codeExpiresAt: null, 
+            loginToken: null 
+        });
+
+        // Create token
+        const adminAuthToken = createAdminToken(admin.ID);
+
+        return {
+            success: true,
+            message: 'Login successfully!',
+            token: adminAuthToken, // Eto na yung permanent token for headers
+        };
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}

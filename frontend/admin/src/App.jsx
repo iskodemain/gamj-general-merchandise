@@ -3,9 +3,7 @@ import {ToastContainer} from 'react-toastify'
 import {Routes, Route, Navigate} from 'react-router-dom'
 import './App.css'
 import LoginAdmin from './pages/LoginAdmin'
-import AdminSignUp from './pages/AdminSignUp' // <-- Import
 import Verification from './components/Verification' // <-- Import Verification component
-import AdminNavbar from './components/AdminNavbar' // <-- Import AdminNavbar component
 import Pending from './components/Pending' // <-- Import Pending component
 import ViewAll from './components/ViewAll'
 import Processing from './components/Processing'
@@ -43,20 +41,23 @@ import LowStock from "./components/ProductMenu/LowStock";
 import Staff from "./components/Staff";
 import Notification from "./components/Notification";
 import AllUser from "./components/AllUser";
+import Overview from "./pages/Overview.jsx";
+import { AdminContext } from "./context/AdminContextProvider.jsx";
 //components
 // icon 
 
 const App = () => {
+  const { token, loginToken } = useContext(AdminContext);
+
   return (
    <div className='App'>
     
     <ToastContainer/>
     <Routes>
-      <Route path="/" element={<LoginAdmin />} />
-      <Route path="*" element={<LoginAdmin/>}/>
-      <Route path="/signup" element={<AdminSignUp />} />
-      <Route path="/verify" element={<Verification />} />
-      <Route path="/admin" element={<AdminNavbar />} />
+      <Route path="*" element={token ? <Navigate to="/overview" /> : <LoginAdmin />}/>
+      <Route path="/" element={token ? <Navigate to="/overview" /> : <LoginAdmin />} />
+      <Route path="/verify" element={token || !loginToken ? <Navigate to="/"/> : <Verification/>} />
+      <Route path="/overview" element={token ? <Overview/> : <Navigate to="/"/>} />
       <Route path="/pending" element={<Pending />} />
       <Route path="/view" element={<ViewAll />} />
       <Route path="/processing" element={<Processing />} />

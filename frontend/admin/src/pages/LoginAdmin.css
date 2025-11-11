@@ -46,26 +46,29 @@
   font-size: 1rem;
   background: #fff;
   transition: border 0.2s;
-  
   width: 100%;
 }
+
 .login-input:focus {
   border: 1.5px solid #22b573;
   background: #fff;
 }
-.forgot-link {
-  margin-top: -10px;
-  margin-bottom: 4px;
+
+.pass-input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  transition: border 0.2s;
+  width: 100%;
 }
-.forgot-password {
-  color: #43A047;
-  font-size: 0.95rem;
-  text-decoration: none;
-  transition: text-decoration 0.2s;
+.pass-input:focus {
+  border: 1.5px solid #22b573;
+  background: #fff;
+  outline: none;
 }
-.forgot-password:hover {
-  text-decoration: underline;
-}
+
+
 .sign-in-btn{
     width: 100%;
     background: #43A047;
@@ -82,21 +85,6 @@
 .sign-in-btn:hover {
     background: #2e6d31;
 }
-.create-account-btn{
-    width: 100%;
-    background: #fff;
-    color: #43A047;
-    font-size: 1.08rem;
-    border: 2px solid #43A047;
-    border-radius: 5px;
-    padding: 10px 0;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-}
-.create-account-btn:hover {
-  background: #2e6d31;
-  color: #fff;
-}
 
 .login-logo{
     display: flex;
@@ -111,3 +99,22 @@
     margin-bottom: 0;
     object-fit: contain;
 }
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.login-showHidePass {
+    position: absolute;
+    top: 13px;
+    right: 5px;
+    padding: 0 8px;
+    cursor: pointer;
+}
+
+
+.login-offPass, .login-onPass {
+    font-size: 1.2rem;
+    color: #43A047;
+}
+

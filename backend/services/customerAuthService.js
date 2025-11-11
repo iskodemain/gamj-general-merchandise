@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import fs from 'fs/promises';
 import {v2 as cloudinary} from 'cloudinary';
 import Customer from '../models/customer.js';
-import { createToken, generateLoginToken, generatePasswordResetToken } from '../utils/token.js';
+import { createCustomerToken, generateLoginToken, generatePasswordResetToken } from '../utils/token.js';
 import { generateVerificationCode } from '../utils/codeGenerator.js';
 import { sendMail } from '../utils/mailer.js';
 import { validateEmail, validatePhone, validatePassword } from '../validators/userValidator.js';
@@ -222,7 +222,7 @@ export const registerCodeVerifyService = async (registerKey, code) => {
         });
 
         // CREATE TOKEN
-        const authToken = createToken(newUser.ID); // Permanent token
+        const authToken = createCustomerToken(newUser.ID); // Permanent token
 
         // CLEAN TEMPDATA
         delete tempUserData[registerKey];
@@ -340,7 +340,7 @@ export const loginCodeVerifyService = async (loginToken, code) => {
         });
 
         // Create token
-        const authToken = createToken(user.ID);
+        const authToken = createCustomerToken(user.ID);
 
         return {
             success: true,

@@ -705,13 +705,6 @@ export const refundOrderTemplate = (userName, orderStatus, refundMethod, orderId
 `;
 };
 
-
-
-
-
-
-
-
 export const loginEmailTemplate = (userName, verificationCode) => {
     return `<!DOCTYPE html>
 <html lang="en">
