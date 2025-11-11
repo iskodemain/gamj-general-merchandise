@@ -4,7 +4,6 @@ import { addOrderService } from "../services/customerOrderService.js";
 
 export const createPayPalOrder = async (req, res) => {
     try {
-        const { ID } = req.user;
         const { amount } = req.body;
 
         if (!amount || amount <= 0) {
