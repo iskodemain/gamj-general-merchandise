@@ -1,0 +1,102 @@
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* SIDEBAR TOGGLE BUTTON */
+.navbar-sidebar-toggle {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #43A047; /* emerald green */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.3s ease;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-sidebar-toggle:hover {
+  background: #3b8b3f; /* darker green */
+  transform: scale(1.05);
+}
+
+/* Arrow icon inside button */
+.navbar-sidebar-toggle .arrow {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-135deg); /* Arrow points right by default */
+  transition: transform 0.3s ease;
+}
+
+.navbar-sidebar-toggle.open .arrow {
+  transform: rotate(45deg); /* Points left when sidebar is open */
+}
+
+.navbar-layout {
+  display: flex;
+  height: auto;
+  background-color: white;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 500;
+}
+
+.navbar-main {
+  margin-top: 3.4rem;
+  border-bottom: 1px solid #D5D5D5;
+  border-bottom: 1px solid #D5D5D5;
+
+  width: 100%;
+  background-color: #EFFFF1;
+}
+
+.navbar-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 32px;
+}
+
+.navbar-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.navbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-icon:hover {
+  opacity: 0.8;
+}
+
+
+
+.navbar-content {
+  padding: 20px 32px;
+}
+
+.navbar-placeholder {
+  font-size: 1rem;
+  color: #333;
+}

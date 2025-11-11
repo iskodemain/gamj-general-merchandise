@@ -1,53 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginAdmin.css";
 import { assets } from "../assets/assets.js";
+import { AdminContext } from "../context/AdminContextProvider.jsx";
+import { IoIosEye } from "react-icons/io";
+import { IoIosEyeOff } from "react-icons/io";
+import Loading from "../../../customer/src/components/Loading.jsx";
+
 
 function LoginAdmin() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [identifier, setIdentifier] = useState("");
+  const {adminLogin, loginIdentifier, setLoginIdentifier} = useContext(AdminContext);
+  const [passwordType, setPasswordType] = useState('password')
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  // Temporary login credentials
-  const validCredentials = {
-    email: "admin@gmail.com",
-    phone: "09062320087",
-    password: "admin",
+
+
+  const togglePassword = () => {
+    setPasswordType((prevPasswordType) => 
+      prevPasswordType === 'password' ? 'text' : 'password'
+    );
   };
 
-  useEffect(() => {
-    sessionStorage.removeItem("loginIdentifier");
-  }, []);
+  const resetSignUpForm = () => {
+    setPassword('');
+    setLoginIdentifier('');
+  };
 
-  const handleSubmit = (e) => {
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Identifier entered:", identifier);
-    console.log("Password entered:", password);
-
-    // Check if credentials match our temporary login
-    const isValidIdentifier =
-      identifier === validCredentials.email ||
-      identifier === validCredentials.phone;
-
-    console.log("isValidIdentifier:", isValidIdentifier);
-    console.log("isValidPassword:", password === validCredentials.password);
-
-    if (isValidIdentifier && password === validCredentials.password) {
-      setError("");
-      sessionStorage.setItem("loginIdentifier", identifier);
-      navigate("/verify");
-    } else {
-      setError(
-        "Invalid email/phone or password. Try admin@gmail.com / 09062320087 with password 'admin' nigga"
-      );
+    setLoading(true);
+    const isSuccess = await adminLogin(loginIdentifier, password);
+    setLoading(false);
+    if (isSuccess) {
+      resetSignUpForm();
     }
+    
   };
+
 
   return (
     <div className="login-bg">
+      {loading && <Loading />}
       <div className="login-card">
         <h2 className="login-title">Login</h2>
         <div className="login-logo">
@@ -59,56 +56,20 @@ function LoginAdmin() {
           </span>
         </div>
 
-        {/* Show error message if credentials are invalid */}
-        {error && <div className="login-error">{error}</div>}
-
         {/*  Login Form  */}
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="login-label">
-            <input
-              type="text"
-              className="login-input"
-              placeholder="Enter your email or phone"
-              autoComplete="username"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              required
-            />
+            <input type="text" className="login-input" placeholder="Enter your email or phone" autoComplete="username" value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} required/>
           </label>
-          <label className="login-label password-label">
+          <label className="login-label">
             <div className="password-input-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="login-input"
-                placeholder="Password: admin"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              ></button>
+              <input type={passwordType} className="pass-input" placeholder="Enter you password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)}required/>
+              <div onClick={togglePassword} className='login-showHidePass'>
+                {passwordType === 'password' ? <IoIosEyeOff className='login-offPass'/> : <IoIosEye className='login-onPass'/>}
+              </div>
             </div>
           </label>
-          <div className="forgot-link">
-            <a href="#" className="forgot-password">
-              Forgot your password?
-            </a>
-          </div>
-          <button className="sign-in-btn" type="submit">
-            Sign In
-          </button>
-          <button
-            className="create-account-btn"
-            type="button"
-            onClick={() => navigate("/signup")}
-          >
-            Create an Account
-          </button>
+          <button className="sign-in-btn" type="submit">Sign In</button>
         </form>
       </div>
     </div>

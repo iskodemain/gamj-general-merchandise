@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets.js";
-import "./adminNavbar.css";
+import "./AdminNavbar.css";
 import Pending from "./Pending"; 
 import Processing from "./Processing"; 
 import OutforDelivery from "./OutforDelivery"; 

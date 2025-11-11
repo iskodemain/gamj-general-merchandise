@@ -13,6 +13,7 @@ import paypalRouter from './routes/paypalRoute.js';
 import multer from 'multer';
 import { Server } from 'socket.io';
 import http from 'http';
+import adminRouter from './routes/admin/adminRoute.js';
 
 // APP CONFIG
 const app = express();
@@ -37,7 +38,7 @@ export const io = new Server(server, {
   },
 });
 
-// ROUTES
+// CUSTOMER ROUTES
 app.use('/api/customer', customerRouter);
 app.use('/api/product', productRouter);
 app.use('/api/wishlist', wishlistRouter);
@@ -45,6 +46,9 @@ app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/notification', notificationRouter);
 app.use('/api/paypal', paypalRouter);
+
+// ADMIN ROUTES
+app.use('/api/admin', adminRouter);
 
 
 // TEST
