@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import './productList.css';
+import './ProductCategory.css';
 import { FaPlus, FaTrash, FaArrowLeft } from 'react-icons/fa';
 
-function ProductList({ onBack }) {
+function ProductCategory({ onBack }) {
   const [categories, setCategories] = useState(['PPE', '']);
 
   const updateCategory = (index, value) => {
@@ -78,4 +78,4 @@ function ProductList({ onBack }) {
   );
 }
 
-export default ProductList;
+export default ProductCategory;

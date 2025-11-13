@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './customerCancel.css';
+import './CustomerCancel.css';
 
 function CustomerCancel(){
     const [reason, setReason] = useState(

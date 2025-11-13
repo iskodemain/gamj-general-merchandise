@@ -1,6 +1,7 @@
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import React, { useState } from 'react';
 import VerifiedStaffView from "./VerifiedStaffView";
+import Navbar from "../Navbar";
 function VerifiedStaff() {
   const [showReview, setShowReview] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -38,47 +39,50 @@ function VerifiedStaff() {
   ];
 
   return (
-    <div className="verified-customer-container">
-      <div className="card">
-        <table className="request-table" role="table" aria-label="Verified customers">
-          <thead>
-            <tr>
-              <th className="col-name">Name</th>
-              <th className="col-email">Email</th>
-              <th className="col-status">Status</th>
-              <th className="col-date">Date Created</th>
-              <th className="col-action">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {customers.map(customer => (
-              <tr key={customer.id}>
-                <td className="name">{customer.name}</td>
-                <td className="email"><span className="email-text">{customer.email}</span></td>
-                <td className="status">
-                  <div className="status-verified">
-                    <span className="status-text">Verified</span>
-                    <IoMdCheckmarkCircle className="check-icon" />
-                  </div>
-                </td>
-                <td className="date">{customer.dateCreated}</td>
-                <td className="action-cell">
-                  
-                  <button 
-                    className="btn btn-review" 
-                    type="button"
-                    onClick={() => handleReviewClick(customer)}
-                  >
-                    Review
-                  </button>
-                </td>
+    <>
+    <Navbar TitleName="Verified Staff"/>
+      <div className="verified-customer-container">
+        <div className="card">
+          <table className="request-table" role="table" aria-label="Verified customers">
+            <thead>
+              <tr>
+                <th className="col-name">Name</th>
+                <th className="col-email">Email</th>
+                <th className="col-status">Status</th>
+                <th className="col-date">Date Created</th>
+                <th className="col-action">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {customers.map(customer => (
+                <tr key={customer.id}>
+                  <td className="name">{customer.name}</td>
+                  <td className="email"><span className="email-text">{customer.email}</span></td>
+                  <td className="status">
+                    <div className="status-verified">
+                      <span className="status-text">Verified</span>
+                      <IoMdCheckmarkCircle className="check-icon" />
+                    </div>
+                  </td>
+                  <td className="date">{customer.dateCreated}</td>
+                  <td className="action-cell">
+                    
+                    <button 
+                      className="btn btn-review" 
+                      type="button"
+                      onClick={() => handleReviewClick(customer)}
+                    >
+                      Review
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

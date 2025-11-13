@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './verifiedCustomerView.css';
+import './VerifiedCustomerView.css';
 import { FaUserLarge, FaRegEye, FaRegEyeSlash, FaEye } from "react-icons/fa6";
 
 function VerifiedCustomerView({ customer, onClose }) {

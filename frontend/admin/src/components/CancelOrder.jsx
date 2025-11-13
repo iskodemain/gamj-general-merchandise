@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import "./cancelOrder.css";
+import "./CancelOrder.css";
 import CancelOrderReview from "./Cancellation/CancelOrderReview.jsx";
 import { FaTrashCan } from "react-icons/fa6";
 import { assets } from "../assets/assets.js";
 import AdminCancel from "./Cancellation/AdminCancel";
+import Navbar from "./Navbar.jsx";
 
 const sampleOrders = [
   {
@@ -51,99 +52,102 @@ export default function CancelOrder() {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   return (
-    <div className="pending-page">
-      <header className="pending-header-row">
-        {/* keep top white design, notif, logout, etc. (these live outside this component in your layout) */}
-      </header>
-      
-      <div className="header-divider" />
+    <>
+      <Navbar TitleName="Order Cancellation"/>
+      <div className="pending-page">
+        <header className="pending-header-row">
+          {/* keep top white design, notif, logout, etc. (these live outside this component in your layout) */}
+        </header>
+        
+        <div className="header-divider" />
 
-      {/* replace only the orders-list area with ViewAll when toggled */}
-      {showViewAll ? (
-        <CancelOrderReview
-          order={selectedOrder}
-          onClose={() => {
-            setShowViewAll(false);
-            setSelectedOrder(null);
-          }}
-        />
-      ) : (
-        <div className="orders-list">
-          {sampleOrders.map(order => {
-            // determine payment display based on method
-            const method = (order.method || "").toLowerCase();
-            const paymentStatus = method.includes("paypal")
-              ? "Paid"
-              : method.includes("cash") || method.includes("cod") || method.includes("cash on delivery")
-              ? "Pending"
-              : order.status || "—";
+        {/* replace only the orders-list area with ViewAll when toggled */}
+        {showViewAll ? (
+          <CancelOrderReview
+            order={selectedOrder}
+            onClose={() => {
+              setShowViewAll(false);
+              setSelectedOrder(null);
+            }}
+          />
+        ) : (
+          <div className="orders-list">
+            {sampleOrders.map(order => {
+              // determine payment display based on method
+              const method = (order.method || "").toLowerCase();
+              const paymentStatus = method.includes("paypal")
+                ? "Paid"
+                : method.includes("cash") || method.includes("cod") || method.includes("cash on delivery")
+                ? "Pending"
+                : order.status || "—";
 
-            return (
-              <article className="order-card" key={order.id}>
-                <div className="order-inner">
-                  <div className="left-col">
-                    <h3 className="section-heading">Products</h3>
+              return (
+                <article className="order-card" key={order.id}>
+                  <div className="order-inner">
+                    <div className="left-col">
+                      <h3 className="section-heading">Products</h3>
 
-                    <ul className="products">
-                      {order.items.map(item => (
-                        <li className="product-row" key={item.id}>
-                          <img className="prod-img" src={item.image} alt={item.name} />
-                          <div className="prod-meta">
-                            <div className="prod-name">{item.name}</div>
+                      <ul className="products">
+                        {order.items.map(item => (
+                          <li className="product-row" key={item.id}>
+                            <img className="prod-img" src={item.image} alt={item.name} />
+                            <div className="prod-meta">
+                              <div className="prod-name">{item.name}</div>
 
-                            <div className="prod-details">
-                              <div className="prod-qty"><span className="bold">Quantity: {item.qty}</span></div>
-                              <div className="prod-specs">
-                                {item.size && <span>Size: {item.size}</span>}
-                                {item.color && <span>Color: {item.color}</span>}
+                              <div className="prod-details">
+                                <div className="prod-qty"><span className="bold">Quantity: {item.qty}</span></div>
+                                <div className="prod-specs">
+                                  {item.size && <span>Size: {item.size}</span>}
+                                  {item.color && <span>Color: {item.color}</span>}
+                                </div>
+                                <div className="prod-price">₱{item.price.toFixed(2)}</div>
                               </div>
-                              <div className="prod-price">₱{item.price.toFixed(2)}</div>
                             </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="right-col">
-                    <div className="order-top">
-                      <div className="order-number">Order Number: <strong>{order.id}</strong></div>
-                      <div className="order-total">₱{order.total.toFixed(2)}</div>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
 
-                    <div className="order-info">
-                      <div className="info-row"><span className="label">Items</span><span className="value">{order.itemsCount}</span></div>
-                      <div className="info-row"><span className="label">Method</span><span className="value">{order.method}</span></div>
-                      <div className="info-row"><span className="label">Payment</span><span className="value">{paymentStatus}</span></div>
-                      <div className="info-row"><span className="label">Date</span><span className="value">{order.date}</span></div>
-                    </div>
-
-                    <div className="customer-block">
-                      <div className="cust-name">{order.customer.name}</div>
-                      <div className="cust-address">{order.customer.address}</div>
-                      <div className="cust-contact">
-                        <div className="cust-email">{order.customer.email}</div>
-                        <div className="cust-phone">{order.customer.phone}</div>
+                    <div className="right-col">
+                      <div className="order-top">
+                        <div className="order-number">Order Number: <strong>{order.id}</strong></div>
+                        <div className="order-total">₱{order.total.toFixed(2)}</div>
                       </div>
-                    </div>
 
-                    <button
-                      className="view-all-btn"
-                      type="button"
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setShowViewAll(true);
-                      }}
-                    >
-                      View All
-                    </button>
+                      <div className="order-info">
+                        <div className="info-row"><span className="label">Items</span><span className="value">{order.itemsCount}</span></div>
+                        <div className="info-row"><span className="label">Method</span><span className="value">{order.method}</span></div>
+                        <div className="info-row"><span className="label">Payment</span><span className="value">{paymentStatus}</span></div>
+                        <div className="info-row"><span className="label">Date</span><span className="value">{order.date}</span></div>
+                      </div>
+
+                      <div className="customer-block">
+                        <div className="cust-name">{order.customer.name}</div>
+                        <div className="cust-address">{order.customer.address}</div>
+                        <div className="cust-contact">
+                          <div className="cust-email">{order.customer.email}</div>
+                          <div className="cust-phone">{order.customer.phone}</div>
+                        </div>
+                      </div>
+
+                      <button
+                        className="view-all-btn"
+                        type="button"
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setShowViewAll(true);
+                        }}
+                      >
+                        View All
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      )}
-    </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

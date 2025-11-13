@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './totalProduct.css';
+import './TotalProduct.css';
 import { FaArrowLeft, FaTrash, FaSearch } from 'react-icons/fa';
 
 function TotalProduct({ onBack }) {

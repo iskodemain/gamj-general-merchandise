@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './mostStock.css';
+import './MostStock.css';
 import { FaArrowLeft, FaTrash, FaSearch } from 'react-icons/fa';
 
 function MostStock({ onBack }) {

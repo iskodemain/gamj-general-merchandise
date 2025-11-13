@@ -31,18 +31,21 @@ import VerifiedStaff from "./components/VeriAndUnverified/VerifiedStaff";
 import VerifiedStaffView from "./components/VeriAndUnverified/VerifiedStaffView";
 import UnverifiedStaff from "./components/VeriAndUnverified/UnverifiedStaff";
 import UnverifiedStaffView from "./components/VeriAndUnverified/UnverifiedStaffView";
-import Profile from "./components/Profile";
-import Products from "./components/Products";
+import Profile from "./pages/Profile.jsx";
+import Products from "./pages/Products.jsx";
 import AddProduct from "./components/ProductMenu/AddProduct";
-import ProductList from "./components/ProductMenu/ProductList";
+import ProductCategory from './components/ProductMenu/ProductCategory.jsx'
 import TotalProduct from "./components/ProductMenu/TotalProduct";
 import MostStock from "./components/ProductMenu/MostStock";
 import LowStock from "./components/ProductMenu/LowStock";
-import Staff from "./components/Staff";
-import Notification from "./components/Notification";
+import Staff from "./pages/Staff.jsx"
+import Notification from "./pages/Notification.jsx";
 import AllUser from "./components/AllUser";
 import Overview from "./pages/Overview.jsx";
 import { AdminContext } from "./context/AdminContextProvider.jsx";
+import OutOfStock from "./components/ProductMenu/OutOfStock.jsx";
+import Settings from "./pages/Settings.jsx";
+
 //components
 // icon 
 
@@ -68,13 +71,13 @@ const App = () => {
       <Route path="/provinces" element={<Provinces />} />
       <Route path="/cities" element={<Cities />} />
       <Route path="/barangay" element={<Barangay />} />
-      <Route path="/cancelorders" element={<CancelOrder />} />
+      <Route path="/cancelorder" element={<CancelOrder />} />
       <Route path="/cancelreason" element={<CancelReason />} />
       <Route path="/cancelreview" element={<CancelReview />} />
-      <Route path="/refund" element={<Refund />} />
+      <Route path="/return" element={<Refund />} />
       <Route path="/admincancel" element={<AdminCancel />} />
       <Route path="/customercancel" element={<CustomerCancel />} />
-      <Route path="/return&refund" element={<ReturnAndRefund />} />
+      <Route path="/returnandrefund" element={<ReturnAndRefund />} />
       <Route path="/returnrefundall" element={<ReturnRefundAll />} />
       <Route path="/reviewrefund" element={<ReviewRefund />} />
       <Route path="/unverifiedcustomers" element={<UnverifiedCustomer />} />
@@ -87,14 +90,16 @@ const App = () => {
       <Route path="/unverifiedstaffview" element={<UnverifiedStaffView />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/products" element={<Products />} />
-      <Route path="/addproduct" element={<AddProduct />} />
-      <Route path="/productlist" element={<ProductList />} />
-      <Route path="/totalproduct" element={<TotalProduct />} />
-      <Route path="/moststock" element={<MostStock />} />
-      <Route path="/lowstock" element={<LowStock />} />
+      <Route path="/products/addproduct" element={<AddProduct />} />
+      <Route path="/products/productcategory" element={<ProductCategory />} />
+      <Route path="/products/totalproduct" element={<TotalProduct />} />
+      <Route path="/products/moststock" element={<MostStock />} />
+      <Route path="/products/lowstock" element={<LowStock />} />
+      <Route path="/products/outofstock" element={<OutOfStock />} />
       <Route path="/staff" element={<Staff />} />
       <Route path="/notifications" element={<Notification />} />
       <Route path="/alluser" element={<AllUser />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
    </div>
   )

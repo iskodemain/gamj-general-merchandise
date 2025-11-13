@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./provinces.css";
+import "./Provinces.css";
 
 function Provinces({ onBack }) {
   const [provinces, setProvinces] = useState(["Cavite", "Metro Manila"]);

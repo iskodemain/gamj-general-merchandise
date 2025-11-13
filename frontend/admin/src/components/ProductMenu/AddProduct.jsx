@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './addProduct.css';
+import './AddProduct.css';
 import { FaPlus, FaTrash, FaArrowLeft } from 'react-icons/fa';
 function AddProduct() {
   const [hasVariants, setHasVariants] = useState(false);

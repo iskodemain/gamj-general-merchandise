@@ -1,27 +1,14 @@
-import react, { useState, useEffect } from 'react';
-import './staff.css';
+import react, { useState, useEffect, useContext } from 'react';
+import './Staff.css';
 import { IoMdCheckmarkCircle } from "react-icons/io";
+import Navbar from '../components/Navbar';
+import { AdminContext } from '../context/AdminContextProvider';
 
-import VerifiedStaffView from "./VeriAndUnverified/VerifiedStaffView";
+
 function Staff() {
-    const [showReview, setShowReview] = useState(false);
+  const { navigate } = useContext(AdminContext);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   
-  const handleReviewClick = (customer) => {
-    setSelectedCustomer(customer);
-    setShowReview(true);
-  };
-
-  const handleCloseReview = () => {
-    setShowReview(false);
-    setSelectedCustomer(null);
-  };
-  if (showReview) {
-    return <VerifiedStaffView
-      customer={selectedCustomer} 
-      onClose={handleCloseReview} 
-    />;
-  }
   const customers = [
     {
       id: 1,
@@ -40,7 +27,9 @@ function Staff() {
   ];
 
   return (
-    <div className="verified-customer-container">
+    <>
+    <Navbar TitleName="Staff"/>
+      <div className="verified-customer-container">
       <div className="card">
         <table className="request-table" role="table" aria-label="Verified customers">
           <thead>
@@ -70,7 +59,7 @@ function Staff() {
                   <button 
                     className="btn btn-review" 
                     type="button"
-                    onClick={() => handleReviewClick(customer)}
+                    onClick={() => handleReviewClick()}
                   >
                     Review
                   </button>
@@ -81,6 +70,7 @@ function Staff() {
         </table>
       </div>
     </div>
+    </>
   );
 }
 

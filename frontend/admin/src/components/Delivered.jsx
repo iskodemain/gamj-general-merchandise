@@ -3,6 +3,7 @@ import { assets } from "../assets/assets.js";
 import "./Delivered.css";
 import ViewAll from "./ViewAll";
 import { FaTrashCan } from "react-icons/fa6";
+import Navbar from "./Navbar.jsx";
 
 
 const sampleOrders = [
@@ -51,7 +52,9 @@ export default function Delivered() {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   return (
-    <div className="pending-page">
+    <>
+      <Navbar TitleName="Delivered Orders"/>
+      <div className="pending-page">
       <header className="pending-header-row">
         {/* keep top white design, notif, logout, etc. (these live outside this component in your layout) */}
       </header>
@@ -155,5 +158,6 @@ export default function Delivered() {
         </div>
       )}
     </div>
+    </>
   );
 }
