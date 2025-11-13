@@ -41,7 +41,7 @@ function Products() {
             <div className="product-card" onClick={() => navigate("/products/totalproduct")}>
               <div className="card-header">
                 <img src={assets.total_product_icon} className="card-icon" />
-                <h3 className="card-title">Total Product</h3>
+                <h3 className="card-title">Total Products</h3>
               </div>
               <hr className="card-divider" />
               <div className="card-content">

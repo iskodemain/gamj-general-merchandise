@@ -14,6 +14,7 @@ import multer from 'multer';
 import { Server } from 'socket.io';
 import http from 'http';
 import adminRouter from './routes/admin/adminRoute.js';
+import adminProductRouter from './routes/admin/adminProductRoute.js';
 
 // APP CONFIG
 const app = express();
@@ -49,6 +50,7 @@ app.use('/api/paypal', paypalRouter);
 
 // ADMIN ROUTES
 app.use('/api/admin', adminRouter);
+app.use('/api/product', adminProductRouter);
 
 
 // TEST
