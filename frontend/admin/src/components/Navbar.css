@@ -52,10 +52,8 @@
 
 .navbar-main {
   margin-top: 2rem;
-  
   box-shadow: 0px -1px 5px rgba(0, 0, 0, 0.086);
   border-bottom: 1px solid #D5D5D5;
-
   width: 100%;
   background-color: #EFFFF1;
 }
@@ -70,9 +68,10 @@
 
 .navbar-title {
   font-family: "Inter", sans-serif;
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 700;
   color: #383737;
+  white-space: nowrap;
 }
 
 .navbar-icons {
@@ -92,8 +91,6 @@
   opacity: 0.8;
 }
 
-
-
 .navbar-content {
   padding: 20px 32px;
 }
@@ -101,4 +98,90 @@
 .navbar-placeholder {
   font-size: 1rem;
   color: #333;
+}
+
+/* ========================= */
+/* 📱 RESPONSIVE STYLES */
+/* ========================= */
+
+/* Medium screens (Tablet) */
+@media (max-width: 768px) {
+  .navbar-top-row {
+    padding: 0 20px;
+    height: 56px;
+  }
+
+  .navbar-title {
+    font-size: 1.6rem;
+  }
+
+  .navbar-icons {
+    gap: 14px;
+  }
+
+  .navbar-icon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* Small screens (Phones - 320px and above) */
+@media (max-width: 525px) {
+  .navbar-top-row {
+    padding: 0 12px;
+    height: 54px;
+  }
+
+  .navbar-title {
+    font-size: 1.2rem;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .navbar-icons {
+    gap: 10px;
+  }
+
+  .navbar-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .navbar-sidebar-toggle {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Extra small (Minimum width: 320px) */
+@media (max-width: 320px) {
+  .navbar-top-row {
+    padding: 0 8px;
+    height: 50px;
+    gap: 4px;
+  }
+
+  .navbar-title {
+    font-size: 1rem;
+    font-weight: 600;
+    max-width: 120px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .navbar-icons {
+    gap: 6px;
+  }
+
+  .navbar-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .navbar-sidebar-toggle {
+    width: 28px;
+    height: 28px;
+  }
 }

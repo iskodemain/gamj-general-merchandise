@@ -1,80 +1,105 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './ProductCategory.css';
 import { FaPlus, FaTrash, FaArrowLeft } from 'react-icons/fa';
+import { AdminContext } from '../../context/AdminContextProvider';
+import Navbar from '../Navbar';
 
 function ProductCategory({ onBack }) {
-  const [categories, setCategories] = useState(['PPE', '']);
+  const { productCategory } = useContext(AdminContext);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    if (productCategory && Array.isArray(productCategory)) {
+      setCategories(productCategory);
+    }
+  }, [productCategory]);
+
+  const addNewCategory = () => {
+    const newCategory = {
+      ID: Date.now(),
+      categoryId: '',
+      categoryName: '',
+      createAt: new Date().toISOString(),
+    };
+    setCategories((prev) => [...prev, newCategory]);
+  };
 
   const updateCategory = (index, value) => {
-    setCategories(prev => {
+    setCategories((prev) => {
       const copy = [...prev];
-      copy[index] = value;
+      copy[index].categoryName = value;
       return copy;
     });
   };
 
-  const addNewCategory = () => {
-    setCategories(prev => [...prev, '']);
-  };
-
   const deleteCategory = (index) => {
-    setCategories(prev => prev.filter((_, i) => i !== index));
+    setCategories((prev) => prev.filter((_, i) => i !== index));
   };
 
   const deleteAll = () => {
-    setCategories(['']);
+    setCategories([]);
   };
 
   const saveChanges = () => {
-    // replace with real save logic (API call etc.)
-    console.log('Saved categories:', categories.filter(Boolean));
-    alert('Categories saved');
+    console.log('Categories to save:', categories);
+    alert('Changes saved (simulation)');
   };
 
   return (
-    <div className="plc-container">
-      <div className="plc-card">
-        <div className="plc-header">
-          <div className="plc-header-left">
-            {onBack && (
-              <button className="plc-back" onClick={onBack} aria-label="Back">
-                <FaArrowLeft />
-              </button>
-            )}
-            <h1 className="plc-title">All Product Categories</h1>
+    <>
+      <Navbar TitleName="List of Product Categories" />
+      <div className="category-container">
+        <div className="category-card">
+          <div className="category-header">
+            <div className="category-header-left">
+              {onBack && (
+                <button className="category-back" onClick={onBack} aria-label="Back">
+                  <FaArrowLeft />
+                </button>
+              )}
+              <h1 className="category-title">All Product Categories</h1>
+            </div>
+
+            <button className="category-add-btn" onClick={addNewCategory} aria-label="Add New">
+              <FaPlus /> <span className="category-add-text">Add New</span>
+            </button>
           </div>
 
-          <button className="plc-add-btn" onClick={addNewCategory} aria-label="Add New">
-            <FaPlus /> <span className="plc-add-text">Add New</span>
-          </button>
-        </div>
+          <div className="category-list">
+            {categories.length > 0 ? (
+              categories.map((cat, idx) => (
+                <div className="category-row" key={cat.ID || idx}>
+                  <input
+                    className="category-input"
+                    value={cat.categoryName}
+                    placeholder="Enter category name"
+                    onChange={(e) => updateCategory(idx, e.target.value)}
+                  />
+                  <button
+                    className="category-delete-icon"
+                    onClick={() => deleteCategory(idx)}
+                    aria-label={`Delete category ${cat.categoryName}`}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="category-empty">No categories found.</p>
+            )}
+          </div>
 
-        <div className="plc-list">
-          {categories.map((cat, idx) => (
-            <div className="plc-row" key={idx}>
-              <input
-                className="plc-input"
-                value={cat}
-                placeholder={idx === 0 ? 'PPE' : 'New category'}
-                onChange={(e) => updateCategory(idx, e.target.value)}
-              />
-              <button
-                className="plc-delete-icon"
-                onClick={() => deleteCategory(idx)}
-                aria-label={`Delete category ${idx + 1}`}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <div className="plc-actions">
-          <button className="plc-save-btn" onClick={saveChanges}>Save Changes</button>
-          <button className="plc-delete-all-btn" onClick={deleteAll}>Delete All</button>
+          <div className="category-actions">
+            <button className="category-save-btn" onClick={saveChanges}>
+              Save Changes
+            </button>
+            <button className="category-delete-all-btn" onClick={deleteAll}>
+              Delete All
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
