@@ -1,7 +1,6 @@
 import express from 'express';
 import { addProduct, fetchAllProducts, fetchVariantName, fetchProductVariantValues, fetchProductCategory, addProductCategory, fetchProductVariantCombination } from '../controllers/customerProductController.js';
 
-import adminAuth from '../middleware/customerAuth.js'
 import upload from '../middleware/multer.js';
 
 const productRouter = express.Router();

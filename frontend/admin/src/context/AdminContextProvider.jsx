@@ -1,5 +1,5 @@
 import axios from "axios"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
@@ -17,6 +17,55 @@ const AdminContextProvider = (props) => {
   const [loginToken, setLoginToken] = useState(() => localStorage.getItem('adminLoginToken') || '');
   const [loginIdentifier, setLoginIdentifier] = useState(() => sessionStorage.getItem('adminLoginIdentifier') || '');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [productCategory, setProductCategory] = useState([]);
+
+
+  /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
+  const fetchAllProducts = async () => {
+    if (token) {
+      try {
+        const response = await axios.get(backendUrl + "/api/product/list", {
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        });;
+        if (response.data.success) {
+            setProducts(response.data.products);
+        } 
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+  useEffect(() => {
+    if (token) {
+      fetchAllProducts();
+    }
+  }, [token]);
+
+  /*---------------------------FETCH PRODUCT CATEGORY-----------------------------*/
+  const fetchProductCategory = async () => {
+    if (token) {
+      try {
+        const response = await axios.get(backendUrl + "/api/product/category", {
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        });;
+        if (response.data.success) {
+            setProductCategory(response.data.productCategory);
+        } 
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+  useEffect(() => {
+    if (token) {
+      fetchProductCategory();
+    }
+  }, [token]);
 
 
   /*--------------------------ADMIN LOGIN---------------------------*/
@@ -80,7 +129,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory
   }  
   return (
     <AdminContext.Provider value={value}>

@@ -7,7 +7,7 @@ import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 
 // ALL PRODUCTS 
-// Add Product
+// Add Product ---- ADMIN PART
 export const addProductService = async (categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination) => {
     try {
 
@@ -308,7 +308,7 @@ export const addProductService = async (categoryId, productName, productDescript
     }
 }
 
-// Fetch All Product
+// Fetch All Product 
 export const fetchAllProductsService = async () => {
     try {
         const products = await Products.findAll({});
@@ -325,6 +325,33 @@ export const fetchAllProductsService = async () => {
             products
         };
 
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+// Product Category (ADD) ---- ADMIN PART
+export const addProductCategoryService = async (categoryName) => {
+    try {
+        if (!categoryName) {
+            return {
+                success: false,
+                message: "Category name is required."
+            };
+        }
+        const newCategory = await Category.create({ 
+                categoryName 
+            }, {
+                fields: [
+                    'categoryName'
+                ]
+            });
+        return {
+            success: true,
+            message: "Category added successfully.",
+            category: newCategory
+        };
     } catch (error) {
         console.log(error);
         throw new Error(error.message);
@@ -423,29 +450,3 @@ export const fetchProductCategoryService = async () => {
     }
 }
 
-// Product Category (ADD)
-export const addProductCategoryService = async (categoryName) => {
-    try {
-        if (!categoryName) {
-            return {
-                success: false,
-                message: "Category name is required."
-            };
-        }
-        const newCategory = await Category.create({ 
-                categoryName 
-            }, {
-                fields: [
-                    'categoryName'
-                ]
-            });
-        return {
-            success: true,
-            message: "Category added successfully.",
-            category: newCategory
-        };
-    } catch (error) {
-        console.log(error);
-        throw new Error(error.message);
-    }
-}
