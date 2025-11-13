@@ -45,7 +45,7 @@ function Verification() {
         <div className="note-identifier-ctn">
           <div className="note-title-idf">Enter the verification code sent to</div>
           <div className="verification-highlight">
-            {loginIdentifier || 'gaga@gmail.com'} 
+            {loginIdentifier} 
           </div>
         </div>
         <form className="verification-form" onSubmit={handleSubmit}>

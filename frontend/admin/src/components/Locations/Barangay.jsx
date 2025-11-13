@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./barangay.css";
+import "./Barangay.css";
 
 function Barangay({ onBack }) {
   const [selectedProvince, setSelectedProvince] = useState("Cavite");

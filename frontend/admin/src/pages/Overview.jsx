@@ -1,20 +1,18 @@
 // src/components/Overview.jsx
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets.js";
 import Navbar from "../components/Navbar.jsx";
 import "./Overview.css";
+import { AdminContext } from "../context/AdminContextProvider.jsx";
 
 function Overview() {
+  const { navigate } = useContext(AdminContext);
   const [openOrders, setOpenOrders] = useState(true);
   const [openUsers, setOpenUsers] = useState(true);
 
-  const navigate = (view) => {
-    console.log(`Navigate to ${view}`);
-  };
-
   return (
     <>
-      <Navbar />
+      <Navbar TitleName="Overview"/>
 
       <main className="overview-container">
         {/* ===== ORDERS SECTION ===== */}
@@ -35,28 +33,28 @@ function Overview() {
                   title="Pending Orders"
                   number="5"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("pending")}
+                  onClick={() => navigate("/pending")}
                 />
                 <OverviewCard
                   color="teal"
                   title="Processing Orders"
                   number="10"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("processing")}
+                  onClick={() => navigate("/processing")}
                 />
                 <OverviewCard
                   color="blue"
                   title="Out for Delivery Orders"
                   number="4"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("outfordelivery")}
+                  onClick={() => navigate("/outfordelivery")}
                 />
                 <OverviewCard
                   color="green"
                   title="Delivered Orders"
                   number="48"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("delivered")}
+                  onClick={() => navigate("/delivered")}
                 />
               </div>
 
@@ -66,28 +64,28 @@ function Overview() {
                   title="All Orders"
                   number="67"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("allorders")}
+                  onClick={() => navigate("/allorders")}
                 />
                 <OverviewCard
                   icon={assets.order_cancellation_icon}
-                  title="Order Cancellations"
+                  title="Order Cancellation"
                   number="2"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("cancelorder")}
+                  onClick={() => navigate("/cancelorder")}
                 />
                 <OverviewCard
                   icon={assets.returnandrefund_icon}
                   title="Return and Refund"
                   number="2"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("returnandrefund")}
+                  onClick={() => navigate("/returnandrefund")}
                 />
                 <OverviewCard
                   icon={assets.delivery_location_icon}
                   title="Delivery Locations"
                   number="2"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("locations")}
+                  onClick={() => navigate("/locations")}
                 />
               </div>
             </>
@@ -112,28 +110,28 @@ function Overview() {
                   title="Verified Customers"
                   number="1"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("verifiedcustomers")}
+                  onClick={() => navigate("/verifiedcustomers")}
                 />
                 <OverviewCard
                   icon={assets.unverified_user_icon}
                   title="Unverified Customers"
                   number="2"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("unverifiedcustomers")}
+                  onClick={() => navigate("/unverifiedcustomers")}
                 />
                 <OverviewCard
                   icon={assets.verified_staff_icon}
                   title="Verified Staff"
                   number="2"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("verifiedstaff")}
+                  onClick={() => navigate("/verifiedstaff")}
                 />
                 <OverviewCard
                   icon={assets.unverified_staff_icon}
                   title="Unverified Staff"
                   number="2"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("unverifiedstaff")}
+                  onClick={() => navigate("/unverifiedstaff")}
                 />
               </div>
 
@@ -143,7 +141,7 @@ function Overview() {
                   title="All Users"
                   number="67"
                   date="Updated: Sep 25, 2025"
-                  onClick={() => navigate("allusers")}
+                  onClick={() => navigate("/alluser")}
                 />
               </div>
             </>

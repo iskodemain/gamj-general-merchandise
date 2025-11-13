@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { toast } from "react-toastify";
 
-function Navbar() {
+function Navbar({TitleName}) {
     const { isSidebarOpen, setIsSidebarOpen, setToken, toastSuccess, navigate } = useContext(AdminContext);
 
     const toggleSidebar = () => {
@@ -38,15 +38,12 @@ function Navbar() {
               <span className="arrow"></span>
             </button>
 
-            <span className="navbar-title">Overview</span>
+            <span className="navbar-title">{TitleName}</span>
           </div>
 
           <div className="navbar-icons">
-            <img
-              src={assets.notification_icon}
-              alt="Notifications"
-              className="navbar-icon"
-            />
+            <button onClick={() => navigate("/settings")}><img src={assets.settings_icon} alt="Setings"className="navbar-icon"/></button>
+            <button onClick={() => navigate("/notifications")}><img src={assets.notification_icon} alt="Notifications"className="navbar-icon"/></button>
             <button onClick={() => logout()}><img src={assets.logout_icon} alt="Logout" className="navbar-icon"/></button>
           </div>
         </div>

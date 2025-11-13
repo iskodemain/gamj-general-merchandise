@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './adminCancel.css';
+import './AdminCancel.css';
 
 function AdminCancel(){
     const [reason, setReason] = useState(

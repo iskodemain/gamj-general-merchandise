@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './unverifiedCustomerReview.css';
+import './UnverifiedCustomerReview.css';
 import { FaRegEye, FaRegEyeSlash, FaFileDownload } from "react-icons/fa";
 import { FaUserLarge } from "react-icons/fa6";
 

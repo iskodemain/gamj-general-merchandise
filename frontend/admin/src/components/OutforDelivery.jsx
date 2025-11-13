@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { assets } from "../assets/assets.js";
 import "./OutforDelivery.css";
 import ViewAll from "./ViewAll";
+import Navbar from "./Navbar.jsx";
+
 
 const sampleOrders = [
   {
@@ -49,7 +51,9 @@ export default function OutforDelivery() {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   return (
-    <div className="pending-page">
+    <>
+    <Navbar TitleName="Out for Delivery Orders"/>
+      <div className="pending-page">
       <header className="pending-header-row">
         {/* keep top white design, notif, logout, etc. (these live outside this component in your layout) */}
       </header>
@@ -143,5 +147,6 @@ export default function OutforDelivery() {
         </div>
       )}
     </div>
+    </>
   );
 }

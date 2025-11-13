@@ -2,10 +2,9 @@ import React, { useContext } from "react";
 import "./Sidebar.css";
 import { assets } from "../assets/assets.js";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
-import { IoIosArrowDroprightCircle } from "react-icons/io";
 
 function Sidebar({ currentView, onNavigate }) {
-    const { setIsSidebarOpen } = useContext(AdminContext);
+    const { setIsSidebarOpen, navigate } = useContext(AdminContext);
 
   return (
     <aside className="sidebar">
@@ -32,37 +31,37 @@ function Sidebar({ currentView, onNavigate }) {
           icon={assets.overview_icon}
           label="Overview"
           active={currentView === "overview"}
-          onClick={() => onNavigate("/overview")}
+          onClick={() => {navigate("/overview"); setIsSidebarOpen((prev) => !prev)}}
         />
         <MenuItem
           icon={assets.profile_icon}
           label="Profile"
           active={currentView === "profile"}
-          onClick={() => onNavigate("/profile")}
+          onClick={() => {navigate("/profile"); setIsSidebarOpen((prev) => !prev)}}
         />
         <MenuItem
           icon={assets.staff_icon}
           label="Staff"
           active={currentView === "staff"}
-          onClick={() => onNavigate("/staff")}
+          onClick={() => {navigate("/staff"); setIsSidebarOpen((prev) => !prev)}}
         />
         <MenuItem
           icon={assets.notification_icon}
           label="Notifications"
           active={currentView === "notifications"}
-          onClick={() => onNavigate("/notifications")}
+          onClick={() => {navigate("/notifications"); setIsSidebarOpen((prev) => !prev)}}
         />
         <MenuItem
           icon={assets.gamj_shop_icon}
           label="GAMJ Shop"
           active={currentView === "gamjshop"}
-          onClick={() => onNavigate("/gamjshop")}
+          onClick={() => {navigate("/gamjshop"); setIsSidebarOpen((prev) => !prev)}}
         />
         <MenuItem
           icon={assets.products_icon}
           label="Products"
           active={currentView === "products"}
-          onClick={() => onNavigate("/products")}
+          onClick={() => {navigate("/products"); setIsSidebarOpen((prev) => !prev)}}
         />
       </nav>
     </aside>

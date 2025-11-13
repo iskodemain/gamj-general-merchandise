@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './outOfStock.css';
+import './OutOfStock.css';
 import { FaArrowLeft, FaTrash, FaSearch } from 'react-icons/fa';
 
 function OutOfStock({ onBack }) {
