@@ -21,6 +21,27 @@ const AdminContextProvider = (props) => {
   const [productCategory, setProductCategory] = useState([]);
   const [variantName, setVariantName] = useState([]);
   const [productVariantValues, setProductVariantValues] = useState([]);
+  const [productVariantCombination, setProductVariantCombination] = useState([]);
+
+  /*---------------------------FETCH ALL PRODUCT VARIANT COMBINATIONS-----------------------------*/
+    const fetchProductVariantCombination = async () => {
+        if (token) {
+          try {
+            const response = await axios.get(backendUrl + "/api/product/product-variant-combination");
+            if (response.data.success) {
+                setProductVariantCombination(response.data.productVariantCombination);
+            } 
+          } catch (error) {
+              console.log(error);
+              toast.error(error.message, { ...toastError });
+          }
+        }
+    };
+    useEffect(() => {
+        if (token) {
+          fetchProductVariantCombination();
+        }
+    }, [token]);
 
   /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
     const fetchProductVariantValues = async () => {
@@ -41,8 +62,6 @@ const AdminContextProvider = (props) => {
       fetchProductVariantValues();
     }
   }, [token]);
-
-  console.log(productVariantValues);
 
   /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
     const fetchVariantName = async () => {
@@ -194,7 +213,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination
   }  
   return (
     <AdminContext.Provider value={value}>

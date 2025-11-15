@@ -452,3 +452,34 @@ export const fetchProductVariantValuesService = async (adminId) => {
         throw new Error(error.message);
     }
 }
+
+// Product Variant Combination (FETCH)
+export const fetchProductVariantCombinationService = async (adminId) => {
+    try {
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+        
+        const productVariantCombination = await ProductVariantCombination.findAll({});
+        if (productVariantCombination.length === 0) {
+            return {
+                success: true,
+                message: "No product variant combinations found.",
+                productVariantCombination: []
+            };
+        }
+
+        return {
+            success: true,
+            productVariantCombination
+        };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
