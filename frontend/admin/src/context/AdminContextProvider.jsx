@@ -20,6 +20,29 @@ const AdminContextProvider = (props) => {
   const [products, setProducts] = useState([]);
   const [productCategory, setProductCategory] = useState([]);
   const [variantName, setVariantName] = useState([]);
+  const [productVariantValues, setProductVariantValues] = useState([]);
+
+  /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
+    const fetchProductVariantValues = async () => {
+        if (token) {
+          try {
+            const response = await axios.get(backendUrl + "/api/product/product-variant-values");
+            if (response.data.success) {
+                setProductVariantValues(response.data.productVariantValues);
+            }
+          } catch (error) {
+              console.log(error);
+              toast.error(error.message, { ...toastError });
+          }
+        }
+    };
+    useEffect(() => {
+    if (token) {
+      fetchProductVariantValues();
+    }
+  }, [token]);
+
+  console.log(productVariantValues);
 
   /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
     const fetchVariantName = async () => {
@@ -40,8 +63,6 @@ const AdminContextProvider = (props) => {
       fetchVariantName();
     }
   }, [token]);
-
-  console.log(variantName)
 
   /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
   const addProduct = async (formData) => {
