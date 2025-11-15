@@ -1,0 +1,535 @@
+
+
+
+.ap-heading { 
+  font-family: "Outfit", sans-serif;
+  margin-top: 0.8rem;
+  font-size: 20px; 
+  color: #353535; 
+  font-weight: 600;
+  
+}
+
+.ap-upload-grid {
+  display:flex;
+  gap:12px;
+  margin-top:1rem;
+  flex-wrap:wrap;
+  margin-bottom: 2rem;
+}
+
+
+.ap-upload-slot {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  border-radius: 8px;
+  border: 2px dashed #d7e8db;
+  background: #fafdfb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  overflow:hidden;
+}
+
+.ap-upload-placeholder { 
+  text-align:center; 
+  color:#86b57f; 
+}
+.ap-plus { font-size:20px; color:#43a047; }
+.ap-upload-text { font-size:11px; color:#86b57f; margin-top:6px; }
+
+/* hide native file input and use label as click area */
+.ap-file-input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+/* preview image */
+.ap-preview { width:100%; height:100%; object-fit:cover; display:block; }
+
+
+/* remove image button */
+.ap-remove-image {
+  position:absolute; top:6px; right:6px;
+  background:#fff; border-radius:6px; padding:4px;
+  border:none; box-shadow:0 2px 6px rgba(0,0,0,0.08); cursor:pointer;
+}
+
+
+/* Page background & container */
+.ap-page {
+  background: #ecf9ef; /* light mint */
+  min-height: 100vh;
+  padding: 28px;
+  font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #222;
+}
+
+.ap-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Header */
+.ap-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ap-back {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+.ap-back:hover { background: rgba(0,0,0,0.03); }
+.ap-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Card */
+.ap-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 14px rgba(33,33,33,0.06);
+  margin-bottom: 18px;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* Section title */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Upload grid */
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.upload-box {
+  border: 2px dashed #d9d9d9;
+  border-radius: 6px;
+  padding: 18px;
+  text-align: center;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  background: #fafafa;
+}
+.upload-box:hover {
+  border-color: #42a85a;
+  background: #f5fff5;
+}
+.upload-icon { font-size: 20px; color: #9aa0a6; margin-bottom: 6px; }
+.upload-text { font-size: 12px; color: #838b8a; line-height: 1.1; }
+.upload-ok { color: #2e7d32; font-size: 12px; margin-top: 6px; font-weight: 600; }
+
+/* hide native file input */
+.hidden-input { display: none; }
+
+/* Forms */
+.form-group { margin-bottom: 12px; display: flex; flex-direction: column; }
+.form-group label { 
+  font-size: 1rem; 
+  margin-bottom: 6px; 
+  font-weight: 600; 
+  color: #353535; 
+}
+.input, .select, .textarea {
+  border: 1px solid #d6d6d6;
+  padding: 13px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  background: #f9fafb;
+}
+
+
+.input:focus, .select:focus, .textarea:focus { border-color: #3fa34d; box-shadow: 0 0 0 3px rgba(63,163,77,0.06); }
+
+.textarea { 
+  min-height: 15rem; 
+  resize: vertical; 
+}
+
+.form-group .ap-pd {
+  height: 7rem;
+  resize: none; 
+}
+
+/* layout helpers */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: start; }
+
+.exp-date-set {
+  margin-top: -10px;
+}
+
+/* checkbox and tiny layout */
+.checkbox-row { 
+  margin-top: 8px;
+}
+.checkbox-inline { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+
+/* Variant card */
+.variant-card { 
+  background: #fbfff9; 
+  border: 1px solid #dfeee0; 
+  padding: 18px; 
+}
+
+.variant-combo-card {
+  background: #fbfff9; 
+  border: 1px solid #dfeee0; 
+  padding: 18px; 
+}
+
+.variant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 12px; }
+.link-btn { background: transparent; border: none; color: #2f9e44; cursor: pointer; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; }
+
+/* variant names */
+.variant-names-box { background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 6px; margin-bottom: 12px; }
+
+.variant-name-row { 
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; 
+  margin-inline: 8px;
+  margin-top: 0.3rem;
+ }
+
+.variant-name-row .vn-title {
+  font-weight: 600;
+  color: #353535;
+}
+
+.variant-name-row:last-child { border-bottom: none; }
+.btn-icon { background: transparent; border: none; color: #e04b4b; cursor: pointer; padding: 6px; }
+
+/* variant values set */
+.variant-values-set { 
+  background: #fff; 
+  border-radius: 6px; 
+  padding: 14px; 
+  margin-bottom: 1rem; 
+  position: relative;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.275);
+}
+
+
+
+.variant-values-set .variant-set-header { 
+  display: flex; 
+  justify-content: flex-end; 
+  position: absolute;
+  top: 16px;
+  right: 19px;
+}
+
+.btn-remove { 
+  color: #e04b4b; 
+  border: none; 
+  cursor: pointer;
+}
+
+.btn-remove .btn-remove-icon {
+  font-size: 1rem;
+}
+
+
+
+/* each variant value */
+.variant-value-row { 
+  margin-inline: 8px; 
+  margin-top: 1.5rem;
+  border-bottom: 1px dashed #f2f2f2; 
+  display: block; 
+}
+.small-title { 
+  font-weight: 600; 
+  margin-bottom: 8px; 
+  color: #353535; 
+  font-size: 1rem; 
+}
+
+/* actions next to value */
+.value-actions { display: flex; align-items: flex-end; gap: 12px; margin-top: 8px; }
+.small-label { 
+  font-size: 1rem; 
+  margin-bottom: 6px; 
+  display: block;
+  font-weight: 600;
+  color: #353535; 
+}
+.btn { padding: 8px 12px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; }
+.btn-primary { background: #2f9e44; color: #fff; }
+.btn-primary:hover { background: #27823b; }
+
+.vv-btn-ctn {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.btn-remove-vv-solo {
+  background: #ff4d4f; 
+  color: #fff;
+}
+
+.btn-remove-vv-double {
+  background-color: none;
+  color: #ff4d4f;
+  cursor: pointer;
+}
+
+
+
+.combo-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+
+.combo-btn-delete { 
+  background: #ff4d4f; 
+  color: #fff;
+  padding: 0.3rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+
+.combo-btn-delete:hover { 
+  background: #e04242; 
+}
+
+.combo-btn-cancel { 
+  background: white; 
+  border: 2px solid #CBCBCB;
+  color: #353535;
+  padding: 0.3rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.combo-btn-cancel:hover {
+  background: rgb(245, 245, 245); 
+}
+
+
+
+.btn-new { display: inline-flex; align-items: center; gap: 8px; }
+.avv-btn { 
+  cursor: pointer;
+  width: 100%; 
+  padding: 10px; 
+  border: 2px solid #43A047;
+  color: #2f9e44; 
+  border-radius: 6px; 
+}
+
+.avv-btn:hover {
+  background-color: #68be6c15;
+  color: #2f9e44; 
+}
+
+.combo-delete-single {
+  color: #EA4335;
+  cursor: pointer;
+}
+
+.combo-avc-btn {
+  cursor: pointer;
+  width: 100%; 
+  padding: 10px; 
+  border: 2px solid #43A047;
+  color: #2f9e44; 
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.combo-avc-btn:hover {
+  background-color: #68be6c15;
+  color: #2f9e44; 
+}
+
+/* combo card */
+.combo-card { 
+  background: #fff;  
+  border-radius: 6px; 
+  padding: 14px; 
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.275);
+}
+
+.combo-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 12px; 
+}
+
+.combo-actions { 
+  display: flex; 
+  gap: 8px; 
+}
+
+.combo-btn-deleteall {
+  background-color: #EA4335;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.combo-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  margin-top: 1.5rem;
+}
+.combo-row { 
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+/* default state */
+.combo-row {
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+
+/* Disable inputs only */
+.combo-row.disabled input {
+  background-color: #e6e6e6 ;
+  cursor: not-allowed ;
+  pointer-events: none;
+}
+
+/* allow toggle to work even when disabled */
+.combo-row.disabled .toggle-col,
+.combo-row.disabled .toggle-col * {
+  pointer-events: auto ;
+  opacity: 1 ;
+}
+
+
+
+.combo-row .select-col { 
+  display: flex; 
+  justify-content: center;
+}
+
+.combo-col { 
+  display: flex;
+  flex-direction: column;
+}
+
+.combo-col input {
+  width: 100%;
+}
+
+.combo-small {
+  width: 300px;
+}
+
+.combo-big {
+  width: 100%;
+}
+
+/* switch styling */
+.switch { 
+  position: relative; 
+  display: inline-block; 
+  width: 44px; 
+  height: 24px; 
+}
+
+.switch input { 
+  opacity: 0; 
+  width: 0; 
+  height: 0; 
+}
+
+.slider {
+  position: absolute; 
+  cursor: pointer; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  background-color: #ddd; 
+  border-radius: 24px; 
+  transition: .2s;
+}
+.slider:before {
+  position: absolute; 
+  content: ""; 
+  height: 18px; 
+  width: 18px; 
+  left: 3px; 
+  top: 3px;
+  background-color: white; 
+  border-radius: 50%; 
+  transition: .2s;
+}
+.switch input:checked + .slider { 
+  background-color: #2f9e44; 
+}
+
+.switch input:checked + .slider:before { 
+  transform: translateX(20px); 
+}
+
+/* toggle list and submit */
+.toggle-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+  margin-bottom: 12px; 
+}
+
+.toggle-row {
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  font-weight: 500; 
+  color: #444; 
+}
+
+.ap-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  margin-top: 8px; 
+}
+
+.btn-submit { 
+  background: #2f9e44; 
+  color: #fff; 
+  width: 220px; 
+  padding: 12px; 
+  border-radius: 6px; 
+  font-weight: 700; 
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .upload-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .combo-row { grid-template-columns: 36px 1fr 100px 80px 56px; }
+  .ap-container { padding: 0 16px; }
+}

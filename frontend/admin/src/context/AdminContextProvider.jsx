@@ -19,6 +19,29 @@ const AdminContextProvider = (props) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [productCategory, setProductCategory] = useState([]);
+  const [variantName, setVariantName] = useState([]);
+
+  /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
+    const fetchVariantName = async () => {
+        if (token) {
+          try {
+            const response = await axios.get(backendUrl + "/api/product/variant-name");
+            if (response.data.success) {
+                setVariantName(response.data.variantName);
+            }
+          } catch (error) {
+              console.log(error);
+              toast.error(error.message, { ...toastError });
+          }
+        }
+    };
+    useEffect(() => {
+    if (token) {
+      fetchVariantName();
+    }
+  }, [token]);
+
+  console.log(variantName)
 
   /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
   const addProduct = async (formData) => {
