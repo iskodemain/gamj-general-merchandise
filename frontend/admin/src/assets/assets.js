@@ -28,6 +28,7 @@ import processing_orders_icon from './processing-orders-icon.png';
 import outfordelivery_orders_icon from './outfordelivery-orders-icon.png';
 import delivered_orders_icon from './delivered-orders-icon.png';
 import settings_icon from './settings-icon.png'
+import image_upload_icon from './image-upload-icon.png'
 
 // NEW ADDED
 import add_product_icon from './add-product-icon.png';
@@ -38,6 +39,7 @@ import low_stock_product_icon from './low-stock-product-icon.png';
 import out_of_stock_product_icon from './out-of-stock-product-icon.png';
 
 export const assets = {
+    image_upload_icon,
     settings_icon,
     add_product_icon,
     product_category_icon,

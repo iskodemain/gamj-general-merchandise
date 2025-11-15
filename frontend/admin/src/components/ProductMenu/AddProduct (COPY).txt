@@ -10,7 +10,6 @@ import Loading from '../Loading.jsx'
 function AddProduct() {
   const { navigate, productCategory, toastError, addProduct } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
-  
 
   // basic product state
   const [productName, setProductName] = useState('');
@@ -55,21 +54,6 @@ function AddProduct() {
     }
   }, [variantValuesSets.length, hasVariants]);
 
-
-  // NEW: When product has variants but NO combinations → sum stock of variant values
-useEffect(() => {
-  if (hasVariants && !hasVariantCombination) {
-    const firstSet = variantValuesSets[0] || [];
-
-    const total = firstSet.reduce((sum, val) => {
-      return sum + (parseInt(val.stock, 10) || 0);
-    }, 0);
-
-    setDisplayStock(String(total));
-  }
-}, [variantValuesSets, hasVariants, hasVariantCombination]);
-
-
   // When using combinations, total stock becomes sum of combo stocks
   useEffect(() => {
     if (hasVariants && hasVariantCombination) {
@@ -79,8 +63,6 @@ useEffect(() => {
       setDisplayStock(String(total));
     }
   }, [variantCombinations, hasVariants, hasVariantCombination]);
-
-
 
   // --- helpers
   const handleImageChange = (index, file) => {
@@ -234,27 +216,9 @@ useEffect(() => {
     return result;
   };
 
-  const handleDecimalInput = (raw) => {
-    if (raw === undefined || raw === null) return '';
-
-    // Allow digits + one decimal point
-    if (/^[0-9]*\.?[0-9]*$/.test(raw)) {
-      return raw;
-    }
-
-    // Reject invalid characters
-    return raw.slice(0, -1);
-  };
-
-
   // --- submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    let finalExpirationDate;
-    let finalVariantNames;
-    let finalVariantValues;
-    let finalVariantCombinations;
 
     const hasAtLeastOneImage = images.some(img => img !== null);
     if (!hasAtLeastOneImage) {
@@ -287,14 +251,41 @@ useEffect(() => {
       return; 
     }
 
+    const formData = new FormData();
+    formData.append('categoryId', Number(categoryId));
+    formData.append('productName', productName);
+    formData.append('productDescription', productDescription);
+    formData.append('productDetails', productDetails || '');
+    formData.append('price', displayPrice === '' ? '' : Number(displayPrice));
+    formData.append('stockQuantity', displayStock === '' ? '' : Number(displayStock));
+    formData.append('isBestSeller', isBestSeller);
+    formData.append('isActive', isActive);
+    formData.append('isOutOfStock', isOutOfStock);
+    formData.append('hasVariant', hasVariants);
+    formData.append('hasVariantCombination', hasVariantCombination);
+
+    // images as files (image1..image4)
+    images.forEach((img, idx) => {
+      if (img) formData.append(`image${idx + 1}`, img);
+    });
+
+    // expiration date only when NOT hasVariants
     if (!hasVariants && expirationDate.year && expirationDate.month && expirationDate.day) {
       const expDate = `${expirationDate.year}-${String(expirationDate.month).padStart(2, '0')}-${String(expirationDate.day).padStart(2, '0')}`;
-      finalExpirationDate = expDate;
+      formData.append('expirationDate', expDate);
     } else {
-      finalExpirationDate = null; 
+      formData.append('expirationDate', null);
     }
 
-    // If variants but NO combinations
+    // VARIANT cases
+    if (!hasVariants) {
+      console.log('Scenario 1: No variants');
+      console.log(Object.fromEntries(formData));
+      // send formData to backend with fetch/axios...
+      return;
+    }
+
+    // If variants but NO combinations: variantValues should include price & stock (choice B)
     if (hasVariants && !hasVariantCombination) {
       // Variant name cannot be empty
       const variantNameIsEmpty = variantNamesList.some(v => !v.name.trim());
@@ -346,10 +337,20 @@ useEffect(() => {
         };
       });
 
-      finalVariantNames = variantNames;
-      finalVariantValues = values
+      formData.append('variantNames', JSON.stringify(variantNames));
+      formData.append('productVariantValue', JSON.stringify(values));
+
+      console.log('Scenario 2: With variants, no combinations');
+      console.log({
+        ...Object.fromEntries(formData),
+        variantNames,
+        variantValues: values
+      });
+      // send formData...
+      return;
     }
 
+    // If variants AND combinations: variantValues should be flat array of {variantName, name} (no price/stock)
     if (hasVariants && hasVariantCombination) {
       // Check if user added at least ONE VALID combination row
       const hasAtLeastOneCombo = variantCombinations.some(
@@ -383,44 +384,27 @@ useEffect(() => {
         availability: !!combo.availability
       }));
 
-      finalVariantNames = variantNames;
-      finalVariantValues = flatVariantValues;
-      finalVariantCombinations = combos;
+      formData.append('variantNames', JSON.stringify(variantNames));
+      formData.append('productVariantValue', JSON.stringify(flatVariantValues));
+      formData.append('productVariantCombination', JSON.stringify(combos));
+
+      console.log('Scenario 3: With variants and combinations');
+      console.log({
+        ...Object.fromEntries(formData),
+        variantNames,
+        variantValues: flatVariantValues,
+        variantCombination: combos
+      });
+      // send formData...
+      return;
     }
-
-    const formData = new FormData();
-    formData.append('categoryId', Number(categoryId));
-    formData.append('productName', productName);
-    formData.append('productDescription', productDescription);
-    formData.append('productDetails', productDetails || '');
-    formData.append('price', displayPrice === '' ? '' : Number(displayPrice));
-    images[0] && formData.append("image1", images[0] || null);
-    images[1] && formData.append("image2", images[1] || null);
-    images[2] && formData.append("image3", images[2] || null);
-    images[3] && formData.append("image4", images[3] || null);
-    formData.append('stockQuantity', displayStock === '' ? '' : Number(displayStock));
-    formData.append('isBestSeller', isBestSeller);
-    formData.append('isActive', isActive);
-    formData.append('isOutOfStock', isOutOfStock);
-    formData.append('hasVariant', hasVariants);
-    formData.append('hasVariantCombination', hasVariantCombination);
-    formData.append('expirationDate', finalExpirationDate || '');
-    formData.append('variantNames', JSON.stringify(finalVariantNames || []));
-    formData.append('variantValues', JSON.stringify(finalVariantValues || []));
-    formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
-
-
-    
-
-    console.log("finalVariantNames:", finalVariantNames);
-    console.log("FormData:", Object.fromEntries(formData));
 
     setLoading(true);
     await addProduct(formData);
     setLoading(false);
+    // RESET ALL THE FIELDS
+    navigate('/products/totalproduct')
 
-    navigate('/products/totalproduct');
-    return; 
   };
 
   // --- render
@@ -520,7 +504,7 @@ useEffect(() => {
                     value={displayStock}
                     onChange={(e) => setDisplayStock(sanitizeNumber(e.target.value))}
                     placeholder="250"
-                    disabled={hasVariants}
+                    disabled={hasVariants && hasVariantCombination}
                     required
                   />
                 </div>
@@ -532,7 +516,7 @@ useEffect(() => {
                     type="text"
                     inputMode="numeric"
                     value={displayPrice}
-                    onChange={(e) => setDisplayPrice(handleDecimalInput(e.target.value))}
+                    onChange={(e) => setDisplayPrice(sanitizeNumber(e.target.value))}
                     placeholder="₱1000"
                     required
                   />
@@ -632,7 +616,7 @@ useEffect(() => {
                                   type="text"
                                   inputMode="numeric"
                                   value={value.price}
-                                  onChange={(e) => updateVariantValue(setIndex, valueIndex, "price", handleDecimalInput(e.target.value))}
+                                  onChange={(e) => updateVariantValue(setIndex, valueIndex, "price", sanitizeNumber(e.target.value))}
                                   placeholder='₱500'
                                 />
                               </div>
@@ -730,7 +714,7 @@ useEffect(() => {
                         </div>
 
                         <div className="combo-col combo-small">
-                          <input className="input" type="text" inputMode="numeric" value={combo.price} disabled={!combo.availability} onChange={(e) => updateVariantCombination(idx, 'price', handleDecimalInput(e.target.value))} placeholder="Price" />
+                          <input className="input" type="text" inputMode="numeric" value={combo.price} disabled={!combo.availability} onChange={(e) => updateVariantCombination(idx, 'price', sanitizeNumber(e.target.value))} placeholder="Price" />
                         </div>
 
                         <div className="combo-col combo-small">

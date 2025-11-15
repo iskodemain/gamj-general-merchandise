@@ -1,25 +1,25 @@
-import { addProductService, fetchAllProductsService, fetchVariantNameService, fetchProductVariantValuesService, fetchProductCategoryService, addProductCategoryService, fetchProductVariantCombinationService } from '../services/customerProductService.js';
+import {  fetchAllProductsService, fetchVariantNameService, fetchProductVariantValuesService, fetchProductCategoryService, addProductCategoryService, fetchProductVariantCombinationService } from '../services/customerProductService.js';
 
 
-// ALL PRODUCTS 
-export const addProduct = async (req, res) => {
-    try {
-        // const { ID } = req.user;
-        const image1 = req.files.image1?.[0];
-        const image2 = req.files.image2?.[0];
-        const image3 = req.files.image3?.[0];
-        const image4 = req.files.image4?.[0];
+// // ALL PRODUCTS 
+// export const addProduct = async (req, res) => {
+//     try {
+//         // const { ID } = req.user;
+//         const image1 = req.files.image1?.[0];
+//         const image2 = req.files.image2?.[0];
+//         const image3 = req.files.image3?.[0];
+//         const image4 = req.files.image4?.[0];
 
-        const {categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination} = req.body;
+//         const {categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination} = req.body;
 
-        const result = await addProductService(categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination);
+//         const result = await addProductService(categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination);
 
-        res.json(result);
-    } catch (error) {
-        console.log(error);
-        res.json({success: false, message:error.message})
-    }
-}
+//         res.json(result);
+//     } catch (error) {
+//         console.log(error);
+//         res.json({success: false, message:error.message})
+//     }
+// }
 
 export const fetchAllProducts = async (req, res) => {
     try {

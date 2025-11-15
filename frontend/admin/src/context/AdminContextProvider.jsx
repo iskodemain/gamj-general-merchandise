@@ -20,6 +20,27 @@ const AdminContextProvider = (props) => {
   const [products, setProducts] = useState([]);
   const [productCategory, setProductCategory] = useState([]);
 
+  /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
+  const addProduct = async (formData) => {
+    if (token) {
+      try {
+        const response = await axios.post(backendUrl + "/api/product/add", formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+        });;
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
 
   /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
   const fetchAllProducts = async () => {
@@ -129,7 +150,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct
   }  
   return (
     <AdminContext.Provider value={value}>
