@@ -1,7 +1,7 @@
 import express from 'express';
 import adminAuth from "../../middleware/adminAuth.js";
 
-import { fetchAllProducts, fetchProductCategory, addProduct, fetchVariantName, fetchProductVariantValues } from '../../controllers/admin/adminProductController.js'
+import { fetchAllProducts, fetchProductCategory, addProduct, fetchVariantName, fetchProductVariantValues, fetchProductVariantCombination } from '../../controllers/admin/adminProductController.js'
 
 import upload from '../../middleware/multer.js';
 
@@ -32,6 +32,9 @@ adminProductRouter.get('/variant-name', adminAuth, fetchVariantName);
 
 // FETCH PRODUCT VARIANT VALUES
 adminProductRouter.get('/product-variant-values', adminAuth, fetchProductVariantValues);
+
+// FETCH PRODUCT VARIANT COMBINATION
+adminProductRouter.get('/product-variant-combination', fetchProductVariantCombination);
 
 
 
