@@ -45,6 +45,7 @@ import Overview from "./pages/Overview.jsx";
 import { AdminContext } from "./context/AdminContextProvider.jsx";
 import OutOfStock from "./components/ProductMenu/OutOfStock.jsx";
 import Settings from "./pages/Settings.jsx";
+import UpdateProduct from "./components/ProductMenu/UpdateProduct.jsx";
 
 //components
 // icon 
@@ -91,6 +92,7 @@ const App = () => {
       <Route path="/profile" element={<Profile />} />
       <Route path="/products" element={<Products />} />
       <Route path="/products/addproduct" element={<AddProduct />} />
+      <Route path="/products/updateproduct/:productId" element={<UpdateProduct />} />
       <Route path="/products/productcategory" element={<ProductCategory />} />
       <Route path="/products/totalproduct" element={<TotalProduct />} />
       <Route path="/products/moststock" element={<MostStock />} />

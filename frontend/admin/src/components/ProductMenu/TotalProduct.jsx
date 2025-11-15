@@ -5,7 +5,7 @@ import Navbar from '../Navbar';
 import { AdminContext } from '../../context/AdminContextProvider';
 
 function TotalProduct() {
-  const { products, productCategory } = useContext(AdminContext);
+  const { products, productCategory, navigate } = useContext(AdminContext);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('');
   const [sortBy, setSortBy] = useState('');
@@ -15,8 +15,8 @@ function TotalProduct() {
     alert(`Delete product ID: ${id}`);
   };
 
-  const handleView = (p) => {
-    alert(`Viewing Product: ${p.productName}`);
+  const handleView = (productId) => {
+    navigate(`/products/updateproduct/${productId}`);
   };
 
   // 🧠 Build category lookup map for faster category name resolution
@@ -95,7 +95,7 @@ function TotalProduct() {
             </div>
 
             <div className="tp-controls-right">
-              <button className="tp-add-btn">Add Product</button>
+              <button onClick={() => navigate('/products/addproduct')} className="tp-add-btn">Add Product</button>
 
               <div className="tp-search">
                 <input
@@ -125,8 +125,8 @@ function TotalProduct() {
 
             <tbody>
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((p) => (
-                  <tr key={p.ID} onClick={() => handleView(p)} className='view-product'>
+                [...filteredProducts].reverse().map((p) => (
+                  <tr key={p.ID} onClick={() => handleView(p.productId)} className='view-product'>
                     <td>
                       <img
                         src={p.image1 || p.images?.[0]}

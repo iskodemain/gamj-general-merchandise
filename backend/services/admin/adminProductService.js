@@ -23,42 +23,6 @@ export const addProductService = async (adminId, categoryId, productName, produc
         hasVariant = toBool(hasVariant);
         hasVariantCombination = toBool(hasVariantCombination);
 
-        console.log(`
-========= NEW PRODUCT REQUEST =========
-
-Admin ID:              ${adminId}
-Category ID:           ${categoryId}
-
-Product Name:          ${productName}
-Description:           ${productDescription}
-Details:               ${productDetails}
-
-Price:                 ${price}
-Stock Quantity:        ${stockQuantity}
-
-Images:
- - Image 1:            ${image1?.path || "NONE"}
- - Image 2:            ${image2?.path || "NONE"}
- - Image 3:            ${image3?.path || "NONE"}
- - Image 4:            ${image4?.path || "NONE"}
-
-Flags:
- - Best Seller:        ${isBestSeller}
- - Active:             ${isActive}
- - Out of Stock:       ${isOutOfStock}
- - Has Variant:        ${hasVariant}
- - Has Combination:    ${hasVariantCombination}
-
-Expiration Date:       ${expirationDate}
-
-Variant Names:         ${JSON.stringify(variantNames, null, 2)}
-Variant Values:        ${JSON.stringify(variantValues, null, 2)}
-Variant Combination:   ${JSON.stringify(variantCombination, null, 2)}
-
-=======================================
-`);
-
-
         const adminUser = await Admin.findByPk(adminId);
         if (!adminUser) {
             return {
@@ -419,6 +383,37 @@ export const fetchProductCategoryService = async (adminId) => {
         return {
             success: true,
             productCategory
+        };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+// Variant Names (FETCH)
+export const fetchVariantNameService = async (adminId) => {
+    try {
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+
+        const variantName = await VariantName.findAll({});
+        if (variantName.length === 0) {
+            return {
+                success: true, 
+                message: "No variant name found.", 
+                variantName: [] 
+            };
+        }
+
+        return {
+            success: true,
+            variantName
         };
 
     } catch (error) {
