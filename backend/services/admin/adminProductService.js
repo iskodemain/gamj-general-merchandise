@@ -654,20 +654,6 @@ export const updateProductService = async (adminId, productID, categoryId, produ
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Fetch All Product
 export const fetchAllProductsService = async (adminId) => {
     try {

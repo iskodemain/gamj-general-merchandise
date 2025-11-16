@@ -1,8 +1,15 @@
 
-
+.tpc-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background: #effff1;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
 
 .tpc-card {
-  width: min(1100px, 98%);
+  width: min(1100px, 100%);
   background: #ffffff;
   border-radius: 12px;
   padding: 18px;
@@ -141,7 +148,6 @@
 
 /* action buttons */
 .tpc-trash {
-  
   color: #e53935;
   width: 40px;
   height: 40px;
