@@ -10,6 +10,23 @@ import Loading from '../Loading.jsx'
 function AddProduct() {
   const { navigate, productCategory, toastError, addProduct } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
+
+  // --- IMAGE system (copied EXACTLY from Add.jsx pattern)
+  const [image_1, setImage_1] = useState(false);
+  const [image_2, setImage_2] = useState(false);
+  const [image_3, setImage_3] = useState(false);
+  const [image_4, setImage_4] = useState(false);
+
+  const [removeImage_1, setRemoveImage_1] = useState(false);
+  const [removeImage_2, setRemoveImage_2] = useState(false);
+  const [removeImage_3, setRemoveImage_3] = useState(false);
+  const [removeImage_4, setRemoveImage_4] = useState(false);
+
+  // Keep same pattern as Add.jsx: when remove flag is true -> clear image and reset flag
+  if (removeImage_1) { setImage_1(false); setRemoveImage_1(false); }
+  if (removeImage_2) { setImage_2(false); setRemoveImage_2(false); }
+  if (removeImage_3) { setImage_3(false); setRemoveImage_3(false); }
+  if (removeImage_4) { setImage_4(false); setRemoveImage_4(false); }
   
 
   // basic product state
@@ -20,10 +37,6 @@ function AddProduct() {
   const [displayPrice, setDisplayPrice] = useState('');
   const [displayStock, setDisplayStock] = useState('');
   const [expirationDate, setExpirationDate] = useState({ month: '', day: '', year: '' });
-
-  // images
-  const [images, setImages] = useState([null, null, null, null]);
-  const [imagePreviews, setImagePreviews] = useState([null, null, null, null]);
 
   // toggles
   const [hasVariants, setHasVariants] = useState(false);
@@ -79,25 +92,6 @@ useEffect(() => {
       setDisplayStock(String(total));
     }
   }, [variantCombinations, hasVariants, hasVariantCombination]);
-
-
-
-  // --- helpers
-  const handleImageChange = (index, file) => {
-    const copyFiles = [...images];
-    const copyPre = [...imagePreviews];
-
-    if (!file) {
-      copyFiles[index] = null;
-      copyPre[index] = null;
-    } else {
-      copyFiles[index] = file;
-      copyPre[index] = URL.createObjectURL(file);
-    }
-
-    setImages(copyFiles);
-    setImagePreviews(copyPre);
-  };
 
   const updateVariantName = (index, value) => {
     setVariantNamesList(prev => {
@@ -256,7 +250,7 @@ useEffect(() => {
     let finalVariantValues;
     let finalVariantCombinations;
 
-    const hasAtLeastOneImage = images.some(img => img !== null);
+    const hasAtLeastOneImage = image_1 || image_2 || image_3 || image_4;
     if (!hasAtLeastOneImage) {
       toast.error("Please upload at least ONE product image.", { ...toastError });
       return;
@@ -394,10 +388,13 @@ useEffect(() => {
     formData.append('productDescription', productDescription);
     formData.append('productDetails', productDetails || '');
     formData.append('price', displayPrice === '' ? '' : Number(displayPrice));
-    images[0] && formData.append("image1", images[0] || null);
-    images[1] && formData.append("image2", images[1] || null);
-    images[2] && formData.append("image3", images[2] || null);
-    images[3] && formData.append("image4", images[3] || null);
+    
+    // append only File objects to FormData as image1..image4
+    if (image_1 instanceof File) formData.append('image1', image_1);
+    if (image_2 instanceof File) formData.append('image2', image_2);
+    if (image_3 instanceof File) formData.append('image3', image_3);
+    if (image_4 instanceof File) formData.append('image4', image_4);
+
     formData.append('stockQuantity', displayStock === '' ? '' : Number(displayStock));
     formData.append('isBestSeller', isBestSeller);
     formData.append('isActive', isActive);
@@ -410,8 +407,6 @@ useEffect(() => {
     formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
 
 
-    
-
     console.log("finalVariantNames:", finalVariantNames);
     console.log("FormData:", Object.fromEntries(formData));
 
@@ -420,7 +415,6 @@ useEffect(() => {
     setLoading(false);
 
     navigate('/products/totalproduct');
-    return; 
   };
 
   // --- render
@@ -441,36 +435,77 @@ useEffect(() => {
             <section className="ap-card">
               <h2 className="ap-heading">Upload Image</h2>
               <div className="ap-upload-grid">
-                {Array.from({ length: 4 }).map((_, idx) => (
-                  <label key={idx} className="ap-upload-slot">
-                    {imagePreviews[idx] ? (
-                      <img src={imagePreviews[idx]} alt={`preview-${idx}`} className="ap-preview" />
-                    ) : (
-                      <div className="ap-upload-placeholder">
-                        <img src={assets.image_upload_icon} alt="" />
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(ev) => handleImageChange(idx, ev.target.files[0])}
-                      className="ap-file-input"
-                    />
-                    {imagePreviews[idx] && (
-                      <button
-                        type="button"
-                        className="ap-remove-image"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleImageChange(idx, null);
-                        }}
-                        title="Remove image"
-                      >
-                        <FaTrash />
-                      </button>
-                    )}
+                {/* IMAGE 1 */}
+                <div className={`main-img-container ${image_1 ? 'uploaded' : ''}`}>
+                  <p onClick={() => setRemoveImage_1(true)} className={`img-remove-btn ${image_1 ? '' : 'hidden'}`}><span><FaTrash/></span></p>
+                  <label htmlFor="image_1" className="img-label">
+                    <div className="img-container">
+                      <img className="image-con"
+                        src={
+                          typeof image_1 === 'string'
+                            ? image_1
+                            : (!image_1 ? assets.image_upload_icon : URL.createObjectURL(image_1))
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input onChange={(e) => setImage_1(e.target.files[0])} type="file" id="image_1" hidden />
                   </label>
-                ))}
+                </div>
+
+                {/* IMAGE 2 */}
+                <div className={`main-img-container ${image_2 ? 'uploaded' : ''}`}>
+                  <p onClick={() => setRemoveImage_2(true)} className={`img-remove-btn ${image_2 ? '' : 'hidden'}`}><span><FaTrash/></span></p>
+                  <label htmlFor="image_2" className="img-label">
+                    <div className="img-container">
+                      <img className="image-con"
+                        src={
+                          typeof image_2 === 'string'
+                            ? image_2
+                            : (!image_2 ? assets.image_upload_icon : URL.createObjectURL(image_2))
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input onChange={(e) => setImage_2(e.target.files[0])} type="file" id="image_2" hidden />
+                  </label>
+                </div>
+
+                {/* IMAGE 3 */}
+                <div className={`main-img-container ${image_3 ? 'uploaded' : ''}`}>
+                  <p onClick={() => setRemoveImage_3(true)} className={`img-remove-btn ${image_3 ? '' : 'hidden'}`}><span><FaTrash/></span></p>
+                  <label htmlFor="image_3" className="img-label">
+                    <div className="img-container">
+                      <img className="image-con"
+                        src={
+                          typeof image_3 === 'string'
+                            ? image_3
+                            : (!image_3 ? assets.image_upload_icon : URL.createObjectURL(image_3))
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input onChange={(e) => setImage_3(e.target.files[0])} type="file" id="image_3" hidden />
+                  </label>
+                </div>
+
+                {/* IMAGE 4 */}
+                <div className={`main-img-container ${image_4 ? 'uploaded' : ''}`}>
+                  <p onClick={() => setRemoveImage_4(true)} className={`img-remove-btn ${image_4 ? '' : 'hidden'}`}><span><FaTrash/></span></p>
+                  <label htmlFor="image_4" className="img-label">
+                    <div className="img-container">
+                      <img className="image-con"
+                        src={
+                          typeof image_4 === 'string'
+                            ? image_4
+                            : (!image_4 ? assets.image_upload_icon : URL.createObjectURL(image_4))
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input onChange={(e) => setImage_4(e.target.files[0])} type="file" id="image_4" hidden />
+                  </label>
+                </div>
               </div>
 
               <div className="form-group">

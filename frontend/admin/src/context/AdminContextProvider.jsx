@@ -23,7 +23,7 @@ const AdminContextProvider = (props) => {
   const [productVariantValues, setProductVariantValues] = useState([]);
   const [productVariantCombination, setProductVariantCombination] = useState([]);
 
-  /*---------------------------FETCH ALL PRODUCT VARIANT COMBINATIONS-----------------------------*/
+  /*---------------------------FETCH ALL PRODUCT VARIANT COMBINATION-----------------------------*/
     const fetchProductVariantCombination = async () => {
         if (token) {
           try {
@@ -43,7 +43,7 @@ const AdminContextProvider = (props) => {
         }
     }, [token]);
 
-  /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
+  /*---------------------------FETCH ALL PRODUCT VARIANT VALUES-----------------------------*/
     const fetchProductVariantValues = async () => {
         if (token) {
           try {
@@ -83,7 +83,28 @@ const AdminContextProvider = (props) => {
     }
   }, [token]);
 
-  /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
+  /*---------------------------UPDATE PRODUCTS-----------------------------*/
+  const updateProduct = async (formData) => {
+    if (token) {
+      try {
+        const response = await axios.put(backendUrl + "/api/product/update", formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+        });;
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------ADD PRODUCTS-----------------------------*/
   const addProduct = async (formData) => {
     if (token) {
       try {
@@ -213,7 +234,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct
   }  
   return (
     <AdminContext.Provider value={value}>

@@ -1,4 +1,4 @@
-import { fetchAllProductsService, fetchProductCategoryService, addProductService, fetchVariantNameService, fetchProductVariantValuesService, fetchProductVariantCombinationService } from "../../services/admin/adminProductService.js";
+import { fetchAllProductsService, fetchProductCategoryService, addProductService, fetchVariantNameService, fetchProductVariantValuesService, fetchProductVariantCombinationService, updateProductService } from "../../services/admin/adminProductService.js";
 
 
 // ALL PRODUCTS 
@@ -13,6 +13,25 @@ export const addProduct = async (req, res) => {
         const {categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination} = req.body;
 
         const result = await addProductService(ID, categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination);
+
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const updateProduct = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const image1File = req.files.image1?.[0] || null;
+        const image2File = req.files.image2?.[0] || null;
+        const image3File = req.files.image3?.[0] || null;
+        const image4File = req.files.image4?.[0] || null;
+
+        const {productID, categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination, image1, image2, image3, image4} = req.body;
+
+        const result = await updateProductService(ID, productID, categoryId, productName, productDescription, productDetails, price, image1File, image2File, image3File, image4File, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination);
 
         res.json(result);
     } catch (error) {
