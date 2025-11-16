@@ -10,28 +10,145 @@
   
 }
 
+/* ==============================
+   GRID LAYOUT
+   ============================== */
 .ap-upload-grid {
-  display:flex;
-  gap:12px;
-  margin-top:1rem;
-  flex-wrap:wrap;
-  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, 120px);
+  gap: 12px;
 }
 
-
+/* ==============================
+   IMAGE SLOT (Upload)
+   ============================== */
 .ap-upload-slot {
-  position: relative;
-  width: 130px;
-  height: 130px;
-  border-radius: 8px;
-  border: 2px dashed #d7e8db;
-  background: #fafdfb;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  overflow:hidden;
+  width: 120px;
+  height: 120px;
+  background: #f2f2f2;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  display: block;
 }
+
+/* Image preview wrapper */
+.ap-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Image itself */
+.ap-preview,
+.image-con {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block !important; /* removes bottom spacing */
+}
+
+/* Hidden file input */
+.ap-file-input {
+  display: none;
+}
+
+/* ==============================
+   EXISTING IMAGES (EDIT MODE)
+   ============================== */
+.img-container-u-edt {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: #f2f2f2;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Trash button for existing images */
+.img-close-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 20;
+
+  background: white;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #ff4d4d;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ==============================
+   NEW IMAGE (UPLOAD MODE)
+   ============================== */
+.main-img-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: #f2f2f2;
+  border-radius: 10px;
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Inner preview area */
+.img-container-u {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Floating remove button for new upload */
+.img-remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 20;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ff4d4d;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Hide remove button */
+.hidden-clbt {
+  display: none !important;
+}
+
+/* Label covering entire upload box */
+.img-label {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+}
+
 
 .ap-upload-placeholder { 
   text-align:center; 
@@ -522,7 +639,17 @@
   width: 220px; 
   padding: 12px; 
   border-radius: 6px; 
-  font-weight: 700; 
+  cursor: pointer;
+}
+
+.upp-delete-btn {
+    background-color: #e04242;
+    color: #fff; 
+    width: 220px; 
+    padding: 12px; 
+    border-radius: 6px; 
+    font-weight: 600;
+    cursor: pointer;
 }
 
 /* responsive */

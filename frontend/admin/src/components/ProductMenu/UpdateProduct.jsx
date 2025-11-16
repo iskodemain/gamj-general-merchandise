@@ -9,13 +9,15 @@ import { toast } from 'react-toastify';
 import Loading from '../Loading.jsx';
 
 function UpdateProduct() {
-  const { navigate, productCategory, toastError, updateProduct, deleteProduct, products } = useContext(AdminContext);
+  const { navigate, productCategory, toastError, updateProduct, deleteProduct, products, variantName, productVariantValues, productVariantCombination } = useContext(AdminContext);
   const { productId } = useParams(); // expects route like /products/update/:id
   const [loading, setLoading] = useState(false);
 
+  // product holder (full object from products list)
+  const [productItemState, setProductItemState] = useState(null);
+
   // basic product state
   const [productID, setProductID] = useState(null); // will hold numeric ID from product
-  const [productIdentifier, setProductIdentifier] = useState(''); // productId like PRDT-000001 (if present)
   const [productName, setProductName] = useState('');
   const [productDescription, setProductDescription] = useState('');
   const [productDetails, setProductDetails] = useState('');
@@ -24,9 +26,26 @@ function UpdateProduct() {
   const [displayStock, setDisplayStock] = useState('');
   const [expirationDate, setExpirationDate] = useState({ month: '', day: '', year: '' });
 
-  // images
-  const [images, setImages] = useState([null, null, null, null]); // File objects for new uploads
-  const [imagePreviews, setImagePreviews] = useState([null, null, null, null]); // preview urls (existing URLs or blob urls)
+  // --- IMAGE STATES (copied pattern from your Update.jsx)
+  const [image_1, setImage_1] = useState(false);
+  const [image_2, setImage_2] = useState(false);
+  const [image_3, setImage_3] = useState(false);
+  const [image_4, setImage_4] = useState(false);
+
+  // flags to indicate user clicked the "close" on an existing remote image
+  const [image_2Close, setImage_2Close] = useState(false);
+  const [image_3Close, setImage_3Close] = useState(false);
+  const [image_4Close, setImage_4Close] = useState(false);
+
+  // convenience remove toggles (keeps parity with your Add.jsx pattern)
+  const [removeImage_2, setRemoveImage_2] = useState(false);
+  const [removeImage_3, setRemoveImage_3] = useState(false);
+  const [removeImage_4, setRemoveImage_4] = useState(false);
+
+  // auto clear when remove flags set (same small pattern used in Add.jsx)
+  if (removeImage_2) { setImage_2(false); setRemoveImage_2(false); }
+  if (removeImage_3) { setImage_3(false); setRemoveImage_3(false); }
+  if (removeImage_4) { setImage_4(false); setRemoveImage_4(false); }
 
   // toggles
   const [hasVariants, setHasVariants] = useState(false);
@@ -48,82 +67,82 @@ function UpdateProduct() {
 
   // ----- Prefill product data on mount / products change -----
   useEffect(() => {
-    if (!products || !products.length) return;
+  if (!products || !products.length || !productId) return;
 
-    // Try to find by numeric ID or by productId string (route param)
-    const found = products.find(p => {
-      // productId might be numeric string or productId like PRDT-000001
-      if (!productId) return false;
-      if (String(p.ID) === productId) return true;
-      if (String(p.productId) === productId) return true;
-      return false;
-    });
+  // find product by numeric ID or productId string
+  const found = products.find(p => String(p.ID) === String(productId) || String(p.productId) === String(productId));
+  if (!found) return;
 
-    if (!found) return;
+  setProductItemState(found);
 
-    // Prefill basic fields
-    setProductID(found.ID ?? null);
-    setProductIdentifier(found.productId ?? '');
-    setProductName(found.productName ?? '');
-    setProductDescription(found.productDescription ?? '');
-    setProductDetails(found.productDetails ?? '');
-    setCategoryId(found.categoryId ?? '');
-    setDisplayPrice(found.price !== undefined && found.price !== null ? String(found.price) : '');
-    setDisplayStock(found.stockQuantity !== undefined && found.stockQuantity !== null ? String(found.stockQuantity) : '');
+  // Basic fields
+  setProductID(found.ID ?? null);
+  setProductName(found.productName ?? '');
+  setProductDescription(found.productDescription ?? '');
+  setProductDetails(found.productDetails ?? '');
+  setCategoryId(found.categoryId ?? '');
+  setDisplayPrice(found.price !== undefined && found.price !== null ? String(found.price) : '');
+  setDisplayStock(found.stockQuantity !== undefined && found.stockQuantity !== null ? String(found.stockQuantity) : '');
+  setIsBestSeller(Boolean(found.isBestSeller));
+  setIsActive(found.isActive === undefined ? true : Boolean(found.isActive));
+  setIsOutOfStock(Boolean(found.isOutOfStock));
+  setHasVariants(Boolean(found.hasVariant));
+  setHasVariantCombination(Boolean(found.hasVariantCombination));
 
-    setIsBestSeller(Boolean(found.isBestSeller));
-    setIsActive(found.isActive === undefined ? true : Boolean(found.isActive));
-    setIsOutOfStock(Boolean(found.isOutOfStock));
-    setHasVariants(Boolean(found.hasVariant));
-    setHasVariantCombination(Boolean(found.hasVariantCombination));
-
-    // Expiration date - if present and stored as ISO e.g., "2025-11-15"
-    if (found.expirationDate) {
-      try {
-        const d = new Date(found.expirationDate);
-        if (!Number.isNaN(d.getTime())) {
-          setExpirationDate({
-            month: String(d.getMonth() + 1),
-            day: String(d.getDate()),
-            year: String(d.getFullYear())
-          });
-        }
-      } catch (err) {
-        // ignore parsing errors
+  // Expiration date parsing if present
+  if (found.expirationDate) {
+    try {
+      const d = new Date(found.expirationDate);
+      if (!Number.isNaN(d.getTime())) {
+        setExpirationDate({
+          month: String(d.getMonth() + 1),
+          day: String(d.getDate()),
+          year: String(d.getFullYear())
+        });
+      } else {
+        setExpirationDate({ month: '', day: '', year: '' });
       }
-    } else {
+    } catch (err) {
       setExpirationDate({ month: '', day: '', year: '' });
     }
+  } else {
+    setExpirationDate({ month: '', day: '', year: '' });
+  }
 
-    // Images: put existing cloud URLs into previews, keep images[] null (so we only upload if user changes)
-    setImagePreviews([
-      found.image1 || (found.images && found.images[0]) || null,
-      found.image2 || null,
-      found.image3 || null,
-      found.image4 || null
-    ]);
-    setImages([null, null, null, null]);
-
-    // Variant details: your provided products sample did not include variant rows,
-    // so we only prefill flags. If you have variant names/values in your product object,
-    // extend this block to map them into variantNamesList, variantValuesSets, variantCombinations.
-    // For now keep default structures if none available.
-
-    // If product contains variantNames, variantValues, variantCombination arrays, map them:
-    if (found.variantNames && Array.isArray(found.variantNames) && found.variantNames.length) {
-      setVariantNamesList(found.variantNames.map(n => ({ name: n })));
+  // Build variantNamesList (ordered)
+  if (Array.isArray(variantName) && variantName.length) {
+    if (Array.isArray(found.variantNames) && found.variantNames.length) {
+      setVariantNamesList(found.variantNames.map(n => ({ name: String(n) })));
     } else {
-      // keep existing state (or single name slot)
-      setVariantNamesList(prev => prev.length ? prev : [{ name: '' }]);
-    }
+      const vnById = {};
+      variantName.forEach(vn => { vnById[String(vn.ID)] = vn.name; });
 
-    if (found.variantValues && Array.isArray(found.variantValues) && found.variantValues.length) {
-      // If product stores flat variantValues (e.g., for combination case), place them into a single set
-      // If you store grouped sets, adapt accordingly.
-      // We'll map into single set for non-combination variant mode.
+      // If productVariantValues exist, derive used variantNameIds for this product
+      const usedVnIds = (Array.isArray(productVariantValues) ? productVariantValues.filter(pvv => pvv.productId === found.ID).map(pvv => String(pvv.variantNameId)) : []);
+      // Remove duplicates and keep order
+      const orderedUniqueVnIds = [...new Set(usedVnIds)];
+      if (orderedUniqueVnIds.length) {
+        setVariantNamesList(orderedUniqueVnIds.map(id => ({ name: vnById[id] || '' })));
+      } else {
+        // fallback: single empty name slot
+        setVariantNamesList(prev => (prev && prev.length ? prev : [{ name: '' }]));
+      }
+    }
+  } else if (Array.isArray(found.variantNames) && found.variantNames.length) {
+    setVariantNamesList(found.variantNames.map(n => ({ name: String(n) })));
+  } else {
+    setVariantNamesList(prev => (prev && prev.length ? prev : [{ name: '' }]));
+  }
+
+  // Build variantValuesSets
+  if (Array.isArray(productVariantValues) && productVariantValues.length) {
+    // filter values for this product
+    const valuesForProduct = productVariantValues.filter(v => String(v.productId) === String(found.ID));
+    if (valuesForProduct.length) {
       if (!found.hasVariantCombination) {
-        setVariantValuesSets([found.variantValues.map(v => ({
-          name: v.name ?? '',
+        // Non-combination mode: flatten values into a single set
+        const singleSet = valuesForProduct.map(v => ({
+          name: v.value ?? '',
           price: v.price !== undefined && v.price !== null ? String(v.price) : '',
           stock: v.stock !== undefined && v.stock !== null ? String(v.stock) : '',
           expirationDate: v.expirationDate ? (() => {
@@ -133,23 +152,99 @@ function UpdateProduct() {
             }
             return { month: '', day: '', year: '' };
           })() : { month: '', day: '', year: '' }
-        }))]);
+        }));
+        setVariantValuesSets([singleSet]);
       } else {
-        // For combinations mode we still set empty sets; user can add sets in UI
-        // You may adapt this if you store sets grouped by variant name.
+        // Combination mode: group values by variantNameId and order groups to match variantNamesList
+        // Build map: variantNameId -> [values]
+        const groups = {};
+        valuesForProduct.forEach(v => {
+          const key = String(v.variantNameId);
+          groups[key] = groups[key] || [];
+          groups[key].push({
+            name: v.value ?? '',
+            price: v.price !== undefined && v.price !== null ? String(v.price) : '',
+            stock: v.stock !== undefined && v.stock !== null ? String(v.stock) : '',
+            expirationDate: v.expirationDate ? (() => {
+              const dt = new Date(v.expirationDate);
+              if (!Number.isNaN(dt.getTime())) {
+                return { month: String(dt.getMonth() + 1), day: String(dt.getDate()), year: String(dt.getFullYear()) };
+              }
+              return { month: '', day: '', year: '' };
+            })() : { month: '', day: '', year: '' }
+          });
+        });
+
+        // Order groups by variantNamesList if we have it, else use the keys order
+        let orderedSets = [];
+        const vnById = {};
+        (variantName || []).forEach(vn => { vnById[String(vn.ID)] = vn.name; });
+
+        if (Array.isArray(found.variantNames) && found.variantNames.length) {
+          // If found.variantNames is a list of names, try to map them back to IDs via vnById reverse lookup
+          const nameToId = {};
+          Object.entries(vnById).forEach(([id, name]) => { nameToId[name] = id; });
+          orderedSets = found.variantNames.map(name => {
+            const id = nameToId[name];
+            return groups[id] || [{ name: '' , price: '', stock:'', expirationDate: { month:'', day:'', year:'' } }];
+          });
+        } else {
+          // fallback: iterate keys found in groups (stable order)
+          orderedSets = Object.keys(groups).map(k => groups[k]);
+        }
+
+        // Ensure at least one set exists
+        if (!orderedSets.length) orderedSets = [[{ name: '', price: '', stock: '', expirationDate: { month:'', day:'', year:'' } }]];
+
+        setVariantValuesSets(orderedSets);
       }
     }
+  } else if (Array.isArray(found.variantValues) && found.variantValues.length) {
+    // fallback for older shape: flat variantValues on found object
+    if (!found.hasVariantCombination) {
+      setVariantValuesSets([found.variantValues.map(v => ({
+        name: v.name ?? '',
+        price: v.price !== undefined && v.price !== null ? String(v.price) : '',
+        stock: v.stock !== undefined && v.stock !== null ? String(v.stock) : '',
+        expirationDate: v.expirationDate ? (() => {
+          const dt = new Date(v.expirationDate);
+          if (!Number.isNaN(dt.getTime())) {
+            return { month: String(dt.getMonth() + 1), day: String(dt.getDate()), year: String(dt.getFullYear()) };
+          }
+          return { month: '', day: '', year: '' };
+        })() : { month: '', day: '', year: '' }
+      }))]);
+    }
+  } else {
+    // Leave default (single empty set) if nothing available
+    setVariantValuesSets(prev => (prev && prev.length ? prev : [[{ name:'', price:'', stock:'', expirationDate:{ month:'', day:'', year:'' } }]]));
+  }
 
-    if (found.variantCombination && Array.isArray(found.variantCombination) && found.variantCombination.length) {
-      setVariantCombinations(found.variantCombination.map(c => ({
+  // Variant combinations (productVariantCombination context or found.variantCombination)
+  if (Array.isArray(productVariantCombination) && productVariantCombination.length) {
+    const combosForProduct = productVariantCombination.filter(c => String(c.productId) === String(found.ID));
+    if (combosForProduct.length) {
+      setVariantCombinations(combosForProduct.map(c => ({
         combinations: c.combinations ?? '',
         price: c.price !== undefined && c.price !== null ? String(c.price) : '',
         stock: c.stock !== undefined && c.stock !== null ? String(c.stock) : '',
         availability: c.availability === undefined ? true : Boolean(c.availability)
       })));
     }
+  } else if (Array.isArray(found.variantCombination) && found.variantCombination.length) {
+    setVariantCombinations(found.variantCombination.map(c => ({
+      combinations: c.combinations ?? '',
+      price: c.price !== undefined && c.price !== null ? String(c.price) : '',
+      stock: c.stock !== undefined && c.stock !== null ? String(c.stock) : '',
+      availability: c.availability === undefined ? true : Boolean(c.availability)
+    })));
+  } else {
+    // keep default
+    setVariantCombinations(prev => (prev && prev.length ? prev : [{ combinations:'', price:'', stock:'', availability:true }]));
+  }
 
-  }, [products, productId]);
+  }, [products, productId, variantName, productVariantValues, productVariantCombination]);
+
 
   // --- effects
   // auto-enable combination if > 1 sets and hasVariants is true
@@ -185,21 +280,11 @@ function UpdateProduct() {
     }
   }, [variantCombinations, hasVariants, hasVariantCombination]);
 
-  // --- helpers
-  const handleImageChange = (index, file) => {
-    const copyFiles = [...images];
-    const copyPre = [...imagePreviews];
-
-    if (!file) {
-      copyFiles[index] = null;
-      copyPre[index] = null;
-    } else {
-      copyFiles[index] = file;
-      copyPre[index] = URL.createObjectURL(file);
-    }
-
-    setImages(copyFiles);
-    setImagePreviews(copyPre);
+  // ----- Image helper: handle close button for existing images (2..4)
+  const handleImgCloseButton = (imageIndex) => {
+    if (imageIndex === 2) { setImage_2Close(true); setImage_2(false); }
+    if (imageIndex === 3) { setImage_3Close(true); setImage_3(false); }
+    if (imageIndex === 4) { setImage_4Close(true); setImage_4(false); }
   };
 
   const updateVariantName = (index, value) => {
@@ -344,8 +429,7 @@ function UpdateProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // validation same as add
-    const hasAtLeastOneImage = images.some(img => img !== null) || imagePreviews.some(p => p);
+    const hasAtLeastOneImage = image_1 || image_2 || image_3 || image_4 || (productItemState && (productItemState.image1 || productItemState.image2 || productItemState.image3 || productItemState.image4));
     if (!hasAtLeastOneImage) {
       toast.error("Please upload at least ONE product image.", { ...toastError });
       return;
@@ -454,20 +538,49 @@ function UpdateProduct() {
     // Build FormData exactly as your backend expects (same as add)
     const formData = new FormData();
     // include both identifiers to be safe - backend can choose which to use
-    if (productID) formData.append('ID', productID);
-    if (productIdentifier) formData.append('productId', productIdentifier);
+    if (productID) formData.append('productID', productID);
 
     formData.append('categoryId', Number(categoryId));
     formData.append('productName', productName);
     formData.append('productDescription', productDescription);
     formData.append('productDetails', productDetails || '');
     formData.append('price', displayPrice === '' ? null : Number(displayPrice));
-    // only append images that are actual File objects (new uploads)
-    if (images[0] instanceof File) formData.append("image1", images[0]);
-    if (images[1] instanceof File) formData.append("image2", images[1]);
-    if (images[2] instanceof File) formData.append("image3", images[2]);
-    if (images[3] instanceof File) formData.append("image4", images[3]);
-    // if no new file for a slot, we don't append; backend should keep existing image.
+    
+    // image_1
+    if (image_1) {
+      formData.append('image1', image_1);
+    } else {
+      // if productItemState exists, append existing cloud url so backend keeps it
+      formData.append('image1', productItemState?.image1 || '');
+    }
+
+    // image_2
+    if ((image_2 && image_2Close) || (image_2 && !image_2Close)) {
+      formData.append('image2', image_2);
+    } else if (image_2Close && !image_2) {
+      formData.append('image2', null); // request backend to remove
+    } else {
+      formData.append('image2', productItemState?.image2 || '');
+    }
+
+    // image_3
+    if ((image_3 && image_3Close) || (image_3 && !image_3Close)) {
+      formData.append('image3', image_3);
+    } else if (image_3Close && !image_3) {
+      formData.append('image3', null);
+    } else {
+      formData.append('image3', productItemState?.image3 || '');
+    }
+
+    // image_4
+    if ((image_4 && image_4Close) || (image_4 && !image_4Close)) {
+      formData.append('image4', image_4);
+    } else if (image_4Close && !image_4) {
+      formData.append('image4', null);
+    } else {
+      formData.append('image4', productItemState?.image4 || '');
+    }
+
     formData.append('stockQuantity', displayStock === '' ? null : Number(displayStock));
     formData.append('isBestSeller', isBestSeller);
     formData.append('isActive', isActive);
@@ -479,23 +592,18 @@ function UpdateProduct() {
     formData.append('variantValues', JSON.stringify(finalVariantValues || []));
     formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
 
+    console.log("FormData:", Object.fromEntries(formData));
+
     setLoading(true);
-    try {
-      // call your provided updateProduct(formData)
-      await updateProduct(formData);
-      toast.success("Product updated successfully.");
-      navigate('/products/totalproduct');
-    } catch (err) {
-      console.error('Update failed:', err);
-      toast.error(err?.message || 'Failed to update product', { ...toastError });
-    } finally {
-      setLoading(false);
-    }
+    await updateProduct(formData);
+    setLoading(false);
+
+    navigate('/products/totalproduct');
   };
 
   // ----- Delete handler (if AdminContext provides deleteProduct) -----
   const handleDelete = async () => {
-    if (!productID && !productIdentifier) {
+    if (!productID) {
       toast.error("Unable to determine product to delete.", { ...toastError });
       return;
     }
@@ -512,7 +620,6 @@ function UpdateProduct() {
       // attempt both identifiers; context implementation can check which one it wants
       const payload = new FormData();
       if (productID) payload.append('ID', productID);
-      if (productIdentifier) payload.append('productId', productIdentifier);
 
       await deleteProduct(payload);
       toast.success("Product deleted.");
@@ -526,6 +633,12 @@ function UpdateProduct() {
   };
 
   // --- render
+  // convenience existing images (cloud urls) for template
+  const existingImage1 = productItemState?.image1 || productItemState?.images?.[0] || null;
+  const existingImage2 = productItemState?.image2 || null;
+  const existingImage3 = productItemState?.image3 || null;
+  const existingImage4 = productItemState?.image4 || null;
+
   return (
     <>
       {loading && <Loading />}
@@ -543,36 +656,95 @@ function UpdateProduct() {
             <section className="ap-card">
               <h2 className="ap-heading">Upload Image</h2>
               <div className="ap-upload-grid">
-                {Array.from({ length: 4 }).map((_, idx) => (
-                  <label key={idx} className="ap-upload-slot">
-                    {imagePreviews[idx] ? (
-                      <img src={imagePreviews[idx]} alt={`preview-${idx}`} className="ap-preview" />
-                    ) : (
-                      <div className="ap-upload-placeholder">
-                        <img src={assets.image_upload_icon} alt="" />
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(ev) => handleImageChange(idx, ev.target.files[0])}
-                      className="ap-file-input"
-                    />
-                    {imagePreviews[idx] && (
-                      <button
-                        type="button"
-                        className="ap-remove-image"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleImageChange(idx, null);
-                        }}
-                        title="Remove image"
-                      >
-                        <FaTrash />
-                      </button>
-                    )}
+                 {/* IMAGE 1 */}
+                <div className={`main-img-container ${(image_1 || existingImage1) ? 'uploaded' : ''}`}>
+                  <label htmlFor="image_1" className="img-label">
+                    <div className="img-container">
+                      <img
+                        className="image-con"
+                        src={image_1 ? URL.createObjectURL(image_1) : (existingImage1 || assets.image_upload_icon)}
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_1" hidden onChange={(e) => setImage_1(e.target.files[0])}/>
                   </label>
-                ))}
+                </div>
+
+                {/* IMAGE 2 */}
+                <div className={`main-img-container ${(image_2 || existingImage2) ? 'uploaded' : ''}`}>
+                  <p
+                    onClick={() => image_2 ? setImage_2(false) : handleImgCloseButton(2)}
+                    className={`img-remove-btn ${(image_2 || existingImage2) ? '' : 'hidden'}`}
+                  >
+                    <FaTrash />
+                  </p>
+
+                  <label htmlFor="image_2" className="img-label">
+                    <div className="img-container">
+                      <img
+                        className="image-con"
+                        src={
+                          image_2
+                            ? URL.createObjectURL(image_2)
+                            : (existingImage2 && !image_2Close ? existingImage2 : assets.image_upload_icon)
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_2" hidden onChange={(e) => setImage_2(e.target.files[0])}/>
+                  </label>
+                </div>
+
+                {/* IMAGE 3 */}
+                <div className={`main-img-container ${(image_3 || existingImage3) ? 'uploaded' : ''}`}>
+                  <p
+                    onClick={() => image_3 ? setImage_3(false) : handleImgCloseButton(3)}
+                    className={`img-remove-btn ${(image_3 || existingImage3) ? '' : 'hidden'}`}
+                  >
+                    <FaTrash />
+                  </p>
+
+                  <label htmlFor="image_3" className="img-label">
+                    <div className="img-container">
+                      <img
+                        className="image-con"
+                        src={
+                          image_3
+                            ? URL.createObjectURL(image_3)
+                            : (existingImage3 && !image_3Close ? existingImage3 : assets.image_upload_icon)
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_3" hidden onChange={(e) => setImage_3(e.target.files[0])}/>
+                  </label>
+                </div>
+
+                {/* IMAGE 4 */}
+                <div className={`main-img-container ${(image_4 || existingImage4) ? 'uploaded' : ''}`}>
+                  <p
+                    onClick={() => image_4 ? setImage_4(false) : handleImgCloseButton(4)}
+                    className={`img-remove-btn ${(image_4 || existingImage4) ? '' : 'hidden'}`}
+                  >
+                    <FaTrash />
+                  </p>
+
+                  <label htmlFor="image_4" className="img-label">
+                    <div className="img-container">
+                      <img
+                        className="image-con"
+                        src={
+                          image_4
+                            ? URL.createObjectURL(image_4)
+                            : (existingImage4 && !image_4Close ? existingImage4 : assets.image_upload_icon)
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_4" hidden onChange={(e) => setImage_4(e.target.files[0])}/>
+                  </label>
+                </div>
+
               </div>
 
               <div className="form-group">
@@ -875,11 +1047,11 @@ function UpdateProduct() {
 
               <div className="ap-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
                 {/* Save Changes */}
-                <button type="submit" className="btn btn-submit">Save Changes</button>
+                <button type="submit" className="btn-submit">Save Changes</button>
 
 
                 {/* Delete button (left) */}
-                <button type="button" className="btn btn-danger" onClick={handleDelete} style={{ marginRight: 'auto' }}>
+                <button type="button" className="upp-delete-btn" onClick={handleDelete} style={{ marginRight: 'auto' }}>
                   Delete
                 </button>
               </div>
