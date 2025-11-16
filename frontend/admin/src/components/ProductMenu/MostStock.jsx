@@ -4,7 +4,7 @@ import { FaArrowLeft, FaTrash } from 'react-icons/fa';
 import { AdminContext } from '../../context/AdminContextProvider';
 import Navbar from '../Navbar';
 
-function MostStock({ onBack }) {
+function MostStock({onBack}) {
   const { products, productCategory, navigate } = useContext(AdminContext);
 
   const [query, setQuery] = useState('');
@@ -59,7 +59,7 @@ function MostStock({ onBack }) {
 
   return (
     <>
-      <Navbar TitleName="Most Stock" />
+      <Navbar TitleName="Most Stock Products" />
       <div className="tpc-container">
         <div className="tpc-card">
 
@@ -120,7 +120,7 @@ function MostStock({ onBack }) {
               ) : (
                 <tr>
                   <td colSpan="6" className="center empty">
-                    No products with stocks ≥ 1000.
+                    No products are displayed.
                   </td>
                 </tr>
               )}
