@@ -15,6 +15,8 @@ import { Server } from 'socket.io';
 import http from 'http';
 import adminRouter from './routes/admin/adminRoute.js';
 import adminProductRouter from './routes/admin/adminProductRoute.js';
+import adminOrderRouter from './routes/admin/adminOrderRoute.js';
+import adminUsersRouter from './routes/admin/adminUsersRoute.js';
 
 // APP CONFIG
 const app = express();
@@ -51,6 +53,8 @@ app.use('/api/paypal', paypalRouter);
 // ADMIN ROUTES
 app.use('/api/admin', adminRouter);
 app.use('/api/product', adminProductRouter);
+app.use('/api/order', adminOrderRouter);
+app.use('/api/all-customer', adminUsersRouter);
 
 
 // TEST

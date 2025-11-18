@@ -22,20 +22,119 @@ const AdminContextProvider = (props) => {
   const [variantName, setVariantName] = useState([]);
   const [productVariantValues, setProductVariantValues] = useState([]);
   const [productVariantCombination, setProductVariantCombination] = useState([]);
+  const [fetchOrders, setFetchOrders] = useState([]);
+  const [fetchOrderItems, setFetchOrderItems] = useState([]);
+  const [customerList, setCustomerList] = useState([]);
+  const [deliveryInfoList, setDeliveryInfoList] = useState([]);
+  const [barangays, setBarangays] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [provinces, setProvinces] = useState([]);
+
+  /*--------------------------FETCH LOCATIONS----------------------------*/
+    const handleFetchLocations = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/all-customer/locations", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setBarangays(response.data.barangays);
+                setCities(response.data.cities);
+                setProvinces(response.data.provinces);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+        handleFetchLocations();
+        }
+    }, [token]);
+
+  /*--------------------------FETCH DELIVERY INFORMATION----------------------------*/
+    const handleFetchDeliveryInfo = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/all-customer/delivery-info", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setDeliveryInfoList(response.data.deliveryInfoList);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+        handleFetchDeliveryInfo();
+        }
+    }, [token]);
+
+    console.log(deliveryInfoList);
+
+  /*--------------------------FETCH ORDERS----------------------------*/
+    const handleFetchAllCustomer = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/all-customer/list", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setCustomerList(response.data.customerList);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+        handleFetchAllCustomer();
+        }
+    }, [token]);
+
+  /*--------------------------FETCH ORDERS----------------------------*/
+    const handleFetchOrders = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/order/list", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setFetchOrders(response.data.orders);
+                setFetchOrderItems(response.data.orderItems);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+        handleFetchOrders();
+        }
+    }, [token]);
 
   /*---------------------------FETCH ALL PRODUCT VARIANT COMBINATION-----------------------------*/
     const fetchProductVariantCombination = async () => {
-        if (token) {
-          try {
-            const response = await axios.get(backendUrl + "/api/product/product-variant-combination");
-            if (response.data.success) {
-                setProductVariantCombination(response.data.productVariantCombination);
-            } 
-          } catch (error) {
-              console.log(error);
-              toast.error(error.message, { ...toastError });
-          }
-        }
+      try {
+        const response = await axios.get(backendUrl + "/api/product/product-variant-combination");
+        if (response.data.success) {
+            setProductVariantCombination(response.data.productVariantCombination);
+        } 
+      } catch (error) {
+          console.log(error);
+          toast.error(error.message, { ...toastError });
+      }
+
     };
     useEffect(() => {
         if (token) {
@@ -45,16 +144,14 @@ const AdminContextProvider = (props) => {
 
   /*---------------------------FETCH ALL PRODUCT VARIANT VALUES-----------------------------*/
     const fetchProductVariantValues = async () => {
-        if (token) {
-          try {
-            const response = await axios.get(backendUrl + "/api/product/product-variant-values");
-            if (response.data.success) {
-                setProductVariantValues(response.data.productVariantValues);
-            }
-          } catch (error) {
-              console.log(error);
-              toast.error(error.message, { ...toastError });
+        try {
+          const response = await axios.get(backendUrl + "/api/product/product-variant-values");
+          if (response.data.success) {
+              setProductVariantValues(response.data.productVariantValues);
           }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, { ...toastError });
         }
     };
     useEffect(() => {
@@ -63,19 +160,18 @@ const AdminContextProvider = (props) => {
     }
   }, [token]);
 
+
   /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
     const fetchVariantName = async () => {
-        if (token) {
-          try {
-            const response = await axios.get(backendUrl + "/api/product/variant-name");
-            if (response.data.success) {
-                setVariantName(response.data.variantName);
-            }
-          } catch (error) {
-              console.log(error);
-              toast.error(error.message, { ...toastError });
-          }
+      try {
+        const response = await axios.get(backendUrl + "/api/product/variant-name");
+        if (response.data.success) {
+            setVariantName(response.data.variantName);
         }
+      } catch (error) {
+          console.log(error);
+          toast.error(error.message, { ...toastError });
+      }
     };
     useEffect(() => {
     if (token) {
@@ -128,19 +224,17 @@ const AdminContextProvider = (props) => {
 
   /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
   const fetchAllProducts = async () => {
-    if (token) {
-      try {
-        const response = await axios.get(backendUrl + "/api/product/list", {
-            headers: {
-            Authorization: `Bearer ${token}`
-            }
-        });;
-        if (response.data.success) {
-            setProducts(response.data.products);
-        } 
-      } catch (error) {
-          console.log(error);
-      }
+    try {
+      const response = await axios.get(backendUrl + "/api/product/list", {
+          headers: {
+          Authorization: `Bearer ${token}`
+          }
+      });;
+      if (response.data.success) {
+          setProducts(response.data.products);
+      } 
+    } catch (error) {
+        console.log(error);
     }
   }
   useEffect(() => {
@@ -151,19 +245,17 @@ const AdminContextProvider = (props) => {
 
   /*---------------------------FETCH PRODUCT CATEGORY-----------------------------*/
   const fetchProductCategory = async () => {
-    if (token) {
-      try {
-        const response = await axios.get(backendUrl + "/api/product/category", {
-            headers: {
-            Authorization: `Bearer ${token}`
-            }
-        });;
-        if (response.data.success) {
-            setProductCategory(response.data.productCategory);
-        } 
-      } catch (error) {
-          console.log(error);
-      }
+    try {
+      const response = await axios.get(backendUrl + "/api/product/category", {
+          headers: {
+          Authorization: `Bearer ${token}`
+          }
+      });;
+      if (response.data.success) {
+          setProductCategory(response.data.productCategory);
+      } 
+    } catch (error) {
+        console.log(error);
     }
   }
   useEffect(() => {
@@ -234,7 +326,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces
   }  
   return (
     <AdminContext.Provider value={value}>

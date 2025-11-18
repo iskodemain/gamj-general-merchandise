@@ -694,7 +694,7 @@ const Profile = () => {
                 <div className="overlay">
                   <FaRegEdit className="overlay-icon" />
                 </div>
-                <input onChange={handleProfileUpload} type="file" id="profileImage" accept="image/*,application/pdf" hidden/>
+                <input onChange={handleProfileUpload} type="file" id="profileImage" accept="image/*" hidden/>
               </label>
               <div className='recommended-ct'>
                 <p className='recommend-px first'>Recommended:</p>
