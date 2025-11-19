@@ -1,20 +1,19 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import "./ViewAll.css";
 import { FaTrashCan, FaArrowLeft } from "react-icons/fa6";
+import { IoIosArrowDown } from "react-icons/io";
+import { IoSearchOutline } from "react-icons/io5";
 
 const STATUS_OPTIONS = [
   { key: "Pending", color: "#F5A623" },
   { key: "Processing", color: "#17A2A2" },
   { key: "Out for Delivery", color: "#2B7BEF" },
   { key: "Delivered", color: "#2FA14C" },
-  { key: "Cancelled", color: "#8c8d8e" },
+  { key: "Cancelled", color: "#e36666" },
 ];
 
 function ViewAll({ order = null, onClose = () => {} }) {
 
-  // -----------------------------
-  // INTERNAL STATES
-  // -----------------------------
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(new Set());
@@ -24,18 +23,27 @@ function ViewAll({ order = null, onClose = () => {} }) {
 
   const searchRef = useRef(null);
 
-  // Cancel modal
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [cancelItem, setCancelItem] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
 
+  // ✅ CLICK OUTSIDE — SIMPLEST & BUG-FREE SOLUTION
+  useEffect(() => {
+    function handleClickOutside(e) {
+      const isPill = e.target.closest(".vap-status-pill");
+      const isMenu = e.target.closest(".vap-status-menu");
 
-  // -----------------------------
-  // LOAD NEW ORDER
-  // -----------------------------
+      if (!isPill && !isMenu) {
+        setOpenDropdown(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   useEffect(() => {
     if (!order) return;
-
     setItems(order.items || []);
     setSelected(new Set());
     setSearch("");
@@ -46,10 +54,6 @@ function ViewAll({ order = null, onClose = () => {} }) {
     setCancelItem(null);
   }, [order]);
 
-
-  // -----------------------------
-  // SEARCH FILTER
-  // -----------------------------
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return items;
@@ -60,10 +64,6 @@ function ViewAll({ order = null, onClose = () => {} }) {
     );
   }, [items, search]);
 
-
-  // -----------------------------
-  // SELECT ALL
-  // -----------------------------
   const toggleSelectAll = () => {
     const allIds = visible.map((i) => i.id);
     const next = new Set(selected);
@@ -77,7 +77,6 @@ function ViewAll({ order = null, onClose = () => {} }) {
       allIds.forEach((id) => next.add(id));
       setShowBulkStatus(true);
     }
-
     setSelected(next);
   };
 
@@ -91,16 +90,20 @@ function ViewAll({ order = null, onClose = () => {} }) {
     if (next.size === 0) setBulkDropdownOpen(false);
   };
 
-
-  // -----------------------------
-  // STATUS CHANGE
-  // -----------------------------
   const changeStatus = (id, status) => {
+    if (status === "Cancelled") {
+      const item = items.find((i) => i.id === id);
+      openCancelModalFor(item);
+      setOpenDropdown(null);
+      return; // STOP — do not update status
+    }
+
     setItems((prev) =>
       prev.map((i) => (i.id === id ? { ...i, status } : i))
     );
     setOpenDropdown(null);
   };
+
 
   const changeStatusForSelected = (status) => {
     setItems((prev) =>
@@ -124,31 +127,20 @@ function ViewAll({ order = null, onClose = () => {} }) {
     return [...statuses][0];
   }, [selected, items]);
 
-
-  // -----------------------------
-  // DELETE ITEM (local)
-  // -----------------------------
   const deleteItem = (id) => {
     if (!window.confirm(`Delete item #${id}?`)) return;
     setItems((prev) => prev.filter((i) => i.id !== id));
-
     const next = new Set(selected);
     next.delete(id);
     setSelected(next);
   };
 
-
-  // -----------------------------
-  // CANCEL MODAL
-  // -----------------------------
   const openCancelModalFor = (item) => {
-    setCancelItem(item);
-    setCancelReason(
-      `Magandang araw. Napansin namin na may sira ang natanggap na produkto (${item.name}). Nais naming humiling ng refund at ibalik ang bayad.`
-    );
-    setCancelModalOpen(true);
-    setOpenDropdown(null);
-  };
+  setCancelItem(item);
+  setCancelModalOpen(true);
+  setOpenDropdown(null);
+};
+
 
   const submitCancel = () => {
     console.log("CANCEL ITEM:", cancelItem, "Reason:", cancelReason);
@@ -156,33 +148,22 @@ function ViewAll({ order = null, onClose = () => {} }) {
     setCancelItem(null);
   };
 
-
-  // -----------------------------
-  // RENDER
-  // -----------------------------
   return (
-    <div className="view-all-wrapper">
-
-      {/* Top Bar */}
-      <div className="view-all-topbar">
-        <button className="back-btn" onClick={onClose}>
+    <div className="vap-wrapper">
+      <div className="vap-topbar">
+        <button className="vap-back-btn" onClick={onClose}>
           <FaArrowLeft />
         </button>
-
-        <div className="order-title">
+        <div className="vap-order-title">
           Order #{order?.orderId || "—"}
         </div>
       </div>
 
-
-      {/* Main */}
-      <div className="view-all-content">
-        <div className="card">
-
-          {/* HEADER */}
-          <div className="card-header sticky">
-            <div className="header-left">
-              <label className="all-checkbox">
+      <div className="vap-content">
+        <div className="vap-card">
+          <div className="vap-card-header">
+            <div className="vap-header-left">
+              <label className="vap-all-checkbox">
                 <input
                   type="checkbox"
                   checked={
@@ -191,50 +172,45 @@ function ViewAll({ order = null, onClose = () => {} }) {
                   }
                   onChange={toggleSelectAll}
                 />
-                <span className="all-label">All ({selected.size})</span>
+                <span className="vap-all-label">All ({selected.size})</span>
               </label>
             </div>
 
-            <div className="header-right">
-              <div className="search-wrap">
-                <input
-                  ref={searchRef}
-                  className="search-input"
-                  placeholder="Search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+            <div className="vap-header-right">
+              <div className="vap-search-wrap">
+                <input ref={searchRef} className="vap-search-input" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)}/>
+                <IoSearchOutline className="search-bar-item"/>
               </div>
 
               {showBulkStatus && (
-                <div className="bulk-status-bar">
-                  <div className="bulk-dropdown">
+                <div className="vap-bulk-status">
+                  <div className="vap-bulk-dropdown">
                     <button
-                      className="bulk-pill"
+                      className="vap-bulk-pill"
                       onClick={() => setBulkDropdownOpen((v) => !v)}
                     >
                       <span
-                        className="pill-dot"
+                        className="vap-pill-dot"
                         style={{
                           background:
                             STATUS_OPTIONS.find((s) => s.key === bulkLabel)
                               ?.color || "#F5A623",
                         }}
                       />
-                      <span className="pill-label">{bulkLabel}</span>
+                      <span className="vap-pill-label">{bulkLabel}</span>
                       ▾
                     </button>
 
                     {bulkDropdownOpen && (
-                      <div className="bulk-menu">
+                      <div className="vap-bulk-menu">
                         {STATUS_OPTIONS.map((opt) => (
                           <button
                             key={opt.key}
-                            className="bulk-menu-item"
+                            className="vap-bulk-item"
                             onClick={() => changeStatusForSelected(opt.key)}
                           >
                             <span
-                              className="menu-dot"
+                              className="vap-menu-dot"
                               style={{ background: opt.color }}
                             />
                             {opt.key}
@@ -248,142 +224,104 @@ function ViewAll({ order = null, onClose = () => {} }) {
             </div>
           </div>
 
-          <div className="divider" />
+          <div className="vap-divider" />
 
-          {/* ITEMS */}
-          <ul className="items-list">
+          <ul className="vap-list">
             {visible.map((item) => (
-              <li
-                key={item.id}
-                className={`items-row ${
-                  selected.has(item.id) ? "selected" : ""
-                }`}
-              >
-                {/* LEFT */}
-                <div className="col item-col">
-                  <div className="row-left">
-                    <input
-                      type="checkbox"
-                      checked={selected.has(item.id)}
-                      onChange={() => toggleSelect(item.id)}
-                      className="row-checkbox"
-                    />
+              <li key={item.id} className={`vap-row ${ selected.has(item.id) ? "vap-selected" : ""}`}>
 
-                    <img className="thumb" src={item.image} alt={item.name} />
+                <div className="vap-item-col">
+                  <div className="vap-row-left">
+                    <input type="checkbox" checked={selected.has(item.id)} onChange={() => toggleSelect(item.id)} className="vap-row-checkbox"/>
 
-                    <div className="item-meta">
-                      <div className="item-name">{item.name}</div>
+                    <img className="vap-thumb" src={item.image} alt={item.name} />
 
-                      <div className="item-sub">
-                        <span className="meta">Quantity: {item.qty}</span>
+                    <div className="vap-item-meta">
+                      <div className="vap-item-name">{item.name}</div>
 
+                      <div className="vap-item-sub">
+                        <span className="vap-meta">Quantity: <span className="vap-qty-variant">{item.qty}</span> </span>
                         {item.value && (
-                          <span className="meta">{item.value}</span>
+                          <span className="vap-meta">Variant: <span className="vap-qty-variant">{item.value}</span></span>
                         )}
                       </div>
 
-                      <div className="item-price">
+                      <div className="vap-item-price">
                         ₱{Number(item.price).toFixed(2)}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* STATUS */}
-                <div className="col status-col">
-                  <div className="status-inner">
+                <div className="vap-status-col">
+                  <div className="vap-status-inner">
                     <span
-                      className="status-dot"
+                      className="vap-status-dot"
                       style={{
                         background:
                           STATUS_OPTIONS.find((s) => s.key === item.status)
                             ?.color || "#F5A623",
                       }}
                     />
-                    <span className="status-label">{item.status}</span>
+                    <span className="vap-status-label">{item.status}</span>
                   </div>
                 </div>
 
-                {/* PAYMENT + STATUS PICK */}
-                <div className="col pay-col">
-                  <div className="pay-meta">
-                    <div className="pay-method">
-                      <span className="small-label">Payment Method:</span>
-                      <span className="method-val">
-                        {order?.method || "—"}
+                <div className="vap-pay-col">
+                  <div className="vap-pay-meta">
+                    <div className="vap-pay-method">
+                      <span className="vap-small-label">Payment Method:</span>
+                      <span className="vap-method-val">
+                        {order?.method}
                       </span>
                     </div>
                   </div>
 
-                  <div className="status-pick">
+                  <div className="vap-status-pick" >
                     {item.status === "Delivered" && (
                       <button
-                        className="row-trash-btn"
+                        className="vap-trash-btn"
                         onClick={() => deleteItem(item.id)}
                       >
                         <FaTrashCan />
                       </button>
                     )}
 
-                    <button
-                      className="status-pill"
-                      onClick={() =>
-                        item.status === "Cancelled"
-                          ? openCancelModalFor(item)
-                          : setOpenDropdown(
-                              openDropdown === item.id ? null : item.id
-                            )
-                      }
-                    >
-                      <span
-                        className="pill-dot"
-                        style={{
-                          background:
-                            STATUS_OPTIONS.find((s) => s.key === item.status)
-                              ?.color,
-                        }}
-                      />
-                      <span className="pill-label">{item.status}</span>
-                      ▾
+                    <button className="vap-status-pill" onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}>
+                      <span className="vap-pill-label">{item.status}</span>
+                      <IoIosArrowDown />
                     </button>
 
                     {openDropdown === item.id && (
-                      <div className="status-menu">
+                      <div className="vap-status-menu">
                         {STATUS_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.key}
-                            className="status-menu-item"
-                            onClick={() => changeStatus(item.id, opt.key)}
-                          >
-                            <span
-                              className="menu-dot"
-                              style={{ background: opt.color }}
-                            />
+                          <button key={opt.key} className="vap-status-item" onClick={() => changeStatus(item.id, opt.key)}>
+                            <span className="vap-menu-dot" style={{ background: opt.color }} />
                             {opt.key}
                           </button>
                         ))}
                       </div>
                     )}
+
                   </div>
                 </div>
+
               </li>
             ))}
 
             {visible.length === 0 && (
-              <li className="empty-row">No items found.</li>
+              <li className="vap-empty">No items found.</li>
             )}
           </ul>
         </div>
       </div>
 
-
-      {/* CANCEL MODAL */}
       {cancelModalOpen && cancelItem && (
-        <div className="cancel-modal-overlay">
-          <div className="cancel-modal">
+        <div className="vap-modal-overlay">
+          <div className="vap-modal">
 
             <button
-              className="cancel-modal-close"
+              className="vap-modal-close"
               onClick={() => {
                 setCancelModalOpen(false);
                 setCancelItem(null);
@@ -392,40 +330,47 @@ function ViewAll({ order = null, onClose = () => {} }) {
               ✕
             </button>
 
-            <div className="cancel-modal-header">Cancel Order Item</div>
-
-            <div className="cancel-product-box">
+            <div className="vap-modal-header">Cancelled Item</div>
+            <div className="vap-product-box">
               <img
-                className="product-image"
+                className="vap-product-image"
                 src={cancelItem.image}
                 alt={cancelItem.name}
               />
 
-              <div className="product-details">
-                <div className="product-name">{cancelItem.name}</div>
+              <div className="vap-product-details">
+                <div className="vap-product-name">{cancelItem.name}</div>
 
-                <div className="product-meta">
-                  <span>Quantity: {cancelItem.qty}</span>
-                  {cancelItem.value && <span>{cancelItem.value}</span>}
+                <div className="vap-product-meta">
+                  <div className="vap-cancel-qty">
+                    <p>Quantity: </p>
+                    {cancelItem.qty}
+                  </div>
+                  {cancelItem.value && 
+                  <div className="vap-cancel-variant">
+                    <p>Variant: </p> 
+                    {cancelItem.value}
+                  </div>}
                 </div>
 
-                <div className="product-price">
+                <div className="vap-product-price">
                   ₱{Number(cancelItem.price).toFixed(2)}
                 </div>
               </div>
             </div>
 
-            <div className="cancel-section-title">Cancellation Reason</div>
+            <div className="vap-cancel-title">Cancellation Reason</div>
 
             <textarea
-              className="cancel-reason-input"
+              className="vap-cancel-input"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               rows={6}
+              placeholder="Reason for cancellation"
             />
 
-            <div className="cancel-actions">
-              <button className="cancel-submit-btn" onClick={submitCancel}>
+            <div className="vap-cancel-actions">
+              <button className="vap-cancel-submit" onClick={submitCancel}>
                 Submit
               </button>
             </div>
@@ -433,6 +378,7 @@ function ViewAll({ order = null, onClose = () => {} }) {
           </div>
         </div>
       )}
+
     </div>
   );
 }
