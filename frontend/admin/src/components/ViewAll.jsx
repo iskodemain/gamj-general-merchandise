@@ -12,7 +12,7 @@ const STATUS_OPTIONS = [
   { key: "Cancelled", color: "#e36666" },
 ];
 
-function ViewAll({ order = null, onClose = () => {} }) {
+function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
@@ -44,7 +44,13 @@ function ViewAll({ order = null, onClose = () => {} }) {
 
   useEffect(() => {
     if (!order) return;
-    setItems(order.items || []);
+
+    const filteredItems =
+      orderStatus && order.items
+        ? order.items.filter((i) => i.status === orderStatus)
+        : order.items || [];
+
+    setItems(filteredItems);
     setSelected(new Set());
     setSearch("");
     setOpenDropdown(null);
@@ -52,17 +58,21 @@ function ViewAll({ order = null, onClose = () => {} }) {
     setBulkDropdownOpen(false);
     setCancelModalOpen(false);
     setCancelItem(null);
-  }, [order]);
+  }, [order, orderStatus]);
+
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
+
     if (!q) return items;
+
     return items.filter(
       (i) =>
         (i.name || "").toLowerCase().includes(q) ||
         String(i.id).includes(q)
     );
   }, [items, search]);
+
 
   const toggleSelectAll = () => {
     const allIds = visible.map((i) => i.id);
@@ -227,6 +237,9 @@ function ViewAll({ order = null, onClose = () => {} }) {
           <div className="vap-divider" />
 
           <ul className="vap-list">
+            {visible.length === 0 && (
+              <li className="vap-empty">No items found.</li>
+            )}
             {visible.map((item) => (
               <li key={item.id} className={`vap-row ${ selected.has(item.id) ? "vap-selected" : ""}`}>
 
@@ -308,10 +321,6 @@ function ViewAll({ order = null, onClose = () => {} }) {
 
               </li>
             ))}
-
-            {visible.length === 0 && (
-              <li className="vap-empty">No items found.</li>
-            )}
           </ul>
         </div>
       </div>
