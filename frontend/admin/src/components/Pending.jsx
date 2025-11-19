@@ -27,7 +27,7 @@ function Pending() {
       );
 
       return {
-        orderId: order.ID,
+        orderId: order.orderId,
         method: order.paymentMethod,
         date: order.dateOrdered,
         total: Number(order.totalAmount),
@@ -38,18 +38,13 @@ function Pending() {
             (p) => p.ID === item.productId
           );
 
-          let value = "No Variant";
-          if (item.variantValues && item.variantValues.length > 0) {
-            value = item.variantValues.map((v) => v.value).join(", ");
-          }
-
           return {
             id: item.ID,
             name: product?.productName || "Product",
             image: product?.image1,
             qty: item.quantity,
-            value,
-            price: Number(item.subTotal) / item.quantity,
+            value: item.value,
+            price: Number(item.subTotal),
             status: item.orderStatus || "Pending",
           };
         }),
@@ -79,168 +74,172 @@ function Pending() {
     <>
       <Navbar TitleName="Pending Orders" />
       <div className="pending-products-container">
-        <div className="pending-products-page">
-          <div className="pending-products-header-divider" />
-          {/* VIEW ALL PAGE */}
-          {showViewAll && <ViewAll order={selectedOrder} onClose={() => setShowViewAll(false)}/>} 
-            
-          <div className="pending-products-list">
-              {pendingOrders.map((order) => {
-                // STEP 2: Get all orderItems belonging to this order
-                const items = fetchOrderItems.filter(
-                  (item) => item.orderId === order.ID
-                );
+        {/* VIEW ALL PAGE */}
+        {showViewAll ? (<ViewAll order={selectedOrder} onClose={() => setShowViewAll(false)}/>) : 
+          <div className="pending-products-page">
+            <div className="pending-products-header-divider" />
+            <div className="pending-products-list">
+                {pendingOrders.map((order) => {
+                  // STEP 2: Get all orderItems belonging to this order
+                  const items = fetchOrderItems.filter(
+                    (item) => item.orderId === order.ID
+                  );
 
-                // STEP 3: Compute total
-                const orderTotal = items.reduce(
-                  (sum, item) => sum + parseFloat(item.subTotal || 0),
-                  0
-                );
+                  // STEP 3: Compute total
+                  const orderTotal = items.reduce(
+                    (sum, item) => sum + parseFloat(item.subTotal || 0),
+                    0
+                  );
 
-                // STEP 4: Customer delivery info
-                const deliveryInfo = deliveryInfoList.find(
-                  (d) => d.customerId === order.customerId
-                );
+                  // STEP 4: Customer delivery info
+                  const deliveryInfo = deliveryInfoList.find(
+                    (d) => d.customerId === order.customerId
+                  );
 
-                const barangay = barangays.find(
-                  (b) => b.ID === deliveryInfo?.barangayId
-                );
-                const city = cities.find(
-                  (c) => c.ID === deliveryInfo?.cityId
-                );
-                const province = provinces.find(
-                  (p) => p.ID === deliveryInfo?.provinceId
-                );
+                  const barangay = barangays.find(
+                    (b) => b.ID === deliveryInfo?.barangayId
+                  );
+                  const city = cities.find(
+                    (c) => c.ID === deliveryInfo?.cityId
+                  );
+                  const province = provinces.find(
+                    (p) => p.ID === deliveryInfo?.provinceId
+                  );
 
-                return (
-                  <article className="pending-product-card" key={order.ID}>
-                    <div className="pending-product-inner">
+                  return (
+                    <article className="pending-product-card" key={order.ID}>
+                      <div className="pending-product-inner">
 
-                      {/* LEFT SIDE – PRODUCT LIST */}
-                      <div className="pending-product-left-col">
-                        <ul className="pending-product-items">
-                          {items.map((item) => {
-                            const product = products.find(
-                              (p) => p.ID === item.productId
-                            );
+                        {/* LEFT SIDE – PRODUCT LIST */}
+                        <div className="pending-product-left-col">
+                          <ul className="pending-product-items">
+                            {items.map((item) => {
+                              const product = products.find(
+                                (p) => p.ID === item.productId
+                              );
 
-                            return (
-                              <li className="pending-product-row" key={item.ID}>
-                                <img
-                                  className="pending-product-img"
-                                  src={product?.image1}
-                                  alt={product?.productName}
-                                />
+                              return (
+                                <li className="pending-product-row" key={item.ID}>
+                                  <img
+                                    className="pending-product-img"
+                                    src={product?.image1}
+                                    alt={product?.productName}
+                                  />
 
-                                <div className="pending-product-meta">
-                                  <div className="pending-product-name">
-                                    {product?.productName}
-                                  </div>
-
-                                  <div className="pending-product-details">
-                                    <div className="pending-product-qty-value">
-                                      <div>
-                                        Qty: {item.quantity}
-                                      </div>
-
-                                      <div className="pending-product-specs">
-                                        {item.value && item.value}
-                                      </div>
-                                      
+                                  <div className="pending-product-meta">
+                                    <div className="pending-product-name">
+                                      {product?.productName}
                                     </div>
 
-                                    <div className="pending-product-price">
-                                      ₱{parseFloat(item.subTotal).toFixed(2)}
+                                    <div className="pending-product-details">
+                                      <div className="pending-product-qty-value">
+                                        <div>
+                                          Quantity: <span className="ppq-font">{item.quantity}</span>
+                                        </div>
+
+                                        <div className="pending-product-specs">
+                                          {item.value && (
+                                            <div>
+                                              Variant: <span className="ppq-specs">{item.value}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        
+                                      </div>
+
+                                      <div className="pending-product-price">
+                                        ₱{parseFloat(item.subTotal).toFixed(2)}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </li>
-                            );
-                          })}
-                        </ul>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+
+                        {/* RIGHT SIDE – ORDER DETAILS */}
+                        <div className="pending-product-right-col">
+                          <div className="pending-product-order-top">
+                            <div className="pending-product-order-number">
+                              Order ID: <strong>{order.orderId}</strong>
+                            </div>
+
+                            <div className="pending-product-order-total">
+                              Total: ₱{orderTotal.toFixed(2)}
+                            </div>
+                          </div>
+
+                          <div className="pending-product-order-info">
+                            <div className="pending-product-info-row">
+                              <div className="pending-product-label">Item: {items.length}</div>
+                            </div>
+
+                            <div className="pending-product-info-row">
+                              <div className="pending-product-label">
+                                Method: {order.paymentMethod}
+                              </div>
+                            </div>
+
+                            <div className="pending-product-info-row">
+                              <div className="pending-product-label">
+                                Date: {formatDate(order.dateOrdered)}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* CUSTOMER INFO */}
+                          <div className="pending-product-customer-block">
+                            <div className="pending-product-cust-name">
+                              {deliveryInfo?.medicalInstitutionName}
+                            </div>
+
+                            <div className="pending-product-cust-address">
+                              <span className="pp-address">Address: </span>
+                              <span className="ppl-adddress">
+                                {deliveryInfo?.detailedAddress},{" "}
+                                {barangay?.barangayName},{" "}
+                                {city?.cityName},{" "}
+                                {province?.provinceName},{" "}
+                                {deliveryInfo?.zipCode},{" "}
+                                {deliveryInfo?.country}
+                              </span>
+                            </div>
+
+                            <div className="pending-product-cust-contact">
+                              <div className="pending-product-cust-email">
+                                <span className="ppc-email">Email:</span> {deliveryInfo?.emailAddress}
+                              </div>
+                              <div className="pending-product-cust-phone">
+                                <span className="ppc-contact">Contact No.:</span> +63 {deliveryInfo?.contactNumber}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* VIEW ALL BUTTON */}
+                          <button
+                            className="pending-product-view-all-btn"
+                            onClick={() => {
+                              console.log("Clicked order from Pending:", order);
+                              const clean = viewPendingOrders.find(
+                                (o) => o.orderId === order.orderId
+                              );
+                              console.log("Matched clean order:", clean);
+                              setSelectedOrder(clean);
+                              setShowViewAll(true);
+                            }}
+                          >
+                            View All
+                          </button>
+
+                        </div>
                       </div>
-
-                      {/* RIGHT SIDE – ORDER DETAILS */}
-                      <div className="pending-product-right-col">
-                        <div className="pending-product-order-top">
-                          <div className="pending-product-order-number">
-                            Order ID: <strong>{order.orderId}</strong>
-                          </div>
-
-                          <div className="pending-product-order-total">
-                            Total: ₱{orderTotal.toFixed(2)}
-                          </div>
-                        </div>
-
-                        <div className="pending-product-order-info">
-                          <div className="pending-product-info-row">
-                            <div className="pending-product-label">Item: {items.length}</div>
-                          </div>
-
-                          <div className="pending-product-info-row">
-                            <div className="pending-product-label">
-                              Method: {order.paymentMethod}
-                            </div>
-                          </div>
-
-                          <div className="pending-product-info-row">
-                            <div className="pending-product-label">
-                              Date: {formatDate(order.dateOrdered)}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* CUSTOMER INFO */}
-                        <div className="pending-product-customer-block">
-                          <div className="pending-product-cust-name">
-                            {deliveryInfo?.medicalInstitutionName}
-                          </div>
-
-                          <div className="pending-product-cust-address">
-                            <span className="pp-address">Address: </span>
-                            <span>
-                              {deliveryInfo?.detailedAddress},{" "}
-                              {barangay?.barangayName},{" "}
-                              {city?.cityName},{" "}
-                              {province?.provinceName},{" "}
-                              {deliveryInfo?.zipCode},{" "}
-                              {deliveryInfo?.country}
-                            </span>
-                          </div>
-
-                          <div className="pending-product-cust-contact">
-                            <div className="pending-product-cust-email">
-                              Email: {deliveryInfo?.emailAddress}
-                            </div>
-                            <div className="pending-product-cust-phone">
-                              Contact No.: {deliveryInfo?.contactNumber}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* VIEW ALL BUTTON */}
-                        <button
-                          className="pending-product-view-all-btn"
-                          onClick={() => {
-                            console.log("Clicked order from Pending:", order);
-                            const clean = viewPendingOrders.find(
-                              (o) => o.orderId === order.ID
-                            );
-                            console.log("Matched clean order:", clean);
-                            setSelectedOrder(clean);
-                            setShowViewAll(true);
-                          }}
-                        >
-                          View All
-                        </button>
-
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-        </div>
+                    </article>
+                  );
+                })}
+              </div>
+          </div>
+        } 
       </div>
     </>
   );

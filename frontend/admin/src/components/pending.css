@@ -93,6 +93,7 @@
   font-weight: 600;
   color: #494949;
   margin-bottom: 6px;
+  font-family: "Outfit", sans-serif;
 }
 .pending-product-details {
   display: flex;
@@ -102,21 +103,30 @@
   align-items: flex-start;
 }
 .pending-product-details .bold { font-weight: 700; color: #333; }
-.pending-product-specs {
-  display: flex;
-  gap: 12px;
-  font-size: 0.88rem;
-  color: #6c6c6c;
-}
+
 .pending-product-qty-value {
   display: flex;
-  font-size: 16px;
+  font-size: 14px;
+  gap: 0.4rem;
+  align-items: center;
 }
+
+.pending-product-specs {
+  display: flex;
+  color: #6c6c6c;
+}
+
+.ppq-specs, .ppq-font {
+  font-weight: 600;
+  color: #494949;
+  font-family: "Outfit", sans-serif;
+} 
 
 .pending-product-price {
   font-weight: 700;
-  color: #111;
+  color: #494949;
   margin-top: 4px;
+  font-family: "Outfit", sans-serif;
 }
 
 /* Right column - order info */
@@ -126,7 +136,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-right: 150px; /* space for the right-aligned button */
+  padding-right: 150px; 
 }
 .pending-product-order-top {
   display: flex;
@@ -136,7 +146,8 @@
 
 .pending-product-order-number { 
   font-family: "Inter", sans-serif;
-  font-weight: 700; color: #333; 
+  font-weight: 700; 
+  color: #2B2B2B; 
 }
 
 .pending-product-order-total { 
@@ -158,17 +169,35 @@
   color: #666;
   font-size: 0.92rem;
 }
-.pending-product-info-row .pending-product-label { font-weight: 700; color: #777; }
+.pending-product-info-row .pending-product-label { 
+  font-weight: 700; 
+  color: #777; 
+  font-family: "Inter", sans-serif;
+}
 .pending-product-info-row .pending-product-value { font-weight: 600; color: #222; }
 
 /* customer block */
 .pending-product-customer-block {
-  border-top: 1px solid #f4f4f4;
+  border-top: 1px solid #f2f2f2;
   padding-top: 10px;
   color: #444;
   font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
 }
-.pending-product-cust-name { font-weight: 700; margin-bottom: 6px; }
+
+.pending-product-cust-name, .pp-address, .ppc-email, .ppc-contact {
+  color: #2B2B2B;
+  font-weight: 600;
+}
+
+.pending-product-cust-name { 
+  font-family: "Inter", sans-serif;
+  font-weight: 700; 
+  margin-bottom: 6px; 
+}
 
 .pending-product-cust-address { 
   white-space: pre-line; 
@@ -177,11 +206,25 @@
 }
 
 .pp-address {
+  font-family: "Inter", sans-serif;
   font-weight: 600;
 }
 
+.ppl-adddress {
+  font-family: "Inter", sans-serif;
+}
 
-.pending-product-cust-contact { color: #8a8a8a; font-size: 0.9rem; display:flex; flex-direction:column; gap:4px; }
+
+.pending-product-cust-contact { 
+  color: #8a8a8a; 
+  display:flex; 
+  flex-direction:column; 
+}
+
+.pending-product-cust-email, .pending-product-cust-phone {
+  font-family: "Inter", sans-serif;
+  color: #646464;
+}
 
 /* View All button - far right vertically centered */
 .pending-product-view-all-btn {
