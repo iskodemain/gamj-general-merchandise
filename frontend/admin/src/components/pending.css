@@ -1,3 +1,9 @@
+.empty-pen {
+  padding:18px; 
+  text-align:center; 
+  color:#383737; 
+}
+
 .pending-products-container {
   padding: 2rem;
   background: #EFFFF1;
@@ -7,6 +13,13 @@
 .pending-products-page {
   background: transparent; 
 }
+
+.pending-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 
 /* Header */
 .pending-products-header-row {

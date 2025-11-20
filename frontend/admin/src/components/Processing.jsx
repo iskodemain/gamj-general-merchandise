@@ -220,6 +220,7 @@ function Processing() {
                           </div>
 
                           <button
+                            type="button"
                             className="proc-viewall-btn"
                             onClick={() => {
                               const clean = viewProcessingOrders.find(
