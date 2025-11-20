@@ -55,7 +55,7 @@ const App = () => {
         <Route path="/place-order" element={token ? (orderItems?.length > 0 ? <PlaceOrder /> : <Navigate to="/" />) : <Navigate to="/login" />}/>
         <Route path="/orders" element={token ? <Orders/> : <Navigate to="/login"/> }/>
         <Route path="/notification" element={token ? <Notification /> : <Navigate to="/login"/>} />
-        <Route path="/login-verification" element={token || !loginToken ? <Navigate to="/"/> : <LoginCodeVerification/>}/>
+        <Route path="/login-verification" element={token ? <Navigate to="/"/> : !loginToken ? <Navigate to="/login" /> : <LoginCodeVerification/>}/>
         <Route path="/forgot-password" element={token ? <Navigate to="/"/> : <ForgotPassword/>}/>
         <Route path="/reset-verify-code" element={token || !fpIdentifier ? <Navigate to="/"/> : <ResetVerifyCode />}/>
         <Route path="/reset-password" element={cannotResetPassword ? <Navigate to="/"/> : <ResetPassword /> }/>

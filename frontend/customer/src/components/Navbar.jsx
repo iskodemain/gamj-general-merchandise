@@ -268,7 +268,7 @@ function Navbar() {
           )}
           <li><NavLink to="/wishlist" onClick={showSidebar}>Wishlist</NavLink></li>
           {token ? (
-            <li><NavLink to="#" onClick={(e) => { e.preventDefault(); logout(); showSidebar(); }}>Logout</NavLink></li>
+            <li><NavLink to="/" onClick={(e) => { e.preventDefault(); logout(); showSidebar(); }}>Logout</NavLink></li>
           ) : (
             <li>
               <NavLink to="/login" onClick={showSidebar}>Register / Sign In</NavLink>

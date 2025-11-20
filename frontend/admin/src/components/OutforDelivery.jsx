@@ -1,152 +1,249 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { assets } from "../assets/assets.js";
 import "./OutforDelivery.css";
 import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
+import { AdminContext } from "../context/AdminContextProvider.jsx";
 
 
-const sampleOrders = [
-  {
-    id: 23,
-    total: 1490.0,
-    itemsCount: 3,
-    method: "PayPal",
-    status: "Out for Delivery",
-    date: "Dec 20 2024",
-    customer: {
-      name: "Medical Hospital Cavite",
-      address: "Brgy. San Roque\nCavite City, Cavite\nPhilippines 4100",
-      email: "orders@medhospcavite.ph",
-      phone: "+63 912 345 6789"
-    },
-    items: [
-      { id: 1, image: assets.product1 || "https://via.placeholder.com/70", name: "Premium T-Shirt by bernil", qty: 1, size: "Adult - L", color: "Black", price: 499.0 },
-      { id: 2, image: assets.product2 || "https://via.placeholder.com/70", name: "GAMJ Logo Cap by francis", qty: 1, size: "One Size", color: "Navy", price: 299.0 },
-      { id: 3, image: assets.product3 || "https://via.placeholder.com/70", name: "large hotdogs (3pcs)", qty: 1, size: "N/A", color: "Mixed", price: 692.0 }
-    ]
-  },
-  {
-    id: 24,
-    total: 820.0,
-    itemsCount: 2,
-    method: "Cash On Delivery",
-    status: "Out for Delivery",
-    date: "Dec 18 2024",
-    customer: {
-      name: "John Doe",
-      address: "Unit 5B, 12th Ave\nMakati City, Metro Manila\nPhilippines 1200",
-      email: "john.doe@example.com",
-      phone: "+63 917 555 0123"
-    },
-    items: [
-      { id: 1, image: assets.product4 || "https://via.placeholder.com/70", name: "Vintage Hoodie", qty: 1, size: "M", color: "Gray", price: 599.0 },
-      { id: 2, image: assets.product5 || "https://via.placeholder.com/70", name: "Sticker Pack", qty: 1, size: "N/A", color: "Mixed", price: 221.0 }
-    ]
-  },
-  // Add more orders here if needed
-];
+function OutforDelivery() {
+  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces } = useContext(AdminContext);
 
-export default function OutforDelivery() {
   const [showViewAll, setShowViewAll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [viewOutForDeliveryOrders, setViewOutForDeliveryOrders] = useState([]);
+
+  useEffect(() => {
+  if (!fetchOrders || fetchOrders.length === 0) {
+    setViewOutForDeliveryOrders([]);
+    return;
+  }
+
+  const formatted = fetchOrders
+    .filter((o) => o.paymentMethod && o)
+    .map((order) => {
+      const items = fetchOrderItems.filter(
+        (item) => item.orderId === order.ID
+      );
+
+      return {
+        orderId: order.orderId,
+        method: order.paymentMethod,
+        date: order.dateOrdered,
+        total: Number(order.totalAmount),
+        itemsCount: items.length,
+
+        items: items.map((item) => {
+          const product = products.find(
+            (p) => p.ID === item.productId
+          );
+
+          return {
+            id: item.ID,
+            name: product?.productName,
+            image: product?.image1,
+            qty: item.quantity,
+            value: item.value,
+            price: Number(item.subTotal),
+            status: item.orderStatus,
+          };
+        }),
+      };
+    });
+
+    setViewOutForDeliveryOrders(formatted);
+  }, [fetchOrders, fetchOrderItems, products]);
+
+
+
+  // Format date
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+
+  const outForDeliveryOrders = fetchOrders?.filter((order) => {
+    const items = fetchOrderItems.filter(
+      (item) => item.orderId === order.ID
+    );
+    return items.some((item) => item.orderStatus === "Out for Delivery");
+  }) || [];
+
 
   return (
     <>
-    <Navbar TitleName="Out for Delivery Orders"/>
-      <div className="pending-page">
-      <header className="pending-header-row">
-        {/* keep top white design, notif, logout, etc. (these live outside this component in your layout) */}
-      </header>
-      
-      <div className="header-divider" />
+      <Navbar TitleName="Out for Delivery Orders" />
+      <div className="outfordelivery-orders-container">
+        {showViewAll ? (
+          <ViewAll order={selectedOrder} onClose={() => setShowViewAll(false)} orderStatus="Out for Delivery" />
+        ) : (
+          <div className="outfordelivery-orders-page">
 
-      {/* replace only the orders-list area with ViewAll when toggled */}
-      {showViewAll ? (
-        <ViewAll
-          order={selectedOrder}
-          onClose={() => {
-            setShowViewAll(false);
-            setSelectedOrder(null);
-          }}
-        />
-      ) : (
-        <div className="orders-list">
-          {sampleOrders.map(order => {
-            // determine payment display based on method
-            const method = (order.method || "").toLowerCase();
-            const paymentStatus = method.includes("paypal")
-              ? "Paid"
-              : method.includes("cash") || method.includes("cod") || method.includes("cash on delivery")
-              ? "Pending"
-              : order.status || "—";
+            <div className="outfordelivery-orders-header-divider" />
 
-            return (
-              <article className="order-card" key={order.id}>
-                <div className="order-inner">
-                  <div className="left-col">
-                    <h3 className="section-heading">Products</h3>
+            <div className="outfordelivery-orders-list">
+              {outForDeliveryOrders.length === 0 ? (
+                <div className="empty-ofd">
+                  No out for delivery orders.
+                </div>
+              ) : (
+                outForDeliveryOrders.map((order) => {
+                  const items = fetchOrderItems
+                    .filter((item) => item.orderId === order.ID)
+                    .filter((item) => item.orderStatus === "Out for Delivery");
 
-                    <ul className="products">
-                      {order.items.map(item => (
-                        <li className="product-row" key={item.id}>
-                          <img className="prod-img" src={item.image} alt={item.name} />
-                          <div className="prod-meta">
-                            <div className="prod-name">{item.name}</div>
+                  const orderTotal = items.reduce(
+                    (sum, item) => sum + parseFloat(item.subTotal || 0),
+                    0
+                  );
 
-                            <div className="prod-details">
-                              <div className="prod-qty"><span className="bold">Quantity: {item.qty}</span></div>
-                              <div className="prod-specs">
-                                {item.size && <span>Size: {item.size}</span>}
-                                {item.color && <span>Color: {item.color}</span>}
-                              </div>
-                              <div className="prod-price">₱{item.price.toFixed(2)}</div>
+                  const deliveryInfo = deliveryInfoList.find(
+                    (d) => d.customerId === order.customerId
+                  );
+
+                  const barangay = barangays.find(
+                    (b) => b.ID === deliveryInfo?.barangayId
+                  );
+
+                  const city = cities.find(
+                    (c) => c.ID === deliveryInfo?.cityId
+                  );
+
+                  const province = provinces.find(
+                    (p) => p.ID === deliveryInfo?.provinceId
+                  );
+
+                  return (
+                    <article className="ofd-order-card" key={order.ID}>
+                      <div className="ofd-order-inner">
+
+                        <div className="ofd-order-left">
+                          <ul className="ofd-item-list">
+                            {items.map((item) => {
+                              const product = products.find((p) => p.ID === item.productId);
+
+                              return (
+                                <li className="ofd-item-row" key={item.ID}>
+                                  <img
+                                    className="ofd-item-img"
+                                    src={product?.image1}
+                                    alt={product?.productName}
+                                  />
+
+                                  <div className="ofd-item-meta">
+                                    <div className="ofd-item-name">
+                                      {product?.productName}
+                                    </div>
+
+                                    <div className="ofd-item-details">
+                                      <div className="ofd-item-qtyblock">
+                                        <div>
+                                          Quantity: <span className="ppq-font">{item.quantity}</span>
+                                        </div>
+
+                                        <div className="ofd-item-specs">
+                                          {item.value && (
+                                            <div>
+                                              Variant: <span className="ppq-specs">{item.value}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      <div className="ofd-item-price">
+                                        ₱{parseFloat(item.subTotal).toFixed(2)}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+
+                        <div className="ofd-order-right">
+                          <div className="ofd-order-top">
+                            <div className="ofd-order-number">
+                              Order ID: <strong>{order.orderId}</strong>
+                            </div>
+
+                            <div className="ofd-order-total">
+                              Total: ₱{orderTotal.toFixed(2)}
                             </div>
                           </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
 
-                  <div className="right-col">
-                    <div className="order-top">
-                      <div className="order-number">Order Number: <strong>{order.id}</strong></div>
-                      <div className="order-total">₱{order.total.toFixed(2)}</div>
-                    </div>
+                          <div className="ofd-order-info">
+                            <div className="ofd-info-row">
+                              <div className="ofd-info-label">Item: {items.length}</div>
+                            </div>
 
-                    <div className="order-info">
-                      <div className="info-row"><span className="label">Items</span><span className="value">{order.itemsCount}</span></div>
-                      <div className="info-row"><span className="label">Method</span><span className="value">{order.method}</span></div>
-                      <div className="info-row"><span className="label">Payment</span><span className="value">{paymentStatus}</span></div>
-                      <div className="info-row"><span className="label">Date</span><span className="value">{order.date}</span></div>
-                    </div>
+                            <div className="ofd-info-row">
+                              <div className="ofd-info-label">Method: {order.paymentMethod}</div>
+                            </div>
 
-                    <div className="customer-block">
-                      <div className="cust-name">{order.customer.name}</div>
-                      <div className="cust-address">{order.customer.address}</div>
-                      <div className="cust-contact">
-                        <div className="cust-email">{order.customer.email}</div>
-                        <div className="cust-phone">{order.customer.phone}</div>
+                            <div className="ofd-info-row">
+                              <div className="ofd-info-label">Date: {formatDate(order.dateOrdered)}</div>
+                            </div>
+                          </div>
+
+                          <div className="ofd-customer-block">
+                            <div className="ofd-cust-name">
+                              {deliveryInfo?.medicalInstitutionName}
+                            </div>
+
+                            <div className="ofd-cust-address">
+                              <span className="pp-address">Address: </span>
+                              <span className="ppl-adddress">
+                                {deliveryInfo?.detailedAddress},{" "}
+                                {barangay?.barangayName},{" "}
+                                {city?.cityName},{" "}
+                                {province?.provinceName},{" "}
+                                {deliveryInfo?.zipCode},{" "}
+                                {deliveryInfo?.country}
+                              </span>
+                            </div>
+
+                            <div className="ofd-cust-contact">
+                              <div className="proc-cust-email">
+                                <span className="ppc-email">Email:</span> {deliveryInfo?.emailAddress}
+                              </div>
+                              <div className="proc-cust-phone">
+                                <span className="ppc-contact">Contact No.:</span> +63 {deliveryInfo?.contactNumber}
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            className="ofd-viewall-btn"
+                            onClick={() => {
+                              const clean = viewOutForDeliveryOrders.find(
+                                (o) => o.orderId === order.orderId
+                              );
+                              setSelectedOrder(clean);
+                              setShowViewAll(true);
+                            }}
+                          >
+                            View All
+                          </button>
+
+                        </div>
                       </div>
-                    </div>
-
-                    <button
-                      className="view-all-btn"
-                      type="button"
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setShowViewAll(true);
-                      }}
-                    >
-                      View All
-                    </button>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      )}
-    </div>
+                    </article>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }
+
+export default OutforDelivery;
