@@ -40,12 +40,12 @@ function Processing() {
 
           return {
             id: item.ID,
-            name: product?.productName || "Product",
+            name: product?.productName,
             image: product?.image1,
             qty: item.quantity,
             value: item.value,
             price: Number(item.subTotal),
-            status: item.orderStatus || "Processing",
+            status: item.orderStatus,
           };
         }),
       };

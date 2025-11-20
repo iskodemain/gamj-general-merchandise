@@ -52,6 +52,8 @@ function Login() {
           setLoginIdentifier(identifier);
           sessionStorage.setItem('loginIdentifier', identifier)
           toast.success(response.data.message, {...toastSuccess});
+          navigate('/login-verification')
+
         } else {
           toast.error(response.data.message, {...toastError});
         }
@@ -62,12 +64,6 @@ function Login() {
         setLoading(false);
       }
   }
-
-  useEffect(() => {
-    if (loginToken) {
-      navigate('/login-verification')
-    }
-  }, [loginToken])
 
   return (
     <div className='signIn-main'>
