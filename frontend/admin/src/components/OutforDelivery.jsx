@@ -220,6 +220,7 @@ function OutforDelivery() {
                           </div>
 
                           <button
+                            type="button"
                             className="ofd-viewall-btn"
                             onClick={() => {
                               const clean = viewOutForDeliveryOrders.find(

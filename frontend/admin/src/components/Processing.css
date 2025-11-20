@@ -1,3 +1,9 @@
+.empty-proc {
+  padding:18px; 
+  text-align:center; 
+  color:#383737; 
+}
+
 .processing-orders-container {
   padding: 2rem;
   background: #EFFFF1;

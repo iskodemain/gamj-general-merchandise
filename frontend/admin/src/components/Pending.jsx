@@ -86,10 +86,10 @@ function Pending() {
           <div className="pending-products-page">
             <div className="pending-products-header-divider" />
             <div className="pending-products-list">
-              <div className="processing-orders-list">
+              <div className="pending-orders-list">
                 {pendingOrders.length === 0 ? (
-                  <div className="empty-proc">
-                    No processing orders.
+                  <div className="empty-pen">
+                    No pending orders.
                   </div>
                 ) : (
                   pendingOrders.map((order) => {
@@ -228,9 +228,9 @@ function Pending() {
 
                             {/* VIEW ALL BUTTON */}
                             <button
+                              type="button"
                               className="pending-product-view-all-btn"
                               onClick={() => {
-                                console.log("Clicked order from Pending:", order);
                                 const clean = viewPendingOrders.find(
                                   (o) => o.orderId === order.orderId
                                 );
