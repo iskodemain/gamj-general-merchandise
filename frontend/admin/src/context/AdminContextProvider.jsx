@@ -29,6 +29,29 @@ const AdminContextProvider = (props) => {
   const [barangays, setBarangays] = useState([]);
   const [cities, setCities] = useState([]);
   const [provinces, setProvinces] = useState([]);
+  const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
+
+  /*--------------------------FETCH CANCELLED ORDERS----------------------------*/
+    const handleFetchCancelledOrders = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/order/list-cancel-order", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setFetchCancelledOrders(response.data.orderCancel);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+        handleFetchCancelledOrders();
+        }
+    }, [token]);
 
   /*--------------------------FETCH LOCATIONS----------------------------*/
     const handleFetchLocations = async() => {
@@ -75,8 +98,6 @@ const AdminContextProvider = (props) => {
         handleFetchDeliveryInfo();
         }
     }, [token]);
-
-    console.log(deliveryInfoList);
 
   /*--------------------------FETCH ORDERS----------------------------*/
     const handleFetchAllCustomer = async() => {
@@ -326,7 +347,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders
   }  
   return (
     <AdminContext.Provider value={value}>
