@@ -1,138 +1,281 @@
-.overview-container {
-  padding: 20px 32px;
-  background: #EFFFF1;
+/* src/components/Overview.css */
+
+/* Root container */
+.ov-container {
+  padding: 22px 28px;
+  background: linear-gradient(180deg, rgba(239,255,241,0.6), rgba(231,255,244,0.5));
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #0f172a;
+  gap: 18px;
 }
+
+/* rows */
+.ov-row { 
+  margin-bottom: 20px; 
+  display: flex; 
+  gap: 18px; 
+  align-items: stretch; 
+}
+
+/* 2-column responsive layout */
+.ov-row-2up { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 18px; 
+}
+
+
+.ov-row-cards { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 18px; 
+}
+.ov-section-full { 
+  width: 100%; 
+  display: block; 
+}
+
+.ov-line-graph {
+  background-color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 5px 20px rgba(8, 8, 8, 0.081);
+  border-radius: 1rem;
+}
+
+/* Card base */
+.ov-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(9,30,66,0.06);
+  padding: 18px;
+  box-sizing: border-box;
+  min-height: 130px;
+}
+
+/* Large stat cards */
+.ov-card-large {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.ov-card-large:hover { transform: translateY(-6px); box-shadow: 0 14px 34px rgba(9,30,66,0.08); }
+
+.ov-card-top { display:flex; align-items:center; justify-content:space-between; }
+.ov-card-title { font-size: 18px; font-weight: 800; color: #111827; }
+.ov-card-sub { font-size: 13px; color: #6b7280; }
+
+/* Body of large card: key-values */
+.ov-card-body { 
+  display:flex; 
+  flex-direction:column; 
+  gap: 10px; 
+  margin-top: 8px; 
+}
+
+
+.ov-kv { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom: 1px dashed rgba(15,23,42,0.04); }
+.ov-kv:last-child { border-bottom: none; }
+.ov-kv-label { color: #6b7280; font-size: 13px; }
+.ov-kv-value { font-size: 20px; font-weight: 800; color: #111827; }
 
 /* Section header */
-.overview-section {
-  margin-bottom: 32px;
+.ov-section-head { 
+  display:flex; 
+  justify-content:space-between; 
+  align-items:center; 
+  margin-bottom: 12px; 
+  gap: 12px; 
+}
+.ov-section-head h3 { margin:0; font-size: 18px; font-weight: 800; }
+
+.ov-controls { 
+  display:flex; 
+  gap: 8px; 
 }
 
-.overview-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* toggle */
+.ov-toggle {
+  background: transparent;
+  border: 2px solid #E6EEF0;
+  padding-block: 4px;
+  width: 6rem;
+  border-radius: 8px;
   cursor: pointer;
-  padding: 8px 0;
-  width: 7rem;
+  font-weight: 700;
+  color: #334155;
+}
+.ov-toggle.active {
+  background: #43A047;
+  color: #fff;
+  border-color: #43A047;
 }
 
-.overview-header-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #222;
+/* Chart containers */
+.ov-chart { 
+  padding: 12px 6px; 
+}
+.ov-chart-line { 
+  width: 100%;
+  height: 300px; 
 }
 
-.overview-chevron {
-  transition: transform 0.25s ease;
+.chart-center,
+.ov-chart-card .ov-card-body {
+  width: 100%;
+  height: 380px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.overview-chevron.open {
-  transform: rotate(180deg);
+/* chart card head */
+.ov-card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+.ov-card-head h4 { margin: 0; font-size: 16px; font-weight: 800; }
+
+/* chart-card */
+.ov-chart-card,
+.ov-card-list {
+  flex: 1;
+  min-width: 0;
 }
 
-/* Grid layout */
-.overview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px;
-  margin-top: 12px;
+/* list card for low-stock */
+.ov-card-list { padding: 18px; }
+.low-stock-list { list-style: none; padding: 0; margin:0; display:flex; flex-direction:column; gap:10px; }
+.low-stock-list li { display:flex; justify-content:space-between; padding:8px; border-radius:8px; background: #fff; border:1px solid rgba(15,23,42,0.03); align-items:center; }
+.ls-name { font-weight:700; color:#0f172a; }
+.ls-qty { color:#6b7280; font-weight:700; }
+
+/* transactions */
+.ov-trans-card { padding: 12px; }
+.ov-trans-list { display:flex; flex-direction:column; gap:8px; }
+.trans-row { display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:8px; background:#fff; border:1px solid rgba(15,23,42,0.03);}
+.trans-left { display:flex; flex-direction:column; gap:4px; }
+.trans-name { font-weight:700; color:#0f172a; }
+.trans-meta { color:#6b7280; font-size:13px; }
+.trans-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.trans-amount { font-weight:800; color:#0f172a; }
+.trans-method { color:#6b7280; font-size:13px; }
+
+/* empty placeholders */
+.ov-empty { color:#6b7280; padding:16px; text-align:center; }
+
+/* actions */
+.ov-actions { display:flex; gap:8px; align-items:center; }
+.ov-viewall-btn { 
+  background:white; 
+  border:2px solid #E5E7EB; 
+  padding:8px 20px; 
+  border-radius:8px; 
+  cursor:pointer; font-weight:700; 
+}
+.ov-viewall-btn:hover { border-color:#cbd5e1; }
+
+
+.ov-card-body canvas {
+  max-width: 100%;
 }
 
-/* Card styling */
-.overview-card {
-    
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    cursor: pointer;
-    transition: all 0.2s ease;
+/* Let product labels ellipsis instead of stretching */
+.chartjs-size-monitor,
+.chartjs-render-monitor {
+  width: 100% !important;
 }
 
-.overview-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+@media (max-width: 700px) {
+  .ov-card-body .chartjs-render-monitor {
+    font-size: 12px !important;
+  }
 }
 
-.overview-card-top {
-    padding: 18px 0 22px 22px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* Even smaller phone adjustments */
+@media (max-width: 450px) {
+  .ov-card-body .chartjs-render-monitor {
+    font-size: 10px !important;
+  }
 }
 
-.overview-card-icon {
-  width: 33px;
-  height: 33px;
-  object-fit: contain;
-}
 
-.overview-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
+/* responsive */
+@media (max-width: 920px) {
+  .ov-row-cards {
+    grid-template-columns: 1fr; 
+  }
+  .ov-row-2up { 
+    grid-template-columns: 1fr; 
+  }
+  .ov-card-large { min-height: 140px; }
 
-.overview-dot.orange { background: #ffa600; }
-.overview-dot.teal { background: #00e3b6; }
-.overview-dot.blue { background: #656dff; }
-.overview-dot.green { background: #00dd31; }
-
-.overview-card-title {
-    font-family: "Roboto", sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #3B3B3B;
-  
-}
-
-.overview-card-container {
-    height: 9rem;
-    padding: 15px 0 20px 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.overview-divider {
-  height: 1px;
-  background: #ddd;
-}
-
-.overview-card-number {
-    font-family: "Roboto", sans-serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #3B3B3B;
-}
-
-.overview-card-date {
-  font-size: 0.9rem;
-  color: #737373;
-  margin-top: 4px;
-  display: block;
-  font-family: "Roboto", sans-serif;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .overview-container {
-    padding: 16px;
+  .ov-chart-card,
+  .ov-card-list {
+    width: 100%;
   }
 
-  .overview-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  .chart-center,
+  .ov-chart-card .ov-card-body {
+    height: 300px;
   }
+}
 
-  .overview-card {
+@media (max-width: 520px) {
+  .ov-chart-card,
+  .ov-card-list {
     padding: 12px;
   }
+
+  .chart-center,
+  .ov-chart-card .ov-card-body {
+    height: 240px;
+  }
 }
 
-@media (max-width: 600px) {
-  .overview-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 700px) {
+
+  /* Stack title + controls vertically */
+  .ov-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Make the buttons smaller and tighter */
+  .ov-controls button.ov-toggle {
+    width: auto;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* Control container spacing */
+  .ov-controls {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Reduce the chart height on small phones */
+  .ov-chart-line {
+    height: 230px !important;
+  }
+}
+
+/* Even smaller phones */
+@media (max-width: 420px) {
+
+  .ov-section-head h3 {
+    font-size: 1rem;
+  }
+
+  .ov-controls button.ov-toggle {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+
+  .ov-chart-line {
+    height: 200px !important;
   }
 }

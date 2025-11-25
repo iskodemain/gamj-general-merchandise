@@ -1,141 +1,259 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { assets } from "../assets/assets.js";
 import "./AllOrders.css";
 import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
+import { AdminContext } from "../context/AdminContextProvider.jsx";
 
-const sampleOrders = [
-  {
-    id: 23,
-    total: 1490.0,
-    itemsCount: 3,
-    method: "PayPal",
-    status: "Processing",
-    date: "Dec 20 2024",
-    customer: {
-      name: "Medical Hospital Cavite",
-      address: "Brgy. San Roque\nCavite City, Cavite\nPhilippines 4100",
-      email: "orders@medhospcavite.ph",
-      phone: "+63 912 345 6789"
-    },
-    items: [
-      { id: 1, image: assets.product1 || "https://via.placeholder.com/70", name: "Premium T-Shirt by bernil", qty: 1, size: "Adult - L", color: "Black", price: 499.0 },
-      { id: 2, image: assets.product2 || "https://via.placeholder.com/70", name: "GAMJ Logo Cap by francis", qty: 1, size: "One Size", color: "Navy", price: 299.0 },
-      { id: 3, image: assets.product3 || "https://via.placeholder.com/70", name: "large hotdogs (3pcs)", qty: 1, size: "N/A", color: "Mixed", price: 692.0 }
-    ]
-  },
-  {
-    id: 24,
-    total: 820.0,
-    itemsCount: 2,
-    method: "Cash On Delivery",
-    status: "Processing",
-    date: "Dec 18 2024",
-    customer: {
-      name: "John Doe",
-      address: "Unit 5B, 12th Ave\nMakati City, Metro Manila\nPhilippines 1200",
-      email: "john.doe@example.com",
-      phone: "+63 917 555 0123"
-    },
-    items: [
-      { id: 1, image: assets.product4 || "https://via.placeholder.com/70", name: "Vintage Hoodie", qty: 1, size: "M", color: "Gray", price: 599.0 },
-      { id: 2, image: assets.product5 || "https://via.placeholder.com/70", name: "Sticker Pack", qty: 1, size: "N/A", color: "Mixed", price: 221.0 }
-    ]
-  },
-  // Add more orders here if needed
-];
 
-export default function AllOrders() {
+function AllOrders() {
+  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces } = useContext(AdminContext);
+
   const [showViewAll, setShowViewAll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [viewPendingOrders, setViewPendingOrders] = useState([]);
+
+  useEffect(() => {
+  if (!fetchOrders || fetchOrders.length === 0) {
+    setViewPendingOrders([]);
+    return;
+  }
+
+  const formatted = fetchOrders
+    .filter((o) => o.paymentMethod && o)   // MUST MATCH pendingOrders filter
+    .map((order) => {
+      const items = fetchOrderItems.filter(
+        (item) => item.orderId === order.ID
+      );
+
+      return {
+        orderId: order.orderId,
+        method: order.paymentMethod,
+        date: order.dateOrdered,
+        total: Number(order.totalAmount),
+        itemsCount: items.length,
+
+        items: items.map((item) => {
+          const product = products.find(
+            (p) => p.ID === item.productId
+          );
+
+          return {
+            id: item.ID,
+            name: product?.productName,
+            image: product?.image1,
+            qty: item.quantity,
+            value: item.value,
+            price: Number(item.subTotal),
+            status: item.orderStatus,
+          };
+        }),
+      };
+    });
+
+    setViewPendingOrders(formatted);
+  }, [fetchOrders, fetchOrderItems, products]);
+
+
+
+  // Format date
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  // STEP 1: Only Pending orders from "orders"
+  const pendingOrders = fetchOrders?.filter((order) => {
+    const items = fetchOrderItems.filter(
+      (item) => item.orderId === order.ID
+    );
+    return items.some((item) => item.orderStatus === "Pending" || item.orderStatus === "Processing" || item.orderStatus === "Out for Delivery" || item.orderStatus === "Delivered");
+  }) || [];
 
   return (
     <>
-    <Navbar TitleName="All Orders"/>
-      <div className="pending-page">
-        <header className="pending-header-row">
-          {/* keep top white design, notif, logout, etc. (these live outside this component in your layout) */}
-        </header>
-        
-        <div className="header-divider" />
-
-        {/* replace only the orders-list area with ViewAll when toggled */}
+    <Navbar TitleName="All Orders" />
+      <div className="ao-container">
         {showViewAll ? (
           <ViewAll
             order={selectedOrder}
-            onClose={() => {
-              setShowViewAll(false);
-              setSelectedOrder(null);
-            }}
+            onClose={() => setShowViewAll(false)}
           />
         ) : (
-          <div className="orders-list">
-            {sampleOrders.map(order => (
-              <article className="order-card" key={order.id}>
-                <div className="order-inner">
-                  <div className="left-col">
-                    <h3 className="section-heading">Products</h3>
+          <div className="ao-page">
+            <div className="ao-header-divider" />
 
-                    <ul className="products">
-                      {order.items.map(item => (
-                        <li className="product-row" key={item.id}>
-                          <img className="prod-img" src={item.image} alt={item.name} />
-                          <div className="prod-meta">
-                            <div className="prod-name">{item.name}</div>
+            <div className="ao-list">
+              {pendingOrders.map((order) => {
+                const items = fetchOrderItems.filter(
+                  (item) => item.orderId === order.ID
+                );
 
-                            <div className="prod-details">
-                              <div className="prod-qty"><span className="bold">Quantity: {item.qty}</span></div>
-                              <div className="prod-specs">
-                                {item.size && <span>Size: {item.size}</span>}
-                                {item.color && <span>Color: {item.color}</span>}
-                              </div>
-                              <div className="prod-price">₱{item.price.toFixed(2)}</div>
+                const orderTotal = items.reduce(
+                  (sum, item) => sum + parseFloat(item.subTotal || 0),
+                  0
+                );
+
+                const deliveryInfo = deliveryInfoList.find(
+                  (d) => d.customerId === order.customerId
+                );
+
+                const barangay = barangays.find(
+                  (b) => b.ID === deliveryInfo?.barangayId
+                );
+                const city = cities.find(
+                  (c) => c.ID === deliveryInfo?.cityId
+                );
+                const province = provinces.find(
+                  (p) => p.ID === deliveryInfo?.provinceId
+                );
+
+                return (
+                  <article className="ao-card" key={order.ID}>
+                    <div className="ao-inner">
+
+                      <div className="ao-left-col">
+                        <ul className="ao-items">
+                          {items.map((item) => {
+                            const product = products.find(
+                              (p) => p.ID === item.productId
+                            );
+
+                            return (
+                              <li className="ao-row" key={item.ID}>
+                                <img
+                                  className="ao-img"
+                                  src={product?.image1}
+                                  alt={product?.productName}
+                                />
+
+                                <div className="ao-meta">
+                                  <div className="ao-name">
+                                    {product?.productName}
+                                  </div>
+
+                                  <div className="ao-details">
+                                    <div className="ao-qty-row">
+                                      <div>
+                                        Quantity:{" "}
+                                        <span className="ao-qty">
+                                          {item.quantity}
+                                        </span>
+                                      </div>
+
+                                      <div className="ao-spec-wrap">
+                                        {item.value && (
+                                          <div>
+                                            Variant:{" "}
+                                            <span className="ao-spec">
+                                              {item.value}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className="ao-price">
+                                      ₱{parseFloat(item.subTotal).toFixed(2)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+
+                      <div className="ao-right-col">
+                        <div className="ao-order-top">
+                          <div className="ao-order-id">
+                            Order ID: <strong>{order.orderId}</strong>
+                          </div>
+
+                          <div className="ao-order-total">
+                            Total: ₱{orderTotal.toFixed(2)}
+                          </div>
+                        </div>
+
+                        <div className="ao-order-info">
+                          <div className="ao-info-row">
+                            <div className="ao-info-label">
+                              Item: {items.length}
                             </div>
                           </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
 
-                  <div className="right-col">
-                    <div className="order-top">
-                      <div className="order-number">Order Number: <strong>{order.id}</strong></div>
-                      <div className="order-total">₱{order.total.toFixed(2)}</div>
-                    </div>
+                          <div className="ao-info-row">
+                            <div className="ao-info-label">
+                              Method: {order.paymentMethod}
+                            </div>
+                          </div>
 
-                    <div className="order-info">
-                      <div className="info-row"><span className="label">Items</span><span className="value">{order.itemsCount}</span></div>
-                      <div className="info-row"><span className="label">Method</span><span className="value">{order.method}</span></div>
-                      <div className="info-row"><span className="label">Payment</span><span className="value">{order.status}</span></div>
-                      <div className="info-row"><span className="label">Date</span><span className="value">{order.date}</span></div>
-                    </div>
+                          <div className="ao-info-row">
+                            <div className="ao-info-label">
+                              Date: {formatDate(order.dateOrdered)}
+                            </div>
+                          </div>
+                        </div>
 
-                    <div className="customer-block">
-                      <div className="cust-name">{order.customer.name}</div>
-                      <div className="cust-address">{order.customer.address}</div>
-                      <div className="cust-contact">
-                        <div className="cust-email">{order.customer.email}</div>
-                        <div className="cust-phone">{order.customer.phone}</div>
+                        <div className="ao-customer">
+                          <div className="ao-cust-name">
+                            {deliveryInfo?.medicalInstitutionName}
+                          </div>
+
+                          <div className="ao-cust-address">
+                            <span className="ao-addr-label">Address: </span>
+                            <span className="ao-addr-val">
+                              {deliveryInfo?.detailedAddress},{" "}
+                              {barangay?.barangayName},{" "}
+                              {city?.cityName},{" "}
+                              {province?.provinceName},{" "}
+                              {deliveryInfo?.zipCode},{" "}
+                              {deliveryInfo?.country}
+                            </span>
+                          </div>
+
+                          <div className="ao-cust-contact">
+                            <div className="ao-cust-email">
+                              <span className="ao-email-label">Email:</span>{" "}
+                              {deliveryInfo?.emailAddress}
+                            </div>
+                            <div className="ao-cust-phone">
+                              <span className="ao-phone-label">
+                                Contact No.:
+                              </span>{" "}
+                              +63 {deliveryInfo?.contactNumber}
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          className="ao-view-btn"
+                          onClick={() => {
+                            const clean = viewPendingOrders.find(
+                              (o) => o.orderId === order.orderId
+                            );
+                            setSelectedOrder(clean);
+                            setShowViewAll(true);
+                          }}
+                        >
+                          View All
+                        </button>
                       </div>
                     </div>
-
-                    <button
-                      className="view-all-btn"
-                      type="button"
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setShowViewAll(true);
-                      }}
-                    >
-                      View All
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+                  </article>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
     </>
   );
 }
+
+export default AllOrders;

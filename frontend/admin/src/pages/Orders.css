@@ -1,0 +1,145 @@
+.overview-container {
+  padding: 20px 32px;
+  background: #EFFFF1;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Section header */
+.overview-section {
+  margin-bottom: 32px;
+}
+
+.overview-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 0;
+  width: 7rem;
+  
+}
+
+.order-back-btn {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.overview-header-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.overview-chevron {
+  transition: transform 0.25s ease;
+}
+
+.overview-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Grid layout */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Card styling */
+.overview-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.overview-card-top {
+    padding: 18px 0 22px 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.overview-card-icon {
+  width: 33px;
+  height: 33px;
+  object-fit: contain;
+}
+
+.overview-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.overview-dot.orange { background: #ffa600; }
+.overview-dot.teal { background: #00e3b6; }
+.overview-dot.blue { background: #656dff; }
+.overview-dot.green { background: #00dd31; }
+
+.overview-card-title {
+    font-family: "Roboto", sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #3B3B3B;
+  
+}
+
+.overview-card-container {
+    height: 9rem;
+    padding: 15px 0 20px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.overview-divider {
+  height: 1px;
+  background: #ddd;
+}
+
+.overview-card-number {
+    font-family: "Roboto", sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #3B3B3B;
+}
+
+.overview-card-date {
+  font-size: 0.9rem;
+  color: #737373;
+  margin-top: 4px;
+  display: block;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .overview-container {
+    padding: 16px;
+  }
+
+  .overview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .overview-card {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}

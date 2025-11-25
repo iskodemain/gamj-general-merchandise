@@ -45,6 +45,7 @@ import { AdminContext } from "./context/AdminContextProvider.jsx";
 import OutOfStock from "./components/ProductMenu/OutOfStock.jsx";
 import Settings from "./pages/Settings.jsx";
 import UpdateProduct from "./components/ProductMenu/UpdateProduct.jsx";
+import Orders from "./pages/Orders.jsx";
 
 //components
 // icon 
@@ -100,6 +101,7 @@ const App = () => {
       <Route path="/notifications" element={<Notification />} />
       <Route path="/alluser" element={<AllUser />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/orders" element={<Orders />} />
     </Routes>
    </div>
   )
