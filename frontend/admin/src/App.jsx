@@ -15,7 +15,6 @@ import Provinces from "./components/Locations/Provinces";
 import Cities from "./components/Locations/Cities";
 import Barangay from "./components/Locations/Barangay";
 import CancelOrder from "./components/CancelOrder";
-import CancelReason from "./components/Cancellation/CancelReason";
 import CancelReview from "./components/Cancellation/CancelOrderReview";
 import Refund from "./components/Cancellation/Refund";
 import AdminCancel from "./components/Cancellation/AdminCancel";
@@ -73,7 +72,6 @@ const App = () => {
       <Route path="/cities" element={<Cities />} />
       <Route path="/barangay" element={<Barangay />} />
       <Route path="/cancelorder" element={<CancelOrder />} />
-      <Route path="/cancelreason" element={<CancelReason />} />
       <Route path="/cancelreview" element={<CancelReview />} />
       <Route path="/return" element={<Refund />} />
       <Route path="/admincancel" element={<AdminCancel />} />

@@ -1,128 +1,419 @@
-import React, { useState } from "react";
-import './CancelReason.css';
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import "./CancelReason.css";
+import { AdminContext } from "../../context/AdminContextProvider";
 
-import Refund from "../Cancellation/Refund";
-function CancelReason({ item = null, order = null, onClose = () => {} }) {
-  const [reason, setReason] = useState("Wrong Item Ordered");
-  const [notes, setNotes] = useState("Nagkamali lang po ng order");
-  const [paypalEmail, setPaypalEmail] = useState("");
-  const [showRefund, setShowRefund] = useState(false);
+function CancelReason({ item = null, onClose = () => {} }) {
+  const { fetchOrders, fetchOrderItems, fetchCancelledOrders, customerList } = useContext(AdminContext);
 
-  const handleSubmit = () => {
-    // show refund view with collected data
-    setShowRefund(true);
-  };
+  const [orderData, setOrderData] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [localCancelRecord, setLocalCancelRecord] = useState(null);
 
-  const handleRefundClose = (completed = false) => {
-    // if refund completed, notify parent; otherwise just go back to the form
-    setShowRefund(false);
-    if (completed) onClose();
-  };
+  const [paypalEmailInput, setPaypalEmailInput] = useState("");
+  const [refundAmount, setRefundAmount] = useState("");
+  const [proofFile, setProofFile] = useState(null);
+  const [proofPreviewUrl, setProofPreviewUrl] = useState("");
+  const [paypalTxId, setPaypalTxId] = useState("");
 
-  if (showRefund) {
-    return (
-      <div className="cancel-reason-page">
-        <div className="cancel-reason-root" role="dialog" aria-modal="true" aria-label="Refund card">
-          <Refund
-            item={item}
-            order={order}
-            reason={reason}
-            notes={notes}
-            paypalEmail={paypalEmail}
-            onDone={() => handleRefundClose(true)}
-            onBack={() => handleRefundClose(false)}
-          />
-        </div>
-      </div>
+  const [refundStarted, setRefundStarted] = useState(false);
+
+  const [localCancellationStatus, setLocalCancellationStatus] = useState(
+    item?.cancellationStatus || item?.status || ""
+  );
+
+  useEffect(() => {
+    if (!item) return;
+
+    const orderItem = fetchOrderItems.find((oi) => oi.ID === item.id) || null;
+    const orderRec = orderItem
+      ? fetchOrders.find((o) => o.ID === orderItem.orderId) || null
+      : null;
+
+    const cust = orderRec
+      ? customerList.find((c) => c.ID === orderRec.customerId) || null
+      : null;
+
+    const cancelRec =
+      fetchCancelledOrders.find(
+        (c) =>
+          Number(c.orderItemId) === Number(item.id) &&
+          (orderRec ? Number(c.customerId) === Number(orderRec.customerId) : true)
+      ) || null;
+
+    setOrderData(orderRec);
+    setCustomer(cust);
+    setLocalCancelRecord(cancelRec);
+
+    setPaypalEmailInput(cancelRec?.cancelPaypalEmail || "");
+    setRefundAmount(cancelRec?.refundAmount || "");
+    setPaypalTxId(cancelRec?.paypalTransactionId || "");
+    setProofPreviewUrl(cancelRec?.proofUrl || "");
+
+    setLocalCancellationStatus(
+      cancelRec?.cancellationStatus || item.cancellationStatus || item.status || ""
     );
-  }
+
+    if (
+      cancelRec?.cancellationStatus === "Refunded" ||
+      cancelRec?.cancellationStatus === "Completed"
+    ) {
+      setRefundStarted(true);
+    }
+  }, [
+    item,
+    fetchOrders,
+    fetchOrderItems,
+    fetchCancelledOrders,
+    customerList,
+  ]);
+
+  const paymentMethod = useMemo(
+    () => orderData?.paymentMethod || "—",
+    [orderData]
+  );
+
+  const handleProofFile = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!f.type.startsWith("image/")) {
+      alert("Please upload an image only.");
+      return;
+    }
+    setProofFile(f);
+    setProofPreviewUrl(URL.createObjectURL(f));
+  };
+
+  const handleProceedRefund = () => {
+    if (!paypalEmailInput.trim()) {
+      alert("Enter PayPal Email.");
+      return;
+    }
+
+    setLocalCancelRecord((prev) =>
+      prev
+        ? { ...prev, cancelPaypalEmail: paypalEmailInput }
+        : prev
+    );
+
+    setRefundStarted(true);
+  };
+
+  const handleSubmitAsRefunded = () => {
+    if (!refundAmount || Number.isNaN(Number(refundAmount))) {
+      alert("Enter refund amount.");
+      return;
+    }
+    if (!proofFile && !proofPreviewUrl) {
+      alert("Upload proof.");
+      return;
+    }
+    if (!paypalTxId.trim()) {
+      alert("Enter PayPal Transaction ID.");
+      return;
+    }
+
+    setLocalCancelRecord((prev) =>
+      prev
+        ? {
+            ...prev,
+            cancellationStatus: "Refunded",
+            refundAmount,
+            proofUrl: proofPreviewUrl,
+            paypalTransactionId: paypalTxId,
+          }
+        : prev
+    );
+
+    setLocalCancellationStatus("Refunded");
+  };
+
+  const handleSubmitAsCompleted = () => {
+    setLocalCancelRecord((prev) =>
+      prev ? { ...prev, cancellationStatus: "Completed" } : prev
+    );
+    setLocalCancellationStatus("Completed");
+  };
+
+  const handleDeleteCancel = () => {
+    if (!window.confirm("Delete this cancellation record?")) return;
+    setLocalCancelRecord(null);
+    setLocalCancellationStatus("");
+    onClose();
+  };
+
+  const cancelExists = Boolean(localCancelRecord);
 
   return (
-    <div className="cancel-reason-page">
-      <div className="cancel-reason-root" role="dialog" aria-modal="true" aria-label="Cancel reason card">
-        <div className="top-section">
-          <div className="top-left">
-            <div className="avatar" aria-hidden="true">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="24" height="24" rx="12" fill="#F6A34B"/>
-                <path d="M12 13c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM4 20.5c0-2.5 3.581-4 8-4s8 1.5 8 4V22H4v-1.5z" fill="#fff"/>
-              </svg>
+    <div className="cr-page">
+      <div className="cr-root">
+
+        {/* TOP */}
+        <div className="cr-top">
+          <div className="cr-top-left">
+            <div className="cr-avatar">
+              {customer?.profileImage ? (
+                <img src={customer.profileImage} alt="Customer" />
+              ) : (
+                <div className="cr-avatar-fallback">
+                  {(customer?.medicalInstitutionName || "C").charAt(0)}
+                </div>
+              )}
             </div>
-            <div className="user-texts">
-              <div className="org">Medical Hospital Cavite</div>
-              <div className="muted">Customer</div>
-              <div className="muted">Payment: Paid</div>
+
+            <div className="cr-user-text">
+              <div className="cr-user-org">
+                {customer?.medicalInstitutionName || "Unknown Customer"}
+              </div>
+              <div className="cr-user-muted">Customer</div>
             </div>
           </div>
 
-          <div className="top-right">
-            <button className="status-pill" type="button" aria-haspopup="listbox">
-              Processing <span className="chev">▾</span>
-            </button>
+          <div className="cr-top-right">
+            <div
+              className={
+                localCancellationStatus === "Completed"
+                  ? "cr-status-pill cr-completed"
+                  : "cr-status-pill"
+              }
+            >
+              {localCancellationStatus || "Processing"}
+            </div>
           </div>
         </div>
 
-        <div className="item-card">
-          <div className="product-img" aria-hidden="true">
-            <svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-              <rect x="18" y="8" width="28" height="40" rx="6" fill="#E6FDF0"/>
-              <rect x="26" y="4" width="12" height="8" rx="2" fill="#D1F7D9"/>
-              <rect x="30" y="22" width="4" height="12" fill="#9EE0A7"/>
-            </svg>
+        {/* ITEM CARD */}
+        <div className="cr-item-card">
+          <div className="cr-item-left">
+            <div className="cr-thumb">
+              <img className="cr-thumb-img" src={item?.image} alt={item?.name} />
+            </div>
+
+            <div className="cr-product-meta">
+              <div className="cr-product-name">{item?.name}</div>
+              <div className="cr-product-sub">
+                Qty: {item?.qty}
+                {item?.value ? ` • ${item.value}` : ""}
+              </div>
+              <div className="cr-product-price">
+                ₱{Number(item?.price || 0).toFixed(2)}
+              </div>
+            </div>
           </div>
 
-          <div className="product-meta">
-            <div className="product-name">Isopropyl Alcohol (Green Cross)</div>
-            <div className="product-sub">Quantity: 2 &nbsp; Size: 500ml</div>
-            <div className="product-price">₱149.00</div>
-          </div>
-
-          <div className="payment-badge" aria-hidden="true">
-            <span className="pay-label">Payment:</span>
-            <span className="paypal-badge">PayPal</span>
+          <div className="cr-pay-badge">
+            <span className="cr-pay-label">Payment:</span>
+            <span className="cr-pay-method">{paymentMethod}</span>
           </div>
         </div>
 
-        <div className="form-section">
-          <label className="q-label">1. Reason for Cancellation</label>
-          <input
-            className="single-input"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            aria-label="Reason for cancellation"
-          />
-          <textarea
-            className="multi-input"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={4}
-            aria-label="Additional notes"
-          />
+        {/* FORM */}
+        <div className="cr-form">
+          {!cancelExists ? (
+            <div className="cr-empty">No cancellation record found.</div>
+          ) : (
+            <>
 
-          <label className="q-label" style={{ marginTop: 16 }}>2. PayPal email address</label>
-          <input
-            className="single-input"
-            placeholder="sample@example.com"
-            value={paypalEmail}
-            onChange={(e) => setPaypalEmail(e.target.value)}
-            aria-label="PayPal email address"
-          />
+              {/* PROCESSING – ENTER PAYPAL EMAIL */}
+              {localCancellationStatus === "Processing" &&
+                !refundStarted &&
+                /pay/i.test(paymentMethod) && (
+                  <>
+                    <label className="cr-label">1. Reason for Cancellation</label>
+                    <input
+                      className="cr-input"
+                      value={localCancelRecord?.reasonForCancellation || ""}
+                      readOnly
+                    />
+
+                    <label className="cr-label">2. Comments</label>
+                    <textarea
+                      className="cr-textarea"
+                      value={localCancelRecord?.cancelComments || ""}
+                      readOnly
+                    />
+
+                    <label className="cr-label">3. PayPal Email Address</label>
+                    <input
+                      className="cr-input"
+                      placeholder="customer-paypal@example.com"
+                      value={paypalEmailInput}
+                      onChange={(e) => setPaypalEmailInput(e.target.value)}
+                    />
+
+                    <div className="cr-action-row">
+                      <button
+                        className="cr-primary-btn"
+                        onClick={handleProceedRefund}
+                        disabled={!paypalEmailInput.trim()}
+                      >
+                        Proceed with Refund Process
+                      </button>
+                    </div>
+                  </>
+                )}
+
+              {/* REFUND FORM WHILE STILL PROCESSING OR REFUNDED */}
+              {(localCancellationStatus === "Processing" && refundStarted && /pay/i.test(paymentMethod)) ||
+              (localCancellationStatus === "Refunded" && /pay/i.test(paymentMethod)) ? (
+                <>
+                  <label className="cr-label">1. Total Refund Amount</label>
+                  <input
+                    className="cr-input"
+                    placeholder="Enter the total refund amount"
+                    value={refundAmount}
+                    onChange={(e) => setRefundAmount(e.target.value)}
+                  />
+
+                  <label className="cr-label">2. Upload an image or screenshot of your refund payment receipt</label>
+
+                  {!proofPreviewUrl ? (
+                    <label className="cr-upload-img">
+                      <span className="cr-upload-text">
+                        Upload Proof of Refund Payment
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProofFile}
+                      />
+                    </label>
+                  ) : (
+                    <label className="cr-upload-img-active">
+                      <span className="cr-upload-text-active">
+                        Change Proof of Refund Payment
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProofFile}
+                      />
+                    </label>
+                  )}
+
+                  {proofPreviewUrl && (
+                    <img className="cr-proof-preview" src={proofPreviewUrl} alt="proof" />
+                  )}
+
+                  <label className="cr-label">3. PayPal Transaction ID</label>
+                  <input
+                    className="cr-input"
+                    placeholder="Enter your PayPal transaction ID"
+                    value={paypalTxId}
+                    onChange={(e) => setPaypalTxId(e.target.value)}
+                  />
+
+                  <div className="cr-action-row">
+
+                    {localCancellationStatus === "Processing" && (
+                      <button
+                        className="cr-primary-btn"
+                        onClick={handleSubmitAsRefunded}
+                        disabled={
+                          !refundAmount ||
+                          !paypalTxId.trim() ||
+                          (!proofFile && !proofPreviewUrl)
+                        }
+                      >
+                        Submit as Refunded
+                      </button>
+                    )}
+
+                    {localCancellationStatus === "Refunded" && (
+                      <button
+                        className="cr-primary-btn"
+                        onClick={handleSubmitAsCompleted}
+                        disabled={
+                          !refundAmount ||
+                          !paypalTxId.trim() ||
+                          (!proofFile && !proofPreviewUrl)
+                        }
+                      >
+                        Submit as Completed
+                      </button>
+                    )}
+                  </div>
+                </>
+              ) : null}
+
+              {/* COMPLETED + CASH */}
+              {localCancellationStatus === "Completed" &&
+                /cash/i.test(paymentMethod) && (
+                  <>
+                    <label className="cr-label">1. Reason for Cancellation</label>
+                    <input
+                      className="cr-input"
+                      value={localCancelRecord?.reasonForCancellation || ""}
+                      readOnly
+                    />
+
+                    <label className="cr-label">2. Comments</label>
+                    <textarea
+                      className="cr-textarea"
+                      value={localCancelRecord?.cancelComments || ""}
+                      readOnly
+                    />
+
+                    <div className="cr-action-row">
+                      <button className="cr-danger-btn" onClick={handleDeleteCancel}>
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+
+              {/* COMPLETED + PAYPAL VIEW ONLY */}
+              {localCancellationStatus === "Completed" &&
+                /pay/i.test(paymentMethod) && (
+                  <>
+                    <label className="cr-label">1. Total Refund Amount</label>
+                    <input
+                      className="cr-input"
+                      value={localCancelRecord?.refundAmount || ""}
+                      readOnly
+                    />
+
+                    <label className="cr-label">2. Proof of Payment</label>
+                    {localCancelRecord?.proofUrl ? (
+                      <a
+                        className="cr-proof-link"
+                        href={localCancelRecord.proofUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View Proof
+                      </a>
+                    ) : (
+                      <div>No proof uploaded</div>
+                    )}
+
+                    <label className="cr-label">3. PayPal Transaction ID</label>
+                    <input
+                      className="cr-input"
+                      value={localCancelRecord?.paypalTransactionId || ""}
+                      readOnly
+                    />
+
+                    <div className="cr-action-row">
+                      <button className="cr-danger-btn" onClick={handleDeleteCancel}>
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+
+            </>
+          )}
         </div>
 
-        <div className="action-row">
-          <button
-            className="primary-btn"
-            type="button"
-            onClick={handleSubmit}
-            disabled={!paypalEmail.trim()}
-          >
-            Proceed with the Refund Process
+        <div className="cr-footer">
+          <button className="cr-secondary-btn" onClick={onClose}>
+            Back
           </button>
         </div>
+
       </div>
     </div>
   );
 }
 
 export default CancelReason;
-

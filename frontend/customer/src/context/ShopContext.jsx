@@ -956,7 +956,6 @@ const ShopContextProvider = (props) => {
         if (token) {
             localStorage.setItem('authToken', token);
             setWishListItems(wishlistItems)
-            console.log(token);
         } else {
             localStorage.removeItem('authToken');
         }
