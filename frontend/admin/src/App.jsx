@@ -46,6 +46,7 @@ import OutOfStock from "./components/ProductMenu/OutOfStock.jsx";
 import Settings from "./pages/Settings.jsx";
 import UpdateProduct from "./components/ProductMenu/UpdateProduct.jsx";
 import Orders from "./pages/Orders.jsx";
+import ActiveOrders from "./pages/ActiveOrders.jsx";
 
 //components
 // icon 
@@ -102,6 +103,7 @@ const App = () => {
       <Route path="/alluser" element={<AllUser />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/orders" element={<Orders />} />
+      <Route path="/activeorders" element={<ActiveOrders />} />
     </Routes>
    </div>
   )

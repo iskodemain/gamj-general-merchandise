@@ -4,6 +4,7 @@ import "./OutforDelivery.css";
 import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
+import { FaArrowLeft } from "react-icons/fa6";
 
 
 function OutforDelivery() {
@@ -80,6 +81,14 @@ function OutforDelivery() {
     <>
       <Navbar TitleName="Out for Delivery Orders" />
       <div className="outfordelivery-orders-container">
+        {!showViewAll &&
+          <div className="outfordelivery-back-ctn">
+            <button className="outfordelivery-order-back-btn" onClick={() => navigate("/activeorders")}>
+                <FaArrowLeft />
+            </button>
+            <h3 className="outfordelivery-text-title">Back</h3>
+          </div>
+        }
         {showViewAll ? (
           <ViewAll order={selectedOrder} onClose={() => setShowViewAll(false)} orderStatus="Out for Delivery" />
         ) : (

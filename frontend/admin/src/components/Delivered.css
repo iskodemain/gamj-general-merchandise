@@ -1,3 +1,27 @@
+.delivered-back-ctn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 0;
+  width: 7rem;
+  margin-bottom: 1rem;
+}
+
+.delivered-order-back-btn {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.delivered-text-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+
 .empty-del {
   padding:18px; 
   text-align:center; 
@@ -275,6 +299,115 @@
     bottom: 6%;
     transform: none;
     align-self: flex-end;
-    margin-top: 8px;
+
+  }
+}
+
+
+/* MOBILE LARGE */
+@media (max-width: 600px) {
+  .delivered-orders-container {
+    padding: 1.2rem;
+  }
+
+  .delivered-text-title {
+    font-size: 1.15rem;
+  }
+
+  .del-order-card {
+    padding: 16px;
+  }
+
+  .del-item-img {
+    width: 54px;
+    height: 54px;
+  }
+
+  .del-item-name {
+    font-size: 0.95rem;
+  }
+
+  .del-order-total {
+    font-size: 1.1rem;
+  }
+
+  .del-info-row {
+    font-size: 0.85rem;
+  }
+
+  .del-customer-block {
+    font-size: 0.85rem;
+  }
+
+  .del-viewall-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  .trash-viewall-btn {
+    font-size: 0.85rem;
+    right: 100px;
+    bottom: 5%;
+  }
+}
+
+/* MOBILE SMALL (350px–250px) */
+@media (max-width: 350px) {
+  .delivered-back-ctn {
+    gap: 8px;
+  }
+
+  .delivered-text-title {
+    font-size: 1rem;
+  }
+
+  .del-order-card {
+    padding: 12px;
+  }
+
+  .del-order-top {
+    flex-direction: column;
+  }
+
+  .del-item-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .del-item-name {
+    font-size: 0.78rem;
+  }
+
+  .del-item-qtyblock {
+    font-size: 0.7rem;
+  }
+
+  .del-item-price {
+    font-size: 0.8rem;
+  }
+
+  .del-order-number, .del-order-total {
+    font-size: 0.8rem;
+  }
+
+  .del-info-row {
+    font-size: 0.6rem;
+  }
+
+  .del-customer-block {
+    font-size: 0.6rem;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .del-viewall-btn {
+    font-size: 0.78rem;
+    padding: 7px 10px;
+    align-self: flex-start; 
+  }
+  .trash-viewall-btn {
+    font-size: 0.78rem;
+    left: 90px;
+    bottom: 4%;
   }
 }

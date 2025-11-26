@@ -30,6 +30,29 @@ const AdminContextProvider = (props) => {
   const [cities, setCities] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
+  const [fetchReturnRefundOrders, setFetchReturnRefundOrders] = useState([]);
+
+  /*--------------------------FETCH RETURN AND REFUND ORDERS----------------------------*/
+    const handleFetchReturnRefundOrders = async() => {
+        try {
+            const response = await axios.get(backendUrl + "/api/order/list-return-refund", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setFetchReturnRefundOrders(response.data.returnRefundOrders);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message, {...toastError});
+        }
+    }
+    useEffect(() => {
+        if (token) {
+        handleFetchReturnRefundOrders();
+        }
+    }, [token]);
 
   /*--------------------------FETCH CANCELLED ORDERS----------------------------*/
     const handleFetchCancelledOrders = async() => {
@@ -347,7 +370,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders
   }  
   return (
     <AdminContext.Provider value={value}>

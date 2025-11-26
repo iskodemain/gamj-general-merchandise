@@ -1,6 +1,7 @@
 import Admin from "../../models/admin.js";
 import OrderItems from "../../models/orderItems.js";
 import Orders from "../../models/orders.js";
+import OrderRefund from '../../models/orderRefund.js'
 import OrderCancel from '../../models/orderCancel.js'
 
 
@@ -66,6 +67,36 @@ export const fetchOrderCancelService = async (adminId) => {
         return {
             success: true,
             orderCancel
+        };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+export const fetchOrderReturnAndRefundService = async (adminId) => {
+    try {
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+
+
+        const returnRefundOrders = await OrderRefund.findAll({});
+        if (returnRefundOrders.length === 0) {
+            return {
+            success: true,
+            returnRefundOrders: []
+            };
+        }
+
+        return {
+            success: true,
+            returnRefundOrders
         };
 
     } catch (error) {

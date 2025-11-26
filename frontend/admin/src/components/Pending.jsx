@@ -4,6 +4,7 @@ import "./Pending.css";
 import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
+import { FaArrowLeft } from "react-icons/fa6";
 
 
 function Pending() {
@@ -81,6 +82,14 @@ function Pending() {
     <>
       <Navbar TitleName="Pending Orders" />
       <div className="pending-products-container">
+        {!showViewAll &&
+          <div className="pending-back-ctn">
+            <button className="pending-order-back-btn" onClick={() => navigate("/activeorders")}>
+                <FaArrowLeft />
+            </button>
+            <h3 className="pending-text-title">Back</h3>
+          </div>
+        }
         {/* VIEW ALL PAGE */}
         {showViewAll ? (<ViewAll order={selectedOrder} onClose={() => setShowViewAll(false)} orderStatus="Pending"/>) : 
           <div className="pending-products-page">

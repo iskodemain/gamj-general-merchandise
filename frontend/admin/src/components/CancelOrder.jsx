@@ -5,10 +5,11 @@ import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 import CancelOrderReview from "./Cancellation/CancelOrderReview.jsx";
+import { FaArrowLeft } from "react-icons/fa6";
 
 
 function CancelOrder() {
-  const { fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders } = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders } = useContext(AdminContext);
 
   const [showViewAll, setShowViewAll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -88,6 +89,14 @@ function CancelOrder() {
     <>
       <Navbar TitleName="Order Cancellation" />
       <div className="cancel-orders-container">
+        {!showViewAll &&
+          <div className="cancel-back-ctn">
+            <button className="cancel-order-back-btn" onClick={() => navigate("/orders")}>
+                <FaArrowLeft />
+            </button>
+            <h3 className="cancel-text-title">Back</h3>
+          </div>
+        }
         {showViewAll ? (
           <CancelOrderReview
             order={selectedOrder}

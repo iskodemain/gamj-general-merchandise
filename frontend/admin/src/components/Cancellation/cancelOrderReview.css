@@ -1,7 +1,6 @@
 /* Wrapper & Topbar */
 .cor-review-wrapper {
   min-height: 100vh;
-  padding: 20px 24px;
   box-sizing: border-box;
 }
 
@@ -615,5 +614,126 @@
   .cor-review-pay-col {
     order: 3;
     justify-content: space-between;
+  }
+}
+
+
+/* --------------------------------------------- */
+/* RESPONSIVE UPGRADE — FULLY STACKED BELOW 480px */
+/* --------------------------------------------- */
+
+@media (max-width: 480px) {
+
+  /* Global font softening */
+  body,
+  .cor-review-wrapper {
+    font-size: 14px;
+  }
+
+  .cor-review-order-title {
+    font-size: 18px;
+  }
+
+  /* Card wraps properly */
+  .cor-review-card,
+  .cor-review-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cor-review-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .cor-review-search-wrap {
+    width: 100%;
+  }
+
+  /* List rows become stacked */
+  .cor-review-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 1rem;
+  }
+
+  /* Columns stack */
+  .cor-review-item-col,
+  .cor-review-status-col,
+  .cor-review-pay-col {
+    width: 100%;
+    padding: 0;
+    border: none;
+  }
+
+  .cor-review-status-col {
+    justify-content: flex-start;
+  }
+
+  /* Thumbnail shrinks on small screens */
+  .cor-review-thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .cor-review-item-name {
+    font-size: 14px;
+    max-width: 200px;
+  }
+
+  /* Payment block aligns vertically */
+  .cor-review-pay-col {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* Trash button compresses */
+  .cor-review-btn-trash {
+    width: 15px;
+    height: 15px;
+  }
+
+  .cor-review-btn-ctn {
+    justify-content: center;
+    flex-direction: row-reverse;
+  }
+  .cor-review-btn-customer,
+  .cor-review-btn-admin {
+    flex: 1 1 auto; /* allow to grow & shrink */
+    width: 100%;
+    min-width: 0; /* ensures shrink works */
+  }
+}
+
+/* ------------------------------------------------ */
+/* EXTREME MINI LAYOUT — 250px MINIMUM (Your request) */
+/* ------------------------------------------------ */
+
+@media (max-width: 320px) {
+
+  body,
+  .cor-review-wrapper {
+    font-size: 13px;
+  }
+
+  .cor-review-thumb {
+    width: 46px;
+    height: 46px;
+  }
+
+  .cor-review-item-name {
+    font-size: 13px;
+  }
+
+  .cor-review-product-image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .cor-review-modal {
+    padding: 14px;
   }
 }

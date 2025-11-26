@@ -4,6 +4,7 @@ import "./Processing.css";
 import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
+import { FaArrowLeft } from "react-icons/fa6";
 
 
 function Processing() {
@@ -80,6 +81,14 @@ function Processing() {
     <>
       <Navbar TitleName="Processing Orders" />
       <div className="processing-orders-container">
+        {!showViewAll &&
+          <div className="processing-back-ctn">
+            <button className="processing-order-back-btn" onClick={() => navigate("/activeorders")}>
+                <FaArrowLeft />
+            </button>
+            <h3 className="processing-text-title">Back</h3>
+          </div>
+        }
         {showViewAll ? (
           <ViewAll order={selectedOrder} onClose={() => setShowViewAll(false)} orderStatus="Processing"/>
         ) : (
