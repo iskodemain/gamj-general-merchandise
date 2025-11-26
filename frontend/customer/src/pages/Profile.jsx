@@ -727,12 +727,14 @@ const Profile = () => {
                   <label>Official Full Address</label>
                   <input onChange={(e) => setFullAddress(e.target.value)} value={fullAddress} type="text" placeholder="Enter full address" required/>
                 </div>
-                <button type="button" className="review-proof-btn" onClick={() => setShowUploadModal(true)}>
+                {!verifiedUser &&
+                  <button type="button" className="review-proof-btn" onClick={() => setShowUploadModal(true)}>
                   <div className='icon-text-tainer'>
                     <IoEyeOutline className="eye-icon" />
                     <p>Review Uploaded Proof</p>
                   </div>
                 </button>
+                }
               </section>
               <section className="profile-section-a">
                 <h3 className="section-title">Authorized Representative Details</h3>

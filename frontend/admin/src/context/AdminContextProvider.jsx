@@ -25,6 +25,8 @@ const AdminContextProvider = (props) => {
   const [fetchOrders, setFetchOrders] = useState([]);
   const [fetchOrderItems, setFetchOrderItems] = useState([]);
   const [customerList, setCustomerList] = useState([]);
+  const [staffList, setStaffList] = useState([]);
+  const [adminList, setAdminList] = useState([]);
   const [deliveryInfoList, setDeliveryInfoList] = useState([]);
   const [barangays, setBarangays] = useState([]);
   const [cities, setCities] = useState([]);
@@ -79,7 +81,7 @@ const AdminContextProvider = (props) => {
   /*--------------------------FETCH LOCATIONS----------------------------*/
     const handleFetchLocations = async() => {
         try {
-            const response = await axios.get(backendUrl + "/api/all-customer/locations", {
+            const response = await axios.get(backendUrl + "/api/users/locations", {
                 headers: {
                 Authorization: `Bearer ${token}`
                 }
@@ -101,31 +103,77 @@ const AdminContextProvider = (props) => {
     }, [token]);
 
   /*--------------------------FETCH DELIVERY INFORMATION----------------------------*/
-    const handleFetchDeliveryInfo = async() => {
-        try {
-            const response = await axios.get(backendUrl + "/api/all-customer/delivery-info", {
-                headers: {
-                Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.data.success) {
-                setDeliveryInfoList(response.data.deliveryInfoList);
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        }
-    }
-    useEffect(() => {
-        if (token) {
-        handleFetchDeliveryInfo();
-        }
-    }, [token]);
+  const handleFetchDeliveryInfo = async() => {
+      try {
+          const response = await axios.get(backendUrl + "/api/users/delivery-info", {
+              headers: {
+              Authorization: `Bearer ${token}`
+              }
+          });
+          if (response.data.success) {
+              setDeliveryInfoList(response.data.deliveryInfoList);
+          }
+      } catch (error) {
+          console.log(error);
+          toast.error(error.message, {...toastError});
+      }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchDeliveryInfo();
+      }
+  }, [token]);
 
-  /*--------------------------FETCH ORDERS----------------------------*/
+
+  /*--------------------------FETCH ADMIN----------------------------*/
+  const handleFetchAllAdmin = async() => {
+    try {
+        const response = await axios.get(backendUrl + "/api/users/admin", {
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            setAdminList(response.data.adminList);
+        }
+    } catch (error) {
+        console.log(error);
+        toast.error(error.message, {...toastError});
+    }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchAllAdmin();
+      }
+  }, [token]);
+  
+
+  /*--------------------------FETCH STAFF----------------------------*/
+  const handleFetchAllStaff = async() => {
+    try {
+        const response = await axios.get(backendUrl + "/api/users/staff", {
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            setStaffList(response.data.staffList);
+        }
+    } catch (error) {
+        console.log(error);
+        toast.error(error.message, {...toastError});
+    }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchAllStaff();
+      }
+  }, [token]);
+
+  /*--------------------------FETCH CUSTOMERS----------------------------*/
     const handleFetchAllCustomer = async() => {
         try {
-            const response = await axios.get(backendUrl + "/api/all-customer/list", {
+            const response = await axios.get(backendUrl + "/api/users/customer", {
                 headers: {
                 Authorization: `Bearer ${token}`
                 }
@@ -370,7 +418,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList
   }  
   return (
     <AdminContext.Provider value={value}>

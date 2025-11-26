@@ -21,13 +21,11 @@ import CustomerCancel from "./components/Cancellation/CustomerCancel";
 import ReturnAndRefund from "./components/ReturnAndRefund";
 import ReturnRefundAll from "./components/ReturnRefundAll";
 import ReviewRefund from "./components/ReviewRefund";
-import UnverifiedCustomer from "./components/VeriAndUnverified/UnverifiedCustomer";
+import UnverifiedUsers from "./components/VeriAndUnverified/UnverifiedUsers.jsx";
 import UnverifiedCustomerReview from "./components/VeriAndUnverified/UnverifiedCustomerReview";
-import VerifiedCustomer from "./components/VeriAndUnverified/VerifiedCustomer";
+import VerifiedUsers from "./components/VeriAndUnverified/VerifiedUsers.jsx";
 import VerifiedCustomerView from "./components/VeriAndUnverified/VerifiedCustomerView";
-import VerifiedStaff from "./components/VeriAndUnverified/VerifiedStaff";
 import VerifiedStaffView from "./components/VeriAndUnverified/VerifiedStaffView";
-import UnverifiedStaff from "./components/VeriAndUnverified/UnverifiedStaff";
 import UnverifiedStaffView from "./components/VeriAndUnverified/UnverifiedStaffView";
 import Profile from "./pages/Profile.jsx";
 import Products from "./pages/Products.jsx";
@@ -48,6 +46,7 @@ import Reports from "./pages/Reports.jsx"
 import Transactions from "./pages/Transactions.jsx"
 import UserManagement from "./pages/UserManagement.jsx"
 import AllUsers from "./components/AllUsers.jsx";
+import RejectedUsers from "./components/VeriAndUnverified/RejectedUsers.jsx";
 
 //components
 // icon 
@@ -81,13 +80,11 @@ const App = () => {
       <Route path="/returnandrefund" element={<ReturnAndRefund />} />
       <Route path="/returnrefundall" element={<ReturnRefundAll />} />
       <Route path="/reviewrefund" element={<ReviewRefund />} />
-      <Route path="/unverifiedcustomers" element={<UnverifiedCustomer />} />
+      <Route path="/unverifiedusers" element={<UnverifiedUsers />} />
       <Route path="/unverifiedcustomerreview" element={<UnverifiedCustomerReview />} />
-      <Route path="/verifiedcustomers" element={<VerifiedCustomer />} />
+      <Route path="/verifiedusers" element={<VerifiedUsers />} />
       <Route path="/verifiedcustomerview" element={<VerifiedCustomerView />} />
-      <Route path="/verifiedstaff" element={<VerifiedStaff />} />
       <Route path="/verifiedstaffview" element={<VerifiedStaffView />} />
-      <Route path="/unverifiedstaff" element={<UnverifiedStaff />} />
       <Route path="/unverifiedstaffview" element={<UnverifiedStaffView />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/products" element={<Products />} />
@@ -106,6 +103,7 @@ const App = () => {
       <Route path="/reports" element={<Reports />} /> 
       <Route path="/transactions" element={<Transactions />} /> 
       <Route path="/allusers" element={<AllUsers />} /> 
+      <Route path="/rejectedusers" element={<RejectedUsers />} /> 
     </Routes>
    </div>
   )

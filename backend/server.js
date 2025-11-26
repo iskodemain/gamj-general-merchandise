@@ -54,7 +54,7 @@ app.use('/api/paypal', paypalRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/product', adminProductRouter);
 app.use('/api/order', adminOrderRouter);
-app.use('/api/all-customer', adminUsersRouter);
+app.use('/api/users', adminUsersRouter);
 
 
 // TEST
