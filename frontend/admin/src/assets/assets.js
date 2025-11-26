@@ -41,8 +41,10 @@ import inventory_icon from './inventory-icon.png'
 import orders_icon from './orders-icon.png'
 import reports_icon from './reports-icon.png'
 import transaction_icon from "./transaction-icon.png"
+import rejected_user_icon from "./rejected-user-icon.png"
 
 export const assets = {
+    rejected_user_icon,
     transaction_icon,
     reports_icon,
     orders_icon,

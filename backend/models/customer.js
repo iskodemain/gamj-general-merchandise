@@ -41,7 +41,7 @@ const Customer = sequelize.define(
     },
     imageProof: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     profileImage: {
       type: DataTypes.STRING(2048),
@@ -91,6 +91,10 @@ const Customer = sequelize.define(
       defaultValue: DataTypes.NOW,
     },
     verifiedCustomer: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    rejectedCustomer: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },

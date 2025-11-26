@@ -1,4 +1,4 @@
-.display-all-back-ctn {
+.unverified-users-back-ctn {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -12,7 +12,7 @@
   left: 20px;
 }
 
-.display-all-back-btn {
+.unverified-users-back-btn {
   background: #fff;
   border: 1px solid #E6E9EE;
   padding: 8px 13px;
@@ -20,13 +20,13 @@
   cursor: pointer;
 }
 
-.display-all-text-title {
+.unverified-users-text-title {
   font-size: 1.3rem;
   font-weight: 600;
   color: #222;
 }
 
-.display-all-users-container {
+.unverified-users-container {
   display: flex;
   justify-content: center;
   padding-top: 80px;
@@ -36,10 +36,9 @@
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
-
 }
 
-.display-all-users-card {
+.unverified-users-card {
   width: 100%;
   background: #fff;
   border-radius: 12px;
@@ -50,7 +49,7 @@
 }
 
 /* === Controls === */
-.display-all-users-controls {
+.unverified-users-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -59,14 +58,14 @@
   margin-bottom: 18px;
 }
 
-.display-all-users-controls-left {
+.unverified-users-controls-left {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.display-all-users-back {
+.unverified-users-back {
   border: none;
   background: transparent;
   color: #374151;
@@ -79,9 +78,9 @@
   cursor: pointer;
   transition: background 0.2s ease;
 }
-.display-all-users-back:hover { background: #f0f0f0; }
+.unverified-users-back:hover { background: #f0f0f0; }
 
-.display-all-users-select-label {
+.unverified-users-select-label {
   display: flex;
   flex-direction: column;
   font-size: 13px;
@@ -89,7 +88,7 @@
   gap: 4px;
   font-weight: 600;
 }
-.display-all-users-select-label select {
+.unverified-users-select-label select {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid #dfe7e1;
@@ -98,14 +97,14 @@
   font-size: 14px;
   transition: all 0.2s ease;
 }
-.display-all-users-select-label select:focus {
+.unverified-users-select-label select:focus {
   outline: none;
   border-color: #2e7d32;
   box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.15);
 }
 
 /* === Right Controls === */
-.display-all-users-controls-right {
+.unverified-users-controls-right {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -114,7 +113,7 @@
   flex-grow: 1;
 }
 
-.display-all-users-add-btn {
+.unverified-users-add-btn {
   background: #2e7d32;
   color: #fff;
   border: none;
@@ -125,14 +124,14 @@
   box-shadow: 0 6px 18px rgba(46, 125, 50, 0.12);
   transition: all 0.2s ease;
 }
-.display-all-users-add-btn:hover { background: #256d27; }
+.unverified-users-add-btn:hover { background: #256d27; }
 
 /* === Search === */
-.display-all-users-search {
+.unverified-users-search {
   position: relative;
   width: 220px;
 }
-.display-all-users-search input {
+.unverified-users-search input {
   width: 100%;
   padding: 8px 36px 8px 14px;
   border-radius: 999px;
@@ -141,8 +140,8 @@
   background: #fff;
   transition: border 0.2s ease;
 }
-.display-all-users-search input:focus { border-color: #2e7d32; }
-.display-all-users-search-icon {
+.unverified-users-search input:focus { border-color: #2e7d32; }
+.unverified-users-search-icon {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -152,12 +151,12 @@
 }
 
 /* === Table === */
-.display-all-users-table {
+.unverified-users-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 760px;
 }
-.display-all-users-table thead th {
+.unverified-users-table thead th {
   text-align: left;
   color: #2e7d32;
   font-weight: 600;
@@ -165,31 +164,31 @@
   padding: 14px 12px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
-.display-all-users-table th.center { 
+.unverified-users-table th.center { 
   text-align: center; 
 }
-.display-all-users-table th.left { 
+.unverified-users-table th.left { 
   text-align: left; 
 }
 
-.display-all-users-table tbody tr {
+.unverified-users-table tbody tr {
   background: #fff;
   height: 72px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.04);
   transition: background 0.15s ease;
 }
-.display-all-users-table tbody tr:hover { 
+.unverified-users-table tbody tr:hover { 
   background: #f8fef8; 
   cursor: pointer;
 }
-.display-all-users-table tbody td {
+.unverified-users-table tbody td {
   padding: 12px;
   vertical-align: middle;
   color: #111827;
   font-size: 14px;
 }
 
-.display-all-users-thumb {
+.unverified-users-thumb {
   width: 56px;
   height: 56px;
   object-fit: cover;
@@ -198,7 +197,7 @@
 }
 
 /* === Actions === */
-.display-all-users-actions {
+.unverified-users-actions {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -206,7 +205,7 @@
   min-width: 150px;
 }
 
-.display-all-users-trash {
+.unverified-users-trash {
   color: #e53935;
   width: 38px;
   height: 38px;
@@ -220,9 +219,9 @@
   flex-shrink: 0;
   transition: background 0.2s ease;
 }
-.display-all-users-trash:hover { background: #fee2e2; }
+.unverified-users-trash:hover { background: #fee2e2; }
 
-.display-all-users-view {
+.unverified-users-view {
   background: #2e7d32;
   color: white;
   padding: 8px 20px;
@@ -233,66 +232,67 @@
   white-space: nowrap;
   flex-shrink: 0;
   transition: all 0.2s ease;
+  min-width: 90px; /* ✅ FIXED: Forces button to stay same width */
 }
-.display-all-users-view:hover {
+.unverified-users-view:hover {
   background: #205823;
 }
 
-.display-all-users-status {
+.unverified-users-status {
   display: flex;
   align-items: center;
   gap: 7px;
 }
 
-.display-all-users-status .display-all-users-icon-status {
+.unverified-users-status .unverified-users-icon-status {
    font-size: 17px;
 }
 
-.display-all-users-check-icon {
+.unverified-users-check-icon {
   color: #43A047;
 }
 
-.display-all-users-line-icon {
+.unverified-users-line-icon {
   color: #F5A623;
 }
 
-.display-all-users-x-icon {
+.unverified-users-x-icon {
   color: #FF3333;
 }
 
 /* === Responsive === */
 @media (max-width: 1024px) {
-  .display-all-users-card { padding: 16px; }
-  .display-all-users-search { width: 180px; }
-  .display-all-users-add-btn { padding: 8px 12px; }
-  .display-all-users-select-label select { min-width: 120px; }
+  .unverified-users-card { padding: 16px; }
+  .unverified-users-search { width: 180px; }
+  .unverified-users-add-btn { padding: 8px 12px; }
+  .unverified-users-select-label select { min-width: 120px; }
 }
 
 @media (max-width: 850px) {
-  .display-all-users-controls {
+  .unverified-users-controls {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
-  .display-all-users-controls-left,
-  .display-all-users-controls-right {
+  .unverified-users-controls-left,
+  .unverified-users-controls-right {
     width: 100%;
     justify-content: space-between;
   }
-  .display-all-users-add-btn,
-  .display-all-users-search {
+  .unverified-users-add-btn,
+  .unverified-users-search {
     width: 100%;
   }
 
-  .display-all-users-card {
+  .unverified-users-card {
     padding: 14px;
     box-shadow: 0 4px 12px rgba(16, 24, 40, 0.05);
   }
 
-  .display-all-users-table { border: 0; min-width: 0; }
-  .display-all-users-table thead { display: none; }
+  .unverified-users-table { border: 0; min-width: 0; }
+  .unverified-users-table thead { display: none; }
 
-  .display-all-users-table tbody tr {
+  .unverified-users-table tbody tr {
     display: block;
     border: 1px solid #e4e4e4;
     border-radius: 10px;
@@ -301,37 +301,37 @@
     height: auto;
   }
 
-  .display-all-users-table tbody td {
+  .unverified-users-table tbody td {
     display: flex;
     justify-content: space-between;
     padding: 6px 4px;
     border-bottom: 1px dashed #e5e7eb;
   }
 
-  .display-all-users-table tbody td:last-child { border-bottom: none; }
+  .unverified-users-table tbody td:last-child { border-bottom: none; }
 
-  .display-all-users-thumb { width: 48px; height: 48px; }
+  .unverified-users-thumb { width: 48px; height: 48px; }
 
-  .display-all-users-view {
+  .unverified-users-view {
     padding: 6px 14px;
     font-size: 13px;
   }
 
-  .display-all-users-trash {
+  .unverified-users-trash {
     width: 32px;
     height: 32px;
   }
 }
 
 @media (max-width: 400px) {
-  .display-all-users-controls-right {
+  .unverified-users-controls-right {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
 
-  .display-all-users-add-btn,
-  .display-all-users-search {
+  .unverified-users-add-btn,
+  .unverified-users-search {
     width: 100%;
   }
 }

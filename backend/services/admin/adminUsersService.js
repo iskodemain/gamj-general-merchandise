@@ -4,6 +4,7 @@ import Cities from "../../models/cities.js";
 import Customer from "../../models/customer.js";
 import DeliveryInfo from "../../models/deliveryInfo.js";
 import Provinces from "../../models/provinces.js";
+import Staff from "../../models/staff.js"
 
 
 
@@ -26,7 +27,6 @@ export const fetchAllCustomerService = async (adminId) => {
             }
         
         return {
-            // IMAGE PROOF NAME
             success: true,
             customerList
         }
@@ -37,6 +37,64 @@ export const fetchAllCustomerService = async (adminId) => {
     }
 } 
 
+export const fetchAllStaffService = async (adminId) => {
+    try {
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+
+        const staffList = await Staff.findAll({});
+            if (staffList.length === 0) {
+                return {
+                    success: true,
+                    staffList: [],
+                };
+            }
+        
+        return {
+            success: true,
+            staffList
+        }
+        
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+} 
+
+
+export const fetchAllAdminService = async (adminId) => {
+    try {
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+
+        const adminList = await Admin.findAll({});
+            if (adminList.length === 0) {
+                return {
+                    success: true,
+                    adminList: [],
+                };
+            }
+        
+        return {
+            success: true,
+            adminList
+        }
+        
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+} 
 
 
 export const fetchDeliveryInfoService = async (adminId) => {

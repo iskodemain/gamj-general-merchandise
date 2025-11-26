@@ -1,54 +1,309 @@
-import React, { useState } from "react";
-import './AllUsers.css'
-import { FaTrashCan, FaCircleCheck  } from "react-icons/fa6";
-import Navbar from "./Navbar";
+import React, { useContext, useState, useMemo } from 'react';
+import './AllUsers.css';
+import { FaTrashCan } from "react-icons/fa6";
+import { MdOutlineRemoveCircle } from "react-icons/md";
+import { IoIosCloseCircle, IoIosCheckmarkCircle  } from "react-icons/io";
+import { FaArrowLeft } from "react-icons/fa6";
+import { FaSearch } from 'react-icons/fa';
+import Navbar from './Navbar.jsx';
+import { AdminContext } from '../context/AdminContextProvider.jsx';
 
 function AllUsers() {
-    const [users] = useState([
-        { id: 1, name: 'Medical Hospital Cavite', email: 'hospital@example.com', type: 'Customer', status: 'Verified', date: 'March 10, 2025' },
-        { id: 2, name: 'Jojo Binayo', email: 'jojo@example.com', type: 'Staff', status: 'Pending', date: 'March 12, 2025' },
-        { id: 3, name: 'Duterte Nigga', email: 'sample@example.com', type: 'Admin', status: 'Rejected', date: 'March 15, 2025' },
-    ]);
+  const { navigate, customerList, adminList, staffList } = useContext(AdminContext);
 
-    return (
-        <>
-            <Navbar TitleName="All Users"/>
-            <div className="allUser">
-                <div className="card">
-                    <div className="tableHeader">
-                        <div className="cell name">Name</div>
-                        <div className="cell email">Email</div>
-                        <div className="cell type">Type</div>
-                        <div className="cell status">Status</div>
-                        <div className="cell date">Date Created</div>
-                        <div className="cell action">Action</div>
-                    </div>
+  const [query, setQuery] = useState('');
+  const [filterType, setFilterType] = useState('');   // '', 'admin', 'staff', 'customer'
+  const [filterStatus, setFilterStatus] = useState(''); // '', 'Verified', 'Unverified', 'Rejected'
+  const [sortBy, setSortBy] = useState(''); // '', 'az', 'za'
 
-                    <div className="tableBody">
-                        {users.map(u => (
-                            <div key={u.id} className="row">
-                                <div className="cell name"><span className="primaryText">{u.name}</span></div>
-                                <div className="cell email"><span className="secondaryText">{u.email}</span></div>
-                                <div className="cell type"><span className="primaryText">{u.type}</span></div>
-                                <div className="cell status">
-                                    {u.status === 'Verified' && <span className="statusTag verified"><FaCircleCheck className="checkIcon" /> {u.status}</span>}
-                                    {u.status === 'Pending' && <span className="statusTag pending">{u.status}</span>}
-                                    {u.status === 'Rejected' && <span className="statusTag rejected">{u.status}</span>}
-                                </div>
-                                <div className="cell date"><span className="secondaryText">{u.date}</span></div>
-                                <div className="cell action">
-                                    {u.status === 'Rejected' && (
-                                        <button className="iconBtn trash" aria-label="Delete"><FaTrashCan /></button>
-                                    )}
-                                    <button className="btn view">View</button>
-                                    
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+  // Defensive helpers for truthy/falsey values that may be 1/0 or true/false or strings
+  const isTrue = (val) => val === 1 || val === true || val === '1' || val === 'true';
+  const isFalse = (val) => val === 0 || val === false || val === '0' || val === 'false';
+
+  // Helper: determine a normalized status for a unified user
+  const getUserStatus = (u) => {
+    if (u.__type === 'Customer') {
+      // Rejected takes precedence
+      if (isTrue(u.rejectedCustomer)) return 'Rejected';
+      if (isTrue(u.verifiedCustomer)) return 'Verified';
+      if (isFalse(u.verifiedCustomer)) return 'Unverified';
+      // fallback: if missing/unknown treat as Unverified
+      return 'Unverified';
+    }
+
+    if (u.__type === 'Staff') {
+      if (isTrue(u.verifiedStaff)) return 'Verified';
+      return 'Unverified';
+    }
+
+    if (u.__type === 'Admin') {
+      // Exclude adminHead before calling this, but handle defensively
+      if (isTrue(u.adminHead)) return 'Excluded';
+      if (isTrue(u.verifiedAdmin)) return 'Verified';
+      if (isFalse(u.verifiedAdmin)) return 'Unverified';
+      return 'Unverified';
+    }
+
+    return 'Unverified';
+  };
+
+  // Build unified user list with consistent fields:
+  // { ID, __type: 'admin'|'staff'|'customer', displayName, status, createAt, original }
+  const unifiedUsers = useMemo(() => {
+    const list = [];
+
+    // Customers
+    (customerList || []).forEach((c) => {
+      const user = {
+        ID: c.ID,
+        __type: 'Customer',
+        original: c,
+        displayName:
+          c.medicalInstitutionName ||
+          `${c.repFirstName || ''} ${c.repLastName || ''}`.trim() ||
+          c.loginEmail ||
+          `Customer-${c.ID}`,
+        createAt: c.createAt || c.updateAt || null,
+        verifiedCustomer: c.verifiedCustomer,
+        rejectedCustomer: c.rejectedCustomer,
+      };
+      user.status = getUserStatus(user);
+      list.push(user);
+    });
+
+    // Staff
+    (staffList || []).forEach((s) => {
+      const user = {
+        ID: s.ID,
+        __type: 'Staff',
+        original: s,
+        displayName:
+          `${s.firstName || ''} ${s.lastName || ''}`.trim() ||
+          s.emailAddress ||
+          `Staff-${s.ID}`,
+        createAt: s.createAt || s.updateAt || null,
+        verifiedStaff: s.verifiedStaff,
+      };
+      user.status = getUserStatus(user);
+      list.push(user);
+    });
+
+    // Admins — exclude adminHead === true
+    (adminList || []).forEach((a) => {
+      if (isTrue(a.adminHead)) return; // skip admin head entirely
+      const user = {
+        ID: a.ID,
+        __type: 'Admin',
+        original: a,
+        displayName: a.userName || a.emailAddress || `Admin-${a.ID}`,
+        createAt: a.createAt || a.updateAt || null,
+        verifiedAdmin: a.verifiedAdmin,
+        adminHead: a.adminHead,
+      };
+      user.status = getUserStatus(user);
+      if (user.status !== 'Excluded') list.push(user);
+    });
+
+    return list;
+  }, [customerList, staffList, adminList]);
+
+  // Filter + Search + Sort
+  const filteredUsers = useMemo(() => {
+    let list = [...unifiedUsers];
+
+    // Filter by Type
+    if (filterType) {
+      list = list.filter(u => u.__type === filterType);
+    }
+
+    // Filter by Status
+    if (filterStatus) {
+      list = list.filter(u => u.status === filterStatus);
+    }
+
+    // Search across all fields (stringify original object for broad search)
+    if (query && query.trim()) {
+      const q = query.trim().toLowerCase();
+      list = list.filter(u => {
+        const nameMatch = (u.displayName || '').toLowerCase().includes(q);
+        // stringify relevant fields for broad search (defensive)
+        const raw = JSON.stringify(u.original || {}).toLowerCase();
+        return nameMatch || raw.includes(q);
+      });
+    }
+
+    // Sort by first letter of displayName (A-Z / Z-A). Fallbacks included.
+    if (sortBy === 'az') {
+      list.sort((a, b) => {
+        const aChar = (a.displayName && a.displayName[0]) ? a.displayName[0].toLowerCase() : '';
+        const bChar = (b.displayName && b.displayName[0]) ? b.displayName[0].toLowerCase() : '';
+        if (aChar < bChar) return -1;
+        if (aChar > bChar) return 1;
+        return (a.displayName || '').localeCompare(b.displayName || '');
+      });
+    } else if (sortBy === 'za') {
+      list.sort((a, b) => {
+        const aChar = (a.displayName && a.displayName[0]) ? a.displayName[0].toLowerCase() : '';
+        const bChar = (b.displayName && b.displayName[0]) ? b.displayName[0].toLowerCase() : '';
+        if (aChar < bChar) return 1;
+        if (aChar > bChar) return -1;
+        return (b.displayName || '').localeCompare(a.displayName || '');
+      });
+    } else {
+      // default sort: most recently created first if createAt exists, otherwise by ID desc
+      list.sort((a, b) => {
+        if (a.createAt && b.createAt) return new Date(b.createAt) - new Date(a.createAt);
+        return (b.ID || 0) - (a.ID || 0);
+      });
+    }
+
+    return list;
+  }, [unifiedUsers, filterType, filterStatus, query, sortBy]);
+
+  // Handlers
+  const handleDelete = (id, type) => {
+    const wants = window.confirm(`Delete ${type} ID ${id}? This action cannot be undone.`);
+    if (!wants) return;
+    // TODO: replace with actual API call and refresh context/state
+    alert(`(stub) delete called for ${type} ID ${id}`);
+  };
+
+  const handleView = (id, type) => {
+    // Per your earlier instruction: pass user type and id to the view.
+    // navigation target is left general; router can map to your UnverifiedCustomerReview.jsx, etc.
+    navigate(`/view/${type}/${id}`, { state: { id, type } });
+  };
+
+  return (
+    <>
+      <Navbar TitleName="All Users" />
+      <div className="display-all-users-container">
+          <div className="display-all-back-ctn">
+            <button className="display-all-back-btn" onClick={() => navigate("/user-management")}>
+                <FaArrowLeft />
+            </button>
+            <h3 className="display-all-text-title">Back</h3>
+          </div>
+        <div className="display-all-users-card">
+        
+          {/* Controls */}
+          <div className="display-all-users-controls">
+            <div className="display-all-users-controls-left">
+              {/* Type Filter */}
+              <label className="display-all-users-select-label">
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="">All Types</option>
+                  <option value="admin">Admin</option>
+                  <option value="staff">Staff</option>
+                  <option value="customer">Customer</option>
+                </select>
+              </label>
+
+              {/* Status Filter */}
+              <label className="display-all-users-select-label">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                >
+                  <option value="">All Statuses</option>
+                  <option value="Verified">Verified</option>
+                  <option value="Unverified">Unverified</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </label>
+
+              {/* Sort */}
+              <label className="display-all-users-select-label">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="">Sort By</option>
+                  <option value="az">Name: A → Z</option>
+                  <option value="za">Name: Z → A</option>
+                </select>
+              </label>
             </div>
-        </>
-    );
+
+            <div className="display-all-users-controls-right">
+              <button onClick={() => navigate('/users/add')} className="display-all-users-add-btn">Add User</button>
+
+              <div className="display-all-users-search">
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <FaSearch className="display-all-users-search-icon" />
+              </div>
+            </div>
+          </div>
+
+          {/* Users Table */}
+          <table className="display-all-users-table" cellSpacing="0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th className="left">Name</th>
+                <th className="left">Type</th>
+                <th className="left">Status</th>
+                <th className="left">Date Created</th>
+                <th className="center">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((u) => (
+                  <tr key={`${u.__type}-${u.ID}`} className='display-all-users-view-user'>
+                    <td>{u.ID}</td>
+                    <td className="left">{u.displayName}</td>
+                    <td className="left">{u.__type}</td>
+                    <td className="left display-all-users-status">
+                      {u.status === "Verified" && 
+                        <>Verified <span><IoIosCheckmarkCircle className='display-all-users-check-icon display-all-users-icon-status'/></span></>
+                      }
+                      {u.status === "Unverified" && 
+                        <>Unverified <span><MdOutlineRemoveCircle className='display-all-users-line-icon display-all-users-icon-status'/></span></>
+                      }
+                      {u.status === "Rejected" && 
+                        <>Rejected <span><IoIosCloseCircle className='display-all-users-x-icon display-all-users-icon-status'/></span></>
+                      }
+                    </td>
+                    <td className="left">
+                      {u.createAt ? new Date(u.createAt).toLocaleString() : '-'}
+                    </td>
+                    <td className="center display-all-users-actions">
+                      <button onClick={() => handleView(u.ID, u.__type)} className='display-all-users-view'>View All</button>
+                      {u.status === 'Rejected' && (
+                        <button
+                          className="display-all-users-trash"
+                          onClick={() => handleDelete(u.ID, u.__type)}
+                          title="Delete user"
+                        >
+                          <FaTrashCan />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="center empty">
+                    No users found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
 }
+
 export default AllUsers;
