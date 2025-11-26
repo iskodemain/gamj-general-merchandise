@@ -1,3 +1,27 @@
+.pending-back-ctn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 0;
+  width: 7rem;
+  margin-bottom: 1rem;
+}
+
+.pending-order-back-btn {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pending-text-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+
 .empty-pen {
   padding:18px; 
   text-align:center; 
@@ -262,5 +286,108 @@
   .pending-product-inner { flex-direction: column; }
   .pending-product-left-col { border-right: none; padding-right: 0; }
   .pending-product-right-col { padding-right: 0; }
-  .pending-product-view-all-btn { position: static; transform: none; align-self: flex-end; margin-top: 8px; }
+  .pending-product-view-all-btn { 
+    position: static; 
+    transform: none; 
+    align-self: flex-end; 
+    margin-top: 8px; 
+  }
+}
+
+/* MOBILE LARGE */
+@media (max-width: 600px) {
+  .pending-products-container {
+    padding: 1.2rem;
+  }
+
+  .pending-text-title {
+    font-size: 1.15rem;
+  }
+
+  .pending-product-card {
+    padding: 16px;
+  }
+
+  .pending-product-img {
+    width: 54px;
+    height: 54px;
+  }
+
+  .pending-product-name {
+    font-size: 0.95rem;
+  }
+
+  .pending-product-order-total {
+    font-size: 1.1rem;
+  }
+
+  .pending-product-info-row {
+    font-size: 0.85rem;
+  }
+
+  .pending-product-customer-block {
+    font-size: 0.85rem;
+  }
+
+  .pending-product-view-all-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* MOBILE SMALL (350px–250px) */
+@media (max-width: 350px) {
+  .peding-back-ctn {
+    gap: 8px;
+  }
+
+  .pending-text-title {
+    font-size: 1rem;
+  }
+
+  .pending-product-card {
+    padding: 12px;
+  }
+
+  .pending-product-order-top {
+    flex-direction: column;
+  }
+
+  .pending-product-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .pending-product-name {
+    font-size: 0.78rem;
+  }
+
+  .pending-product-qty-value {
+    font-size: 0.7rem;
+  }
+
+  .pending-product-price {
+    font-size: 0.8rem;
+  }
+
+  .pending-product-order-number, .pending-product-order-total {
+    font-size: 0.8rem;
+  }
+
+  .pending-product-info-row {
+    font-size: 0.6rem;
+  }
+
+  .pending-product-customer-block {
+    font-size: 0.6rem;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .pending-product-view-all-btn {
+    font-size: 0.78rem;
+    padding: 7px 10px;
+    align-self: flex-start; 
+  }
 }

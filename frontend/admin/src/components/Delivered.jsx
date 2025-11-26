@@ -5,6 +5,7 @@ import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
 import { FaTrashCan } from "react-icons/fa6";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
+import { FaArrowLeft } from "react-icons/fa6";
 
 
 function Delivered() {
@@ -80,12 +81,19 @@ function Delivered() {
     // PROCESS THIS
   }
 
-
   return (
     <>
       <Navbar TitleName="Delivered Orders" />
-
       <div className="delivered-orders-container">
+        {!showViewAll &&
+          <div className="delivered-back-ctn">
+            <button className="delivered-order-back-btn" onClick={() => navigate("/activeorders")}>
+                <FaArrowLeft />
+            </button>
+            <h3 className="delivered-text-title">Back</h3>
+          </div>
+        }
+
         {showViewAll ? (
           <ViewAll
             order={selectedOrder}

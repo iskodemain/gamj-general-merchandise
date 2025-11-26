@@ -1,7 +1,6 @@
 /* Wrapper & Topbar */
 .vap-wrapper {
   min-height: calc(100vh - 64px);
-  padding: 20px 24px;
   box-sizing: border-box;
 }
 
@@ -661,5 +660,130 @@
   .vap-pay-col {
     order: 3;
     justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Global font softening */
+  body,
+  .vap-wrapper {
+    font-size: 14px;
+  }
+
+  .vap-order-title {
+    font-size: 18px;
+  }
+
+  /* Card wraps properly */
+  .vap-card,
+  .vap-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .vap-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .vap-search-wrap {
+    width: 100%;
+  }
+
+  /* List rows become stacked */
+  .vap-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 1rem;
+  }
+
+  /* Columns stack */
+  .vap-item-col,
+  .vap-status-col,
+  .vap-pay-col {
+    width: 100%;
+    padding: 0;
+    border: none;
+  }
+
+  .vap-status-col {
+    justify-content: flex-start;
+  }
+
+  /* Status pill becomes full width */
+  .vap-status-pill {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+
+  /* Dropdown adapts */
+  .vap-status-menu {
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Thumbnail shrinks on small screens */
+  .vap-thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .vap-item-name {
+    font-size: 14px;
+    max-width: 200px;
+  }
+
+  /* Payment block aligns vertically */
+  .vap-pay-col {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* Trash button compresses */
+  .vap-trash-btn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* ------------------------------------------------ */
+/* EXTREME MINI LAYOUT — 250px MINIMUM (Your request) */
+/* ------------------------------------------------ */
+
+@media (max-width: 325px) {
+
+  body,
+  .vap-wrapper {
+    font-size: 13px;
+  }
+
+  .vap-thumb {
+    width: 46px;
+    height: 46px;
+  }
+
+  .vap-status-pill {
+    font-size: 12px;
+    padding-inline: 0.4rem;
+  }
+
+  .vap-item-name {
+    font-size: 13px;
+  }
+
+  .vap-product-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .vap-modal {
+    padding: 14px;
   }
 }

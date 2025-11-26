@@ -20,7 +20,7 @@ ChartJS.register(
 );
 
 function Overview() {
-  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList} = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList, fetchReturnRefundOrders} = useContext(AdminContext);
 
   // timeframe toggle for line chart
   const [timeframe, setTimeframe] = useState("weekly"); // 'daily' or 'weekly'
@@ -29,25 +29,23 @@ function Overview() {
   // Section (1) Overview cards
   // --------------------------
   const stats = useMemo(() => {
-    const activeOrders = fetchOrders.reduce((acc, order) => {
-      // count orders with at least one non-cancelled item (business-specific)
-      const items = fetchOrderItems.filter((it) => it.orderId === order.ID);
-      const hasActive = items.some(
-        (it) =>
-          ["Pending", "Processing", "Out for Delivery", "Delivered"].includes(
-            it.orderStatus
-          )
-      );
-      return acc + (hasActive ? 1 : 0);
-    }, 0);
+    // ACTIVE ORDER STATUSES
+    const ACTIVE = ["Pending", "Processing", "Out for Delivery", "Delivered"];
+
+    // Set for unique orderId-status pairs
+    const activeSet = new Set();
+
+    fetchOrderItems.forEach((item) => {
+      if (ACTIVE.includes(item.orderStatus)) {
+        activeSet.add(`${item.orderId}-${item.orderStatus}`);
+      }
+    });
+
+    const activeOrders = activeSet.size;
 
     const cancellations = fetchCancelledOrders.length || 0;
 
-    const returnsRefunds = fetchOrders.reduce((acc, order) => {
-      const items = fetchOrderItems.filter((it) => it.orderId === order.ID);
-      const hasReturn = items.some((it) => it.orderStatus === "Return/Refund");
-      return acc + (hasReturn ? 1 : 0);
-    }, 0);
+    const returnsRefunds = fetchReturnRefundOrders.length || 0;
 
     const availableStock = products.reduce((acc, p) => acc + (p.stock || 0), 0);
     const lowStockAlerts = products.reduce(
@@ -64,7 +62,7 @@ function Overview() {
       lowStockAlerts,
       outOfStock,
     };
-  }, [fetchOrders, fetchOrderItems, fetchCancelledOrders, products]);
+  }, [fetchOrders, fetchOrderItems, fetchCancelledOrders, fetchReturnRefundOrders,products]);
 
   // -----------------------------------------
   // Section (2) Orders Over Time (line chart)
