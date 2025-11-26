@@ -37,8 +37,16 @@ import total_product_icon from './total-product-icon.png';
 import most_stock_product_icon from './most-stock-product-icon.png';
 import low_stock_product_icon from './low-stock-product-icon.png';
 import out_of_stock_product_icon from './out-of-stock-product-icon.png';
+import inventory_icon from './inventory-icon.png'
+import orders_icon from './orders-icon.png'
+import reports_icon from './reports-icon.png'
+import transaction_icon from "./transaction-icon.png"
 
 export const assets = {
+    transaction_icon,
+    reports_icon,
+    orders_icon,
+    inventory_icon,
     image_upload_icon,
     settings_icon,
     add_product_icon,

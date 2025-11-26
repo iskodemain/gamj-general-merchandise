@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import './AllUser.css'
+import './AllUsers.css'
 import { FaTrashCan, FaCircleCheck  } from "react-icons/fa6";
 import Navbar from "./Navbar";
 
-function AllUser() {
+function AllUsers() {
     const [users] = useState([
         { id: 1, name: 'Medical Hospital Cavite', email: 'hospital@example.com', type: 'Customer', status: 'Verified', date: 'March 10, 2025' },
         { id: 2, name: 'Jojo Binayo', email: 'jojo@example.com', type: 'Staff', status: 'Pending', date: 'March 12, 2025' },
@@ -51,4 +51,4 @@ function AllUser() {
         </>
     );
 }
-export default AllUser;
+export default AllUsers;
