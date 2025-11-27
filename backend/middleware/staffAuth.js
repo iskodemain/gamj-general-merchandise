@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import Staff from '../models/staff.js';
 
 const staffAuth = async (req, res, next) => {
   try {
@@ -13,6 +14,18 @@ const staffAuth = async (req, res, next) => {
 
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET_STAFF);
+
+    const staffUser = await Staff.findByPk(decoded.ID);
+
+    //----------------------------------------------------
+    if (!staffUser || staffUser.forceLogout) {
+      return res.status(401).json({
+        success: false,
+        forceLogout: true,
+        message: "Your account has been removed."
+      });
+    }
+    //----------------------------------------------------
 
     req.staff = { ID: decoded.ID };
     next();

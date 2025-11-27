@@ -8,6 +8,14 @@ import { io } from "socket.io-client"
 
 export const AdminContext = createContext();
 const AdminContextProvider = (props) => {
+  /*-----------------------TOAST---------------------*/
+  const toastSuccess = {
+    position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
+  }
+  const toastError = {
+    position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
+  }
+
   const currency = <TbCurrencyPeso className="peso-sign"/>; 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
@@ -33,6 +41,29 @@ const AdminContextProvider = (props) => {
   const [provinces, setProvinces] = useState([]);
   const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
   const [fetchReturnRefundOrders, setFetchReturnRefundOrders] = useState([]);
+
+
+  /*---------------------------USER REJECT PROCESS-----------------------------*/
+  const handleDeletetUser = async (userID, userType) => {
+    if (token) {
+      const formData = {userID, userType};
+      try {
+        const response = await axios.post(backendUrl + "/api/users/delete", formData, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
 
   /*---------------------------USER REJECT PROCESS-----------------------------*/
   const handleRejectUser = async (userID, userType, rejectTitle, rejectMessage) => {
@@ -451,18 +482,72 @@ const AdminContextProvider = (props) => {
     }
   };
 
+  // 🚨 AUTO LOGOUT INTERCEPTOR FOR DELETED ADMINS
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          const data = error.response.data;
 
-  
-  /*-----------------------TOAST---------------------*/
-  const toastSuccess = {
-      position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
-  }
-  const toastError = {
-      position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
-  }
+          if (data.forceLogout) {
+            toast.error("Your account has been removed.", { ...toastError });
+            navigate("/login");
+
+            localStorage.removeItem("adminAuthToken");
+            localStorage.removeItem("adminLoginToken");
+            sessionStorage.clear();
+
+            setToken("");
+            setLoginToken("");
+            setLoginIdentifier("");
+
+            return Promise.reject(error);
+          }
+
+          if (data.message === "Unauthorized: Token missing or malformed.") {
+            toast.error("Please log in again.", { ...toastError });
+            navigate("/login");
+
+            localStorage.removeItem("adminAuthToken");
+            localStorage.removeItem("adminLoginToken");
+            sessionStorage.clear();
+
+            setToken("");
+            setLoginToken("");
+            setLoginIdentifier("");
+
+            return Promise.reject(error);
+          }
+
+          if (data.message === "Invalid or expired token. Please log in again.") {
+            toast.error("Session expired. Please log in again.", { ...toastError });
+            navigate("/login");
+
+            localStorage.removeItem("adminAuthToken");
+            localStorage.removeItem("adminLoginToken");
+            sessionStorage.clear();
+
+            setToken("");
+            setLoginToken("");
+            setLoginIdentifier("");
+
+            return Promise.reject(error);
+          }
+
+        }
+
+        return Promise.reject(error);
+      }
+    );
+
+    // Cleanup interceptor when component unmounts
+    return () => axios.interceptors.response.eject(interceptor);
+  }, []);
+
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser
   }  
   return (
     <AdminContext.Provider value={value}>

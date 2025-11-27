@@ -49,6 +49,10 @@ const Staff = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    forceLogout: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    }
   },
   {
     tableName: 'staff',

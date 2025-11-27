@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import Admin from '../models/admin.js';
 
 const adminAuth = async (req, res, next) => {
   try {
@@ -13,6 +14,18 @@ const adminAuth = async (req, res, next) => {
 
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET_ADMIN);
+
+    //----------------------------------------------------
+    const adminUser = await Admin.findByPk(decoded.ID);
+
+    if (!adminUser || adminUser.forceLogout) {
+      return res.status(401).json({
+        success: false,
+        forceLogout: true,
+        message: "Your account has been removed."
+      });
+    }
+    //----------------------------------------------------
 
     req.admin = { ID: decoded.ID };
     next();

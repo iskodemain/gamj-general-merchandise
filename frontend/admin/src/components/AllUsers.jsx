@@ -8,9 +8,10 @@ import { FaSearch } from 'react-icons/fa';
 import Navbar from './Navbar.jsx';
 import { AdminContext } from '../context/AdminContextProvider.jsx';
 import ViewUserInfo from "./VeriAndUnverified/ViewUserInfo.jsx"
+import Loading from './Loading.jsx';
 
 function AllUsers() {
-  const { navigate, customerList, adminList, staffList } = useContext(AdminContext);
+  const { navigate, customerList, adminList, staffList, handleDeletetUser } = useContext(AdminContext);
 
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState('');   
@@ -19,6 +20,27 @@ function AllUsers() {
 
   const [viewUser, setViewUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState(null);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const openModal = (action, message) => {
+    setModalAction(() => action);
+    setModalMessage(message);
+    setModalOpen(true);
+  };
+
+  const confirmAction = async () => {
+    if (modalAction) await modalAction();
+    setModalOpen(false);
+  };
+
+  const cancelAction = () => {
+    setModalOpen(false);
+  };
+
 
   // Defensive helpers for truthy/falsey values that may be 1/0 or true/false or strings
   const isTrue = (val) => val === 1 || val === true || val === '1' || val === 'true';
@@ -166,7 +188,23 @@ function AllUsers() {
 
   // Handlers
   const handleDelete = (id, type) => {
-    // APPLY THE LOGIC HERE
+    openModal(
+      async () => {
+        setLoading(true);
+
+        const approved = await handleDeletetUser(id, type);
+        
+        if (approved) {
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
+
+        setLoading(false);
+
+      },
+      `Are you sure you want to permanently delete this ${type}?`
+    );
   };
 
   const handleView = (id, type, status) => {
@@ -188,6 +226,20 @@ function AllUsers() {
   return (
     <>
       <Navbar TitleName="All Users" />
+      {loading && <Loading/>}
+      {/* Confirmation Modal */}
+      {modalOpen && (
+        <div className="conf-modal-overlay">
+          <div className="conf-modal-box">
+            <p className="conf-modal-message">{modalMessage}</p>
+
+            <div className="conf-modal-buttons">
+              <button className="conf-btn-confirm" onClick={confirmAction}>Yes</button>
+              <button className="conf-btn-cancel" onClick={cancelAction}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="display-all-users-container">
           <div className="display-all-back-ctn">
             <button className="display-all-back-btn" onClick={() => navigate("/user-management")}>

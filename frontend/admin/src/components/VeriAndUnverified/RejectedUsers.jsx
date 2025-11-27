@@ -6,9 +6,10 @@ import { FaSearch } from 'react-icons/fa';
 import Navbar from '../Navbar.jsx';
 import { AdminContext } from '../../context/AdminContextProvider.jsx';
 import ViewUserInfo from './ViewUserInfo.jsx';
+import Loading from '../Loading.jsx';
 
 function RejectedUsers() {
-  const { navigate, customerList } = useContext(AdminContext);
+  const { navigate, customerList, handleDeletetUser } = useContext(AdminContext);
 
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState(''); 
@@ -16,6 +17,26 @@ function RejectedUsers() {
 
   const [viewUser, setViewUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState(null);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const openModal = (action, message) => {
+    setModalAction(() => action);
+    setModalMessage(message);
+    setModalOpen(true);
+  };
+
+  const confirmAction = async () => {
+    if (modalAction) await modalAction();
+    setModalOpen(false);
+  };
+
+  const cancelAction = () => {
+    setModalOpen(false);
+  };
 
   const isTrue = (val) => val === 1 || val === true || val === "1" || val === "true";
 
@@ -77,10 +98,23 @@ function RejectedUsers() {
   }, [unifiedUsers, filterType, query, sortBy]);
 
   const handleDelete = (id, type) => {
-    const ok = window.confirm(`Delete ${type} ID ${id}? This action cannot be undone.`);
-    if (!ok) return;
+    openModal(
+      async () => {
+        setLoading(true);
 
-    alert(`Delete called for ${type} ID ${id}`);
+        const approved = await handleDeletetUser(id, type);
+        
+        if (approved) {
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
+
+        setLoading(false);
+
+      },
+      `Are you sure you want to permanently delete this ${type}?`
+    );
   };
 
   const handleView = (id, type, status) => {
@@ -102,6 +136,20 @@ function RejectedUsers() {
   return (
     <>
       <Navbar TitleName="Rejected Users" />
+      {loading && <Loading/>}
+      {/* Confirmation Modal */}
+      {modalOpen && (
+        <div className="conf-modal-overlay">
+          <div className="conf-modal-box">
+            <p className="conf-modal-message">{modalMessage}</p>
+
+            <div className="conf-modal-buttons">
+              <button className="conf-btn-confirm" onClick={confirmAction}>Yes</button>
+              <button className="conf-btn-cancel" onClick={cancelAction}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="rejected-users-container">
         
         <div className="rejected-users-back-ctn">

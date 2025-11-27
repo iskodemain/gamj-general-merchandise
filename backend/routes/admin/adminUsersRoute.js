@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { fetchAllCustomer, fetchDeliveryInfo, fetchLocationData, fetchAllStaff, fetchAllAdmin, approvedUser, rejectUser } from '../../controllers/admin/adminUsersController.js';
+import { fetchAllCustomer, fetchDeliveryInfo, fetchLocationData, fetchAllStaff, fetchAllAdmin, approvedUser, rejectUser, deleteUser } from '../../controllers/admin/adminUsersController.js';
 
 import adminAuth from "../../middleware/adminAuth.js";
 
@@ -17,6 +17,7 @@ adminUsersRouter.get('/locations', adminAuth, fetchLocationData);
 // UPDATE
 adminUsersRouter.patch('/approval', adminAuth, approvedUser);
 adminUsersRouter.patch('/reject', adminAuth, rejectUser);
+adminUsersRouter.post('/delete', adminAuth, deleteUser);
 
 
 

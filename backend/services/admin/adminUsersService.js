@@ -338,3 +338,78 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
     throw new Error(error.message);
   }
 };
+
+export const deleteUserService = async (adminId, userID, userType) => {
+  try {
+    // Verify admin exists
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: "Admin user not found",
+      };
+    }
+
+    let userToDelete = null;
+
+    // DELETE CUSTOMER
+    if (userType === "Customer") {
+      userToDelete = await Customer.findByPk(userID);
+
+      if (!userToDelete) {
+        return {
+          success: false,
+          message: "Customer not found",
+        };
+      }
+      await userToDelete.update({ forceLogout: true });
+      await userToDelete.destroy();
+    }
+
+    // DELETE STAFF
+    else if (userType === "Staff") {
+      userToDelete = await Staff.findByPk(userID);
+
+      if (!userToDelete) {
+        return {
+          success: false,
+          message: "Staff user not found",
+        };
+      }
+      await userToDelete.update({ forceLogout: true });
+      await userToDelete.destroy();
+    }
+
+    // DELETE ADMIN
+    else if (userType === "Admin") {
+      userToDelete = await Admin.findByPk(userID);
+
+      if (!userToDelete) {
+        return {
+          success: false,
+          message: "Admin user not found",
+        };
+      }
+      await userToDelete.update({ forceLogout: true });
+      await userToDelete.destroy();
+    }
+
+    // INVALID TYPE
+    else {
+      return {
+        success: false,
+        message: "Invalid user type",
+      };
+    }
+
+    return {
+      success: true,
+      message: `${userType} account deleted successfully.`,
+      deletedUser: { ID: userID, userType }
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};

@@ -9,11 +9,19 @@ import { io } from "socket.io-client";
 
 export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
+    /*-----------------------------------------TOAST--------------------------------------*/
+    const toastSuccess = { 
+        position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
+    }
+    const toastError = {
+        position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
+    }
+
     const currency = <TbCurrencyPeso className="peso-sign"/>; 
     const backendUrl = import.meta.env.VITE_BACKEND_URL
     const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID
     const socket = io(backendUrl);
-    
+
     /*--------------------------USE STATE--------------------------*/
     const [token, setToken] = useState(() => localStorage.getItem('authToken') || '');
     const [loginToken, setLoginToken] = useState(() => localStorage.getItem('loginToken') || '');
@@ -57,7 +65,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -69,13 +76,14 @@ const ShopContextProvider = (props) => {
 
     /*----------------------READ NOTIFICATION-----------------------*/
     const readNotification = async() => {
-        try {
-            await axios.patch(backendUrl + "/api/notification/read", {}, {
-                headers: { Authorization: `Bearer ${token}`},
-            });
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
+        if (token) {
+            try {
+                await axios.patch(backendUrl + "/api/notification/read", {}, {
+                    headers: { Authorization: `Bearer ${token}`},
+                });
+            } catch (error) {
+                console.log(error);
+            }
         }
     }
 
@@ -94,7 +102,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
 
@@ -150,7 +157,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -220,8 +226,7 @@ const ShopContextProvider = (props) => {
                 setFetchRefundProof(response.data.refundProof);
             }
         } catch (error) {
-        console.log(error);
-        toast.error(error.message, {...toastError});
+            console.log(error);
         }
     }
     useEffect(() => {
@@ -356,7 +361,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -379,8 +383,7 @@ const ShopContextProvider = (props) => {
                 setFetchCancelledOrders(response.data.orderCancel);
             }
         } catch (error) {
-        console.log(error);
-        toast.error(error.message, {...toastError});
+            console.log(error);
         }
     }
     useEffect(() => {
@@ -453,7 +456,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -478,7 +480,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -524,7 +525,6 @@ const ShopContextProvider = (props) => {
             } 
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -540,7 +540,6 @@ const ShopContextProvider = (props) => {
             } 
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         }
     }
     useEffect(() => {
@@ -677,13 +676,6 @@ const ShopContextProvider = (props) => {
         handleFetchLocation();
     }
     }, [token]);
-    /*-----------------------------------------TOAST--------------------------------------*/
-    const toastSuccess = { 
-        position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
-    }
-    const toastError = {
-        position: "top-center", autoClose: 3000, hideProgressBar: true, closeOnClick: false, pauseOnHover: false, draggable: true, progress: 0, theme: "light", transition: Bounce
-    }
 
     /*-------------------------------WISHLIST------------------------------*/
     const getUserWishlist = async () => {
@@ -696,7 +688,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         } 
     }
     useEffect(() => {
@@ -707,13 +698,6 @@ const ShopContextProvider = (props) => {
 
 
     const addToWishlist = async (productId) => {
-        // let wishlistData = structuredClone(wishlistItems);
-        // wishlistData[productId] = true;
-        // setWishListItems(wishlistData);
-        // if (!wishlistItems.includes(productId)) {
-        //     const newWishlist = [...wishlistItems, productId];
-        //     setWishListItems(newWishlist);
-        // }
         if (!wishlistItems.some(item => item.productId === productId)) {
             setWishListItems([...wishlistItems, { productId }]);
         }
@@ -730,18 +714,11 @@ const ShopContextProvider = (props) => {
                 }
             } catch (error) {
                 console.log(error);
-                toast.error(error.message, {...toastError});
             } 
         }
     }
 
     const removeFromWishlist = async (productId) => {
-        // let wishlistData = structuredClone(wishlistItems);
-        // delete wishlistData[productId];
-        // setWishListItems(wishlistData);
-        // const newWishlist = wishlistItems.filter(id => id !== productId);
-        // setWishListItems(newWishlist);
-
         setWishListItems(wishlistItems.filter(item => item.productId !== productId));
         
         if (token) {
@@ -757,18 +734,9 @@ const ShopContextProvider = (props) => {
                 }
             } catch (error) {
                 console.log(error);
-                toast.error(error.message, {...toastError});
             } 
         }
     };
-
-    // const isInWishlist = (itemId) => {
-    //     return wishlistItems[itemId] !== undefined;
-    // };
-
-    // const isInWishlist = (itemId) => {
-    //     return wishlistItems.includes(itemId);
-    // };
 
     const isInWishlist = (itemId) => {
         return wishlistItems.some(item => item.productId === itemId);
@@ -786,7 +754,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message, {...toastError});
         } 
     }
     useEffect(() => {
@@ -815,7 +782,6 @@ const ShopContextProvider = (props) => {
                 }
             } catch (error) {
                 console.log(error);
-                toast.error(error.message, {...toastError});
             } 
         }
 
@@ -849,7 +815,6 @@ const ShopContextProvider = (props) => {
                 }
             } catch (error) {
                 console.log(error);
-                toast.error(error.message, {...toastError});
             } 
         }
     }
@@ -870,7 +835,6 @@ const ShopContextProvider = (props) => {
                 }
             } catch (error) {
                 console.log(error);
-                toast.error(error.message, {...toastError});
             } 
         }
     }
@@ -889,8 +853,7 @@ const ShopContextProvider = (props) => {
                 }
             } catch (error) {
                 console.log(error);
-                toast.error(error.message, {...toastError});
-        } 
+            } 
         }
     }
     
@@ -1259,10 +1222,76 @@ const ShopContextProvider = (props) => {
         };
     }, []);
 
-    
 
+    // AUTO LOGOUT INTERCEPTOR
+    useEffect(() => {
+        const interceptor = axios.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response && error.response.status === 401) {
+                    const data = error.response.data;
 
+                    if (data.forceLogout) {
+                        toast.error("Your account has been removed.", { ...toastError });
+                        navigate("/login");
+                        // Remove tokens
+                        localStorage.removeItem("authToken");
+                        localStorage.removeItem("loginToken");
+                        localStorage.removeItem("resetPasswordToken");
+                        sessionStorage.clear();
+                        setCartItems([]);
+                        setWishListItems([]);
 
+                        setToken("");
+                        setLoginToken("");
+                        setResetPasswordToken("");
+
+                        return Promise.reject(error);
+                    }
+
+                    if (data.message === "Unauthorized: Token missing or malformed.") {
+                        toast.error("Please log in again.", { ...toastError });
+                        navigate("/login");
+                        // Remove tokens
+                        localStorage.removeItem("authToken");
+                        localStorage.removeItem("loginToken");
+                        localStorage.removeItem("resetPasswordToken");
+                        sessionStorage.clear();
+                        setCartItems([]);
+                        setWishListItems([]);
+
+                        setToken("");
+                        setLoginToken("");
+                        setResetPasswordToken("");
+
+                        return Promise.reject(error);
+                    }
+
+                    if (data.message === "Invalid or expired token. Please log in again.") {
+                        toast.error("Session expired. Please log in again.", { ...toastError });
+                        navigate("/login");
+                        // Remove tokens
+                        localStorage.removeItem("authToken");
+                        localStorage.removeItem("loginToken");
+                        localStorage.removeItem("resetPasswordToken");
+                        sessionStorage.clear();
+                        setCartItems([]);
+                        setWishListItems([]);
+
+                        setToken("");
+                        setLoginToken("");
+                        setResetPasswordToken("");
+
+                        return Promise.reject(error);
+                    }
+                }
+
+                return Promise.reject(error);
+            }
+        );
+
+        return () => axios.interceptors.response.eject(interceptor);
+    }, []);
 
 
     /*----------------------------VALUE ACCESS-----------------------------*/

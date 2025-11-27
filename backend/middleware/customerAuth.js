@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import Customer from '../models/customer.js';
 
 const customerAuth = async (req, res, next) => {
   try {
@@ -13,6 +14,18 @@ const customerAuth = async (req, res, next) => {
 
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET_CUSTOMER);
+
+    //----------------------------------------------------
+    const customerUser = await Customer.findByPk(decoded.ID);
+
+    if (!customerUser || customerUser.forceLogout) {
+      return res.status(401).json({
+        success: false,
+        forceLogout: true,
+        message: "Your account has been removed."
+      });
+    }
+    //----------------------------------------------------
 
     req.user = { ID: decoded.ID };
     next();
