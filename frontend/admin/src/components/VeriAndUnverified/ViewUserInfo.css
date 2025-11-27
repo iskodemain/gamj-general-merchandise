@@ -1,0 +1,291 @@
+.conf-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.conf-modal-box {
+    background: #fff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    width: 380px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.conf-modal-message {
+    font-size: 1.15rem;
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+
+.conf-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.conf-btn-confirm {
+    padding: 10px 24px;
+    background: #43A047;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
+.conf-btn-cancel {
+    padding: 10px 24px;
+    background: #E53935;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
+
+.view-user-info-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(239,255,241,0.6), rgba(231,255,244,0.5));
+  width: 100%;
+}
+
+/* Back button */
+.view-user-back-ctn {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 0;
+  width: 7rem;
+  margin-bottom: 1rem;
+}
+
+.view-user-back-btn {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.view-user-text-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+/* container for the user card */
+.user-container {
+    min-width: 80%;
+  display: flex;
+  justify-content: center;
+}
+
+.verified-customer-view, .verified-staff-view, .verified-staff-view {
+    width: 100%;
+}
+
+.profile-card {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.109);
+    box-sizing: border-box;
+}
+
+/* Header */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.profile-title {
+  color: #000000;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.profile-title .verified-color {
+    color: #43A047;
+}
+
+.profile-title .unverified-color {
+    color: #F5A623;
+}
+
+.profile-title .rejected-color {
+    color: #FF3333;
+}
+
+/* avatar */
+.avatar-circle {
+  width: 70px;
+  height: 70px;
+  background: #ffe8d9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.avatar-icon { color: #ff8a65; font-size: 24px; }
+.avatar-img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Section headings */
+.info-section { margin-bottom: 22px; }
+.section-title { 
+    font-size: 18px; 
+    font-weight: 700; 
+    color: #43A047; 
+    margin: 0 0 12px 0; 
+}
+
+
+/* Forms */
+.form-group { margin-bottom: 12px; }
+.form-row { display: flex; gap: 14px; margin-bottom: 12px; }
+.form-row .form-group { flex: 1; margin-bottom: 0; }
+
+label { display: block; font-size: 14px; font-weight: 500; color: #4b5563; margin-bottom: 6px; }
+input[type="text"], input[type="email"], input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+/* input prefix */
+.input-with-prefix { display: flex; align-items: center; }
+.input-with-prefix input { border-top-left-radius: 0; border-bottom-left-radius: 0; flex: 1; }
+
+/* document */
+.document-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #FFFFFF;
+  cursor: pointer;
+  margin-bottom: 8px;
+  box-shadow: 0 0px 8px rgba(0, 0, 0, 0.143);
+}
+.document-icon { 
+    color: #43A047;
+    font-size: 18px; 
+
+}
+.document-label { color: #43A047; font-weight: 700; }
+.document-box {
+    padding: 10px 12px; 
+    border: 1px solid #d1d5db; 
+    border-radius: 8px; 
+    background-color: #f9fafb; 
+    display:flex; 
+    align-items:center; 
+    gap:10px; 
+    color: #262626;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 0.3rem;
+}
+.document-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+
+/* password toggle */
+.password-input { position: relative; }
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* action buttons */
+.vui-action-buttons { 
+    display:flex; 
+    justify-content: space-between; 
+    gap:14px; 
+    margin-top: 18px; 
+    flex-wrap:wrap; 
+}
+
+.btn-save1, .btn-delete, .btn-reject {
+  padding: 12px 22px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; min-width: 140px;
+}
+
+.btn-save1 { background-color: #43A047; color: white; }
+.btn-save1:hover { background: #388e3c; }
+.btn-reject, .btn-delete { background-color: #E53935; color: white; }
+.btn-reject:hover, .btn-delete:hover { background: #d32f2f; }
+
+/* proof modal */
+.proof-modal {
+  position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.6); z-index: 9999;
+}
+.proof-modal-inner { background: #fff; padding: 14px; border-radius: 10px; max-width: 90%; max-height: 90%; display:flex; flex-direction:column; gap:12px; align-items:center; }
+.proof-modal-inner img { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px; }
+.proof-close { padding: 8px 12px; border-radius: 8px; border: none; cursor:pointer; background:#eee; }
+
+/* responsive tweaks */
+@media (max-width: 920px) {
+  .profile-card { padding: 20px; }
+  .profile-title { font-size: 22px; }
+  .avatar-circle { width: 60px; height: 60px; }
+  .form-row { flex-direction: column; gap: 12px; }
+  .vui-action-buttons { flex-direction: column; width: 100%; }
+  .btn-save1, .btn-delete, .btn-reject { width: 100%; min-width: unset; }
+}
+
+@media (max-width: 520px) {
+    .profile-card { 
+        padding: 14px; 
+    }
+    .profile-title{ 
+        font-size: 18px; 
+    }
+    input[type="text"], input[type="email"], input[type="password"] { 
+        padding: 8px 10px; 
+        font-size: 13px; 
+    }
+    .document-thumb { 
+        width: 40px; 
+        height: 40px; 
+    }
+    .user-container {
+        width: 100%;
+    }
+    .conf-modal-box {
+        width: 300px;
+    }
+}

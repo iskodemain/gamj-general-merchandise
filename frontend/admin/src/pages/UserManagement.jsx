@@ -83,7 +83,7 @@ function Orders() {
   
   return (
     <>
-      <Navbar TitleName="Orders" />
+      <Navbar TitleName="User Management" />
 
       <main className="ordersView-container">
 

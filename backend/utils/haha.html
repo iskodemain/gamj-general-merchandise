@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Approved</title>
+    <style>
+        /* Basic Reset */
+        body, table, td, a {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        img {
+            border: 0;
+            display: block;
+            max-width: 100%;
+        }
+
+        /* Layout */
+        .email-container {
+            width: 100%;
+            background-color: #f4f6f9;
+            padding: 20px 0;
+        }
+
+        .email-content {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .email-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .email-header img {
+            margin: 0 auto;
+            max-width: 120px;
+        }
+
+        /* Body */
+        .email-body {
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333333;
+        }
+
+        .approved-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+
+        .highlight-text {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        /* Footer */
+        .email-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            margin-top: 30px;
+        }
+
+        .email-footer a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <table class="email-container" role="presentation">
+        <tr>
+            <td>
+                <div class="email-content">
+                    
+                    <!-- Header Section with Logo -->
+                    <div class="email-header">
+                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                    </div>
+
+                    <!-- Body Section -->
+                    <div class="email-body">
+                        <h2 class="approved-title">Your Account Has Been Approved!</h2>
+
+                        <p>Hi <b>${userName}</b>,</p>
+
+                        <p>
+                            We’re happy to inform you that your account has been 
+                            <span class="highlight-text">successfully approved</span> and is now fully active.
+                        </p>
+
+                        <p>
+                            You can now log in and start exploring our product catalog, place orders, and enjoy full access to our services.
+                        </p>
+
+                        <p>
+                            Thank you for choosing <b>GAMJ General Merchandise</b>.  
+                            We look forward to serving your medical supply needs.
+                        </p>
+                    </div>
+
+                    <!-- Footer Section -->
+                    <div class="email-footer">
+                        <p>If you have any questions or need assistance, feel free to reach out.</p>
+                        <p>Email us at:  
+                            <a href="mailto:gamjmerchandisehelp@gmail.com" target="_blank">
+                                gamjmerchandisehelp@gmail.com
+                            </a>
+                        </p>
+                    </div>
+
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

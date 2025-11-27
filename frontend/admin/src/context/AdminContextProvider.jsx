@@ -34,6 +34,28 @@ const AdminContextProvider = (props) => {
   const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
   const [fetchReturnRefundOrders, setFetchReturnRefundOrders] = useState([]);
 
+  /*---------------------------UPDATE PRODUCTS-----------------------------*/
+  const handleApproveUser = async (userID, userType) => {
+    if (token) {
+      const formData = {userID, userType};
+      try {
+        const response = await axios.patch(backendUrl + "/api/users/approval", formData, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
   /*--------------------------FETCH RETURN AND REFUND ORDERS----------------------------*/
     const handleFetchReturnRefundOrders = async() => {
         try {
@@ -418,7 +440,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser
   }  
   return (
     <AdminContext.Provider value={value}>

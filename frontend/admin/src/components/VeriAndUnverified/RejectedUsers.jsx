@@ -1,9 +1,11 @@
 import React, { useContext, useState, useMemo } from 'react';
 import './RejectedUsers.css';
 import { FaArrowLeft, FaTrashCan } from "react-icons/fa6";
+import { IoIosCloseCircle  } from "react-icons/io";
 import { FaSearch } from 'react-icons/fa';
 import Navbar from '../Navbar.jsx';
 import { AdminContext } from '../../context/AdminContextProvider.jsx';
+import ViewUserInfo from './ViewUserInfo.jsx';
 
 function RejectedUsers() {
   const { navigate, customerList } = useContext(AdminContext);
@@ -11,6 +13,9 @@ function RejectedUsers() {
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState(''); 
   const [sortBy, setSortBy] = useState('');
+
+  const [viewUser, setViewUser] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const isTrue = (val) => val === 1 || val === true || val === "1" || val === "true";
 
@@ -31,6 +36,7 @@ function RejectedUsers() {
           c.loginEmail ||
           `Customer-${c.ID}`,
         createAt: c.createAt || c.updateAt || null,
+        status: "Rejected"
       };
 
       list.push(user);
@@ -70,16 +76,28 @@ function RejectedUsers() {
     return list;
   }, [unifiedUsers, filterType, query, sortBy]);
 
-  const handleView = (id, type) => {
-    navigate(`/view/${type}/${id}`, { state: { id, type } });
-  };
-
   const handleDelete = (id, type) => {
     const ok = window.confirm(`Delete ${type} ID ${id}? This action cannot be undone.`);
     if (!ok) return;
 
     alert(`Delete called for ${type} ID ${id}`);
   };
+
+  const handleView = (id, type, status) => {
+    setSelectedUser({ ID: id, userType: type, userStatus: status });
+    setViewUser(true);
+  };
+
+  if (viewUser && selectedUser) {
+    return (
+      <ViewUserInfo
+        ID={selectedUser.ID}
+        userType={selectedUser.userType}
+        userStatus={selectedUser.userStatus}
+        onBack={() => setViewUser(false)}
+      />
+    );
+  }
 
   return (
     <>
@@ -145,6 +163,7 @@ function RejectedUsers() {
                 <th>ID</th>
                 <th className="left">Name</th>
                 <th className="left">Type</th>
+                <th className="left">Status</th>
                 <th className="left">Date Created</th>
                 <th className="center">Action</th>
               </tr>
@@ -157,11 +176,14 @@ function RejectedUsers() {
                     <td>{u.ID}</td>
                     <td className="left">{u.displayName}</td>
                     <td className="left">{u.__type}</td>
+                    <td className="left rejected-users-status">
+                      Verified <span><IoIosCloseCircle className="rejected-users-x-icon" /></span>
+                    </td>
                     <td className="left">
                       {u.createAt ? new Date(u.createAt).toLocaleString() : "-"}
                     </td>
                     <td className="center rejected-users-actions">
-                      <button onClick={() => handleView(u.ID, u.__type)} className='rejected-users-view'>
+                      <button onClick={() => handleView(u.ID, u.__type, u.status)} className='rejected-users-view'>
                         View All
                       </button>
 
