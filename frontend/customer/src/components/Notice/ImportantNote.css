@@ -1,27 +1,56 @@
+/* ------------------ COLORS ------------------ */
+/* Icon Background */
+.warning-icon-bg.unverified {
+    background-color: #F5A623;
+}
+
+.warning-icon-bg.reject {
+    background-color: #FF3333;
+}
+
+/* Text Colors */
+.main-note.unverified-text {
+    color: #F5A623;
+}
+
+.main-note.reject-text {
+    color: #FF3333;
+}
+
+/* ------------------ OVERLAY ------------------ */
 .in-main {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5); /* dim effect */
+    background-color: rgba(0,0,0,0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
 }
 
+/* ------------------ MODAL ------------------ */
 .in-semi {
     background-color: white;
     padding: 1.7rem;
     border-radius: 0.5rem;
-    width: 30%;
+
+    /* Prevent squeezing */
+    width: 380px;
+    max-width: 90vw;
+    min-width: 300px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
+
+    box-sizing: border-box;
 }
 
+/* ------------------ CLOSE BUTTON ------------------ */
 .close-icon-bg {
     position: absolute;
     top: 0.7rem;
@@ -31,27 +60,27 @@
     cursor: pointer;
 }
 
+/* ------------------ WARNING ICON ------------------ */
 .warning-icon-bg {
-    background-color: #FF3333;
     color: white;
     width: 3rem;
     height: 3rem;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    
 }
 
-.warning-icon-bg .warning-icon {
+.warning-icon {
     font-size: 1.7rem;
 }
 
+/* ------------------ TEXT ------------------ */
 .main-note {
-    color: #FF5050;
     font-weight: bold;
     font-family: "Inter", sans-serif;
     margin-top: 1rem;
+    text-align: center;
 }
 
 .paragraph-note {
@@ -60,17 +89,52 @@
     font-size: 13px;
     text-align: center;
     margin-top: 0.7rem;
+    width: 100%;
+    max-width: 320px;
 }
 
+/* ------------------ BUTTON ------------------ */
 .in-okay-btn {
     background-color: #43A047;
     color: white;
     font-size: 13px;
     margin-top: 2rem;
-    width: 40%;
+    width: 50%;
     height: 2rem;
     border-radius: 5px;
     cursor: pointer;
+    border: none;
 }
 
+/* ------------------ RESPONSIVE ------------------ */
+@media (max-width: 500px) {
+    .in-semi {
+        width: 100vw;
+        min-width: 200px;
+        padding: 1.3rem;
+        margin-right: 1rem;
+    }
 
+    .warning-icon-bg {
+        width: 2.6rem;
+        height: 2.6rem;
+    }
+
+    .warning-icon {
+        font-size: 1.4rem;
+    }
+
+    .main-note {
+        font-size: 15px;
+    }
+
+    .paragraph-note {
+        font-size: 12px;
+        max-width: 260px;
+    }
+
+    .in-okay-btn {
+        width: 65%;
+        height: 1.9rem;
+    }
+}

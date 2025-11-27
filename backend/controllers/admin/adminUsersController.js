@@ -1,4 +1,4 @@
-import { fetchAllCustomerService, fetchDeliveryInfoService, fetchLocationDataService, fetchAllStaffService, fetchAllAdminService, approvedUserService } from "../../services/admin/adminUsersService.js";
+import { fetchAllCustomerService, fetchDeliveryInfoService, fetchLocationDataService, fetchAllStaffService, fetchAllAdminService, approvedUserService, rejectUserService } from "../../services/admin/adminUsersService.js";
 
 
 
@@ -63,6 +63,18 @@ export const approvedUser = async (req, res) => {
         const {userID, userType} = req.body;
         const { ID } = req.admin;
         const result = await approvedUserService(ID, userID, userType);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const rejectUser = async (req, res) => {
+    try {
+        const {userID, userType, rejectTitle, rejectMessage} = req.body;
+        const { ID } = req.admin;
+        const result = await rejectUserService(ID, userID, userType, rejectTitle, rejectMessage);
         res.json(result);
     } catch (error) {
         console.log(error);

@@ -2,27 +2,47 @@
   margin-top: 3rem;
 }
 
-.profile-in-title, .profile-in-paragraph  {
-    color: #FF3333;
-}
-
-.profile-in-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.profile-in-paragraph {
-  margin-top: 1rem;
-  font-size: 14px;
-  font-weight: bold;
-}
-
 .profile-container {
   max-width: 600px;
   margin: 40px auto;
   padding: 36px 32px 32px 32px;
   font-family: 'Segoe UI', Arial, sans-serif;
 }
+
+/* UNVERIFIED */
+.profile-in-title-unverified, .profile-in-paragraph-unverified  {
+    color: #F5A623;
+}
+
+.profile-in-title-unverified {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.profile-in-paragraph-unverified {
+  margin-top: 1rem;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* REJECTED */
+.profile-in-title-rejected, .profile-in-paragraph-rejected  {
+    color: #FF3333;
+}
+
+.profile-in-title-rejected {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.profile-in-paragraph-rejected {
+  margin-top: 1rem;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+
+
 /* Pill-shaped segmented bar for steps */
 .profile-steps {
   display: flex;

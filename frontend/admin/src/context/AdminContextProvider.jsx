@@ -34,7 +34,29 @@ const AdminContextProvider = (props) => {
   const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
   const [fetchReturnRefundOrders, setFetchReturnRefundOrders] = useState([]);
 
-  /*---------------------------UPDATE PRODUCTS-----------------------------*/
+  /*---------------------------USER REJECT PROCESS-----------------------------*/
+  const handleRejectUser = async (userID, userType, rejectTitle, rejectMessage) => {
+    if (token) {
+      const formData = {userID, userType, rejectTitle, rejectMessage};
+      try {
+        const response = await axios.patch(backendUrl + "/api/users/reject", formData, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------USER APPROVED PROCESS-----------------------------*/
   const handleApproveUser = async (userID, userType) => {
     if (token) {
       const formData = {userID, userType};
@@ -440,7 +462,7 @@ const AdminContextProvider = (props) => {
   }
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser
   }  
   return (
     <AdminContext.Provider value={value}>
