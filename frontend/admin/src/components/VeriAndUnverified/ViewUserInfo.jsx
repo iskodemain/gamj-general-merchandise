@@ -8,7 +8,7 @@ import Navbar from "../Navbar.jsx";
 import Loading from "../Loading.jsx";
 
 function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
-  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser } = useContext(AdminContext);
+  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser, handleDeletetUser } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   // Confirmation modal state
@@ -127,8 +127,15 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
   const handleSave = () => {
   };
 
-  const handleDelete = () => {
-    
+  const handleDelete = async() => {
+    setLoading(true);
+    const approved = await handleDeletetUser(ID, userType);
+    if (approved) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+    setLoading(false);
   };
 
   const handleApprove = async () => {
@@ -137,7 +144,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     if (approved) {
       setTimeout(() => {
         window.location.reload();
-      }, 400);
+      }, 500);
     }
     setLoading(false);
   };
@@ -181,7 +188,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     const rejected = await handleRejectUser(ID, userType, rejectTitle, rejectMessage);
 
     if (rejected) {
-      setTimeout(() => window.location.reload(), 400);
+      setTimeout(() => window.location.reload(), 500);
     }
 
     setLoading(false);

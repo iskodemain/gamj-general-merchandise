@@ -113,6 +113,10 @@ const Customer = sequelize.define(
     resetPasswordToken: {
       type: DataTypes.STRING(255),
       allowNull: true
+    },
+    forceLogout: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     }
   },
   {

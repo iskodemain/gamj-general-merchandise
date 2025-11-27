@@ -65,6 +65,10 @@ const Admin = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    forceLogout: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    }
   },
   {
     tableName: 'admin',

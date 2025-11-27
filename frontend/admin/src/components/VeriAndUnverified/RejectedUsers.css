@@ -1,3 +1,57 @@
+.conf-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.conf-modal-box {
+    background: #fff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    width: 380px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.conf-modal-message {
+    font-size: 1.15rem;
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+
+.conf-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.conf-btn-confirm {
+    padding: 10px 24px;
+    background: #43A047;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
+.conf-btn-cancel {
+    padding: 10px 24px;
+    background: #E53935;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
 .rejected-users-back-ctn {
   display: flex;
   flex-direction: row;
