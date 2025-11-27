@@ -2,6 +2,8 @@ import React, { useContext, useState, useMemo } from 'react';
 import './UnverifiedUsers.css';
 import { FaArrowLeft } from "react-icons/fa6";
 import { FaSearch } from 'react-icons/fa';
+import { MdOutlineRemoveCircle } from "react-icons/md";
+import ViewUserInfo from './ViewUserInfo.jsx';
 import Navbar from '../Navbar.jsx';
 import { AdminContext } from '../../context/AdminContextProvider.jsx';
 
@@ -11,6 +13,9 @@ function UnverifiedUsers() {
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState('');
   const [sortBy, setSortBy] = useState('');
+
+  const [viewUser, setViewUser] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const unifiedUsers = useMemo(() => {
     const list = [];
@@ -28,6 +33,7 @@ function UnverifiedUsers() {
           c.loginEmail ||
           `Customer-${c.ID}`,
         createAt: c.createAt || c.updateAt || null,
+        status: "Unverified"
       };
       list.push(user);
     });
@@ -43,6 +49,7 @@ function UnverifiedUsers() {
           s.emailAddress ||
           `Staff-${s.ID}`,
         createAt: s.createAt || s.updateAt || null,
+        status: "Unverified"
       };
       list.push(user);
     });
@@ -57,6 +64,7 @@ function UnverifiedUsers() {
         original: a,
         displayName: a.userName || a.emailAddress || `Admin-${a.ID}`,
         createAt: a.createAt || a.updateAt || null,
+        status: "Unverified"
       };
       list.push(user);
     });
@@ -106,9 +114,21 @@ function UnverifiedUsers() {
     return list;
   }, [unifiedUsers, filterType, query, sortBy]);
 
-  const handleView = (id, type) => {
-    navigate(`/view/${type}/${id}`, { state: { id, type } });
+  const handleView = (id, type, status) => {
+    setSelectedUser({ ID: id, userType: type, userStatus: status });
+    setViewUser(true);
   };
+
+  if (viewUser && selectedUser) {
+    return (
+      <ViewUserInfo
+        ID={selectedUser.ID}
+        userType={selectedUser.userType}
+        userStatus={selectedUser.userStatus}
+        onBack={() => setViewUser(false)}
+      />
+    );
+  }
 
   return (
     <>
@@ -172,6 +192,7 @@ function UnverifiedUsers() {
                 <th>ID</th>
                 <th className="left">Name</th>
                 <th className="left">Type</th>
+                <th className="left">Status</th>
                 <th className="left">Date Created</th>
                 <th className="center">Action</th>
               </tr>
@@ -184,12 +205,15 @@ function UnverifiedUsers() {
                     <td>{u.ID}</td>
                     <td className="left">{u.displayName}</td>
                     <td className="left">{u.__type}</td>
+                    <td className="left unverified-users-status">
+                      Unverified <span><MdOutlineRemoveCircle className="unverified-users-line-icon" /></span>
+                    </td>
                     <td className="left">
                       {u.createAt ? new Date(u.createAt).toLocaleString() : "-"}
                     </td>
                     <td className="center unverified-users-actions">
                       <button
-                        onClick={() => handleView(u.ID, u.__type)}
+                        onClick={() => handleView(u.ID, u.__type, u.status)}
                         className="unverified-users-view"
                       >
                         View All

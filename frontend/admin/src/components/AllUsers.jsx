@@ -7,14 +7,18 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { FaSearch } from 'react-icons/fa';
 import Navbar from './Navbar.jsx';
 import { AdminContext } from '../context/AdminContextProvider.jsx';
+import ViewUserInfo from "./VeriAndUnverified/ViewUserInfo.jsx"
 
 function AllUsers() {
   const { navigate, customerList, adminList, staffList } = useContext(AdminContext);
 
   const [query, setQuery] = useState('');
-  const [filterType, setFilterType] = useState('');   // '', 'admin', 'staff', 'customer'
-  const [filterStatus, setFilterStatus] = useState(''); // '', 'Verified', 'Unverified', 'Rejected'
-  const [sortBy, setSortBy] = useState(''); // '', 'az', 'za'
+  const [filterType, setFilterType] = useState('');   
+  const [filterStatus, setFilterStatus] = useState(''); 
+  const [sortBy, setSortBy] = useState(''); 
+
+  const [viewUser, setViewUser] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Defensive helpers for truthy/falsey values that may be 1/0 or true/false or strings
   const isTrue = (val) => val === 1 || val === true || val === '1' || val === 'true';
@@ -162,17 +166,24 @@ function AllUsers() {
 
   // Handlers
   const handleDelete = (id, type) => {
-    const wants = window.confirm(`Delete ${type} ID ${id}? This action cannot be undone.`);
-    if (!wants) return;
-    // TODO: replace with actual API call and refresh context/state
-    alert(`(stub) delete called for ${type} ID ${id}`);
+    // APPLY THE LOGIC HERE
   };
 
-  const handleView = (id, type) => {
-    // Per your earlier instruction: pass user type and id to the view.
-    // navigation target is left general; router can map to your UnverifiedCustomerReview.jsx, etc.
-    navigate(`/view/${type}/${id}`, { state: { id, type } });
+  const handleView = (id, type, status) => {
+    setSelectedUser({ ID: id, userType: type, userStatus: status });
+    setViewUser(true);
   };
+
+  if (viewUser && selectedUser) {
+    return (
+      <ViewUserInfo
+        ID={selectedUser.ID}
+        userType={selectedUser.userType}
+        userStatus={selectedUser.userStatus}
+        onBack={() => setViewUser(false)}
+      />
+    );
+  }
 
   return (
     <>
@@ -278,7 +289,7 @@ function AllUsers() {
                       {u.createAt ? new Date(u.createAt).toLocaleString() : '-'}
                     </td>
                     <td className="center display-all-users-actions">
-                      <button onClick={() => handleView(u.ID, u.__type)} className='display-all-users-view'>View All</button>
+                      <button onClick={() => handleView(u.ID, u.__type, u.status)} className='display-all-users-view'>View All</button>
                       {u.status === 'Rejected' && (
                         <button
                           className="display-all-users-trash"

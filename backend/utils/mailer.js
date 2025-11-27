@@ -28,3 +28,13 @@ export const orderSendMail = async ({ to, subject, html, attachments }) => {
     attachments,
   });
 };
+
+export const accountSendMail = async ({ to, subject, html, attachments }) => {
+  return transporter.sendMail({
+    from: `Account Update ${process.env.GAMJ_EMAIL}`,
+    to,
+    subject,
+    html,
+    attachments,
+  });
+};
