@@ -1179,3 +1179,137 @@ export const userAccountApprovalTemplate = (userName) => {
 </body>
 </html>`;
 };
+
+
+export const userAccountRejectedTemplate = (userName, rejectTitle, rejectMessage) => {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Rejected</title>
+    <style>
+        body, table, td, a {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        img {
+            border: 0;
+            display: block;
+            margin: 0 auto; /* Ensures image is centered in email */
+        }
+
+        .email-container {
+            width: 100%;
+            background-color: #f4f6f9;
+            padding: 20px 0;
+        }
+
+        .email-content {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Centers all inner content */
+        }
+
+        .email-header img {
+            max-width: 140px;
+            margin-bottom: 20px;
+        }
+
+        .rejected-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #c62828;
+            margin-bottom: 20px;
+        }
+
+        .reason-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #c62828;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .reason-message {
+            font-size: 15px;
+            color: #444444;
+            margin: 10px auto 25px auto;
+            padding: 12px 15px;
+            background-color: #ffe6e6;
+            border-left: 4px solid #c62828;
+            border-radius: 4px;
+            text-align: left;
+            max-width: 90%;
+            display: block;
+        }
+
+        .email-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            margin-top: 30px;
+        }
+
+        .email-footer a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <table class="email-container" role="presentation" width="100%">
+        <tr>
+            <td align="center">
+                <div class="email-content">
+
+                    <!-- Centered Logo -->
+                    <div class="email-header">
+                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                    </div>
+
+                    <h2 class="rejected-title">Your Account Has Been Rejected</h2>
+
+                    <p>Hi <b>${userName}</b>,</p>
+
+                    <p>
+                        We have reviewed your account application, and unfortunately,
+                        we are unable to approve it at this time.
+                    </p>
+
+                    <p class="reason-title">Reason for Rejection:</p>
+
+                    <div class="reason-message">
+                        <b>Title: ${rejectTitle}</b><br>
+                        <b>Message: </b>${rejectMessage}
+                    </div>
+
+                    <p>
+                        For questions or clarifications, feel free to reach out to our support team.
+                    </p>
+
+                    <div class="email-footer">
+                        <p>Need help? Contact us:</p>
+                        <p>
+                            <a href="mailto:gamjmerchandisehelp@gmail.com">
+                                gamjmerchandisehelp@gmail.com
+                            </a>
+                        </p>
+                    </div>
+
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+};

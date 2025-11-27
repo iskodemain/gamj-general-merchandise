@@ -17,7 +17,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const {token, backendUrl, toastSuccess, toastError, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, setToken, verifiedUser, setVerifiedUser, activeStep, setActiveStep, setHasDeliveryInfo, setNbProfileImage} = useContext(ShopContext);
+  const {token, backendUrl, toastSuccess, toastError, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, setToken, verifiedUser, setVerifiedUser, rejectedCustomer, setRejectedCustomer, activeStep, setActiveStep, setHasDeliveryInfo, setNbProfileImage} = useContext(ShopContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -195,6 +195,7 @@ const Profile = () => {
         setRepEmailAddress(response.data.user.repEmailAddress);
         setRepJobPosition(response.data.user.repJobPosition);
         setVerifiedUser(response.data.user.verifiedCustomer);
+        setRejectedCustomer(response.data.user.rejectedCustomer);
       }
     } catch (error) {
       console.log(error);
@@ -1052,11 +1053,21 @@ const Profile = () => {
       )}
 
       {
-        verifiedUser === false && (
+        verifiedUser === false && rejectedCustomer === false && (
           <div className='profile-in-container'>
-            <p className='profile-in-title'>IMPORTANT NOTE:</p>
-            <p className='profile-in-paragraph'>
+            <p className='profile-in-title-unverified'>IMPORTANT NOTE:</p>
+            <p className='profile-in-paragraph-unverified'>
               Your account is currently under verification. Please wait for approval—we will notify you once your account has been successfully verified. In the meantime, purchasing products is temporarily unavailable as we review your information. Thank you for your patience and understanding.
+            </p>
+          </div>
+        ) 
+      }
+      {
+        verifiedUser === false && rejectedCustomer === true && (
+          <div className='profile-in-container'>
+            <p className='profile-in-title-rejected'>IMPORTANT NOTE:</p>
+            <p className='profile-in-paragraph-rejected'>
+              Your account application has been reviewed and unfortunately cannot be approved at this time. Because of this, access to purchasing products is currently unavailable. If you believe this decision was made in error or need further clarification, you may contact our support team at: <i>gamjmerchandisehelp@gmail.com</i>. Thank you for your understanding.
             </p>
           </div>
         ) 

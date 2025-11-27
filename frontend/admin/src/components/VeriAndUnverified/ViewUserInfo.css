@@ -1,3 +1,99 @@
+/* REJECT MODAL */
+.reject-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.reject-modal-box {
+  width: 420px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 5px 18px rgba(0,0,0,0.25);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.reject-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.reject-modal-group {
+  margin-bottom: 15px;
+}
+
+.reject-modal-group label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.reject-modal-group input,
+.reject-modal-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #bfbfbf; 
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #f9fafb;
+}
+
+.reject-modal-group textarea {
+    resize: none;
+}
+
+.reject-modal-group input:focus,
+.reject-modal-group textarea:focus {
+    outline: 2px solid #43A047;
+    border: none;
+}
+
+.reject-error-text {
+  font-size: 12px;
+  color: red;
+  margin-top: 3px;
+}
+
+.reject-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.reject-submit {
+  padding: 8px 18px;
+  background: #d9534f;
+  color: #fff;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.reject-cancel {
+  padding: 8px 18px;
+  background: #777;
+  color: #fff;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+
 .conf-modal-overlay {
     position: fixed;
     inset: 0;

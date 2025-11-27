@@ -8,13 +8,19 @@ import Navbar from "../Navbar.jsx";
 import Loading from "../Loading.jsx";
 
 function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
-  const { customerList, staffList, adminList, handleApproveUser } = useContext(AdminContext);
+  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   // Confirmation modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [modalMessage, setModalMessage] = useState("");
+
+  // Reject-reason modal state (appears BEFORE confirmation for reject)
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectTitle, setRejectTitle] = useState("");
+  const [rejectMessage, setRejectMessage] = useState("");
+  const [rejectErrors, setRejectErrors] = useState({ title: "", message: "" });
 
   const openModal = (action, message) => {
     setModalAction(() => action);
@@ -136,9 +142,51 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     setLoading(false);
   };
 
-  const handleReject = () => {
-    
+
+  // *************** REJECT FLOW ***************
+  const openRejectReasonModal = () => {
+    setRejectTitle("");
+    setRejectMessage("");
+    setRejectErrors({ title: "", message: "" });
+    setRejectModalOpen(true);
   };
+
+  const submitRejectReason = () => {
+    let errors = { title: "", message: "" };
+    let hasError = false;
+
+    if (!rejectTitle.trim()) {
+      errors.title = "Title is required.";
+      hasError = true;
+    }
+    if (!rejectMessage.trim()) {
+      errors.message = "Message is required.";
+      hasError = true;
+    }
+
+    if (hasError) {
+      setRejectErrors(errors);
+      return;
+    }
+
+    // Close reject modal → open confirmation modal
+    setRejectModalOpen(false);
+
+    openModal(() => handleReject(), "Are you sure you want to reject this user?");
+  };
+
+  const handleReject = async () => {
+    setLoading(true);
+
+    const rejected = await handleRejectUser(ID, userType, rejectTitle, rejectMessage);
+
+    if (rejected) {
+      setTimeout(() => window.location.reload(), 400);
+    }
+
+    setLoading(false);
+  };
+  // ********************************************
 
 
   // helper to render proof clickable area (customer only)
@@ -171,6 +219,52 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     <>
       {loading && <Loading/>}
       <Navbar TitleName={handleNavbarTitle(userType, userStatus)} />
+
+      {/* ================= REJECT REASON MODAL ================= */}
+      {rejectModalOpen && (
+        <div className="reject-modal-overlay">
+          <div className="reject-modal-box">
+            <h2 className="reject-modal-title">Reason for Account Rejection</h2>
+
+            <div className="reject-modal-group">
+              <label>Title</label>
+              <input
+                type="text"
+                value={rejectTitle}
+                onChange={(e) => setRejectTitle(e.target.value)}
+              />
+              {rejectErrors.title && (
+                <p className="reject-error-text">{rejectErrors.title}</p>
+              )}
+            </div>
+
+            <div className="reject-modal-group">
+              <label>Message</label>
+              <textarea
+                rows="4"
+                value={rejectMessage}
+                onChange={(e) => setRejectMessage(e.target.value)}
+              ></textarea>
+              {rejectErrors.message && (
+                <p className="reject-error-text">{rejectErrors.message}</p>
+              )}
+            </div>
+
+            <div className="reject-modal-buttons">
+              <button className="reject-submit" onClick={submitRejectReason}>
+                Submit
+              </button>
+              <button
+                className="reject-cancel"
+                onClick={() => setRejectModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ======================================================= */}
 
       {/* Confirmation Modal */}
       {modalOpen && (
@@ -375,7 +469,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                   {userStatus === "Unverified" ? (
                     <>
                       <button className="btn-save1" onClick={() => openModal(handleApprove, "Are you sure you want to approve this user?")}>Approve User</button>
-                      <button className="btn-reject" onClick={() => openModal(handleReject, "Are you sure you want to reject this user?")}>Reject User</button>
+                      <button className="btn-reject" onClick={openRejectReasonModal}>Reject User</button>
                     </>
                   ) : userStatus === "Rejected" ? (
                     <button className="btn-delete" onClick={() => openModal(handleDelete, "Are you sure you want to delete this account permanently?")}>Delete</button>
