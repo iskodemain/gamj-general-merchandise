@@ -6,9 +6,10 @@ import { IoEyeOutline } from "react-icons/io5";
 import "./ViewUserInfo.css";
 import Navbar from "../Navbar.jsx";
 import Loading from "../Loading.jsx";
+import { toast } from "react-toastify";
 
 function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
-  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser, handleDeletetUser } = useContext(AdminContext);
+  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, toastSuccess, toastError } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   // Confirmation modal state
@@ -21,6 +22,14 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
   const [rejectTitle, setRejectTitle] = useState("");
   const [rejectMessage, setRejectMessage] = useState("");
   const [rejectErrors, setRejectErrors] = useState({ title: "", message: "" });
+
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  const isValidPhone = (phone) => {
+    return /^9\d{9}$/.test(phone);
+  }
+
 
   const openModal = (action, message) => {
     setModalAction(() => action);
@@ -73,21 +82,21 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
         repEmail: user.repEmailAddress || "",
         repJob: user.repJobPosition || "",
         identifier: user.loginEmail || user.loginPhoneNum,
-        password: user.loginPassword
+        password: ""
       };
     } else if (userType === "Staff") {
       return {
         firstName: user?.firstName || "",
         lastName: user?.lastName || "",
-        email: user?.emailAddress || "",
-        password: user?.password
+        identifier: user?.emailAddress || user?.phoneNumber,
+        password: ""
       };
     } else {
       // Admin
       return {
         userName: user?.userName || "",
-        email: user?.emailAddress || "",
-        password: user?.password
+        identifier: user?.emailAddress || user?.phoneNumber,
+        password: ""
       };
     }
   });
@@ -123,9 +132,203 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     return ''; // ← fallback (prevents undefined)
   };
 
-  // button handlers (placeholders / optimistic)
-  const handleSave = () => {
+  const handleContactNumber = (e) => {
+    let value = e.target.value;
+    value = value.replace(/\D/g, '');
+    // Limit to 10 digits max
+    if (value.length > 10) {
+      value = value.slice(0, 10);
+    }
+
+    // Must start with 9
+    if (value && value[0] !== '9') {
+      return; // Ignore input if first digit isn't 9
+    }
+
+    setForm({ ...form, contact: value });
   };
+
+  const handleLandlineNumber = (e) => {
+    let value = e.target.value;
+    value = value.replace(/\D/g, '');
+
+    if (value.length > 8) {
+      value = value.slice(0, 8);
+    }
+    setForm({ ...form, landline: value });
+  };
+
+  const handleRepContactNumber = (e) => {
+    let value = e.target.value;
+    value = value.replace(/\D/g, '');
+    // Limit to 10 digits max
+    if (value.length > 10) {
+      value = value.slice(0, 10);
+    }
+
+    // Must start with 9
+    if (value && value[0] !== '9') {
+      return; // Ignore input if first digit isn't 9
+    }
+    
+    setForm({ ...form, repContact: value });
+  };
+  
+  const handleSave = async () => {
+    setLoading(true);
+
+    let payload = { ID, userType }; 
+
+    if (userType === "Customer") {
+      if (!form.medName.trim()) {
+        toast.error("Please enter the name of the medical institution.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      if (!form.contact.trim()) {
+        toast.error("Please enter the contact number of the medical institution.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      if (!isValidPhone(form.contact.trim())) {
+        toast.error("Invalid institution contact number.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (form.landline.trim()) {
+        if (form.landline.trim().length !== 8) {
+          toast.error("Invalid institution landline number. It must be 8 digits.", { ...toastError });
+          setLoading(false);
+          return;
+        }
+      }
+      if (!form.email.trim()) {
+        toast.error("Please enter the email address of the medical institution.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!isValidEmail(form.email.trim())) {
+        toast.error("Invalid institution email address.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!form.address.trim()) {
+        toast.error("Please enter the full address of the medical institution.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      if (!form.repFirstName.trim()) {
+        toast.error("Please enter the first name of the representative.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      if (!form.repLastName.trim()) {
+        toast.error("Please enter the last name of the authorized representative.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      if (!form.repContact.trim()) {
+        toast.error("Please enter the contact number of the authorized representative.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!isValidPhone(form.repContact.trim())) {
+        toast.error("Invalid representative contact number.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!form.repEmail.trim()) {
+        toast.error("Please enter the email address of the authorized representative.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!isValidEmail(form.repEmail.trim())) {
+        toast.error("Invalid representative email address.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      if (!form.repJob.trim()) {
+        toast.error("Please enter the job position of the authorized representative.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      if (!form.identifier.trim()) {
+        toast.error("The user account email or phone number is required.", { ...toastError });
+        setLoading(false);
+        return;
+      }
+      payload = {
+        ...payload,
+        medicalInstitutionName: form.medName.trim(),
+        contactNumber: form.contact.trim(),
+        landlineNumber: form.landline.trim(),
+        emailAddress: form.email.trim(),
+        fullAddress: form.address.trim(),
+        repFirstName: form.repFirstName.trim(),
+        repLastName: form.repLastName.trim(),
+        repContactNumber: form.repContact.trim(),
+        repEmailAddress: form.repEmail.trim(),
+        repJobPosition: form.repJob.trim(),
+        identifier: form.identifier.trim(),
+        password: form.password.trim()
+      };
+    }
+
+    else if (userType === "Staff") {
+      if (!form.firstName.trim()) {
+        toast.error("First name is required.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!form.lastName.trim()) {
+        toast.error("Last name is required.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!form.identifier.trim()) {
+        toast.error("The user account email or phone number is required.", toastError);
+        setLoading(false);
+        return;
+      }
+
+      payload = {
+        ...payload,
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        identifier: form.identifier.trim(),
+        password: form.password.trim()
+      };
+    }
+
+    else if (userType === "Admin") {
+      if (!form.userName.trim()) {
+        toast.error("Username is required.", toastError);
+        setLoading(false);
+        return;
+      }
+      if (!form.identifier.trim()) {
+        toast.error("The user account email or phone number is required.", toastError);
+        setLoading(false);
+        return;
+      }
+      payload = {
+        ...payload,
+        userName: form.userName.trim(),
+        identifier: form.identifier.trim(),
+        password: form.password.trim()
+      };
+    }
+
+    // Send final payload
+    const saved = await handleSaveUserInfo(payload);
+
+    if (saved) {
+      setTimeout(() => window.location.reload(), 500);
+    }
+
+    setLoading(false);
+  };
+
 
   const handleDelete = async() => {
     setLoading(true);
@@ -339,8 +542,10 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                     <input
                       type="text"
                       value={form.medName}
+                      placeholder="Medical Institution Name"
                       onChange={(e) => setForm((s) => ({ ...s, medName: e.target.value }))}
                       disabled={isCustomerLocked}
+                      required
                     />
                   </div>
 
@@ -352,8 +557,9 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                           type="text"
                           placeholder="+63 | Contact number"
                           value={form.contact}
-                          onChange={(e) => setForm((s) => ({ ...s, contact: e.target.value }))}
+                          onChange={handleContactNumber}
                           disabled={isCustomerLocked}
+                          required
                         />
                       </div>
                     </div>
@@ -364,7 +570,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                         type="text"
                         placeholder="02 | Landline number"
                         value={form.landline}
-                        onChange={(e) => setForm((s) => ({ ...s, landline: e.target.value }))}
+                        onChange={handleLandlineNumber}
                         disabled={isCustomerLocked}
                       />
                     </div>
@@ -375,8 +581,10 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                     <input
                       type="email"
                       value={form.email}
+                      placeholder="Official Email Address"
                       onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
                       disabled={isCustomerLocked}
+                      required
                     />
                   </div>
 
@@ -384,9 +592,11 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                     <label>Official Full Address</label>
                     <input
                       type="text"
+                      placeholder="Official Full Address"
                       value={form.address}
                       onChange={(e) => setForm((s) => ({ ...s, address: e.target.value }))}
                       disabled={isCustomerLocked}
+                      required
                     />
                   </div>
 
@@ -406,6 +616,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                         value={form.repFirstName}
                         onChange={(e) => setForm((s) => ({ ...s, repFirstName: e.target.value }))}
                         disabled={isCustomerLocked}
+                        required
                       />
                     </div>
 
@@ -416,6 +627,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                         value={form.repLastName}
                         onChange={(e) => setForm((s) => ({ ...s, repLastName: e.target.value }))}
                         disabled={isCustomerLocked}
+                        required
                       />
                     </div>
                   </div>
@@ -425,9 +637,11 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                       <label>Work Contact Number</label>
                       <input
                         type="text"
+                        placeholder="+63 | Contact number"
                         value={form.repContact}
-                        onChange={(e) => setForm((s) => ({ ...s, repContact: e.target.value }))}
+                        onChange={handleRepContactNumber}
                         disabled={isCustomerLocked}
+                        required
                       />
                     </div>
 
@@ -436,8 +650,10 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                       <input
                         type="email"
                         value={form.repEmail}
+                        placeholder="Work Email Address"
                         onChange={(e) => setForm((s) => ({ ...s, repEmail: e.target.value }))}
                         disabled={isCustomerLocked}
+                        required
                       />
                     </div>
                   </div>
@@ -446,9 +662,11 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                     <label>Job Position/Designation</label>
                     <input
                       type="text"
+                      placeholder="Job Position/Designation (e.g. manager, assistant manager)"
                       value={form.repJob}
                       onChange={(e) => setForm((s) => ({ ...s, repJob: e.target.value }))}
                       disabled={isCustomerLocked}
+                      required
                     />
                   </div>
                 </section>
@@ -457,14 +675,14 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                   <h3 className="section-title">User Account</h3>
 
                   <div className="form-group">
-                    <label>Email or Phone</label>
-                    <input type="email" value={form.identifier} onChange={(e) => setForm((s) => ({ ...s, identifier: e.target.value }))} disabled={isCustomerLocked} />
+                    <label>Email or phone number</label>
+                    <input type="text" value={form.identifier} placeholder="Enter a email or phone number" onChange={(e) => setForm((s) => ({ ...s, identifier: e.target.value }))} disabled={isCustomerLocked} required/>
                   </div>
 
                   <div className="form-group">
-                    <label>Change Your Password</label>
+                    <label>Change Password</label>
                     <div className="password-input">
-                      <input type={passwordVisible ? "text" : "password"} value={form.password} onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))} disabled={isCustomerLocked} />
+                      <input type={passwordVisible ? "text" : "password"} value={form.password} placeholder="Enter a new password" onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))} disabled={isCustomerLocked} />
                       <button className="toggle-password" onClick={togglePasswordVisibility} >
                         {passwordVisible ? <FaRegEye /> : <FaRegEyeSlash /> }
                       </button>
@@ -517,12 +735,12 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                 <section className="info-section">
                   <h3 className="section-title">User Account</h3>
                   <div className="form-group">
-                    <label>Email Address</label>
-                    <input type="email" value={form.email} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} />
+                    <label>Email or phone number</label>
+                    <input type="text" value={form.identifier} onChange={(e) => setForm((s) => ({ ...s, identifier: e.target.value }))} />
                   </div>
 
                   <div className="form-group">
-                    <label>Change Your Password</label>
+                    <label>Change Password</label>
                     <div className="password-input">
                       <input type={passwordVisible ? "text" : "password"} value={form.password} onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))} />
                       <button className="toggle-password" onClick={togglePasswordVisibility} aria-label={passwordVisible ? "Hide password" : "Show password"}>
@@ -553,7 +771,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                   <h3 className="section-title">Admin Information</h3>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>User Name</label>
+                      <label>Username</label>
                       <input type="text" value={form.userName} onChange={(e) => setForm((s) => ({ ...s, userName: e.target.value }))} />
                     </div>
                   </div>
@@ -562,12 +780,12 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                 <section className="info-section">
                   <h3 className="section-title">User Account</h3>
                   <div className="form-group">
-                    <label>Email Address</label>
-                    <input type="email" value={form.email} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} />
+                    <label>Email or phone number</label>
+                    <input type="text" value={form.identifier} onChange={(e) => setForm((s) => ({ ...s, identifier: e.target.value }))} />
                   </div>
 
                   <div className="form-group">
-                    <label>Change Your Password</label>
+                    <label>Change Password</label>
                     <div className="password-input">
                       <input type={passwordVisible ? "text" : "password"} value={form.password} onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))} />
                       <button className="toggle-password" onClick={togglePasswordVisibility} aria-label={passwordVisible ? "Hide password" : "Show password"}>

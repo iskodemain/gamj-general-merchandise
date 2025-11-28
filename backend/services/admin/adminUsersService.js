@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import Admin from "../../models/admin.js";
 import Barangays from "../../models/barangays.js";
 import Cities from "../../models/cities.js";
@@ -8,6 +9,7 @@ import Staff from "../../models/staff.js"
 import { accountSendMail } from '../../utils/mailer.js'; 
 import { userAccountApprovalTemplate,userAccountRejectedTemplate } from '../../utils/emailTemplates.js';
 import Notifications from "../../models/notifications.js";
+import { validateEmail, validatePhone, validatePassword } from '../../validators/userValidator.js';
 
 
 
@@ -346,7 +348,7 @@ export const deleteUserService = async (adminId, userID, userType) => {
     if (!adminUser) {
       return {
         success: false,
-        message: "Admin user not found",
+        message: "User not found",
       };
     }
 
@@ -406,6 +408,107 @@ export const deleteUserService = async (adminId, userID, userType) => {
       success: true,
       message: `${userType} account deleted successfully.`,
       deletedUser: { ID: userID, userType }
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+
+export const saveUserInfoService = async (adminId, data) => {
+  try {
+    // Verify admin exists
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    let identifierType = "invalid";
+
+    if (validateEmail(data.identifier)) {
+      identifierType = "email";
+    } else if (validatePhone(data.identifier)) { 
+      identifierType = "phone";
+    }
+
+    if (identifierType === "invalid") {
+      return {
+        success: false,
+        message: "You must provide a valid email or PH mobile number."
+      };
+    }
+
+    if (data.password) {
+      const passwordError = validatePassword(data.password);
+      if (passwordError) {
+        return {
+          success: false,
+          message: passwordError
+        };
+      }
+    }
+
+    // HASH THE PASSWORD
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
+
+    let updated = null;
+
+    if (data.userType === "Customer") {
+      updated = await Customer.update(
+        {
+          medicalInstitutionName: data.medicalInstitutionName,
+          contactNumber: data.contactNumber,
+          landlineNumber: data.landlineNumber,
+          emailAddress: data.emailAddress,
+          fullAddress: data.fullAddress,
+          repFirstName: data.repFirstName,
+          repLastName: data.repLastName,
+          repContactNumber: data.repContactNumber,
+          repEmailAddress: data.repEmailAddress,
+          repJobPosition: data.repJobPosition,
+          loginEmail: identifierType === "email" ? data.identifier : null,
+          loginPhoneNum: identifierType === "phone" ? data.identifier : null,
+          loginPassword: hashedPassword
+        },
+        { where: { ID: data.ID } }
+      );
+    }
+
+    if (data.userType === "Staff") {
+      updated = await Staff.update(
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          emailAddress: identifierType === "email" ? data.identifier : null,
+          phoneNumber: identifierType === "phone" ? data.identifier : null,
+          password: hashedPassword
+        },
+        { where: { ID: data.ID } }
+      );
+    }
+
+    if (data.userType === "Admin") {
+      updated = await Admin.update(
+        {
+          userName: data.userName,
+          emailAddress: identifierType === "email" ? data.identifier : null,
+          phoneNumber: identifierType === "phone" ? data.identifier : null,
+          password: hashedPassword
+        },
+        { where: { ID: data.ID } }
+      );
+    }
+
+    return {
+      success: true,
+      message: "Save Changes Successful",
+      updated,
     };
 
   } catch (error) {
