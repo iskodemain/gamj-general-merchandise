@@ -292,7 +292,7 @@ function AllUsers() {
             </div>
 
             <div className="display-all-users-controls-right">
-              <button onClick={() => navigate('/users/add')} className="display-all-users-add-btn">Add User</button>
+              <button onClick={() => navigate('/addnewuser')} className="display-all-users-add-btn">Add User</button>
 
               <div className="display-all-users-search">
                 <input

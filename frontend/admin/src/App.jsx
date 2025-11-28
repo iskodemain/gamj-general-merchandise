@@ -47,6 +47,7 @@ import Transactions from "./pages/Transactions.jsx"
 import UserManagement from "./pages/UserManagement.jsx"
 import AllUsers from "./components/AllUsers.jsx";
 import RejectedUsers from "./components/VeriAndUnverified/RejectedUsers.jsx";
+import AddNewUser from "./components/AddNewUser.jsx";
 
 //components
 // icon 
@@ -104,6 +105,7 @@ const App = () => {
       <Route path="/transactions" element={<Transactions />} /> 
       <Route path="/allusers" element={<AllUsers />} /> 
       <Route path="/rejectedusers" element={<RejectedUsers />} /> 
+      <Route path="/addnewuser" element={<AddNewUser />} />
     </Routes>
    </div>
   )

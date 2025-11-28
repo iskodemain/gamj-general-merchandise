@@ -273,6 +273,9 @@ export const processingOrderTemplate = (userName, orderStatus, paymentMethod) =>
                         <p>If you have any questions about your order, feel free to reach out to us.</p>
                         <p>Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com" target="_blank">gamjmerchandisehelp@gmail.com</a></p>
                         <p>Thank you for choosing us!</p>
+                        <p style="margin-top: 15px;">
+                            © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+                        </p>
                     </div>
                 </div>
             </td>
@@ -320,6 +323,9 @@ export const outForDeliveryTemplate = (userName, orderStatus, paymentMethod) => 
           </div>
           <div class="email-footer">
             <p>For delivery concerns, reach us at: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+            <p style="margin-top: 15px;">
+                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
           </div>
         </div>
       </td>
@@ -367,6 +373,9 @@ export const deliveredOrderTemplate = (userName, orderStatus, paymentMethod) => 
           </div>
           <div class="email-footer">
             <p>We’d love your feedback! If you have any issues, reach us at <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+            <p style="margin-top: 15px;">
+                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
           </div>
         </div>
       </td>
@@ -510,6 +519,9 @@ export const customerCancelledOrderTemplate = (userName, orderStatus, paymentMet
             <p>If this cancellation wasn’t made by you or you have questions, contact us immediately.</p>
             <p>Email: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
             <p>Thank you for choosing GAMJ General Merchandise!</p>
+            <p style="margin-top: 15px;">
+                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
           </div>
         </div>
       </td>
@@ -575,6 +587,9 @@ export const adminCancelledOrderTemplate = (userName, orderStatus, paymentMethod
           <div class="email-footer">
             <p>If you have any questions regarding this cancellation, please contact us:</p>
             <p>Email: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+            <p style="margin-top: 15px;">
+                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
           </div>
         </div>
       </td>
@@ -694,6 +709,9 @@ export const refundOrderTemplate = (userName, orderStatus, refundMethod, orderId
               <a href="mailto:gamjmerchandisehelp@gmail.com">
                 gamjmerchandisehelp@gmail.com
               </a>
+              <p style="margin-top: 15px;">
+                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+              </p>
             </p>
           </div>
         </div>
@@ -809,6 +827,9 @@ export const loginEmailTemplate = (userName, verificationCode) => {
                     <div class="email-footer">
                         <p>If this wasn't you, we recommend changing your password immediately.</p>
                         <p>Need help? Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com" target='blank'>gamjmerchandisehelp@gmail.com</a>.</p>
+                        <p style="margin-top: 15px;">
+                            © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+                        </p>
                     </div>
                 </div>
             </td>
@@ -922,6 +943,9 @@ export const registrationEmailTemplate = (verificationCode) => {
                     <div class="email-footer">
                         <p>If you did not attempt to sign up, you can safely ignore this email.</p>
                         <p>Need help? Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com" target='blank'>gamjmerchandisehelp@gmail.com</a>.</p>
+                        <p style="margin-top: 15px;">
+                            © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+                        </p>
                     </div>
                 </div>
             </td>
@@ -1035,6 +1059,9 @@ export const resetPasswordEmailTemplate = (userName, verificationCode) => {
                     <div class="email-footer">
                         <p>If you did not request a password reset, please disregard this email.</p>
                         <p>Need help? Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com" target='blank'>gamjmerchandisehelp@gmail.com</a>.</p>
+                        <p style="margin-top: 15px;">
+                            © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+                        </p>
                     </div>
                 </div>
             </td>
@@ -1170,6 +1197,9 @@ export const userAccountApprovalTemplate = (userName) => {
                                 gamjmerchandisehelp@gmail.com
                             </a>
                         </p>
+                        <p style="margin-top: 15px;">
+                            © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+                        </p>
                     </div>
 
                 </div>
@@ -1304,8 +1334,140 @@ export const userAccountRejectedTemplate = (userName, rejectTitle, rejectMessage
                                 gamjmerchandisehelp@gmail.com
                             </a>
                         </p>
+                        <p style="margin-top: 15px;">
+                            © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+                        </p>
                     </div>
 
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+};
+
+
+export const userAccountCreatedTemplate = (userName) => {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Created Successfully</title>
+    <style>
+        /* Basic Reset */
+        body, table, td, a {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        img {
+            border: 0;
+            display: block;
+            max-width: 100%;
+        }
+        /* Layout */
+        .email-container {
+            width: 100%;
+            background-color: #f4f6f9;
+            padding: 20px 0;
+        }
+        .email-content {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        /* Header */
+        .email-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        .email-header img {
+            margin: 0 auto;
+            max-width: 120px;
+        }
+        /* Body */
+        .email-body {
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333333;
+        }
+        .success-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+        .highlight-text {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        /* Footer */
+        .email-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            margin-top: 30px;
+        }
+        .email-footer a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <table class="email-container" role="presentation">
+        <tr>
+            <td>
+                <div class="email-content">
+                    
+                    <!-- Header Section with Logo -->
+                    <div class="email-header">
+                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                    </div>
+                    
+                    <!-- Body Section -->
+                    <div class="email-body">
+                        <h2 class="success-title">Your Account Has Been Activated!</h2>
+                        
+                        <p>Hi <b>${userName}</b>,</p>
+                        
+                        <p>
+                            Great news! Your account has been <span class="highlight-text">successfully approved</span> 
+                            and is now fully active.
+                        </p>
+                        
+                        <p>
+                            You can now <b>log in</b> and access the GAMJ General Merchandise platform 
+                            with your credentials.
+                        </p>
+                        
+                        <p>
+                            Thank you for being part of <b>GAMJ General Merchandise</b>.  
+                            We look forward to working with you!
+                        </p>
+                    </div>
+                    
+                    <!-- Footer Section -->
+                    <div class="email-footer">
+                        <p>If you have any questions or need assistance, our support team is here to help.</p>
+                        <p>Email us at:  
+                            <a href="mailto:gamjmerchandisehelp@gmail.com" target="_blank">
+                                gamjmerchandisehelp@gmail.com
+                            </a>
+                        </p>
+                        <p style="margin-top: 15px;">
+                            © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+                        </p>
+                    </div>
                 </div>
             </td>
         </tr>

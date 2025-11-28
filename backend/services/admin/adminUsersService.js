@@ -7,9 +7,10 @@ import DeliveryInfo from "../../models/deliveryInfo.js";
 import Provinces from "../../models/provinces.js";
 import Staff from "../../models/staff.js"
 import { accountSendMail } from '../../utils/mailer.js'; 
-import { userAccountApprovalTemplate,userAccountRejectedTemplate } from '../../utils/emailTemplates.js';
+import { userAccountApprovalTemplate, userAccountRejectedTemplate, userAccountCreatedTemplate } from '../../utils/emailTemplates.js';
 import Notifications from "../../models/notifications.js";
 import { validateEmail, validatePhone, validatePassword } from '../../validators/userValidator.js';
+import { createCustomerToken, createStaffToken, createAdminToken } from '../../utils/token.js';
 
 
 
@@ -315,7 +316,7 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
       });
 
       await accountSendMail({
-        to: customer.loginEmail || customer.repEmailAddress,
+        to: customer.loginEmail || customer.repEmailAddress || customer.emailAddress,
         subject: 'Your GAMJ Account Has Been Rejected',
         html: userAccountRejectedTemplate(customer.medicalInstitutionName, rejectTitle, rejectMessage),
         attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
@@ -416,7 +417,6 @@ export const deleteUserService = async (adminId, userID, userType) => {
   }
 };
 
-
 export const saveUserInfoService = async (adminId, data) => {
   try {
     // Verify admin exists
@@ -426,6 +426,10 @@ export const saveUserInfoService = async (adminId, data) => {
         success: false,
         message: "User not found",
       };
+    }
+
+    if (!["Customer", "Staff", "Admin"].includes(data.userType)) {
+      return { success: false, message: "Invalid user type." };
     }
 
     let identifierType = "invalid";
@@ -509,6 +513,197 @@ export const saveUserInfoService = async (adminId, data) => {
       success: true,
       message: "Save Changes Successful",
       updated,
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+export const addNewUserService = async (adminId, data) => {
+  try {
+    // Verify admin exists
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    if (!["Customer", "Staff", "Admin"].includes(data.userType)) {
+      return { success: false, message: "Invalid account role selected." };
+    }
+
+
+    let identifierType = "invalid";
+
+    if (validateEmail(data.identifier)) {
+      identifierType = "email";
+    } else if (validatePhone(data.identifier)) { 
+      identifierType = "phone";
+    }
+
+    if (identifierType === "invalid") {
+      return {
+        success: false,
+        message: "You must provide a valid email or PH mobile number."
+      };
+    }
+
+    const existsCustomer = await Customer.findOne({
+      where: {
+        [identifierType === "email" ? "loginEmail" : "loginPhoneNum"]: data.identifier
+      }
+    });
+
+    const existsStaff = await Staff.findOne({
+      where: {
+        [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
+      }
+    });
+
+    const existsAdmin = await Admin.findOne({
+      where: {
+        [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
+      }
+    });
+
+    if (existsCustomer || existsStaff || existsAdmin) {
+      return {
+        success: false,
+        message: "This email or phone number is already used by another account."
+      };
+    }
+
+
+    // PASSWORD VALIDATION
+    if (!data.password || data.password.trim() === "") {
+      return { success: false, message: "Account password is required." };
+    }
+
+    const passwordError = validatePassword(data.password);
+    if (passwordError) {
+      return {
+        success: false,
+        message: passwordError
+      };  
+    }
+
+    // HASH THE PASSWORD
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
+
+    let addNewUser = null;
+
+    if (data.userType === "Customer") {
+      addNewUser = await Customer.create(
+        {
+          medicalInstitutionName: data.medicalInstitutionName,
+          contactNumber: data.contactNumber,
+          landlineNumber: data.landlineNumber,
+          emailAddress: data.emailAddress,
+          fullAddress: data.fullAddress,
+          repFirstName: data.repFirstName,
+          repLastName: data.repLastName,
+          repContactNumber: data.repContactNumber,
+          repEmailAddress: data.repEmailAddress,
+          repJobPosition: data.repJobPosition,
+          loginEmail: identifierType === "email" ? data.identifier : null,
+          loginPhoneNum: identifierType === "phone" ? data.identifier : null,
+          loginPassword: hashedPassword,
+          verifiedCustomer: true
+        }, {
+            fields: [
+            'medicalInstitutionName',
+            'contactNumber',
+            'landlineNumber',
+            'emailAddress',
+            'fullAddress',
+            'repFirstName',
+            'repLastName',
+            'repContactNumber',
+            'repEmailAddress',
+            'repJobPosition',
+            'loginPhoneNum',
+            'loginEmail',
+            'loginPassword',
+            'verifiedCustomer'
+          ]
+        }
+      );
+
+      await accountSendMail({
+        to: addNewUser.loginEmail || addNewUser.repEmailAddress || addNewUser.emailAddress,
+        subject: 'Your GAMJ Account Has Been Created by Admin',
+        html: userAccountCreatedTemplate(addNewUser.medicalInstitutionName),
+        attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+      });
+    }
+
+    if (data.userType === "Staff") {
+      addNewUser = await Staff.create(
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          emailAddress: identifierType === "email" ? data.identifier : null,
+          phoneNumber: identifierType === "phone" ? data.identifier : null,
+          password: hashedPassword,
+          verifiedStaff: true
+        }, {
+            fields: [
+            'firstName',
+            'lastName',
+            'emailAddress',
+            'phoneNumber',
+            'password',
+            'verifiedStaff'
+          ]
+        }
+      );
+      if (identifierType === "email") {
+        await accountSendMail({
+          to: addNewUser.emailAddress,
+          subject: 'Your GAMJ Account Has Been Created by Admin',
+          html: userAccountCreatedTemplate(addNewUser.firstName + " " + addNewUser.lastName),
+          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+        });
+      }
+    }
+
+    if (data.userType === "Admin") {
+      addNewUser = await Admin.create(
+        {
+          userName: data.userName,
+          emailAddress: identifierType === "email" ? data.identifier : null,
+          phoneNumber: identifierType === "phone" ? data.identifier : null,
+          password: hashedPassword,
+          verifiedAdmin: true
+        }, {
+            fields: [
+            'userName',
+            'emailAddress',
+            'phoneNumber',
+            'password',
+            'verifiedAdmin'
+          ]
+        }
+      );
+      if (identifierType === "email") {
+        await accountSendMail({
+          to: addNewUser.emailAddress,
+          subject: 'Your GAMJ Account Has Been Created by Admin',
+          html: userAccountCreatedTemplate(addNewUser.userName),
+          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+        });
+      }
+    }
+
+    return {
+      success: true,
+      message: "Account created successfully.",
+      addNewUser,
     };
 
   } catch (error) {
