@@ -10,7 +10,7 @@ import { accountSendMail } from '../../utils/mailer.js';
 import { userAccountApprovalTemplate, userAccountRejectedTemplate, userAccountCreatedTemplate } from '../../utils/emailTemplates.js';
 import Notifications from "../../models/notifications.js";
 import { validateEmail, validatePhone, validatePassword } from '../../validators/userValidator.js';
-import { createCustomerToken, createStaffToken, createAdminToken } from '../../utils/token.js';
+
 
 
 
@@ -444,6 +444,31 @@ export const saveUserInfoService = async (adminId, data) => {
       return {
         success: false,
         message: "You must provide a valid email or PH mobile number."
+      };
+    }
+
+    const existsCustomer = await Customer.findOne({
+      where: {
+        [identifierType === "email" ? "loginEmail" : "loginPhoneNum"]: data.identifier
+      }
+    });
+
+    const existsStaff = await Staff.findOne({
+      where: {
+        [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
+      }
+    });
+
+    const existsAdmin = await Admin.findOne({
+      where: {
+        [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
+      }
+    });
+
+    if (existsCustomer || existsStaff || existsAdmin) {
+      return {
+        success: false,
+        message: "This email or phone number is already used by another account."
       };
     }
 

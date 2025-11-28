@@ -4,6 +4,13 @@ import { FaTrashCan, FaArrowLeft } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 
+const SELECT_ALL_STATUS_OPTIONS = [
+  { key: "Pending", color: "#F5A623" },
+  { key: "Processing", color: "#17A2A2" },
+  { key: "Out for Delivery", color: "#2B7BEF" },
+  { key: "Delivered", color: "#2FA14C" },
+];
+
 const STATUS_OPTIONS = [
   { key: "Pending", color: "#F5A623" },
   { key: "Processing", color: "#17A2A2" },
@@ -203,7 +210,7 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                         className="vap-pill-dot"
                         style={{
                           background:
-                            STATUS_OPTIONS.find((s) => s.key === bulkLabel)
+                            SELECT_ALL_STATUS_OPTIONS.find((s) => s.key === bulkLabel)
                               ?.color || "#F5A623",
                         }}
                       />
@@ -213,7 +220,7 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 
                     {bulkDropdownOpen && (
                       <div className="vap-bulk-menu">
-                        {STATUS_OPTIONS.map((opt) => (
+                        {SELECT_ALL_STATUS_OPTIONS.map((opt) => (
                           <button
                             key={opt.key}
                             className="vap-bulk-item"
