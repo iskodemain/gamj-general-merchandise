@@ -3,26 +3,25 @@ import "./Sidebar.css";
 import { assets } from "../assets/assets.js";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 
-function Sidebar({ currentView, onNavigate }) {
-    const { setIsSidebarOpen, navigate } = useContext(AdminContext);
+function Sidebar({ currentView }) {
+    const { setIsSidebarOpen, navigate, adminProfileInfo } = useContext(AdminContext);
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
-        <div
-          className="sidebar-toggle-arrow"
-          onClick={() => setIsSidebarOpen((prev) => !prev)}
+      <div className="sidebar-header" onClick={() => {navigate("/profile"); setIsSidebarOpen(false)}}>
+
+        <div className="sidebar-toggle-arrow" 
+          onClick={(e) => {
+            e.stopPropagation(); 
+            setIsSidebarOpen((prev) => !prev);
+          }}
         >
           <span className="arrow-head"></span>
         </div>
-        <img
-          src={assets.admin_gamj_logo}
-          alt="Admin Logo"
-          className="sidebar-logo"
-        />
+        
         <div className="sidebar-brand">
-          <span className="sidebar-brand-title">GAMJ Merchandise</span>
-          <span className="sidebar-brand-role">Admin</span>
+          <span className="sidebar-brand-title">{adminProfileInfo.userName}</span>
+          <span className="sidebar-brand-role">{adminProfileInfo.adminHead ? "Admin Head" : "Admin"}</span>
         </div>
       </div>
 
@@ -31,49 +30,49 @@ function Sidebar({ currentView, onNavigate }) {
           icon={assets.overview_icon}
           label="Overview"
           active={currentView === "overview"}
-          onClick={() => {navigate("/overview"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/overview"); setIsSidebarOpen(false)}}
         />
         <MenuItem
           icon={assets.products_icon}
           label="Products"
           active={currentView === "products"}
-          onClick={() => {navigate("/products"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/products"); setIsSidebarOpen(false);}}
         />
         <MenuItem
           icon={assets.inventory_icon}
           label="Inventory"
           active={currentView === "inventory"}
-          onClick={() => {navigate("/inventory"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/inventory"); setIsSidebarOpen(false)}}
         />
         <MenuItem
           icon={assets.orders_icon}
           label="Orders"
           active={currentView === "orders"}
-          onClick={() => {navigate("/orders"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/orders"); setIsSidebarOpen(false);}}
         />
         <MenuItem
           icon={assets.transaction_icon}
           label="Transactions"
           active={currentView === "transactions"}
-          onClick={() => {navigate("/transactions"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/transactions"); setIsSidebarOpen(false)}}
         />
         <MenuItem
           icon={assets.staff_icon}
           label="User Management"
           active={currentView === "user management"}
-          onClick={() => {navigate("/user-management"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/user-management"); setIsSidebarOpen(false)}}
         />
         <MenuItem
           icon={assets.reports_icon}
           label="Reports"
           active={currentView === "reports"}
-          onClick={() => {navigate("/reports"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/reports"); setIsSidebarOpen(false)}}
         />
         <MenuItem
           icon={assets.settings_icon}
           label="Settings"
           active={currentView === "settings"}
-          onClick={() => {navigate("/settings"); setIsSidebarOpen((prev) => !prev)}}
+          onClick={() => {navigate("/settings"); setIsSidebarOpen(false);}}
         />
         
       </nav>

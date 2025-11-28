@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 
 function AddNewUser() {
-  const { handleAddUser, toastError, navigate } = useContext(AdminContext);
+  const { handleAddUser, toastError } = useContext(AdminContext);
 
   const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState("");

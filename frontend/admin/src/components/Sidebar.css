@@ -15,11 +15,18 @@
 
 /* ===== HEADER ===== */
 .sidebar-header {
+    cursor: pointer;
     position: relative;
     display: flex;
     align-items: center;
-    padding: 10px 0 10px 20px;
+    padding: 12px 0 12px 35px;
     border-bottom: 1px solid #D5D5D5;
+    transition: background-color 0.4s ease;
+    border-top-right-radius: 20px;
+}
+
+.sidebar-header:hover {
+    background-color: #EFFFF1;
 }
 
 /* ===== COOL ARROW TOGGLE BUTTON ===== */
@@ -77,6 +84,7 @@
 }
 
 .sidebar-brand-title {
+  margin-bottom: 0.3rem;
   font-size: 1.05rem;
   font-weight: 600;
   color: #333;

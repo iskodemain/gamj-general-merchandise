@@ -1,15 +1,27 @@
-
-.profile-card {
-  width: min(800px, 95%);
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
+/* PAGE CONTAINER — Center the card */
+.admin-profile-container {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; 
+  padding: 20px;
   box-sizing: border-box;
 }
 
-/* Header section with title and icon */
-.header-section {
+/* PROFILE CARD */
+.admin-profile-card {
+  width: 100%;
+  max-width: 600px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.105);
+  box-sizing: border-box;
+}
+
+/* HEADER */
+.admin-profile-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,34 +30,19 @@
   border-bottom: 1px solid #eaeaea;
 }
 
-.profile-title {
+.admin-profile-title {
   color: #000000;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   margin: 0;
 }
 
-.icon-container {
-  width: 70px;
-  height: 70px;
-  
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.profile-icon {
-  color: #43A047;
-  font-size: 24px;
-}
-
-/* Section styling */
-.info-section {
+/* SECTION */
+.admin-profile-section {
   margin-bottom: 32px;
 }
 
-.section-title {
+.admin-profile-section-title {
   font-size: 18px;
   font-weight: 700;
   color: #128C3A;
@@ -53,23 +50,20 @@
   margin-top: 0;
 }
 
-/* Form elements */
-.form-group {
+/* FORM ELEMENTS */
+.admin-profile-form-group {
   margin-bottom: 18px;
 }
 
-label {
+.admin-profile-form-group label {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #4b5563;
   margin-bottom: 6px;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="password"] {
+.admin-profile-form-group input {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid #d1d5db;
@@ -80,12 +74,23 @@ input[type="password"] {
   box-sizing: border-box;
 }
 
-/* Password field styling */
-.password-input {
+/* PASSWORD FIELD */
+.admin-profile-password-input {
   position: relative;
 }
 
-.toggle-password {
+.admin-profile-password-input input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #111827;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+.admin-profile-toggle-password {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -94,46 +99,93 @@ input[type="password"] {
   background: transparent;
   color: #6b7280;
   cursor: pointer;
+}
+
+/* ACTION BUTTONS */
+.admin-profile-action {
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  margin-top: 24px;
 }
 
-/* Action section */
-.action-section {
-  display: flex;
-  justify-content: flex-start;
-  width: 25%;
-  margin-top: 32px;
-}
-
-.btn-save {
-  
-  border: none;
+.admin-profile-btn-save {
+  padding: 12px 20px;
   border-radius: 8px;
-  font-weight: 500;
-  font-size: 16px;
-  cursor: pointer;
   background-color: #43A047;
   color: white;
-  transition: background-color 0.2s;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  width: 50%;
+  max-width: 220px;
 }
 
-.btn-save:hover {
+.admin-profile-btn-save:hover {
   background-color: #388e3c;
 }
 
-/* Responsive adjustments */
+/* ==============================
+   RESPONSIVE BREAKPOINTS
+============================== */
+
+/* Medium screens */
 @media (max-width: 768px) {
-  .profile-card {
+  .admin-profile-card {
     padding: 24px;
   }
-  
-  .action-section {
-    justify-content: center;
+
+  .admin-profile-btn-save {
+    width: 100%;
+  }
+}
+
+/* Small screens — 400px and below */
+@media (max-width: 400px) {
+  .admin-profile-container {
+    padding: 0;
   }
   
-  .btn-save {
+  .admin-profile-title {
+    font-size: 18px;
+  }
+
+  .admin-profile-form-group input,
+  .admin-profile-password-input input {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .admin-profile-btn-save {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+/* EXTRA small — 200px support */
+@media (max-width: 250px) {
+  .admin-profile-card {
+    padding: 16px;
+  }
+
+  .admin-profile-title {
+    font-size: 16px;
+  }
+
+  .admin-profile-form-group label {
+    font-size: 12px;
+  }
+
+  .admin-profile-form-group input,
+  .admin-profile-password-input input {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .admin-profile-btn-save {
+    font-size: 13px;
+    padding: 8px;
     width: 100%;
   }
 }
