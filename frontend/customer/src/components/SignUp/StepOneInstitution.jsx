@@ -140,8 +140,8 @@ const StepOneInstitution = () => {
     let value = e.target.value;
     value = value.replace(/\D/g, '');
 
-    if (value.length > 10) {
-      value = value.slice(0, 10);
+    if (value.length > 8) {
+      value = value.slice(0, 8);
     }
     setLandlineCNum(value);
   };

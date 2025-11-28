@@ -70,8 +70,8 @@ const Profile = () => {
     let value = e.target.value;
     value = value.replace(/\D/g, '');
 
-    if (value.length > 10) {
-      value = value.slice(0, 10);
+    if (value.length > 8) {
+      value = value.slice(0, 8);
     }
     setLandlineNumber(value);
   };
@@ -716,8 +716,8 @@ const Profile = () => {
                     <input onChange={handleContactNumber} value={contactNumber} type="text" placeholder="Enter contact number" required/>
                   </div>
                   <div className="form-group">
-                    <label>Landline Number</label>
-                    <input onChange={handleLandlineNumber} value={landlineNumber} type="text" placeholder="Enter landline number" />
+                    <label>Landline Number (Optional)</label>
+                    <input onChange={handleLandlineNumber} value={landlineNumber} type="text" placeholder="02 | Landline number" />
                   </div>
                 </div>
                 <div className="form-group">
