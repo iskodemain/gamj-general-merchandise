@@ -190,7 +190,7 @@ function RejectedUsers() {
             </div>
 
             <div className="rejected-users-controls-right">
-              <button onClick={() => navigate('/users/add')} className="rejected-users-add-btn">Add User</button>
+              <button onClick={() => navigate('/addnewuser')} className="rejected-users-add-btn">Add User</button>
 
               <div className="rejected-users-search">
                 <input

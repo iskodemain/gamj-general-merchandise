@@ -172,7 +172,7 @@ function UnverifiedUsers() {
             </div>
 
             <div className="unverified-users-controls-right">
-              <button onClick={() => navigate('/users/add')} className="unverified-users-add-btn">Add User</button>
+              <button onClick={() => navigate('/addnewuser')} className="unverified-users-add-btn">Add User</button>
 
               <div className="unverified-users-search">
                 <input

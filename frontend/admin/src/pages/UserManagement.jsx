@@ -124,6 +124,13 @@ function Orders() {
               date="Updated: Sep 25, 2025"
               onClick={() => navigate("/rejectedusers")}
             />
+            <OverviewCard
+              icon={assets.add_user_icon}
+              title="Add New User"
+              number={"+"}
+              date="Updated: Sep 25, 2025"
+              onClick={() => navigate('/addnewuser')}
+            />
             
           </div>
         </section>

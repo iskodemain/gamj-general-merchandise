@@ -42,7 +42,28 @@ const AdminContextProvider = (props) => {
   const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
   const [fetchReturnRefundOrders, setFetchReturnRefundOrders] = useState([]);
 
-  /*---------------------------USER DELETE PROCESS-----------------------------*/
+  /*---------------------------CREATE NEW USER-----------------------------*/
+  const handleAddUser = async (payload) => {
+    if (token) {
+      try {
+        const response = await axios.post(backendUrl + "/api/users/add", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------USER CHANGE INFO PROCESS-----------------------------*/
   const handleSaveUserInfo = async (payload) => {
     if (token) {
       try {
@@ -567,7 +588,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser
   }  
   return (
     <AdminContext.Provider value={value}>

@@ -9,7 +9,7 @@ import Loading from "../Loading.jsx";
 import { toast } from "react-toastify";
 
 function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
-  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, toastSuccess, toastError } = useContext(AdminContext);
+  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, toastError } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   // Confirmation modal state
@@ -600,9 +600,11 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <ProofArea />
-                  </div>
+                  {userStatus !== "Verified" && 
+                    <div className="form-group">
+                      <ProofArea />
+                    </div>
+                  }
                 </section>
 
                 <section className="info-section">
