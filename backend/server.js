@@ -17,6 +17,7 @@ import adminRouter from './routes/admin/adminRoute.js';
 import adminProductRouter from './routes/admin/adminProductRoute.js';
 import adminOrderRouter from './routes/admin/adminOrderRoute.js';
 import adminUsersRouter from './routes/admin/adminUsersRoute.js';
+import adminSettingsRouter from './routes/admin/adminSettingsRoute.js';
 
 // APP CONFIG
 const app = express();
@@ -55,6 +56,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/product', adminProductRouter);
 app.use('/api/order', adminOrderRouter);
 app.use('/api/users', adminUsersRouter);
+app.use('/api/settings', adminSettingsRouter);
 
 
 // TEST
