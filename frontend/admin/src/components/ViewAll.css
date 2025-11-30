@@ -306,6 +306,10 @@
   font-size: 13px;
 }
 
+.vap-status-pill:disabled {
+  cursor: default;
+}
+
 /* Status Menu */
 .vap-status-menu {
   position: absolute;

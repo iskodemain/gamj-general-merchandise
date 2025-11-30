@@ -30,9 +30,9 @@ function Delivered() {
 
       return {
         orderId: order.orderId,
+        customerId: order.customerId,
         method: order.paymentMethod,
         date: order.dateOrdered,
-        total: Number(order.totalAmount),
         itemsCount: items.length,
 
         items: items.map((item) => {
@@ -108,7 +108,7 @@ function Delivered() {
               {deliveredOrders.length === 0 ? (
                 <div className="empty-del">No delivered orders.</div>
               ) : (
-                deliveredOrders.map((order) => {
+                deliveredOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
                   const items = fetchOrderItems
                     .filter((item) => item.orderId === order.ID)
                     .filter((item) => item.orderStatus === "Delivered");

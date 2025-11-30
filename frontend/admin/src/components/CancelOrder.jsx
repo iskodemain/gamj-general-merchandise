@@ -114,7 +114,7 @@ function CancelOrder() {
                   No cancel orders.
                 </div>
               ) : (
-                cancelledOrders.map((order) => {
+                cancelledOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
                   const items = fetchOrderItems
                     .filter((item) => item.orderId === order.ID)
                     .filter((item) => item.orderStatus === "Cancelled");
