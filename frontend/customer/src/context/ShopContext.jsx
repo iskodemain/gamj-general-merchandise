@@ -962,7 +962,6 @@ const ShopContextProvider = (props) => {
     useEffect(() => {
         // When a new order is placed (for Admin/Staff dashboards)
         socket.on("newOrder", (data) => {
-            console.log("📦 New Order Received:", data);
             setFetchOrders((prev) => [data.order, ...prev]);
             setFetchOrderItems((prev) => [...data.orderItems, ...prev]);
         });
@@ -990,12 +989,25 @@ const ShopContextProvider = (props) => {
             );
         });
 
-
         return () => {
             socket.off("newOrder");
             socket.off("newNotification_Customer");
             socket.off("lowStockAlert");
             socket.off("cartUpdated");
+        };
+    }, []);
+
+    // (SOCKET IO) - Update Order Status
+    useEffect(() => {
+        socket.on("updateOrderStatus", (data) => {
+            setFetchOrderItems((prev) => {
+                const updatedIds = new Set(data.orderItems.map(item => item.ID));
+                return [...prev.filter(item => !updatedIds.has(item.ID)), ...data.orderItems];
+            });
+        });
+
+        return () => {
+            socket.off("updateOrderStatus");
         };
     }, []);
 

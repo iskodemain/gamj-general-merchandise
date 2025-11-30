@@ -131,13 +131,44 @@ export const placeOrderTemplate = (userName, orderStatus, paymentMethod, orderId
 </html>`;
 };
 
-export const processingOrderTemplate = (userName, orderStatus, paymentMethod) => {
+
+export const orderStatusUpdateTemplate = (userName, orderStatus, paymentMethod, listOfProducts, dateOrdered) => {
+  // 🎨 Dynamic status configuration
+  const statusConfig = {
+    'Processing': {
+      color: '#00E3B6',
+      icon: '⚙️',
+      progress: 33,
+      message: 'Your order is being prepared'
+    },
+    'Out for Delivery': {
+      color: '#656DFF',
+      icon: '🚚',
+      progress: 66,
+      message: 'Your order is on its way'
+    },
+    'Delivered': {
+      color: '#00DD31',
+      icon: '✅',
+      progress: 100,
+      message: 'Your order has been delivered'
+    },
+    'Cancelled': {
+      color: '#e36666',
+      icon: '❌',
+      progress: 0,
+      message: 'Your order has been cancelled'
+    }
+  };
+
+  const currentStatus = statusConfig[orderStatus] || statusConfig['Processing'];
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Now Being Processed</title>
+    <title>Order Status Update</title>
     <style>
         body, table, td, a {
             margin: 0;
@@ -174,7 +205,12 @@ export const processingOrderTemplate = (userName, orderStatus, paymentMethod) =>
 
         .email-header img {
             max-width: 120px;
-            margin-bottom: 10px;
+            margin: 0 auto 10px auto;
+        }
+
+        .email-header h2 {
+            margin: 0;
+            color: #333;
         }
 
         .email-body {
@@ -185,19 +221,109 @@ export const processingOrderTemplate = (userName, orderStatus, paymentMethod) =>
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #1976d2; /* Blue for processing */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background-color: ${currentStatus.color};
             color: #ffffff;
             font-weight: bold;
-            border-radius: 20px;
+            border-radius: 25px;
             margin: 20px 0;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .payment-method {
+        .status-icon {
+            font-size: 18px;
+            line-height: 1;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .status-message {
             font-size: 15px;
-            margin-top: 10px;
             color: #555;
+            margin: 15px 0;
+            font-style: italic;
+        }
+
+        .order-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .order-details h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .info-item strong {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: ${currentStatus.color};
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .info-item .icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .info-item span {
+            color: #333;
+            font-size: 14px;
+            display: block;
+            margin-left: 20px;
+        }
+
+        .products-list {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .products-list h4 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+        }
+
+        .products-list ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #333;
+        }
+
+        .products-list li {
+            margin: 5px 0;
+            font-size: 14px;
         }
 
         .progress-section {
@@ -205,20 +331,47 @@ export const processingOrderTemplate = (userName, orderStatus, paymentMethod) =>
             text-align: center;
         }
 
+        .progress-section > p {
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+        }
+
         .progress-bar {
             width: 80%;
-            height: 10px;
+            height: 12px;
             background-color: #e0e0e0;
-            border-radius: 5px;
-            margin: 0 auto;
+            border-radius: 6px;
+            margin: 0 auto 15px auto;
             position: relative;
+            overflow: hidden;
         }
 
         .progress-bar-fill {
-            height: 10px;
-            background-color: #1976d2;
-            width: 60%; /* visually show progress */
-            border-radius: 5px;
+            height: 12px;
+            width: ${currentStatus.progress}%;
+            background-color: ${currentStatus.color};
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: ${currentStatus.color};
+            color: white;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .progress-label .icon {
+            font-size: 16px;
+            line-height: 1;
         }
 
         .email-footer {
@@ -235,6 +388,21 @@ export const processingOrderTemplate = (userName, orderStatus, paymentMethod) =>
             text-decoration: none;
             font-weight: 600;
         }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-content {
+                padding: 20px;
+            }
+
+            .order-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -242,37 +410,83 @@ export const processingOrderTemplate = (userName, orderStatus, paymentMethod) =>
         <tr>
             <td>
                 <div class="email-content">
-                    <!-- Header -->
+                    <!-- Header with Centered Logo -->
                     <div class="email-header">
                         <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
-                        <h2>Order Processing Update</h2>
+                        <h2>Order Status Update</h2>
                     </div>
 
                     <!-- Body -->
                     <div class="email-body">
                         <p>Hi <strong>${userName}</strong>,</p>
-                        <p>Good news! Your order is now being <b>processed</b> by our team at <strong>GAMJ General Merchandise</strong>.</p>
+                        <p>Your order has been updated at <strong>GAMJ General Merchandise</strong>.</p>
 
                         <div class="status-badge">
-                            Order Status: ${orderStatus}
+                            <span class="status-icon">${currentStatus.icon} ${" "}</span>
+                            <span>${orderStatus}</span>
                         </div>
 
+                        <p class="status-message">${currentStatus.message}</p>
+
+                        <!-- Order Details -->
+                        <div class="order-details">
+                            <h3>
+                                <span class="icon">📦</span>
+                                <span>Order Information</span>
+                            </h3>
+                            
+                            <!-- Order Info Grid -->
+                            <div class="order-info-grid">
+                                <div class="info-item">
+                                    <strong>
+                                        <span class="icon">📅</span>
+                                        <span>Date Ordered</span>
+                                    </strong>
+                                    <span>${new Date(dateOrdered).toLocaleDateString('en-US', { 
+                                      year: 'numeric', 
+                                      month: 'long', 
+                                      day: 'numeric' 
+                                    })}</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <strong>
+                                        <span class="icon">💳</span>
+                                        <span>Payment Method</span>
+                                    </strong>
+                                    <span>${paymentMethod}</span>
+                                </div>
+                            </div>
+
+                            <!-- Products List -->
+                            <div class="products-list">
+                                <h4>Items in this Update:</h4>
+                                <ul>
+                                    ${listOfProducts}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
                         <div class="progress-section">
+                            <p>Order Progress</p>
                             <div class="progress-bar">
                                 <div class="progress-bar-fill"></div>
                             </div>
-                            <p style="margin-top: 10px; color: #555;">We’re carefully preparing your items for delivery.</p>
+                            <div class="progress-label">
+                                <span class="icon">${currentStatus.icon} ${" "}</span>
+                                <span>${orderStatus}</span>
+                            </div>
                         </div>
 
-                        <p class="payment-method">Payment Method: <b>${paymentMethod}</b></p>
-                        <p>You’ll receive another update once your order has been shipped.</p>
+                        <p style="margin-top: 30px;">Thank you for choosing GAMJ General Merchandise!</p>
                     </div>
 
                     <!-- Footer -->
                     <div class="email-footer">
                         <p>If you have any questions about your order, feel free to reach out to us.</p>
                         <p>Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com" target="_blank">gamjmerchandisehelp@gmail.com</a></p>
-                        <p>Thank you for choosing us!</p>
+                        <p>Thank you for shopping with us!</p>
                         <p style="margin-top: 15px;">
                             © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
                         </p>
@@ -285,105 +499,7 @@ export const processingOrderTemplate = (userName, orderStatus, paymentMethod) =>
 </html>`;
 };
 
-export const outForDeliveryTemplate = (userName, orderStatus, paymentMethod) => {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Out for Delivery</title>
-<style>
-  body, table, td, a { margin: 0; padding: 0; font-family: Arial, sans-serif; }
-  img { border: 0; display: block; max-width: 100%; }
-  .email-container { width: 100%; background-color: #f4f6f9; padding: 20px 0; }
-  .email-content { max-width: 600px; margin: 0 auto; background-color: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  .email-header { text-align: center; margin-bottom: 30px; }
-  .email-header img { max-width: 120px; }
-  .email-body { text-align: center; font-size: 16px; line-height: 1.6; color: #333; }
-  .status-badge { display: inline-block; padding: 10px 20px; background-color: #0288d1; color: #fff; font-weight: bold; border-radius: 20px; margin: 20px 0; }
-  .email-footer { text-align: center; font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #e0e0e0; padding-top: 20px; }
-  .email-footer a { color: #43A047; text-decoration: none; font-weight: 600; }
-</style>
-</head>
-<body>
-  <table class="email-container">
-    <tr>
-      <td>
-        <div class="email-content">
-          <div class="email-header">
-            <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
-            <h2>Out for Delivery!</h2>
-          </div>
-          <div class="email-body">
-            <p>Hi <strong>${userName}</strong>,</p>
-            <p>Your order is now <b>out for delivery</b> and will arrive soon!</p>
-            <div class="status-badge">Status: ${orderStatus}</div>
-            <p>Please make sure someone is available to receive your package.</p>
-            <p class="payment-method">Payment Method: <b>${paymentMethod}</b></p>
-          </div>
-          <div class="email-footer">
-            <p>For delivery concerns, reach us at: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
-            <p style="margin-top: 15px;">
-                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-};
 
-export const deliveredOrderTemplate = (userName, orderStatus, paymentMethod) => {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Delivered</title>
-<style>
-  body, table, td, a { margin: 0; padding: 0; font-family: Arial, sans-serif; }
-  img { border: 0; display: block; max-width: 100%; }
-  .email-container { width: 100%; background-color: #f4f6f9; padding: 20px 0; }
-  .email-content { max-width: 600px; margin: 0 auto; background-color: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  .email-header { text-align: center; margin-bottom: 30px; }
-  .email-header img { max-width: 120px; }
-  .email-body { text-align: center; font-size: 16px; line-height: 1.6; color: #333; }
-  .status-badge { display: inline-block; padding: 10px 20px; background-color: #43a047; color: #fff; font-weight: bold; border-radius: 20px; margin: 20px 0; }
-  .email-footer { text-align: center; font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #e0e0e0; padding-top: 20px; }
-  .email-footer a { color: #43A047; text-decoration: none; font-weight: 600; }
-</style>
-</head>
-<body>
-  <table class="email-container">
-    <tr>
-      <td>
-        <div class="email-content">
-          <div class="email-header">
-            <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
-            <h2>Order Delivered Successfully!</h2>
-          </div>
-          <div class="email-body">
-            <p>Hi <strong>${userName}</strong>,</p>
-            <p>Your order has been <b>successfully delivered</b>! We hope you enjoy your purchase.</p>
-            <div class="status-badge">Status: ${orderStatus}</div>
-            <p>Thank you for shopping with <strong>GAMJ General Merchandise</strong>.</p>
-            <p class="payment-method">Payment Method: <b>${paymentMethod}</b></p>
-          </div>
-          <div class="email-footer">
-            <p>We’d love your feedback! If you have any issues, reach us at <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
-            <p style="margin-top: 15px;">
-                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-};
 
 export const customerCancelledOrderTemplate = (userName, orderStatus, paymentMethod, orderId, productName) => {
   const refundMessage =

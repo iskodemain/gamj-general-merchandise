@@ -447,31 +447,6 @@ export const saveUserInfoService = async (adminId, data) => {
       };
     }
 
-    const existsCustomer = await Customer.findOne({
-      where: {
-        [identifierType === "email" ? "loginEmail" : "loginPhoneNum"]: data.identifier
-      }
-    });
-
-    const existsStaff = await Staff.findOne({
-      where: {
-        [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
-      }
-    });
-
-    const existsAdmin = await Admin.findOne({
-      where: {
-        [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
-      }
-    });
-
-    if (existsCustomer || existsStaff || existsAdmin) {
-      return {
-        success: false,
-        message: "This email or phone number is already used by another account."
-      };
-    }
-
     if (data.password) {
       const passwordError = validatePassword(data.password);
       if (passwordError) {

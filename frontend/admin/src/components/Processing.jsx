@@ -29,9 +29,9 @@ function Processing() {
 
       return {
         orderId: order.orderId,
+        customerId: order.customerId,
         method: order.paymentMethod,
         date: order.dateOrdered,
-        total: Number(order.totalAmount),
         itemsCount: items.length,
 
         items: items.map((item) => {
@@ -102,7 +102,7 @@ function Processing() {
                   No processing orders.
                 </div>
               ) : (
-                processingOrders.map((order) => {
+                processingOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
                   const items = fetchOrderItems.filter((item) => item.orderId === order.ID).filter((item) => item.orderStatus === "Processing");
 
                   const orderTotal = items.reduce(

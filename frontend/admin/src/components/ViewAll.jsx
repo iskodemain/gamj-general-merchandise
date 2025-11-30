@@ -1,25 +1,29 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef, useContext } from "react";
 import "./ViewAll.css";
 import { FaTrashCan, FaArrowLeft } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
+import Loading from "../components/Loading.jsx"
+import { AdminContext } from "../context/AdminContextProvider.jsx";
 
 const SELECT_ALL_STATUS_OPTIONS = [
-  { key: "Pending", color: "#F5A623" },
-  { key: "Processing", color: "#17A2A2" },
-  { key: "Out for Delivery", color: "#2B7BEF" },
-  { key: "Delivered", color: "#2FA14C" },
+  { key: "Pending", color: "#FFA600" },
+  { key: "Processing", color: "#00E3B6" },
+  { key: "Out for Delivery", color: "#656DFF" },
+  { key: "Delivered", color: "#00DD31" },
 ];
 
 const STATUS_OPTIONS = [
-  { key: "Pending", color: "#F5A623" },
-  { key: "Processing", color: "#17A2A2" },
-  { key: "Out for Delivery", color: "#2B7BEF" },
-  { key: "Delivered", color: "#2FA14C" },
+  { key: "Pending", color: "#FFA600" },
+  { key: "Processing", color: "#00E3B6" },
+  { key: "Out for Delivery", color: "#656DFF" },
+  { key: "Delivered", color: "#00DD31" },
   { key: "Cancelled", color: "#e36666" },
 ];
 
 function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
+  const { handleChangeOrderStatus } = useContext(AdminContext);
+  const [loading, setLoading] = useState(false);
 
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
@@ -107,30 +111,53 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
     if (next.size === 0) setBulkDropdownOpen(false);
   };
 
-  const changeStatus = (id, status) => {
+  const changeStatus = async (id, status) => {
     if (status === "Cancelled") {
       const item = items.find((i) => i.id === id);
       openCancelModalFor(item);
       setOpenDropdown(null);
       return; // STOP — do not update status
     }
+  
+    setLoading(true);
 
-    setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, status } : i))
-    );
+    const payload = [
+      {
+        customerID: order.customerId,
+        orderItemID: id, // priority to change
+        changeStatus: status, // priority to change
+      },
+    ];
+
+    const created = await handleChangeOrderStatus(payload);
+    setLoading(false);
     setOpenDropdown(null);
+
+    if (created) {
+      setTimeout(() => window.location.reload(), 500);
+    }
   };
 
 
-  const changeStatusForSelected = (status) => {
-    setItems((prev) =>
-      prev.map((i) =>
-        selected.has(i.id) ? { ...i, status } : i
-      )
-    );
-    setSelected(new Set());
-    setShowBulkStatus(false);
+  const changeStatusForSelected = async (status) => {
+    if (selected.size === 0) return;
+    setLoading(true);
+
+    const payload = [...selected].map((id) => ({
+      customerID: order.customerId,
+      orderItemID: id, // priority to change
+      changeStatus: status, // priority to change
+    }));
+
+    const created = await handleChangeOrderStatus(payload);
+    setLoading(false);
     setBulkDropdownOpen(false);
+
+    if (created) {
+      setSelected(new Set());
+      setShowBulkStatus(false);
+      setTimeout(() => window.location.reload(), 500);
+    }
   };
 
   const bulkLabel = useMemo(() => {
@@ -159,14 +186,70 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 };
 
 
-  const submitCancel = () => {
-    console.log("CANCEL ITEM:", cancelItem, "Reason:", cancelReason);
+  const submitCancel = async() => {
+    if (!cancelItem) return;
+
+    setLoading(true);
+
+    const payload = [
+      {
+        customerID: order.customerId,
+        orderItemID: cancelItem.id, // priority to change
+        changeStatus: "Cancelled", // priority to change
+        cancelComments: cancelReason, // priority to add
+      },
+    ];
+
+    const created = await handleChangeOrderStatus(payload);
+    setLoading(false);
+
+    if (created) {
+      setTimeout(() => window.location.reload(), 500);
+    }
+
     setCancelModalOpen(false);
     setCancelItem(null);
   };
 
+  // -------------------------------------------
+  // INDIVIDUAL ITEM STATUS OPTIONS LOGIC
+  // -------------------------------------------
+  const getIndividualOptions = (currentStatus) => {
+    switch (currentStatus) {
+      case "Pending":
+        return ["Processing", "Out for Delivery", "Delivered", "Cancelled"];
+      case "Processing":
+        return ["Out for Delivery", "Delivered", "Cancelled"];
+      case "Out for Delivery":
+        return ["Delivered", "Cancelled"];
+      case "Delivered":
+        return []; // no dropdown
+      default:
+        return [];
+    }
+  };
+
+  // -------------------------------------------
+  // BULK STATUS OPTIONS LOGIC (based on orderStatus tab)
+  // -------------------------------------------
+  const getBulkOptions = () => {
+    switch (orderStatus) {
+      case "Pending":
+        return ["Processing", "Out for Delivery", "Delivered"];
+      case "Processing":
+        return ["Out for Delivery", "Delivered"];
+      case "Out for Delivery":
+        return ["Delivered"];
+      case "Delivered":
+        return []; // replaced with delete all
+      default:
+        return [];
+    }
+  };
+
   return (
     <div className="vap-wrapper">
+      {loading && <Loading />}
       <div className="vap-topbar">
         <button className="vap-back-btn" onClick={onClose}>
           <FaArrowLeft />
@@ -198,44 +281,62 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                 <input ref={searchRef} className="vap-search-input" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)}/>
                 <IoSearchOutline className="search-bar-item"/>
               </div>
-
               {showBulkStatus && (
                 <div className="vap-bulk-status">
-                  <div className="vap-bulk-dropdown">
+                  
+                  {/* If Delivered, show DELETE ALL instead of bulk dropdown */}
+                  {orderStatus === "Delivered" ? (
                     <button
-                      className="vap-bulk-pill"
-                      onClick={() => setBulkDropdownOpen((v) => !v)}
+                      className="vap-trash-btn"
+                      onClick={() => {
+                        if (window.confirm("Delete all selected delivered items?")) {
+                          [...selected].forEach(id => deleteItem(id));
+                        }
+                      }}
                     >
-                      <span
-                        className="vap-pill-dot"
-                        style={{
-                          background:
-                            SELECT_ALL_STATUS_OPTIONS.find((s) => s.key === bulkLabel)
-                              ?.color || "#F5A623",
-                        }}
-                      />
-                      <span className="vap-pill-label">{bulkLabel}</span>
-                      ▾
+                      <FaTrashCan />
                     </button>
+                  ) : (
+                    <div className="vap-bulk-dropdown">
+                      <button
+                        className="vap-bulk-pill"
+                        onClick={() => setBulkDropdownOpen((v) => !v)}
+                      >
+                        <span
+                          className="vap-pill-dot"
+                          style={{
+                            background:
+                              SELECT_ALL_STATUS_OPTIONS.find((s) => s.key === bulkLabel)
+                                ?.color || "#F5A623",
+                          }}
+                        />
+                        <span className="vap-pill-label">{bulkLabel}</span>
+                        ▾
+                      </button>
 
-                    {bulkDropdownOpen && (
-                      <div className="vap-bulk-menu">
-                        {SELECT_ALL_STATUS_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.key}
-                            className="vap-bulk-item"
-                            onClick={() => changeStatusForSelected(opt.key)}
-                          >
-                            <span
-                              className="vap-menu-dot"
-                              style={{ background: opt.color }}
-                            />
-                            {opt.key}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                      {bulkDropdownOpen && (
+                        <div className="vap-bulk-menu">
+                          {getBulkOptions().map((key) => {
+                            const opt = SELECT_ALL_STATUS_OPTIONS.find(o => o.key === key);
+                            return (
+                              <button
+                                key={opt.key}
+                                className="vap-bulk-item"
+                                onClick={() => changeStatusForSelected(opt.key)}
+                              >
+                                <span
+                                  className="vap-menu-dot"
+                                  style={{ background: opt.color }}
+                                />
+                                {opt.key}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                 </div>
               )}
             </div>
@@ -307,19 +408,39 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                       </button>
                     )}
 
-                    <button className="vap-status-pill" onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}>
+                    <button 
+                      className="vap-status-pill" 
+                      disabled={orderStatus === "Delivered"}  // ⛔ disable dropdown entirely
+                      onClick={() =>
+                        orderStatus !== "Delivered" &&
+                        setOpenDropdown(openDropdown === item.id ? null : item.id)
+                      }
+                    >
                       <span className="vap-pill-label">{item.status}</span>
-                      <IoIosArrowDown />
+                      {
+                        orderStatus !== "Delivered" && <IoIosArrowDown />
+                      }
                     </button>
 
                     {openDropdown === item.id && (
                       <div className="vap-status-menu">
-                        {STATUS_OPTIONS.map((opt) => (
-                          <button key={opt.key} className="vap-status-item" onClick={() => changeStatus(item.id, opt.key)}>
-                            <span className="vap-menu-dot" style={{ background: opt.color }} />
-                            {opt.key}
-                          </button>
-                        ))}
+
+                        {getIndividualOptions(item.status).map((key) => {
+                          const opt = STATUS_OPTIONS.find(o => o.key === key);
+
+                          return (
+                            <button
+                              key={opt.key}
+                              className="vap-status-item"
+                              onClick={() => changeStatus(item.id, opt.key)}
+                            >
+                              <span className="vap-menu-dot" style={{ background: opt.color }} />
+                              {opt.key}
+                            </button>
+                          );
+                        })}
+
+
                       </div>
                     )}
 

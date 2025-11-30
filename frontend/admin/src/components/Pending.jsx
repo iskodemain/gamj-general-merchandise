@@ -29,9 +29,9 @@ function Pending() {
 
       return {
         orderId: order.orderId,
+        customerId: order.customerId,
         method: order.paymentMethod,
         date: order.dateOrdered,
-        total: Number(order.totalAmount),
         itemsCount: items.length,
 
         items: items.map((item) => {
@@ -101,7 +101,7 @@ function Pending() {
                     No pending orders.
                   </div>
                 ) : (
-                  pendingOrders.map((order) => {
+                  pendingOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
                     const items = fetchOrderItems.filter((item) => item.orderId === order.ID).filter((item) => item.orderStatus === "Pending");
 
                     const orderTotal = items.reduce(
@@ -243,7 +243,6 @@ function Pending() {
                                 const clean = viewPendingOrders.find(
                                   (o) => o.orderId === order.orderId
                                 );
-                                console.log("Matched clean order:", clean);
                                 setSelectedOrder(clean);
                                 setShowViewAll(true);
                               }}
