@@ -52,24 +52,22 @@ const ShopContextProvider = (props) => {
     const [showPaypalModal, setShowPaypalModal] = useState(false);
     const [settingsData, setSettingsData] = useState([])
 
-    /*---------------------------FETCH ADMIN SETTING DATA-----------------------------*/
+    /*---------------------------FETCH BUSINESS INFO DATA-----------------------------*/
     const fetchSettingsData = async () => {
         try {
-        const response = await axios.get(backendUrl + "/api/settings");
+        const response = await axios.get(backendUrl + "/api/business-info");
         if (response.data.success) {
             setSettingsData(response.data.settingData)
         } else {
             toast.error(response.data.message, { ...toastError });
         }
         } catch (error) {
-        console.log(error);
+            console.log(error);
         }
     }
     useEffect(() => {
-        if (token) {
         fetchSettingsData();
-        }
-    }, [token]);
+    }, []);
 
     /*----------------------FETCH NOTIFICATION PAGE-----------------------*/
     const [fetchNotifications, setFetchNotifications] = useState([]);

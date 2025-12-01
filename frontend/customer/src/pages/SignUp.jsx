@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import './SignUp.css'
 import { ShopContext } from '../context/ShopContext'
 import StepOneInstitution from '../components/SignUp/StepOneInstitution.jsx'
 import StepTwoRepresentative from '../components/SignUp/StepTwoRepresentative.jsx'
