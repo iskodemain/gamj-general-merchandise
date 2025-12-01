@@ -2,8 +2,7 @@ import { fetchSettingsDataService, updateSettingsDataService } from "../../servi
 
 export const fetchSettingsData = async (req, res) => {
     try {
-        const { ID } = req.admin;
-        const result = await fetchSettingsDataService(ID);
+        const result = await fetchSettingsDataService();
         res.json(result);
     } catch (error) {
         console.log(error);
