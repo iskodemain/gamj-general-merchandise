@@ -2,7 +2,6 @@ import React, {useContext, useState, useEffect} from 'react'
 import MainTitle from '../components/MainTitle'
 import './PlaceOrder.css'
 import OrderSummary from '../components/OrderSummary'
-import OurPolicy from '../components/OurPolicy'
 import Infos from '../components/Infos'
 import Footer from '../components/Footer'
 import { ShopContext } from '../context/ShopContext'
@@ -176,7 +175,6 @@ function PlaceOrder() {
             </div> 
          </div>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

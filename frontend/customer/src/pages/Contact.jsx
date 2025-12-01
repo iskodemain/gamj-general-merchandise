@@ -4,7 +4,6 @@ import { GoMail } from "react-icons/go";
 import { FaViber } from "react-icons/fa";
 import { FaFacebookMessenger } from "react-icons/fa";
 import React from 'react'
-import OurPolicy from '../components/OurPolicy.jsx'
 import Infos from '../components/Infos.jsx'
 import Footer from '../components/Footer.jsx'
 import './Contact.css'
@@ -56,7 +55,6 @@ const About = () => {
             <div className='text-4xl'>
 
             </div>
-                <OurPolicy/>
                 <Infos/>
                 <Footer/>
             </div>

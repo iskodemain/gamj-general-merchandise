@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import './StepTwoRepresentative.css'
-import OurPolicy from '../OurPolicy.jsx'
 import Infos from '../Infos.jsx'
 import Footer from '../Footer.jsx'
 import { ShopContext } from '../../context/ShopContext.jsx'
@@ -116,7 +115,6 @@ const StepTwoRepresentative = () => {
         <button className='sp2-LC-button' type="submit" disabled={!isStepTwoComplete}>Proceed to the Next Step</button>
         <button type="button" onClick={handleBackBtn} className='sp2-LC-button-next'>Back</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

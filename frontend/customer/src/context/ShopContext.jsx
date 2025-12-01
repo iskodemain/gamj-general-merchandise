@@ -71,8 +71,6 @@ const ShopContextProvider = (props) => {
         }
     }, [token]);
 
-    console.log(settingsData);
-
     /*----------------------FETCH NOTIFICATION PAGE-----------------------*/
     const [fetchNotifications, setFetchNotifications] = useState([]);
     const handleFetchNotification = async() => {
