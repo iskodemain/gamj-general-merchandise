@@ -5,6 +5,9 @@
 }
 
 .lcv-form {
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 40px 32px 32px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -75,8 +78,8 @@
 /* lcv-vc */
 @media (min-width: 640px) {
   .lcv-vc {
-    padding-left: 5vw;
-    padding-right: 5vw;
+    padding-left: 2vw;
+    padding-right: 2vw;
   }
 }
 

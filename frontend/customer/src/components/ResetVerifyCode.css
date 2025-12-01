@@ -5,6 +5,9 @@
 }
 
 .rvc-form {
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 40px 32px 32px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,7 +30,7 @@
     width: 100%;
     padding: 10px;
     border-radius: 0.3rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     cursor: pointer;
 }
 
@@ -75,8 +78,8 @@
 /* rvc-vc */
 @media (min-width: 640px) {
   .rvc-vc {
-    padding-left: 5vw;
-    padding-right: 5vw;
+    padding-left: 2vw;
+    padding-right: 2vw;
   }
 }
 
@@ -98,6 +101,6 @@
 /* rvc-FORM */
 @media (min-width: 640px) {
   .rvc-form {
-    max-width: 24rem; 
+    max-width: 30rem; 
   }
 }

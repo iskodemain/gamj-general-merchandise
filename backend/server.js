@@ -18,6 +18,7 @@ import adminProductRouter from './routes/admin/adminProductRoute.js';
 import adminOrderRouter from './routes/admin/adminOrderRoute.js';
 import adminUsersRouter from './routes/admin/adminUsersRoute.js';
 import adminSettingsRouter from './routes/admin/adminSettingsRoute.js';
+import cusomerSettingsRouter from './routes/customerSettingsRoute.js';
 
 // APP CONFIG
 const app = express();
@@ -50,6 +51,7 @@ app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/notification', notificationRouter);
 app.use('/api/paypal', paypalRouter);
+app.use('/api/business-info', cusomerSettingsRouter);
 
 // ADMIN ROUTES
 app.use('/api/admin', adminRouter);
