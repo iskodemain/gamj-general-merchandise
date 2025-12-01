@@ -8,7 +8,7 @@ import upload from '../../middleware/multer.js';
 const adminSettingsRouter = express.Router();
 
 // FETCH
-adminSettingsRouter.get('/', adminAuth, fetchSettingsData);
+adminSettingsRouter.get('/', fetchSettingsData);
 
 // UPDATE
 adminSettingsRouter.put(

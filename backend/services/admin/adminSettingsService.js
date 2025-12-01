@@ -3,16 +3,8 @@ import SystemSettings from "../../models/systemSettings.js"
 import Admin from "../../models/admin.js";
 import fs from 'fs/promises';
 
-export const fetchSettingsDataService = async (adminId) => {
+export const fetchSettingsDataService = async () => {
     try {
-        const adminUser = await Admin.findByPk(adminId);
-        if (!adminUser) {
-            return {
-                success: false,
-                message: 'User not found'
-            }
-        }
-
         const settingData = await SystemSettings.findAll({});
         if (settingData.length === 0) {
             return {

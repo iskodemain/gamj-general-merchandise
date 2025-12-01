@@ -75,11 +75,7 @@ const AdminContextProvider = (props) => {
   /*---------------------------FETCH ADMIN SETTING DATA-----------------------------*/
   const fetchSettingsData = async () => {
     try {
-      const response = await axios.get(backendUrl + "/api/settings", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-      });
+      const response = await axios.get(backendUrl + "/api/settings");
       if (response.data.success) {
         setSettingsData(response.data.settingData)
       } else {
