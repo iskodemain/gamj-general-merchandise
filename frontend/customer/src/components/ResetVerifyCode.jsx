@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ShopContext } from '../context/ShopContext.jsx'
 import axios from 'axios'
 import { toast } from "react-toastify";
-import OurPolicy from './OurPolicy.jsx'
 import Infos from './Infos.jsx'
 import Footer from './Footer.jsx'
 import './ResetVerifyCode.css'
@@ -87,7 +86,6 @@ const ResetVerifyCode = () => {
         <input type="text" inputMode="numeric" pattern="\d{6}" value={fpVerificationCode} onChange={handleVerifyCode} maxLength={6}  className='rvc-input-code-page' placeholder='Enter the 6-digit code' required/>
         <button type='submit' className='rvc-vc-button' disabled={loading || fpVerificationCode.length !== 6}>{loading ? 'Verifying...' : 'Verify Code'}</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState}from 'react'
 import './Login.css'
-import OurPolicy from '../components/OurPolicy.jsx'
 import Infos from '../components/Infos.jsx'
 import Footer from '../components/Footer.jsx'
 import { ShopContext } from '../context/ShopContext.jsx'
@@ -87,7 +86,6 @@ function Login() {
         <button className='LI-button' disabled={loading || !signInComplete}>{loading ? 'Signing in…' : 'Sign In'}</button>
         <button type="button"  onClick={() => handleStateSignUp()} className='LI-button-next'>Create an Account</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

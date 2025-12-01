@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react'
 import { ShopContext } from '../context/ShopContext.jsx'
 import axios from 'axios'
 import { toast } from "react-toastify";
-import OurPolicy from '../components/OurPolicy.jsx'
 import Infos from '../components/Infos.jsx'
 import Footer from '../components/Footer.jsx'
 import './ForgotPassword.css'
@@ -51,7 +50,6 @@ const ForgotPassword = () => {
         <input onChange={(e)=>setIdentifier(e.target.value)} value={identifier} type="text" className='fp-input-identifier-page' placeholder='Enter your email or phone number' required/>
         <button type='submit' className='fp-button' disabled={loading}>{loading ? 'Sending...' : 'Send Verification Code'}</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

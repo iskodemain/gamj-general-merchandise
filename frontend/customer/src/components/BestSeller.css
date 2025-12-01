@@ -45,23 +45,19 @@
 }
 
 .bs-subtitle {
-    margin-bottom: 2rem;       
+  margin-top: 1rem;
+    margin-bottom: 2rem ;       
     width: 75%;                
     margin-left: auto;         
     margin-right: auto;
     color: #4b5563;            
     line-height: 1.375;  
+    font-size: 1rem;   
 }
 
-@media (min-width: 640px) { 
+@media (max-width: 640px) { 
   .bs-subtitle {
     font-size: 0.875rem;     
-  }
-}
-
-@media (min-width: 768px) { 
-  .bs-subtitle {
-    font-size: 1rem;         
   }
 }
 

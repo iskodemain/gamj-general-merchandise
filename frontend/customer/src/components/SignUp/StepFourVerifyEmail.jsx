@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import OurPolicy from '../OurPolicy.jsx'
 import Infos from '../Infos.jsx'
 import Footer from '../Footer.jsx'
 import Loading from '../Loading.jsx'
@@ -95,7 +94,6 @@ const StepFourVerifyEmail = () => {
         <input type="text" inputMode="numeric" pattern="\d{6}" value={verificationCode} onChange={handleVerifyCode} maxLength={6}  className='sp4-input-code-page' placeholder='Enter the 6-digit code' required/>
         <button type='submit' className='sp4-vc-button' disabled={loading || verificationCode.length !== 6}>{loading ? 'Verifying...' : 'Verify Code'}</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

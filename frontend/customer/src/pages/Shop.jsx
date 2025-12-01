@@ -2,7 +2,6 @@ import React, {useState, useRef, useEffect, useContext} from 'react'
 import MainTitle from '../components/MainTitle'
 import { ShopContext } from '../context/ShopContext.jsx'
 import ProductItem from '../components/ProductItem.jsx';
-import OurPolicy from '../components/OurPolicy.jsx';
 import Infos from '../components/Infos.jsx';
 import Footer from '../components/Footer.jsx';
 import './Shop.css'
@@ -159,7 +158,6 @@ const Shop = () => {
           )}
         </div>
       </div>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

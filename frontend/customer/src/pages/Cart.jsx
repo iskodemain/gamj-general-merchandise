@@ -5,7 +5,6 @@ import { FiMinus } from "react-icons/fi";
 import { FiPlus } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import './Cart.css';
-import OurPolicy from '../components/OurPolicy.jsx';
 import Infos from '../components/Infos.jsx';
 import Footer from '../components/Footer.jsx';
 import { NavLink } from 'react-router-dom';
@@ -380,7 +379,6 @@ function Cart() {
           </>
         )}
       </div>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

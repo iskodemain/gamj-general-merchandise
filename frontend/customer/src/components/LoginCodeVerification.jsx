@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from 'react'
 import { ShopContext } from '../context/ShopContext.jsx'
 import axios from 'axios'
 import { toast } from "react-toastify";
-import OurPolicy from '../components/OurPolicy.jsx'
 import Infos from '../components/Infos.jsx'
 import Footer from '../components/Footer.jsx'
 import './LoginCodeVerification.css'
@@ -99,7 +98,6 @@ const LoginCodeVerification = () => {
         <input type="text" inputMode="numeric" pattern="\d{6}" value={loginVerificationCode} onChange={handleVerifyCode} maxLength={6}  className='lcv-input-code-page' placeholder='Enter the 6-digit code' required/>
         <button type='submit' className='lcv-vc-button' disabled={loading || loginVerificationCode.length !== 6}>{loading ? 'Verifying...' : 'Verify Code'}</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

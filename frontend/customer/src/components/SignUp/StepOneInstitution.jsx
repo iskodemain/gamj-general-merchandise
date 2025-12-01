@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react'
-import OurPolicy from '../OurPolicy.jsx'
 import Infos from '../Infos.jsx'
 import Footer from '../Footer.jsx'
 import './StepOneInstitution.css'
@@ -303,7 +302,6 @@ const StepOneInstitution = () => {
         <button className='sp1-LC-button' type="submit" disabled={!isStepOneComplete}>Proceed to the Next Step</button>
         <button type="button" onClick={handleStateSignIn} className='sp1-LC-button-next' >Already have an account?</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

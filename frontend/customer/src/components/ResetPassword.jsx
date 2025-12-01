@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ShopContext } from '../context/ShopContext.jsx'
 import axios from 'axios'
 import { toast } from "react-toastify";
-import OurPolicy from '../components/OurPolicy.jsx'
 import Infos from '../components/Infos.jsx'
 import Footer from '../components/Footer.jsx'
 import './ResetPassword.css'
@@ -180,7 +179,6 @@ const ResetPassword = () => {
         <button className='RP-button' type="submit" disabled={!isPasswordValid || loading}>
         {loading ? 'Resetting...' : 'Reset Password'} </button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

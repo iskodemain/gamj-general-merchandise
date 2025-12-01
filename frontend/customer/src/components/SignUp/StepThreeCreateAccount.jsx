@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './StepThreeCreateAccount.css'
-import OurPolicy from '../OurPolicy.jsx'
 import Infos from '../Infos.jsx'
 import Loading from '../Loading.jsx'
 import Footer from '../Footer.jsx'
@@ -223,7 +222,6 @@ const StepThreeCreateAccount = () => {
         {loading ? 'Verifying...' : 'Verify Account'}</button>
         <button type="button" onClick={handleBackBtn} className='LC-button-next'>Back</button>
       </form>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

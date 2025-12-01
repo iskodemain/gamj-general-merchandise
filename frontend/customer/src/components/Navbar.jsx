@@ -11,7 +11,7 @@ import { ShopContext } from "../context/ShopContext.jsx";
 import '../pages/Notification.css' // Import the notification styles
 
 function Navbar() {
-  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, navigate, toastSuccess, nbProfileImage, setWishListItems, fetchVerifiedCustomer, fetchNotifications, readNotification} = useContext(ShopContext);
+  const {setShowSearch, getCartCount, getWishlistCount, token, setToken, setCartItems, navigate, toastSuccess, nbProfileImage, setWishListItems, fetchVerifiedCustomer, fetchNotifications, readNotification, settingsData} = useContext(ShopContext);
   const cartCount = getCartCount();
   const wishlistCount = getWishlistCount();
   const [sidebar, setSideBar] = useState(false)
@@ -100,16 +100,26 @@ function Navbar() {
     setShowNotifications(false);
     navigate("/notification");
   }
+
+  const businessLogo = settingsData && settingsData.length > 0 ? settingsData[0].businessLogo : assets.logo;
+  const businessName = settingsData && settingsData.length > 0 ? settingsData[0].businessName : "Default Business Name";
+
   
   return (
     <>
     <div className='navContainer'>
-      {/* LEFT - Logo */}
-      <div className='mainLogo'>
-        <NavLink to="/">
-          <img src={assets.logo} className="gamjLogo" alt="" draggable="false"/>
+      <div className="mainLogo">
+        <NavLink to="/" className="mainLogo-link">
+          <img 
+            src={businessLogo} 
+            className="mainLogo-img" 
+            alt="Logo"
+            draggable="false"
+          />
+          <p className="mainLogo-text">{businessName}</p>
         </NavLink>
       </div>
+
 
       {/* CENTER - Navigation Links */}
       <div className='nav-links'>

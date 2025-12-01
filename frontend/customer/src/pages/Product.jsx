@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, NavLink } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext';
-import OurPolicy from '../components/OurPolicy';
 import Infos from '../components/Infos';
 import Footer from '../components/Footer';
 import './Product.css'
@@ -404,7 +403,6 @@ const Product = () => {
       <div onClick={handleUpScroll}>
         <RelatedProducts category={productData.categoryId}/>
       </div>
-      <OurPolicy/>
       <Infos/>
       <Footer/>
     </div>

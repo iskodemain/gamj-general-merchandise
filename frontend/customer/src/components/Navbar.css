@@ -202,15 +202,43 @@ img {
     width: 100%;
 }
 
-.navContainer .gamjLogo {
-    width: 100%;
-    height: auto;
+.mainLogo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
 }
 
-.navContainer .mainLogo {
-    width: 10rem;
-    margin-right: 3rem;
+.mainLogo-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
 }
+
+/* FIXED LOGO BOX — prevents navbar resizing */
+.mainLogo-img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  flex-shrink: 0;
+
+  /* No dragging */
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.mainLogo-text {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #7ED957;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 .navContainer .allButtons {
     width: 11rem;
@@ -529,11 +557,6 @@ img {
     padding: 0.8rem 1rem;
   }
 
-  /* Reduce logo size */
-  .mainLogo {
-    width: 8rem;
-  }
-
   /* Reduce gap between icons */
   .nav-icons {
     gap: 1rem;
@@ -588,9 +611,6 @@ img {
 
 /* ✅ For very small screens (below 400px) */
 @media (max-width: 420px) {
-  .mainLogo {
-    width: 6rem;
-  }
 
   .burger-menu {
     width: 22px;
@@ -607,6 +627,37 @@ img {
 
   .nav-menu ul li a {
     font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 870px) {
+  .mainLogo-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .mainLogo-text {
+    font-size: 1rem;
+  }
+}
+
+/* For very small screens like 200px–420px */
+@media (max-width: 420px) {
+  .mainLogo-img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mainLogo-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* For ultra small screens (200px width) */
+@media (max-width: 260px) {
+  .mainLogo-text {
+    font-size: 0.8rem;
+    max-width: 90px;
   }
 }
 
