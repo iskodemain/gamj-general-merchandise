@@ -330,9 +330,20 @@ function Orders() {
 
                         if (refundInfo.refundStatus === 'Successfully Processed') {
                           return (
-                            <button className="order-button-container receipt-btn" onClick={() => handleViewReceipt(item.ID)}>
-                              View Receipt
-                            </button>
+                            <>
+                              {refundInfo.refundPaypalEmail ? (
+                                <button className="order-button-container receipt-btn" onClick={() => handleViewReceipt(item.ID)}>View Receipt</button>
+                              ) : (
+                                <div className="delivered-btn-group">
+                                  <div className="delivered-btn-duo">
+                                    <RiDeleteBinFill 
+                                      className="delete-btn" 
+                                      onClick={() => handleRemove(item.ID)}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </>
                           );
                         }
 

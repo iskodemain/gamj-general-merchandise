@@ -19,8 +19,6 @@ import Refund from "./components/Cancellation/Refund";
 import AdminCancel from "./components/Cancellation/AdminCancel";
 import CustomerCancel from "./components/Cancellation/CustomerCancel";
 import ReturnAndRefund from "./components/ReturnAndRefund";
-import ReturnRefundAll from "./components/ReturnRefundAll";
-import ReviewRefund from "./components/ReviewRefund";
 import UnverifiedUsers from "./components/VeriAndUnverified/UnverifiedUsers.jsx";
 import UnverifiedCustomerReview from "./components/VeriAndUnverified/UnverifiedCustomerReview";
 import VerifiedUsers from "./components/VeriAndUnverified/VerifiedUsers.jsx";
@@ -79,8 +77,6 @@ const App = () => {
       <Route path="/admincancel" element={<AdminCancel />} />
       <Route path="/customercancel" element={<CustomerCancel />} />
       <Route path="/returnandrefund" element={<ReturnAndRefund />} />
-      <Route path="/returnrefundall" element={<ReturnRefundAll />} />
-      <Route path="/reviewrefund" element={<ReviewRefund />} />
       <Route path="/unverifiedusers" element={<UnverifiedUsers />} />
       <Route path="/unverifiedcustomerreview" element={<UnverifiedCustomerReview />} />
       <Route path="/verifiedusers" element={<VerifiedUsers />} />

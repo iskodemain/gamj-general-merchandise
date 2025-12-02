@@ -1100,6 +1100,7 @@ const ShopContextProvider = (props) => {
     // (SOCKET IO) - CANCEL ORDER REQUEST
     useEffect(() => {
         socket.on("orderCancelledUpdate", (data) => {
+            console.log(data)
 
             // ✅ Remove the canceled order from state immediately
             setFetchCancelledOrders((prev) =>

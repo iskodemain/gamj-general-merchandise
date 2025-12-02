@@ -238,7 +238,7 @@ function Navbar() {
               }
 
               {!token ? (
-                <button className="profile-dropdown-item" onClick={() => { setShowProfileDropdown(false); navigate('/login'); }}>Login / Register</button>
+                <button className="profile-dropdown-item" onClick={() => { setShowProfileDropdown(false); navigate('/login'); }}>Sign In / Sign Up</button>
               ) : (
                 <button className="profile-dropdown-item logout" onClick={() => { setShowProfileDropdown(false); logout(); }}>Logout</button>
               )}

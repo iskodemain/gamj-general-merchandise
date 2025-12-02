@@ -9,8 +9,10 @@ import Loading from '../Loading';
 const RefundOrderModal = () => {
     const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, cancelOrderRefundRequest } = useContext(ShopContext);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
+
     const [refundInfoComplete, setRefundInfoComplete] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [existingRefund, setExistingRefund] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
 
@@ -103,6 +105,8 @@ const RefundOrderModal = () => {
         setRefundMethod('');
         setRefundPaypalEmail('');
         setOtherReason('');
+        setIsSubmitting(false);
+        setIsCancelling(false);
     }
 
     const handleSubmitRefundOrder = async (e) => {
@@ -130,9 +134,9 @@ const RefundOrderModal = () => {
             }
             
         }
-        setLoading(true); 
+        setIsSubmitting(true); 
         await addOrderRefund(orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus);
-        setLoading(false); 
+        setIsSubmitting(false); 
         handleCloseButton();
     }
 
@@ -143,9 +147,9 @@ const RefundOrderModal = () => {
             return;
         }
 
-        setLoading(true); 
+        setIsCancelling(true); 
         await cancelOrderRefundRequest(orderRefundId, orderItemId);
-        setLoading(false); 
+        setIsCancelling(false);
         setRefundOrder(false);
     };
 
@@ -153,7 +157,7 @@ const RefundOrderModal = () => {
         if (!existingRefund) {
             return (
             <button type="submit" className="refund-request-btn" disabled={!refundInfoComplete}>
-                Submit Return Request
+                {isSubmitting  ? "Submitting..." : "Submit Return Request"}
             </button>
             );
         }
@@ -161,7 +165,7 @@ const RefundOrderModal = () => {
         if (existingRefund.refundStatus === 'Pending') {
             return (
             <button type="button" className="refund-request-btn cancel-btn" onClick={() => handleCancelRefundRequest(existingRefund.ID, existingRefund.orderItemId)}>
-                {loading ? "Cancelling..." : "Cancel Request"}
+                {isCancelling ? "Cancelling..." : "Cancel Request"}
             </button>
             );
         } 
@@ -179,7 +183,7 @@ const RefundOrderModal = () => {
 
   return (
     <div className='refund-order-bg'>
-        {(loading || modalLoading) && <Loading />}
+        {(isSubmitting || isCancelling || modalLoading) && <Loading />}
         <form onSubmit={handleSubmitRefundOrder}  className='refund-modal-card'>
             <IoCloseOutline className="close-refund-btn" onClick={handleCloseButton}/>
             <div className="refund-content-ctn">
@@ -189,9 +193,11 @@ const RefundOrderModal = () => {
                     <label>1. Select the reason for your return</label>
                     <select value={reasonForRefund} onChange={(e) => setReasonForRefund(e.target.value)} className='cancel-input' disabled={isDisabled}>
                     <option value="" disabled hidden>Select Reason</option>
-                    <option value="Change of mind">Change of mind</option>
-                    <option value="Ordered by mistake">Ordered by mistake</option>
-                    <option value="Found a better price">Found a better price</option>
+                    <option value="Order not received">Order not received</option>
+                    <option value="Incomplete product received">Incomplete product received</option>
+                    <option value="Incorrect product received">Incorrect product received</option>
+                    <option value="Physically damaged product">Physically damaged product</option>
+                    <option value="Defective product received">Defective product received</option>
                     <option value="Other">Other</option>
                     </select>
                     <textarea value={refundComments} onChange={(e) => setRefundComments(e.target.value)} className='refund-textarea' placeholder="Additional Comments (optional)" disabled={isDisabled}/>

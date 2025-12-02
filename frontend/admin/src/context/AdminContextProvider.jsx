@@ -42,7 +42,141 @@ const AdminContextProvider = (props) => {
   const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
   const [fetchReturnRefundOrders, setFetchReturnRefundOrders] = useState([]);
   const [adminProfileInfo, setAdminProfileInfo] = useState([]);
-  const [settingsData, setSettingsData] = useState([])
+  const [settingsData, setSettingsData] = useState([]);
+  const [fetchRefundProof, setFetchRefundProof] = useState([]);
+
+  /*---------------------------SUBMIT REFUND PROOF-----------------------------*/
+  const submitRefundProof = async (payload) => {
+    if (token) {
+      try {
+        const response = await axios.post(backendUrl + "/api/order/submit-refund-proof", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------REJECTED  REFUND REQUEST-----------------------------*/
+  const rejectRefundRequest = async (refundID, newStatus, rejectedReason) => {
+    if (token) {
+      const payload = {refundID, newStatus, rejectedReason};
+      try {
+        const response = await axios.patch(backendUrl + "/api/order/reject-refund-request", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------SUCCESSFULLY PROCESSED REFUND-----------------------------*/
+  const successfullyProcessedRefund = async (refundID, newStatus) => {
+    if (token) {
+      const payload = {refundID, newStatus};
+      try {
+        const response = await axios.patch(backendUrl + "/api/order/success-refund-process", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------APPROVED REFUND REQUEST-----------------------------*/
+  const approveRefundRequest = async (refundID, newStatus) => {
+    if (token) {
+      const payload = {refundID, newStatus};
+      try {
+        const response = await axios.patch(backendUrl + "/api/order/approve-refund-request", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------PROCESS REFUND REQUEST-----------------------------*/
+  const processRefundRequest = async (refundID, newStatus) => {
+    if (token) {
+      const payload = {refundID, newStatus};
+      try {
+        const response = await axios.patch(backendUrl + "/api/order/process-refund-request", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------FETCH REFUND PROOF-----------------------------*/
+  const handleFetchSettingsData = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/order/list-refund-proof", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setFetchRefundProof(response.data.refundProof)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchSettingsData();
+      }
+  }, [token]);
 
   /*---------------------------CHANGE SETTINGS DATA-----------------------------*/
   const handleChangeSettingsData = async (payload) => {
@@ -703,7 +837,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof
   }  
   return (
     <AdminContext.Provider value={value}>

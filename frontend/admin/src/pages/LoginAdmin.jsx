@@ -46,7 +46,7 @@ function LoginAdmin() {
     <div className="login-bg">
       {loading && <Loading />}
       <div className="login-card">
-        <h2 className="login-title">Login</h2>
+        <h2 className="login-title">Log In</h2>
         <div className="login-logo">
           <div className="logo-icon">
             <img src={assets.gamj_logo} alt="Gamj shop" />
@@ -69,7 +69,7 @@ function LoginAdmin() {
               </div>
             </div>
           </label>
-          <button className="sign-in-btn" type="submit">Sign In</button>
+          <button className="sign-in-btn" type="submit">Log In</button>
         </form>
       </div>
     </div>
