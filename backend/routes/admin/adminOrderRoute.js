@@ -1,6 +1,6 @@
 import express from 'express';
 import adminAuth from '../../middleware/adminAuth.js';
-import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof } from '../../controllers/admin/adminOrderController.js';
+import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem } from '../../controllers/admin/adminOrderController.js';
 
 import upload from '../../middleware/multer.js';
 
@@ -21,8 +21,13 @@ adminOrderRouter.patch('/approve-refund-request', adminAuth, approveRefundReques
 adminOrderRouter.patch('/success-refund-process', adminAuth, sucessfullyProcessedRefund);
 adminOrderRouter.patch('/reject-refund-request', adminAuth, rejectedRefundRequest);
 
+adminOrderRouter.patch('/cancel/submit-as-completed', adminAuth, cancelSubmitAsCompleted);
 
-// CREATE
+// DELETE
+adminOrderRouter.patch('/admin/delete-order-item', adminAuth, adminDeleteOrderItem);
+
+
+// CREATE FOR RETURN/REFUND
 adminOrderRouter.post(
   '/submit-refund-proof',
   upload.fields([
@@ -30,6 +35,17 @@ adminOrderRouter.post(
   ]),
   adminAuth,
   submitRefundProof
+);
+
+
+// CREATE FOR ORDER CANCELLATION
+adminOrderRouter.post(
+  '/cancel/submit-refund-proof',
+  upload.fields([
+    { name: "receiptImage", maxCount: 1 }
+  ]),
+  adminAuth,
+  cancelSubmitAsRefund
 );
 
 

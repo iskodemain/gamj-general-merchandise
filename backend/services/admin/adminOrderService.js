@@ -514,8 +514,8 @@ export const sucessfullyProcessedRefundService = async (adminId, refundID, newSt
     }
 
     // Find refund order
-    const succesProcessedRefund = await OrderRefund.findByPk(refundID);
-    if (!succesProcessedRefund) {
+    const successProcessedRefund = await OrderRefund.findByPk(refundID);
+    if (!successProcessedRefund) {
       return {
         success: false,
         message: "Success processed refund not found"
@@ -523,13 +523,13 @@ export const sucessfullyProcessedRefundService = async (adminId, refundID, newSt
     }
 
     // Update status
-    succesProcessedRefund.refundStatus = newStatus;
-    await succesProcessedRefund.save();
+    successProcessedRefund.refundStatus = newStatus;
+    await successProcessedRefund.save();
 
     return {
       success: true,
       message: "Processed Refund successfully",
-      updatedRefund: succesProcessedRefund,
+      updatedRefund: successProcessedRefund,
     };
 
   } catch (error) {
@@ -683,7 +683,179 @@ export const submitRefundProofService = async (adminId, body, file) => {
   }
 };
 
+// CANCELLED ORDER BY CUSTOMER
+
+export const cancelSubmitAsRefundService = async (adminId, body, file) => {
+  try {
+    // ----------------------------------
+    // 1. Validate admin
+    // ----------------------------------
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: "Admin user not found"
+      };
+    }
+
+    // ----------------------------------
+    // 2. Find refund order
+    // ----------------------------------
+    const orderCancel = await OrderCancel.findByPk(body.cancelID);
+    if (!orderCancel) {
+      return {
+        success: false,
+        message: "Submit as refund not found"
+      };
+    }
+
+    // ----------------------------------
+    // 3. Update refund status
+    // ----------------------------------
+    orderCancel.cancellationStatus = body.newStatus;
+    await orderCancel.save();
+
+    // ----------------------------------
+    // 4. Validate customer
+    // ----------------------------------
+    const customer = await Customer.findByPk(body.customerID);
+    if (!customer) {
+      return {
+        success: false,
+        message: "Customer not found"
+      };
+    }
+
+    // ----------------------------------
+    // 5. Upload image to Cloudinary
+    // ----------------------------------
+   let cloudResult = null;
+
+    if (file?.receiptImage?.[0]) {
+      try {
+        cloudResult = await cloudinary.uploader.upload(
+          file.receiptImage[0].path,
+          {
+            folder: "gamj/refundReceipt",
+            resource_type: "image"
+          }
+        );
+      } catch (err) {
+        return {
+          success: false,
+          message: "Image upload failed",
+          error: err.message
+        };
+      }
+
+      // Delete local image after upload
+      try {
+        await fs.unlink(file.receiptImage[0].path);
+      } catch (unlinkErr) {
+        console.error("Image unlink failed: ", unlinkErr.message);
+      }
+    }
+
+    // ----------------------------------
+    // 6. Save RefundProof record
+    // ----------------------------------
+    await RefundProof.create({
+      customerId: body.customerID,
+      cancelId: body.cancelID,
+      refundAmount: body.refundAmount,
+      receiptImage: cloudResult ? cloudResult.secure_url : body.receiptImage,
+      transactionID: body.transactionID
+    }, {
+      fields: [
+        'customerId',
+        'cancelId',
+        'refundAmount',
+        'receiptImage',
+        'transactionID'
+      ]
+    });
+
+    return {
+      success: true,
+      message: "Successfully Refunded",
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
 
+export const cancelSubmitAsCompletedService = async (adminId, cancelID, newStatus) => {
+  try {
+    // Verify admin exists
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: "Admin user not found"
+      };
+    }
+
+    // Find refund order
+    const orderCancel = await OrderCancel.findByPk(cancelID);
+    if (!orderCancel) {
+      return {
+        success: false,
+        message: "Order cancel submit as completed not found"
+      };
+    }
+
+    // Update status
+    orderCancel.cancellationStatus = newStatus;
+    await orderCancel.save();
+
+    return {
+      success: true,
+      message: "Submit as completed successfully",
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+
+export const adminDeleteOrderItemService = async (adminId, orderItemID) => {
+  try {
+    // Verify admin exists
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: "Admin user not found"
+      };
+    }
+
+    // Find refund order
+    const orderItem = await OrderItems.findByPk(orderItemID);
+    if (!orderItem) {
+      return {
+        success: false,
+        message: "Order item not found"
+      };
+    }
+
+    // Update status
+    orderItem.isDeletedByAdmin = 1;
+    await orderItem.save();
+
+    return {
+      success: true,
+      message: "Successfully deleted",
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
 

@@ -22,7 +22,7 @@ const STATUS_OPTIONS = [
 ];
 
 function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
-  const { handleChangeOrderStatus } = useContext(AdminContext);
+  const { handleChangeOrderStatus, adminDeleteOrderItem } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   const [items, setItems] = useState([]);
@@ -56,7 +56,7 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   useEffect(() => {
     if (!order) return;
 
-    const filteredItems =
+    let filteredItems =
       orderStatus && order.items
         ? order.items.filter((i) => i.status === orderStatus)
         : order.items || [];
@@ -70,7 +70,6 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
     setCancelModalOpen(false);
     setCancelItem(null);
   }, [order, orderStatus]);
-
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
