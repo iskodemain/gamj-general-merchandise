@@ -1,10 +1,14 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import "./CancelReason.css";
 import { AdminContext } from "../../context/AdminContextProvider";
+import { FaArrowLeft } from "react-icons/fa6";
+import Loading from "../../../../customer/src/components/Loading";
+import { toast } from "react-toastify";
 
 function CancelReason({ item = null, onClose = () => {} }) {
-  const { fetchOrders, fetchOrderItems, fetchCancelledOrders, customerList } = useContext(AdminContext);
+  const { fetchOrders, fetchOrderItems, fetchCancelledOrders, customerList, cancelSubmitAsRefund, toastError, fetchRefundProof, cancelSubmitAsCompleted, adminDeleteOrderItem } = useContext(AdminContext);
 
+  const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [localCancelRecord, setLocalCancelRecord] = useState(null);
@@ -24,48 +28,71 @@ function CancelReason({ item = null, onClose = () => {} }) {
   useEffect(() => {
     if (!item) return;
 
-    const orderItem = fetchOrderItems.find((oi) => oi.ID === item.id) || null;
+    // 1. Find ORDER ITEM
+    const orderItem = fetchOrderItems?.find(
+      (oi) => Number(oi.ID) === Number(item.id)
+    ) || null;
+
+    // 2. Find ORDER RECORD
     const orderRec = orderItem
-      ? fetchOrders.find((o) => o.ID === orderItem.orderId) || null
+      ? fetchOrders?.find((o) => Number(o.ID) === Number(orderItem.orderId)) || null
       : null;
 
+    // 3. Find CUSTOMER
     const cust = orderRec
-      ? customerList.find((c) => c.ID === orderRec.customerId) || null
+      ? customerList?.find((c) => Number(c.ID) === Number(orderRec.customerId)) || null
       : null;
 
+    // 4. Find CANCEL RECORD
     const cancelRec =
-      fetchCancelledOrders.find(
+      fetchCancelledOrders?.find(
         (c) =>
           Number(c.orderItemId) === Number(item.id) &&
-          (orderRec ? Number(c.customerId) === Number(orderRec.customerId) : true)
+          (orderRec
+            ? Number(c.customerId) === Number(orderRec.customerId)
+            : true)
       ) || null;
 
     setOrderData(orderRec);
     setCustomer(cust);
     setLocalCancelRecord(cancelRec);
 
+    // Reset fields
     setPaypalEmailInput(cancelRec?.cancelPaypalEmail || "");
-    setRefundAmount(cancelRec?.refundAmount || "");
-    setPaypalTxId(cancelRec?.paypalTransactionId || "");
-    setProofPreviewUrl(cancelRec?.proofUrl || "");
+    setRefundAmount("");
+    setPaypalTxId("");
+    setProofFile(null);
+    setProofPreviewUrl("");
 
-    setLocalCancellationStatus(
-      cancelRec?.cancellationStatus || item.cancellationStatus || item.status || ""
-    );
+    // 5. Find REFUND PROOF for CANCELLATION
+    if (cancelRec && fetchRefundProof?.length > 0) {
+      const foundProof = fetchRefundProof.find(
+        (p) => Number(p.cancelId) === Number(cancelRec.ID)
+      );
 
-    if (
-      cancelRec?.cancellationStatus === "Refunded" ||
-      cancelRec?.cancellationStatus === "Completed"
-    ) {
-      setRefundStarted(true);
+      if (foundProof) {
+        setRefundAmount(foundProof.refundAmount || "");
+        setProofPreviewUrl(foundProof.receiptImage || "");
+        setPaypalTxId(foundProof.transactionID || "");
+      }
     }
+
+    // 6. Local Status Handling
+    const status =
+      cancelRec?.cancellationStatus || item?.cancellationStatus || item?.status || "";
+
+    setLocalCancellationStatus(status);
+    setRefundStarted(status === "Refunded" || status === "Completed");
+
   }, [
     item,
     fetchOrders,
     fetchOrderItems,
     fetchCancelledOrders,
-    customerList,
+    fetchRefundProof,
+    customerList
   ]);
+
 
   const paymentMethod = useMemo(
     () => orderData?.paymentMethod || "—",
@@ -84,66 +111,89 @@ function CancelReason({ item = null, onClose = () => {} }) {
   };
 
   const handleProceedRefund = () => {
-    if (!paypalEmailInput.trim()) {
-      alert("Enter PayPal Email.");
-      return;
-    }
-
-    setLocalCancelRecord((prev) =>
-      prev
-        ? { ...prev, cancelPaypalEmail: paypalEmailInput }
-        : prev
-    );
-
-    setRefundStarted(true);
+    setRefundStarted(true)
   };
 
-  const handleSubmitAsRefunded = () => {
-    if (!refundAmount || Number.isNaN(Number(refundAmount))) {
-      alert("Enter refund amount.");
-      return;
+  const handleSubmitAsRefunded = async () => {
+    if (!localCancelRecord || !orderData) return;
+
+    if (!refundAmount || isNaN(Number(refundAmount))) {
+      return toast.error("Invalid amount.", toastError);
     }
-    if (!proofFile && !proofPreviewUrl) {
-      alert("Upload proof.");
-      return;
+
+    if (!proofPreviewUrl) {
+      return toast.error("Upload proof.", toastError);
     }
+
     if (!paypalTxId.trim()) {
-      alert("Enter PayPal Transaction ID.");
-      return;
+      return toast.error("Enter PayPal TxID.", toastError);
     }
 
-    setLocalCancelRecord((prev) =>
-      prev
-        ? {
-            ...prev,
-            cancellationStatus: "Refunded",
-            refundAmount,
-            proofUrl: proofPreviewUrl,
-            paypalTransactionId: paypalTxId,
-          }
-        : prev
-    );
+    const formData = new FormData();
+    formData.append("newStatus", "Refunded");
+    formData.append("customerID", localCancelRecord.customerId);
+    formData.append("cancelID", localCancelRecord.ID);
+    formData.append("refundAmount", refundAmount);
+    formData.append("transactionID", paypalTxId.trim());
 
-    setLocalCancellationStatus("Refunded");
+    if (proofFile) {
+      formData.append("receiptImage", proofFile);
+    }
+
+    else if (proofPreviewUrl) {
+      formData.append("receiptImage", proofPreviewUrl);
+    }
+
+    setLoading(true);
+    const success = await cancelSubmitAsRefund(formData);
+    setLoading(false);
+
+    if (success) {
+      setTimeout(() => window.location.reload(), 500);
+    }
   };
 
-  const handleSubmitAsCompleted = () => {
-    setLocalCancelRecord((prev) =>
-      prev ? { ...prev, cancellationStatus: "Completed" } : prev
-    );
-    setLocalCancellationStatus("Completed");
+  const handleSubmitAsCompleted = async() => {
+    if (!localCancelRecord) return;
+
+    setLoading(true);
+
+    const success = await cancelSubmitAsCompleted(localCancelRecord.ID, "Completed");
+    setLoading(false);
+
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
   };
 
-  const handleDeleteCancel = () => {
-    if (!window.confirm("Delete this cancellation record?")) return;
-    setLocalCancelRecord(null);
-    setLocalCancellationStatus("");
-    onClose();
+  const handleDeleteCancel = async () => {
+    if (!localCancelRecord) return;
+
+    setLoading(true);
+
+    const success = await adminDeleteOrderItem(localCancelRecord.orderItemId);
+    setLoading(false);
+
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
   };
 
   const cancelExists = Boolean(localCancelRecord);
 
   return (
+    <>
+    {loading && <Loading />}
+    <div className="return-viewall-topbar">
+        <button className="return-viewall-back-btn" onClick={onClose}>
+          <FaArrowLeft />
+        </button>
+        <div className="return-viewall-order-title">Back</div>
+      </div>
     <div className="cr-page">
       <div className="cr-root">
 
@@ -238,13 +288,13 @@ function CancelReason({ item = null, onClose = () => {} }) {
                       placeholder="customer-paypal@example.com"
                       value={paypalEmailInput}
                       onChange={(e) => setPaypalEmailInput(e.target.value)}
+                      readOnly
                     />
 
                     <div className="cr-action-row">
                       <button
                         className="cr-primary-btn"
                         onClick={handleProceedRefund}
-                        disabled={!paypalEmailInput.trim()}
                       >
                         Proceed with Refund Process
                       </button>
@@ -266,7 +316,7 @@ function CancelReason({ item = null, onClose = () => {} }) {
 
                   <label className="cr-label">2. Upload an image or screenshot of your refund payment receipt</label>
 
-                  {!proofPreviewUrl ? (
+                  {!proofPreviewUrl && (
                     <label className="cr-upload-img">
                       <span className="cr-upload-text">
                         Upload Proof of Refund Payment
@@ -277,7 +327,9 @@ function CancelReason({ item = null, onClose = () => {} }) {
                         onChange={handleProofFile}
                       />
                     </label>
-                  ) : (
+                  )}
+
+                  {proofPreviewUrl && localCancellationStatus === "Processing" &&
                     <label className="cr-upload-img-active">
                       <span className="cr-upload-text-active">
                         Change Proof of Refund Payment
@@ -288,7 +340,7 @@ function CancelReason({ item = null, onClose = () => {} }) {
                         onChange={handleProofFile}
                       />
                     </label>
-                  )}
+                  }
 
                   {proofPreviewUrl && (
                     <img className="cr-proof-preview" src={proofPreviewUrl} alt="proof" />
@@ -308,10 +360,7 @@ function CancelReason({ item = null, onClose = () => {} }) {
                       <button
                         className="cr-primary-btn"
                         onClick={handleSubmitAsRefunded}
-                        disabled={
-                          !refundAmount ||
-                          !paypalTxId.trim() ||
-                          (!proofFile && !proofPreviewUrl)
+                        disabled={ !refundAmount || !paypalTxId.trim() || (!proofFile && !proofPreviewUrl)
                         }
                       >
                         Submit as Refunded
@@ -368,28 +417,19 @@ function CancelReason({ item = null, onClose = () => {} }) {
                     <label className="cr-label">1. Total Refund Amount</label>
                     <input
                       className="cr-input"
-                      value={localCancelRecord?.refundAmount || ""}
+                      value={refundAmount}
                       readOnly
                     />
 
                     <label className="cr-label">2. Proof of Payment</label>
-                    {localCancelRecord?.proofUrl ? (
-                      <a
-                        className="cr-proof-link"
-                        href={localCancelRecord.proofUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View Proof
-                      </a>
-                    ) : (
-                      <div>No proof uploaded</div>
+                    {proofPreviewUrl && (
+                      <img className="cr-proof-preview" src={proofPreviewUrl} alt="proof" />
                     )}
 
                     <label className="cr-label">3. PayPal Transaction ID</label>
                     <input
                       className="cr-input"
-                      value={localCancelRecord?.paypalTransactionId || ""}
+                      value={paypalTxId}
                       readOnly
                     />
 
@@ -404,15 +444,9 @@ function CancelReason({ item = null, onClose = () => {} }) {
             </>
           )}
         </div>
-
-        <div className="cr-footer">
-          <button className="cr-secondary-btn" onClick={onClose}>
-            Back
-          </button>
-        </div>
-
       </div>
     </div>
+    </>
   );
 }
 

@@ -43,7 +43,72 @@ const AdminContextProvider = (props) => {
   const [fetchReturnRefundOrders, setFetchReturnRefundOrders] = useState([]);
   const [adminProfileInfo, setAdminProfileInfo] = useState([]);
   const [settingsData, setSettingsData] = useState([]);
-  const [fetchRefundProof, setFetchRefundProof] = useState([]);
+  const [fetchRefundProof, setFetchRefundProof] = useState([]); 
+
+  /*---------------------------DELETE ORDER ITEM-----------------------------*/
+  const adminDeleteOrderItem = async (orderItemID) => {
+    if (token) {
+      try {
+        const response = await axios.patch(backendUrl + "/api/order/admin/delete-order-item", {orderItemID}, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------SUCCESSFULLY PROCESSED REFUND-----------------------------*/
+  const cancelSubmitAsCompleted = async (cancelID, newStatus) => {
+    if (token) {
+      const payload = {cancelID, newStatus};
+      try {
+        const response = await axios.patch(backendUrl + "/api/order/cancel/submit-as-completed", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
+
+  /*---------------------------CANCEL SUBMIT AS REFUND-----------------------------*/
+  const cancelSubmitAsRefund = async (payload) => {
+    if (token) {
+      try {
+        const response = await axios.post(backendUrl + "/api/order/cancel/submit-refund-proof", payload, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+        });
+        if (response.data.success) {
+            toast.success(response.data.message, { ...toastSuccess });
+            return true
+        } else {
+          toast.error(response.data.message, { ...toastError });
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    }
+  }
 
   /*---------------------------SUBMIT REFUND PROOF-----------------------------*/
   const submitRefundProof = async (payload) => {
@@ -837,7 +902,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem
   }  
   return (
     <AdminContext.Provider value={value}>
