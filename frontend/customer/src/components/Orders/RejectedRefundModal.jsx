@@ -1,4 +1,4 @@
-import {React, useState, useContext } from 'react'
+import {React, useState, useContext, useEffect } from 'react'
 import './RejectedRefundModal.css'
 import { ShopContext } from '../../context/ShopContext';
 import { IoCloseOutline } from "react-icons/io5";
@@ -6,15 +6,28 @@ import Loading from '../Loading';
 import { assets } from '../../assets/assets';
 
 const RejectedRefundModal = () => {
-    const { setShowRejectedRefund, orderItemId } = useContext(ShopContext);
+    const { setShowRejectedRefund, orderItemId, fetchOrderRefund } = useContext(ShopContext);
 
     const [loading, setLoading] = useState(false);
+    const [record, setRecord] = useState(null);
 
     const handleCloseButton = () => {
         setShowRejectedRefund(false);
     }
 
-    // Fetch the rejected refund message from the admin later
+    useEffect(() => {
+        if (!orderItemId) return;
+
+        // Try find in refundOrders (for Return/Refund)
+        const refundFound = fetchOrderRefund?.find(r => Number(r.orderItemId) === Number(orderItemId));
+        if (refundFound) {
+            setRecord(refundFound);
+            return;
+        }
+
+        setRecord(null);
+    }, [orderItemId, fetchOrderRefund]);
+
 
   return (
     <div className='rejectfund-order-bg'>
@@ -25,7 +38,7 @@ const RejectedRefundModal = () => {
                     <p className='rejectfund-title'>Return/Refund Request Rejected</p>
                     <div className='refund-reason'>
                         <label>1. Reason for rejecting your refund request</label>
-                        <textarea value={'After reviewing your request, we found that the item was delivered in good condition and matched the order details. Since there were no reported issues or damages at the time of delivery, this order does not qualify for a refund under our policy.'} disabled/>
+                        <textarea value={record?.rejectedReason || ""} disabled />
                     </div>
 
                     <button className='refund-submit-btn' type='button' onClick={handleCloseButton}>Okay, got it</button>

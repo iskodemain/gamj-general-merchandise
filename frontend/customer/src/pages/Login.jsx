@@ -84,7 +84,7 @@ function Login() {
             <button onClick={() => navigate('/forgot-password')}  className='li-fp-button'>Forgot Password?</button>
         </div>
         <button className='LI-button' disabled={loading || !signInComplete}>{loading ? 'Signing in…' : 'Sign In'}</button>
-        <button type="button"  onClick={() => handleStateSignUp()} className='LI-button-next'>Create an Account</button>
+        <button type="button"  onClick={() => handleStateSignUp()} className='LI-button-next'>Sign Up</button>
       </form>
       <Infos/>
       <Footer/>

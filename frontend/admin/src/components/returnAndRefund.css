@@ -1,0 +1,346 @@
+.return-refund-back-ctn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 0;
+  width: 7rem;
+  margin-bottom: 1rem;
+}
+
+.return-refund-back-btn {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.return-refund-text-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.return-refund-empty {
+  padding: 18px;
+  text-align: center;
+  color: #383737;
+}
+
+.return-refund-container {
+  padding: 2rem;
+  background: #EFFFF1;
+  min-height: 100vh;
+}
+
+.return-refund-page {
+  background: transparent;
+}
+
+.return-refund-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.return-refund-card {
+  border: 1px solid #B5B5B5;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px 0 rgba(11, 12, 12, 0.12);
+  padding: 20px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.return-refund-inner {
+  display: flex;
+  gap: 23px;
+}
+
+.return-refund-left {
+  flex: 1.1;
+  border-right: 1px solid #f2f2f2;
+  padding-right: 18px;
+  min-width: 0;
+}
+
+.return-refund-item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.return-refund-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #fafafa;
+}
+
+.return-refund-item-img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+
+.return-refund-item-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.return-refund-item-name {
+  font-weight: 600;
+  color: #494949;
+  margin-bottom: 6px;
+  font-family: "Outfit", sans-serif;
+}
+
+.return-refund-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #6c6c6c;
+  align-items: flex-start;
+}
+
+.return-refund-item-qtyblock {
+  display: flex;
+  font-size: 14px;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.return-refund-item-specs {
+  display: flex;
+  color: #6c6c6c;
+}
+
+.return-refund-item-price {
+  font-weight: 700;
+  color: #494949;
+  margin-top: 4px;
+  font-family: "Outfit", sans-serif;
+}
+
+.return-refund-right {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 150px;
+}
+
+.return-refund-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.return-refund-number {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  color: #2B2B2B;
+}
+
+.return-refund-total {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #111;
+}
+
+.return-refund-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.return-refund-info-row {
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+  font-size: 0.92rem;
+}
+
+.return-refund-info-label {
+  font-weight: 700;
+  color: #777;
+  font-family: "Inter", sans-serif;
+}
+
+.return-refund-customer-block {
+  border-top: 1px solid #f2f2f2;
+  padding-top: 10px;
+  color: #444;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.return-refund-cust-name {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.return-refund-cust-address {
+  white-space: pre-line;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.return-refund-cust-contact {
+  color: #8a8a8a;
+  display: flex;
+  flex-direction: column;
+}
+
+.return-refund-viewall-btn {
+  position: absolute;
+  right: 20px;
+  top: 10%;
+  transform: translateY(-50%);
+  background: #43A047;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+}
+
+.return-refund-viewall-btn:hover {
+  background: #00c42a;
+}
+
+@media (max-width: 920px) {
+  .return-refund-inner {
+    flex-direction: column;
+  }
+
+  .return-refund-left {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .return-refund-right {
+    padding-right: 0;
+  }
+
+  .return-refund-viewall-btn {
+    position: static;
+    transform: none;
+    align-self: flex-end;
+    margin-top: 8px;
+  }
+}
+
+/* MOBILE LARGE */
+@media (max-width: 600px) {
+  .return-refund-container {
+    padding: 1.2rem;
+  }
+
+  .return-refund-text-title {
+    font-size: 1.15rem;
+  }
+
+  .return-refund-card {
+    padding: 16px;
+  }
+
+  .return-refund-item-img {
+    width: 54px;
+    height: 54px;
+  }
+
+  .return-refund-item-name {
+    font-size: 0.95rem;
+  }
+
+  .return-refund-total {
+    font-size: 1.1rem;
+  }
+
+  .return-refund-info-row {
+    font-size: 0.85rem;
+  }
+
+  .return-refund-customer-block {
+    font-size: 0.85rem;
+  }
+
+  .return-refund-viewall-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* MOBILE SMALL (350px–250px) */
+@media (max-width: 350px) {
+  .return-refund-back-ctn {
+    gap: 8px;
+  }
+
+  .return-refund-text-title {
+    font-size: 1rem;
+  }
+
+  .return-refund-card {
+    padding: 12px;
+  }
+
+  .return-refund-top {
+    flex-direction: column;
+  }
+
+  .return-refund-item-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .return-refund-item-name {
+    font-size: 0.78rem;
+  }
+
+  .return-refund-item-qtyblock {
+    font-size: 0.7rem;
+  }
+
+  .return-refund-item-price {
+    font-size: 0.8rem;
+  }
+
+  .return-refund-number, .return-refund-total {
+    font-size: 0.8rem;
+  }
+
+  .return-refund-info-row {
+    font-size: 0.6rem;
+  }
+
+  .return-refund-customer-block {
+    font-size: 0.6rem;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .return-refund-viewall-btn {
+    font-size: 0.78rem;
+    padding: 7px 10px;
+    align-self: flex-start; 
+  }
+}

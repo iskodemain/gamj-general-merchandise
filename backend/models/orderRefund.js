@@ -76,6 +76,10 @@ const OrderRefund = sequelize.define(
       allowNull: false,
       defaultValue: 'Pending',
     },
+    rejectedReason: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     dateRequest: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
