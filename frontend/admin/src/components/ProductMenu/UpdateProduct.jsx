@@ -603,33 +603,7 @@ function UpdateProduct() {
 
   // ----- Delete handler (if AdminContext provides deleteProduct) -----
   const handleDelete = async () => {
-    if (!productID) {
-      toast.error("Unable to determine product to delete.", { ...toastError });
-      return;
-    }
-    if (!deleteProduct) {
-      toast.error("Delete operation not available. Implement deleteProduct in AdminContext.", { ...toastError });
-      console.warn("AdminContext.deleteProduct not available.");
-      return;
-    }
-
     if (!window.confirm("Delete this product? This action cannot be undone.")) return;
-
-    setLoading(true);
-    try {
-      // attempt both identifiers; context implementation can check which one it wants
-      const payload = new FormData();
-      if (productID) payload.append('ID', productID);
-
-      await deleteProduct(payload);
-      toast.success("Product deleted.");
-      navigate('/products/totalproduct');
-    } catch (err) {
-      console.error('Delete failed:', err);
-      toast.error(err?.message || 'Failed to delete product', { ...toastError });
-    } finally {
-      setLoading(false);
-    }
   };
 
   // --- render

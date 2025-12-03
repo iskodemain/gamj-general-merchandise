@@ -44,6 +44,106 @@ const AdminContextProvider = (props) => {
   const [adminProfileInfo, setAdminProfileInfo] = useState([]);
   const [settingsData, setSettingsData] = useState([]);
   const [fetchRefundProof, setFetchRefundProof] = useState([]); 
+  const [fetchInventoryStock, setFetchInventoryStock] = useState([]); 
+  const [fetchInventoryBatch, setFetchInventoryBatch] = useState([]); 
+  const [fetchInventoryHistory, setFetchInventoryHistory] = useState([]); 
+
+  
+  /*--------------------------- ADD STOCK (SINGLE ENTRY POINT) -----------------------------*/
+  const addStock = async (payload) => {
+    if (!token) return;
+
+    try {
+      const response = await axios.post(
+        backendUrl + "/api/inventory/add-stock",
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        toast.success(response.data.message, { ...toastSuccess });
+        return response.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error processing stock-in.", { ...toastError });
+      return null;
+    }
+  };
+
+  /*---------------------------FETCH HISTORY BATCH-----------------------------*/
+  const handleFetchInventoryHistory = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/inventory/history", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setFetchInventoryHistory(response.data.inventoryHistory)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchInventoryHistory();
+      }
+  }, [token]);
+
+  /*---------------------------FETCH INVENTORY BATCH-----------------------------*/
+  const handleFetchInventoryBatch = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/inventory/batch", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setFetchInventoryBatch(response.data.inventoryBatch)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchInventoryBatch();
+      }
+  }, [token]);
+
+
+  /*---------------------------FETCH INVENTORY STOCK-----------------------------*/
+  const handleFetchInventoryStock = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/inventory/stock", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setFetchInventoryStock(response.data.inventoryStock)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchInventoryStock();
+      }
+  }, [token]);
+
 
   /*---------------------------DELETE ORDER ITEM-----------------------------*/
   const adminDeleteOrderItem = async (orderItemID) => {
@@ -902,7 +1002,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory
   }  
   return (
     <AdminContext.Provider value={value}>

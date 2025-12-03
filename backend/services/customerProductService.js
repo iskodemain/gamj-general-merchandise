@@ -3,8 +3,10 @@ import Category from "../models/category.js";
 import VariantName from "../models/variantName.js";
 import ProductVariantValues from "../models/productVariantValues.js";
 import ProductVariantCombination from "../models/productVariantCombination.js";
-import {v2 as cloudinary} from 'cloudinary';
-import fs from 'fs/promises';
+import InventoryStock from "../models/inventoryStock.js";
+
+
+
 
 // ALL PRODUCTS 
 // Add Product ---- ADMIN PART
@@ -442,6 +444,29 @@ export const fetchProductCategoryService = async () => {
         return {
             success: true,
             productCategory
+        };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+
+export const fetchInventoryStockService = async () => {
+    try {
+        const inventoryStock = await InventoryStock.findAll({});
+        if (inventoryStock.length === 0) {
+            return {
+                success: true,
+                inventoryStock: [],
+            };
+        }
+
+
+        return {
+            success: true,
+            inventoryStock,
         };
 
     } catch (error) {

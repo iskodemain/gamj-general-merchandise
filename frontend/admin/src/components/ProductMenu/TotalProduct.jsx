@@ -117,7 +117,7 @@ function TotalProduct() {
                 <th className="left">Name</th>
                 <th className="left">Category</th>
                 <th className="left">Price</th>
-                <th className="left">Stock</th>
+                {/* <th className="left">Stock</th> */}
                 <th className="left">Status</th>
                 <th className="left">Action</th>
               </tr>
@@ -137,7 +137,7 @@ function TotalProduct() {
                     <td className="left">{p.productName}</td>
                     <td className="left">{categoryMap[p.categoryId] || '—'}</td>
                     <td className="left">₱{p.price.toFixed(2)}</td>
-                    <td className="left">{p.stockQuantity}</td>
+                    {/* <td className="left">{p.stockQuantity}</td> */}
                     <td className="left">
                       {p.isActive ? (
                         <span className="status-active">Active</span>

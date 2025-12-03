@@ -5,7 +5,6 @@ import OrderRefund from '../../models/orderRefund.js'
 import OrderCancel from '../../models/orderCancel.js'
 import Customer from "../../models/customer.js";
 import Products from "../../models/products.js";
-import DeliveryInfo from "../../models/deliveryInfo.js";
 import Notifications from "../../models/notifications.js";
 import { orderSendMail } from '../../utils/mailer.js';
 import { orderStatusUpdateTemplate } from "../../utils/emailTemplates.js";

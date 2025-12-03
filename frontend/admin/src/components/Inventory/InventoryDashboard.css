@@ -1,0 +1,345 @@
+.inventory-dashboard-container {
+  padding: 20px;
+  background-color: #f5f6fa;
+  min-height: 100vh;
+}
+
+/* ==================== Statistics Cards ==================== */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border-left: 4px solid #3498db;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card-ok {
+  border-left-color: #27ae60;
+}
+
+.stat-card-low {
+  border-left-color: #f39c12;
+}
+
+.stat-card-out {
+  border-left-color: #e74c3c;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+/* ==================== Controls Bar ==================== */
+.controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 300px;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #43A047;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.right-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-select,
+.sort-select {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+  min-width: 150px;
+  transition: border 0.2s ease;
+}
+
+.filter-select:hover,
+.sort-select:hover {
+  border-color: #43A047;
+}
+
+.filter-select:focus,
+.sort-select:focus {
+  border-color: #43A047;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.add-stock-btn {
+  background-color: #43A047;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.add-stock-btn:hover {
+  background-color: #7ED957;
+  transform: translateY(-1px);
+}
+
+.add-stock-btn:active {
+  transform: translateY(0);
+}
+
+/* ==================== Results Count ==================== */
+.results-count {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+/* ==================== Table ==================== */
+.table-wrapper {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventory-table thead tr {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.inventory-table th {
+  padding: 12px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inventory-table td {
+  padding: 12px;
+  font-size: 14px;
+  color: #495057;
+  border-bottom: 1px solid #eee;
+}
+
+.inventory-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.inventory-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Row Status Colors */
+.low-row {
+  background-color: #fff3cd;
+}
+
+.low-row:hover {
+  background-color: #ffe69c;
+}
+
+.out-row {
+  background-color: #f8d7da;
+}
+
+.out-row:hover {
+  background-color: #f5c2c7;
+}
+
+/* ==================== Product Image ==================== */
+.prod-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* ==================== Stock Badge ==================== */
+.stock-badge {
+  background-color: #e9ecef;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* ==================== Status Badges ==================== */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+  text-align: center;
+}
+
+.status-ok {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-low {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-out {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* ==================== Action Buttons ==================== */
+.action-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 5px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.action-btn-primary {
+  background-color: #43A047;
+  color: white;
+}
+
+.action-btn-primary:hover {
+  background-color: #7ED957;
+}
+
+.action-btn-secondary {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.action-btn-secondary:hover {
+  background-color: #7f8c8d;
+}
+
+/* ==================== No Results ==================== */
+.no-results {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #7f8c8d;
+}
+
+/* ==================== Responsive Design ==================== */
+@media (max-width: 768px) {
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .right-controls {
+    flex-direction: column;
+  }
+
+  .filter-select,
+  .sort-select,
+  .add-stock-btn {
+    width: 100%;
+  }
+
+  .inventory-table {
+    font-size: 12px;
+  }
+
+  .inventory-table th,
+  .inventory-table td {
+    padding: 8px;
+  }
+
+  .prod-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .action-btn {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+}

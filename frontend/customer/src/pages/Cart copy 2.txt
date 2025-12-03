@@ -12,22 +12,10 @@ import { toast } from "react-toastify";
 import UnavailableNote from '../components/Notice/UnavailableNote.jsx';
 
 function Cart() {
-  const {
-    products, currency, cartItems, setCartItems, updateQuantity, showCartContent,
-    setShowCartContent, orderSubTotal, getOrderSubTotal, navigate, token, toastError,
-    deleteCartItem, deleteMultipleCartItem, productVariantValues, productVariantCombination,
-    showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo,
-    setActiveStep, setOrderItems, setCartItemsToDelete, fetchInventoryStock
-  } = useContext(ShopContext);
-
+  const {products, currency, cartItems, setCartItems, updateQuantity, showCartContent, setShowCartContent, orderSubTotal, getOrderSubTotal, navigate, token, toastError, deleteCartItem, deleteMultipleCartItem, productVariantValues, productVariantCombination, showUnavailableNote, setShowUnavailableNote, verifiedUser, hasDeliveryInfo, setActiveStep, setOrderItems, setCartItemsToDelete, fetchInventoryStock} = useContext(ShopContext)
   const [cartData, setCartData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-
   const allSelected = selectedItems.length === cartData.length && cartData.length > 0;
-
-  // ✅ SANITIZED ARRAYS (fixes your increase button bug)
-  const safeVariantValues = productVariantValues.filter(v => v && v.ID);
-  const safeVariantCombinations = productVariantCombination.filter(c => c && c.ID);
 
   function getStockFromInventory(productId, variantValueId = null, variantCombinationId = null) {
     return (
@@ -45,28 +33,31 @@ function Cart() {
     const updatedCart = cartItems.filter(item => {
       const productData = products.find(p => p.ID === item.productId);
       if (!productData) {
+        toast.warning(`"${productData.productName}" is no longer available.`, { ...toastError });
         deleteCartItem(item.ID);
-        return false;
+        return false; // Product removed
       }
 
-      // CASE 1 — single variant products
+      // Case 1: product has variants but no combinations
       if (productData.hasVariant && !productData.hasVariantCombination) {
-        const exists = safeVariantValues.some(
+        const exists = productVariantValues.some(
           pv => pv.productId === item.productId && pv.value === item.value
         );
         if (!exists) {
-          deleteCartItem(item.ID);
-          return false;
+          toast.warning(`"${productData.productName}" (${item.value}) is no longer available.`, { ...toastError });
+          deleteCartItem(item.ID); // Delete from DB
+          return false; // Remove from frontend
         }
       }
 
-      // CASE 2 — variant combination products
+      // Case 2: product has variant combinations
       if (productData.hasVariant && productData.hasVariantCombination) {
-        const exists = safeVariantCombinations.some(
+        const exists = productVariantCombination.some(
           pvc => pvc.productId === item.productId && pvc.combinations === item.value
         );
         if (!exists) {
-          deleteCartItem(item.ID);
+          toast.warning(`"${productData.productName}" (${item.value}) combination is no longer available.`, { ...toastError });
+          deleteCartItem(item.ID); // Delete from DB
           return false;
         }
       }
@@ -78,7 +69,7 @@ function Cart() {
       setCartItems(updatedCart);
       setShowCartContent(updatedCart.length > 0);
     }
-  }, [cartItems, products, safeVariantValues, safeVariantCombinations]);
+  }, [cartItems, products, productVariantValues, productVariantCombination]);
 
   useEffect(() => {
     if (!products.length) {
@@ -88,15 +79,18 @@ function Cart() {
 
     const validCart = cartItems.filter(item => {
       const productData = products.find(p => p.ID === item.productId);
-      if (!productData) return false;
-      if (!productData.isActive || productData.isOutOfStock) return false;
+      if (!productData) {
+        return false; // Product not found
+      }
+      if (!productData.isActive || productData.isOutOfStock) {
+        return false;
+      }
       return item.quantity > 0;
     });
 
     setCartData(validCart);
     setShowCartContent(validCart.length > 0);
   }, [cartItems, products]);
-
 
   useEffect(() => {
     let total = 0;
@@ -108,15 +102,16 @@ function Cart() {
       const productData = products.find(p => p.ID === item.productId);
       if (!productData) return;
 
+      // Use the same logic as your getItemPrice function
       let itemPrice = productData.price;
 
       if (productData.hasVariant && productData.hasVariantCombination) {
-        const combo = safeVariantCombinations.find(
+        const combo = productVariantCombination.find(
           pvc => pvc.productId === item.productId && pvc.combinations === item.value
         );
         if (combo) itemPrice = combo.price;
-      } else if (productData.hasVariant) {
-        const variant = safeVariantValues.find(
+      } else if (productData.hasVariant && !productData.hasVariantCombination) {
+        const variant = productVariantValues.find(
           pv => pv.productId === item.productId && pv.value === item.value
         );
         if (variant) itemPrice = variant.price;
@@ -126,29 +121,32 @@ function Cart() {
     });
 
     getOrderSubTotal(total);
-  }, [selectedItems, cartData, products, safeVariantValues, safeVariantCombinations]);
+  }, [selectedItems, cartData, products, productVariantValues, productVariantCombination]);
 
 
-
-  // ✅ REAL STOCK SOURCE (now using safe arrays)
+  // TOTAL STOCKS
+  // ✅ REAL STOCK SOURCE — SAME LOGIC AS PRODUCT PAGE
   const getCartItemStock = (item, productData) => {
     let variantValueId = null;
     let variantCombinationId = null;
 
+    // Single Variant
     if (productData.hasVariant && !productData.hasVariantCombination) {
-      const match = safeVariantValues.find(
+      const match = productVariantValues.find(
         pv => pv.productId === item.productId && pv.value === item.value
       );
       if (match) variantValueId = match.ID;
     }
 
+    // Variant Combination
     if (productData.hasVariant && productData.hasVariantCombination) {
-      const matchCombo = safeVariantCombinations.find(
+      const matchCombo = productVariantCombination.find(
         pvc => pvc.productId === item.productId && pvc.combinations === item.value
       );
       if (matchCombo) variantCombinationId = matchCombo.ID;
     }
 
+    // Always read from InventoryStock
     return getStockFromInventory(
       item.productId,
       variantValueId,
@@ -157,12 +155,17 @@ function Cart() {
   };
 
 
+
+
+
+  // MINIMUM BUTTON
   const handleDecrease = (productId, value, quantity) => {
     if (quantity > 1) {
       updateQuantity(productId, value, quantity - 1);
     }
   };
 
+  // MAXIMUM BUTTON
   const handleIncrease = (productId, value, quantity, productData, item) => {
     const maxStock = getCartItemStock(item, productData);
     if (quantity < maxStock) {
@@ -171,6 +174,8 @@ function Cart() {
   };
 
 
+
+  // Select/Deselect all
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedItems([]);
@@ -179,6 +184,7 @@ function Cart() {
     }
   };
 
+  // Select single item
   const handleSelectItem = (cartIds) => {
     setSelectedItems(prev =>
       prev.includes(cartIds) ? prev.filter(i => i !== cartIds) : [...prev, cartIds]
@@ -186,42 +192,41 @@ function Cart() {
   };
 
 
+  // Delete selected items
   const handleDeleteSelected = () => {
-    const updatedCartItems = cartItems.filter(item => !selectedItems.includes(item.ID));
+    const updatedCartItems = cartItems.filter((item) => !selectedItems.includes(item.ID));
     setCartItems(updatedCartItems);
     setSelectedItems([]);
     setShowCartContent(updatedCartItems.length > 0);
     deleteMultipleCartItem(selectedItems);
   };
 
+  
   const handleDeleteSingle = (cartMainId) => {
-    const updatedCartItems = cartItems.filter(item => item.ID !== cartMainId);
+    const updatedCartItems = cartItems.filter((item) => !(item.ID === cartMainId));
     setCartItems(updatedCartItems);
     setShowCartContent(updatedCartItems.length > 0);
     deleteCartItem(cartMainId);
   };
 
-
   const getItemPrice = (productData, item) => {
     if (productData.hasVariant && productData.hasVariantCombination) {
-      const combo = safeVariantCombinations.find(
+      const combo = productVariantCombination.find(
         pvc => pvc.productId === item.productId && pvc.combinations === item.value
       );
       return combo ? combo.price : productData.price;
     }
-
-    if (productData.hasVariant) {
-      const variant = safeVariantValues.find(
+    if (productData.hasVariant && !productData.hasVariantCombination) {
+      const variant = productVariantValues.find(
         pv => pv.productId === item.productId && pv.value === item.value
       );
       return variant ? variant.price : productData.price;
     }
-
     return productData.price;
   };
 
 
-  const handleCheckout = async () => {
+  const handleCheckout  = async () => {
     if (!token) {
       navigate('/login');
       toast.error("You must log in to proceed with the checkout.", {...toastError});
@@ -240,6 +245,7 @@ function Cart() {
       return;
     }
 
+    // ✅ Build orderItems based on selected items in the cart
     const builtOrderItems = selectedItems.map(cartMainId => {
       const item = cartData.find(i => i.ID === cartMainId);
       if (!item) return null;
@@ -250,18 +256,20 @@ function Cart() {
       const itemPrice = getItemPrice(productData, item);
       const subTotal = itemPrice * item.quantity;
 
+      // Initialize variant IDs as null (if product doesn't have them)
       let productVariantValueId = null;
       let productVariantCombinationId = null;
 
+      // Assign the correct IDs if variants exist
       if (productData.hasVariant && !productData.hasVariantCombination) {
-        const variant = safeVariantValues.find(
+        const variant = productVariantValues.find(
           pv => pv.productId === item.productId && pv.value === item.value
         );
         if (variant) productVariantValueId = variant.ID;
       }
 
       if (productData.hasVariant && productData.hasVariantCombination) {
-        const combo = safeVariantCombinations.find(
+        const combo = productVariantCombination.find(
           pvc => pvc.productId === item.productId && pvc.combinations === item.value
         );
         if (combo) productVariantCombinationId = combo.ID;
@@ -275,13 +283,21 @@ function Cart() {
         quantity: item.quantity,
         subTotal: parseFloat(subTotal.toFixed(2))
       };
-    });
+    })
 
+    // 🆕 Collect selected cart item IDs for deletion after successful order
     setCartItemsToDelete(selectedItems);
-    setOrderItems(builtOrderItems);
-    navigate('/place-order');
-  };
 
+    // ✅ Save to state (you said orderItems is managed in context)
+    setOrderItems(builtOrderItems);
+
+    // Optional: log for verification
+    console.log("✅ Order Items Built:", builtOrderItems);
+
+    console.log("🛒 Cart IDs to Delete:", selectedItems);
+
+    navigate('/place-order');
+  }
 
   return (
     <div className='main-cart'>
@@ -290,13 +306,13 @@ function Cart() {
         <div className='text-2xl'>
           <MainTitle mtext1={'YOUR'} mtext2={'CART'}/>
         </div>
-
+        {/* EMPTY CART */}
         {!showCartContent && (
           <div className='empty-cart-message'>
             <p>No items in your cart.</p>
           </div>
         )}
-
+        {/* ACTIVE CART */}
         {showCartContent && (
           <>
             <div className="cart-header-actions">
@@ -308,97 +324,77 @@ function Cart() {
                 />All ({cartData.length})
               </label>
             </div>
-
             <div>
-              {cartData.map((item, index) => {
-                const productData = products.find(product => product.ID === item.productId);
-                return (
-                  <div key={index} className='cart-container'>
-                    <div className='cc-2'>
-                      <NavLink className='cursor-pointer' to={`/product/${productData.productId}`}>
-                        <img className='cart-product-img'
-                          src={productData.images?.[0] || 'default-image.jpg'}
-                          alt={productData?.productName || 'Product Image'}
-                        />
-                      </NavLink>
-
-                      <div>
-                        <p className='cart-name'>{productData.productName}</p>
-                        <div className='cc-size'>
-                          {productData.hasVariant && <p>{item.value || ''}</p>}
-                        </div>
-
-                        <div className='qd-container'>
-                          <div className="quantity-controls-cart">
-                            <button
-                              onClick={() => handleDecrease(item.productId, item.value, item.quantity)}
-                              className="quantity-btn-cart"
-                            >
-                              <FiMinus className='minus-cart'/>
-                            </button>
-
-                            <input
-                              onChange={(e) => {
-                                const newQty = Number(e.target.value);
-                                if (isNaN(newQty) || newQty <= 0) return;
-
-                                const maxStock = getCartItemStock(item, productData);
-
-                                if (newQty > maxStock) {
-                                  updateQuantity(item.productId, item.value, maxStock);
-                                } else {
-                                  updateQuantity(item.productId, item.value, newQty);
-                                }
-                              }}
-                              type="number"
-                              value={item.quantity}
-                              className="quantity-input-cart"
-                              min={1}
-                              max={getCartItemStock(item, productData)}
-                            />
-
-                            <button
-                              onClick={() => handleIncrease(item.productId, item.value, item.quantity, productData, item)}
-                              className="quantity-btn-cart"
-                            >
-                              <FiPlus className='plus-cart'/>
-                            </button>
+              {
+                cartData.map((item, index) => {
+                  const productData = products.find((product) => product.ID === item.productId);
+                  return (
+                    <div key={index} className='cart-container'>
+                      <div className='cc-2'>
+                        <NavLink className='cursor-pointer' to={`/product/${productData.productId}`}>
+                          <img className='cart-product-img' src={productData.images?.[0] || 'default-image.jpg'} alt={productData?.productName || 'Product Image'}/>
+                        </NavLink>
+                        <div>
+                          <p className='cart-name'>{productData.productName}</p>
+                          <div className='cc-size'>
+                            {productData.hasVariant && 
+                              <p> 
+                                {item.value || ''}
+                              </p>
+                            }
+                          
                           </div>
+                          <div className='qd-container'>
+                            <div className="quantity-controls-cart">
+                              <button onClick={() => handleDecrease(item.productId, item.value, item.quantity)} className="quantity-btn-cart"><FiMinus className='minus-cart'/></button>
+                              <input
+                                onChange={(e) => {
+                                  const newQty = Number(e.target.value);
+                                    if (isNaN(newQty) || newQty <= 0) return;
 
-                          <RiDeleteBinLine
-                            onClick={() => handleDeleteSingle(item.ID)}
-                            className='cart-delete'
+                                    const maxStock = getCartItemStock(item, productData);
+
+                                    if (newQty > maxStock) {
+                                      updateQuantity(item.productId, item.value, maxStock);
+                                    } else {
+                                      updateQuantity(item.productId, item.value, newQty);
+                                    }
+                                }}
+                                type="number"
+                                value={item.quantity}
+                                className="quantity-input-cart"
+                                min={1}
+                                max={getCartItemStock(item, productData)}
+                              />
+                              <button onClick={() => handleIncrease(item.productId, item.value, item.quantity, productData)} className="quantity-btn-cart"><FiPlus className='plus-cart'/></button>
+                            </div>
+                            <RiDeleteBinLine onClick={() => handleDeleteSingle(item.ID)} className='cart-delete'/>
+                          </div>
+                        </div>
+                      </div>
+                      <div className='cart-right-functions'>
+                        <div className="cart-item-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(item.ID)}
+                            onChange={() => handleSelectItem(item.ID)}
                           />
                         </div>
+                        <p className='cart-price'>Price: {currency}{getItemPrice(productData, item)}</p>
                       </div>
                     </div>
-
-                    <div className='cart-right-functions'>
-                      <div className="cart-item-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(item.ID)}
-                          onChange={() => handleSelectItem(item.ID)}
-                        />
-                      </div>
-
-                      <p className='cart-price'>
-                        Price: {currency}{getItemPrice(productData, item)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+                  )
+                })
+              }
             </div>
-
+            {/* Checkout section with DELETE on left, CHECKOUT on right */}
             <div className={`${showCartContent ? 'checkout-container' : 'hidden'}`}>
-              {selectedItems.length > 0 && (
+              {selectedItems.length > 0 && ( // ✅ only show if at least one checkbox selected
                 <p className='checkout-total-price'>
                   Total Price: {currency}{orderSubTotal.toFixed(2)}
                 </p>
               )}
-
-              <div className='checkout-buttons'>
+            <div className='checkout-buttons'>
                 <button
                   className="cart-button-delete"
                   onClick={handleDeleteSelected}
@@ -406,29 +402,21 @@ function Cart() {
                   style={{marginRight: 'auto'}}
                 >
                   {selectedItems.length === 1
-                    ? 'DELETE(1 ITEM)'
-                    : selectedItems.length > 1
-                      ? `DELETE(${selectedItems.length} ITEMS)`
-                      : 'DELETE'}
+                  ? 'DELETE(1 ITEM)'
+                  :selectedItems.length > 1
+                  ? `DELETE(${selectedItems.length} ITEMS)`
+                  : 'DELETE'}
                 </button>
-
-                <button
-                  onClick={handleCheckout}
-                  className='cart-button-checkout'
-                  disabled={selectedItems.length === 0}
-                >
-                  CHECKOUT
-                </button>
-              </div>
+              <button onClick={()=> handleCheckout ()} className='cart-button-checkout' disabled={selectedItems.length === 0}>CHECKOUT</button>  
+            </div>   
             </div>
           </>
         )}
       </div>
-
       <Infos/>
       <Footer/>
     </div>
-  );
+  )
 }
 
-export default Cart;
+export default Cart
