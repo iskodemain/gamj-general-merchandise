@@ -26,14 +26,6 @@ const Product = () => {
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
 
-  function getStockFromInventory(productId, variantValueId = null, variantCombinationId = null) {
-    return (fetchInventoryStock.find(s =>
-      s.productId === productId &&
-      (variantValueId !== null ? s.variantValueId === variantValueId : s.variantValueId === null) &&
-      (variantCombinationId !== null ? s.variantCombinationId === variantCombinationId : s.variantCombinationId === null)
-    )?.totalQuantity) ?? 0;
-  }
-
   const handleUpScroll = () => {
     window.scrollTo(0, 0);
   }
@@ -49,8 +41,7 @@ const Product = () => {
 
         // ✅ Always start with product base price & stock quantity
         const basePrice = Number(product.price);
-        // const baseStock = Number(product.stockQuantity);
-        const baseStock = getStockFromInventory(product.ID);
+        const baseStock = Number(product.stockQuantity);
 
         setPrice(basePrice);
         setStock(baseStock);
@@ -119,8 +110,7 @@ const Product = () => {
     // (APPLY THE CORRECT PRICE & STOCK BASED ON SELECTED COMBINATION)
     if (!productData) return;
     if (!productData.hasVariant && !productData.hasVariantCombination) {
-      // const productStock = Number(productData.stockQuantity);
-      const productStock = getStockFromInventory(productData.ID);
+      const productStock = Number(productData.stockQuantity);
       setPrice(Number(productData.price));
       setStock(productStock);
       setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
@@ -131,16 +121,14 @@ const Product = () => {
       const match = productVariantValues.find(pv => pv.productId === productData.ID && pv.value === formatted);
 
       if (match) {
-        // const productStock = Number(match.stock);
-        const productStock = getStockFromInventory(productData.ID, match.ID);
+        const productStock = Number(match.stock);
         setPrice(Number(match.price));
         setStock(productStock);
         setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
       } else {
         setItemNotAvailable(true);
         setPrice(Number(productData.price));
-        // setStock(Number(productData.stockQuantity));
-        setStock(getStockFromInventory(productData.ID));
+        setStock(Number(productData.stockQuantity));
       }
       return;
     }
@@ -153,16 +141,14 @@ const Product = () => {
       );
 
       if (matchCombo) {
-        // const productStock = Number(matchCombo.stock);
-        const productStock = getStockFromInventory(productData.ID, null, matchCombo.ID);
+        const productStock = Number(matchCombo.stock);
         setPrice(Number(matchCombo.price));
         setStock(productStock);
         setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
       } else {
         setItemNotAvailable(true);
         setPrice(Number(productData.price));
-        // setStock(Number(productData.stockQuantity));
-        setStock(getStockFromInventory(productData.ID));
+        setStock(Number(productData.stockQuantity));
       }
       return;
     }
@@ -235,7 +221,6 @@ const Product = () => {
       if (activeProduct) {
         if (quantity > productStocks) {
           toast.error("You've reached the maximum quantity available for this product.", { ...toastError });
-          return;
         } 
 
         // Compute price based on selected variant/combination

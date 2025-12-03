@@ -46,6 +46,10 @@ import UserManagement from "./pages/UserManagement.jsx"
 import AllUsers from "./components/AllUsers.jsx";
 import RejectedUsers from "./components/VeriAndUnverified/RejectedUsers.jsx";
 import AddNewUser from "./components/AddNewUser.jsx";
+import Inventory from "./pages/Inventory.jsx";
+import InventoryDashboard from "./components/Inventory/InventoryDashboard.jsx";
+import AddStock from "./components/Inventory/AddStock.jsx";
+import BatchList from "./components/Inventory/BatchList.jsx";
 
 //components
 // icon 
@@ -102,6 +106,10 @@ const App = () => {
       <Route path="/allusers" element={<AllUsers />} /> 
       <Route path="/rejectedusers" element={<RejectedUsers />} /> 
       <Route path="/addnewuser" element={<AddNewUser />} />
+      <Route path="/inventory" element={<Inventory />} />
+      <Route path="/inventory/list" element={<InventoryDashboard />} />
+      <Route path="/inventory/add" element={<AddStock />} />
+      <Route path="/inventory/batch" element={<BatchList />} />
     </Routes>
    </div>
   )

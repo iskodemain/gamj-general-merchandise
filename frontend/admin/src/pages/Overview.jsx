@@ -20,7 +20,7 @@ ChartJS.register(
 );
 
 function Overview() {
-  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList, fetchReturnRefundOrders} = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList, fetchReturnRefundOrders, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory} = useContext(AdminContext);
 
   // timeframe toggle for line chart
   const [timeframe, setTimeframe] = useState("weekly"); // 'daily' or 'weekly'
@@ -31,8 +31,6 @@ function Overview() {
   const stats = useMemo(() => {
     // ACTIVE ORDER STATUSES
     const ACTIVE = ["Pending", "Processing", "Out for Delivery", "Delivered"];
-
-    // Set for unique orderId-status pairs
     const activeSet = new Set();
 
     fetchOrderItems.forEach((item) => {
@@ -42,17 +40,22 @@ function Overview() {
     });
 
     const activeOrders = activeSet.size;
-
     const cancellations = fetchCancelledOrders.length || 0;
-
     const returnsRefunds = fetchReturnRefundOrders.length || 0;
 
-    const availableStock = products.reduce((acc, p) => acc + (p.stock || 0), 0);
-    const lowStockAlerts = products.reduce(
-      (acc, p) => acc + (p.stock !== undefined && p.stock <= (p.lowThreshold ?? 5) ? 1 : 0),
+    // ---- INVENTORY (REAL) ----
+    const availableStock = fetchInventoryStock.reduce(
+      (sum, item) => sum + (item.totalQuantity || 0),
       0
     );
-    const outOfStock = products.reduce((acc, p) => acc + (p.stock === 0 ? 1 : 0), 0);
+
+    const lowStockAlerts = fetchInventoryStock.filter(
+      item => item.totalQuantity <= item.lowStockThreshold
+    ).length;
+
+    const outOfStock = fetchInventoryStock.filter(
+      item => item.totalQuantity === 0
+    ).length;
 
     return {
       activeOrders,
@@ -62,7 +65,12 @@ function Overview() {
       lowStockAlerts,
       outOfStock,
     };
-  }, [fetchOrders, fetchOrderItems, fetchCancelledOrders, fetchReturnRefundOrders,products]);
+  }, [
+    fetchOrderItems,
+    fetchCancelledOrders,
+    fetchReturnRefundOrders,
+    fetchInventoryStock
+  ]);
 
   // -----------------------------------------
   // Section (2) Orders Over Time (line chart)
@@ -195,11 +203,24 @@ function Overview() {
   }, [fetchOrderItems]);
 
   const inventoryStatusOverview = useMemo(() => {
-    const inStock = products.filter((p) => (p.stock || 0) > (p.lowThreshold ?? 5)).length;
-    const lowStock = products.filter((p) => (p.stock || 0) > 0 && (p.stock || 0) <= (p.lowThreshold ?? 5)).length;
-    const outOfStock = products.filter((p) => (p.stock || 0) === 0).length;
-    return { labels: ["In Stock", "Low Stock", "Out of Stock"], data: [inStock, lowStock, outOfStock] };
-  }, [products]);
+    const inStock = fetchInventoryStock.filter(
+      item => item.totalQuantity > item.lowStockThreshold
+    ).length;
+
+    const lowStock = fetchInventoryStock.filter(
+      item => item.totalQuantity > 0 && item.totalQuantity <= item.lowStockThreshold
+    ).length;
+
+    const outOfStock = fetchInventoryStock.filter(
+      item => item.totalQuantity === 0
+    ).length;
+
+    return {
+      labels: ["In Stock", "Low Stock", "Out of Stock"],
+      data: [inStock, lowStock, outOfStock]
+    };
+  }, [fetchInventoryStock]);
+
 
   // ---------------------------------
   // Section (4) Most ordered + Low stock
@@ -222,12 +243,20 @@ function Overview() {
   }, [fetchOrderItems, products]);
 
   const lowStockItems = useMemo(() => {
-    const arr = products
-      .filter((p) => (p.stock || 0) <= (p.lowThreshold ?? 5))
-      .map((p) => ({ name: p.productName || "Unknown", stock: p.stock || 0 }));
+    const arr = fetchInventoryStock
+      .filter(item => item.totalQuantity <= item.lowStockThreshold)
+      .map(item => {
+        const prod = products.find(p => p.ID === item.productId);
+        return {
+          name: prod?.productName || "Unknown",
+          stock: item.totalQuantity
+        };
+      });
+
     arr.sort((a, b) => a.stock - b.stock);
     return arr.slice(0, 6);
-  }, [products]);
+  }, [fetchInventoryStock, products]);
+
 
   // ---------------------------------
   // Section (5) Recent transactions (limited)

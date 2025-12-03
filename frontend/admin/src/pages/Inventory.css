@@ -1,0 +1,143 @@
+.inventory-main-container {
+  padding: 20px 32px;
+  background: #EFFFF1;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Section header */
+.inventory-main-section {
+  margin-bottom: 32px;
+}
+
+.inventory-main-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 0;
+  width: 7rem;
+}
+
+.inventory-main-back-btn {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.inventory-main-header-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.inventory-main-chevron {
+  transition: transform 0.25s ease;
+}
+
+.inventory-main-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Grid layout */
+.inventory-main-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Card styling */
+.inventory-main-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-main-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.inventory-main-card-top {
+  padding: 18px 0 22px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inventory-main-card-icon {
+  width: 33px;
+  height: 33px;
+  object-fit: contain;
+}
+
+.inventory-main-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.inventory-main-dot.orange { background: #ffa600; }
+.inventory-main-dot.teal { background: #00e3b6; }
+.inventory-main-dot.blue { background: #656dff; }
+.inventory-main-dot.green { background: #00dd31; }
+
+.inventory-main-card-title {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #3B3B3B;
+}
+
+.inventory-main-card-container {
+  height: 9rem;
+  padding: 15px 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.inventory-main-divider {
+  height: 1px;
+  background: #ddd;
+}
+
+.inventory-main-card-number {
+  font-family: "Roboto", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #3B3B3B;
+}
+
+.inventory-main-card-date {
+  font-size: 0.9rem;
+  color: #737373;
+  margin-top: 4px;
+  display: block;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .inventory-main-container {
+    padding: 16px;
+  }
+
+  .inventory-main-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .inventory-main-card {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .inventory-main-grid {
+    grid-template-rows: 1fr;
+  }
+}

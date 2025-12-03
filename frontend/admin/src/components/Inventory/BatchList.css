@@ -1,0 +1,472 @@
+/* ==================== BatchList.css ==================== */
+
+/* Container & Layout */
+.batchlist-container {
+  padding: 20px;
+  background: #FBFBFB;
+  min-height: 100vh;
+}
+
+.batchlist-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.batchlist-header {
+  margin-bottom: 25px;
+}
+
+.batchlist-title-section {
+  color: 383737;
+  text-align: center;
+}
+
+.batchlist-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.batchlist-subtitle {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Controls */
+.batchlist-controls {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.batchlist-search-wrapper {
+  width: 100%;
+}
+
+.batchlist-search {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.batchlist-search:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.batchlist-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.batchlist-select {
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: border 0.3s ease;
+  min-width: 150px;
+}
+
+.batchlist-select:focus {
+  border-color: #667eea;
+}
+
+.batchlist-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  user-select: none;
+}
+
+.batchlist-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Desktop Table */
+.batchlist-table-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.batchlist-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+.batchlist-table thead th {
+  text-align: left;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #495057;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.batchlist-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s ease;
+}
+
+.batchlist-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.batchlist-row.expired {
+  background: #ffebee;
+}
+
+.batchlist-row.low {
+  background: #fff3e0;
+}
+
+.batchlist-row.near {
+  background: #fff9c4;
+}
+
+.batchlist-table tbody td {
+  padding: 12px;
+  font-size: 14px;
+  color: #495057;
+}
+
+.batchlist-cell-batch {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.batchlist-cell-product strong {
+  color: #2c3e50;
+}
+
+.batchlist-qty-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #e9ecef;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.batchlist-qty-badge.low {
+  background: #ff9800;
+  color: white;
+}
+
+.batchlist-expiry-days {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-top: 4px;
+}
+
+.batchlist-status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.batchlist-status-badge.ok {
+  background: #d4edda;
+  color: #155724;
+}
+
+.batchlist-status-badge.low {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.batchlist-status-badge.expired {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.batchlist-status-badge.near {
+  background: #fff9c4;
+  color: #f57f17;
+}
+
+.batchlist-status-badge.noexpiry {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.batchlist-btn-view {
+  padding: 8px 16px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.batchlist-btn-view:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
+.batchlist-empty {
+  text-align: center;
+  padding: 40px;
+  color: #7f8c8d;
+  font-size: 15px;
+}
+
+/* Mobile Cards (hidden on desktop) */
+.batchlist-cards {
+  display: none;
+}
+
+/* Responsive Design */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .batchlist-table {
+    min-width: 900px;
+  }
+}
+
+/* Mobile - Switch to cards */
+@media (max-width: 900px) {
+  .batchlist-table-container {
+    display: none;
+  }
+
+  .batchlist-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .batchlist-card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .batchlist-card.expired {
+    border-left: 4px solid #e74c3c;
+  }
+
+  .batchlist-card.low {
+    border-left: 4px solid #ff9800;
+  }
+
+  .batchlist-card.near {
+    border-left: 4px solid #ffeb3b;
+  }
+
+  .batchlist-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .batchlist-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #667eea;
+    font-family: 'Courier New', monospace;
+  }
+
+  .batchlist-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .batchlist-card-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+
+  .batchlist-card-label {
+    font-weight: 600;
+    color: #7f8c8d;
+  }
+
+  .batchlist-card-value {
+    font-weight: 500;
+    color: #2c3e50;
+    text-align: right;
+  }
+
+  .batchlist-card-value.low {
+    color: #ff9800;
+    font-weight: 700;
+  }
+
+  .batchlist-card-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .batchlist-btn-view {
+    width: 100%;
+  }
+
+  .batchlist-empty-cards {
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8c8d;
+    font-size: 15px;
+    background: white;
+    border-radius: 12px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .batchlist-container {
+    padding: 15px 10px;
+  }
+
+  .batchlist-title {
+    font-size: 24px;
+  }
+
+  .batchlist-subtitle {
+    font-size: 12px;
+  }
+
+  .batchlist-controls {
+    padding: 15px;
+  }
+
+  .batchlist-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .batchlist-select {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+/* Extra Small (320px) */
+@media (max-width: 320px) {
+  .batchlist-container {
+    padding: 10px 5px;
+  }
+
+  .batchlist-title {
+    font-size: 20px;
+  }
+
+  .batchlist-controls {
+    padding: 12px;
+  }
+
+  .batchlist-card {
+    padding: 12px;
+  }
+
+  .batchlist-card-title {
+    font-size: 14px;
+  }
+
+  .batchlist-card-row {
+    font-size: 13px;
+  }
+}
+
+/* Ultra Small (200px) */
+@media (max-width: 250px) {
+  .batchlist-container {
+    padding: 8px 3px;
+  }
+
+  .batchlist-title {
+    font-size: 18px;
+  }
+
+  .batchlist-subtitle {
+    font-size: 11px;
+  }
+
+  .batchlist-controls {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .batchlist-search {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .batchlist-select {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .batchlist-card {
+    padding: 10px;
+  }
+
+  .batchlist-card-title {
+    font-size: 13px;
+  }
+
+  .batchlist-card-row {
+    font-size: 12px;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .batchlist-card-value {
+    text-align: left;
+  }
+
+  .batchlist-status-badge {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .batchlist-btn-view {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
