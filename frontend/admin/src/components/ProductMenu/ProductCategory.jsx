@@ -7,15 +7,9 @@ import Loading from '../Loading';
 import { toast } from 'react-toastify';
 
 function ProductCategory() {
-  const { productCategory, addProductCategory, toastSuccess, updateProductCategory } = useContext(AdminContext);
+  const { productCategory, addProductCategory, toastSuccess, updateProductCategory, deleteProductCategory } = useContext(AdminContext);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
-  //   if (productCategory && Array.isArray(productCategory)) {
-  //     setCategories(productCategory);
-  //   }
-  // }, [productCategory]);
 
   useEffect(() => {
     if (productCategory && Array.isArray(productCategory)) {
@@ -44,9 +38,26 @@ function ProductCategory() {
     });
   };
 
-  const deleteCategory = (index) => {
-    setCategories(prev => prev.filter((_, i) => i !== index));
+  const deleteCategoryHandler = async (index) => {
+    const cat = categories[index];
+
+    // DELETE NEW UNSAVED CATEGORY – just remove from UI
+    if (cat.isNew) {
+      setCategories(prev => prev.filter((_, i) => i !== index));
+      return;
+    }
+
+    setLoading(true);
+    const deleted = await deleteProductCategory(cat.ID);
+    setLoading(false);
+
+    if (deleted) {
+      // Remove from UI
+      setCategories(prev => prev.filter((_, i) => i !== index));
+      toast.success("Category deleted successfully!", toastSuccess);
+    }
   };
+
 
   const deleteAll = () => {
     setCategories([]);
@@ -117,7 +128,7 @@ function ProductCategory() {
                   />
                   <button
                     className="category-delete-icon"
-                    onClick={() => deleteCategory(idx)}
+                    onClick={() => deleteCategoryHandler(idx)}
                     aria-label={`Delete category ${cat.categoryName}`}
                   >
                     <FaTrash />
