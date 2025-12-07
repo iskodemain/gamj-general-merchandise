@@ -1,7 +1,7 @@
 import express from 'express';
 import adminAuth from "../../middleware/adminAuth.js";
 
-import { fetchAllProducts, fetchProductCategory, addProduct, fetchVariantName, fetchProductVariantValues, fetchProductVariantCombination, updateProduct } from '../../controllers/admin/adminProductController.js'
+import { fetchAllProducts, fetchProductCategory, addProduct, fetchVariantName, fetchProductVariantValues, fetchProductVariantCombination, updateProduct, addProductCategory } from '../../controllers/admin/adminProductController.js'
 
 import upload from '../../middleware/multer.js';
 
@@ -50,6 +50,11 @@ adminProductRouter.get('/product-variant-values', adminAuth, fetchProductVariant
 
 // FETCH PRODUCT VARIANT COMBINATION
 adminProductRouter.get('/product-variant-combination', fetchProductVariantCombination);
+
+
+// ADD PRODUCTS CATEGORIES
+adminProductRouter.post('/category/add', adminAuth, addProductCategory);
+
 
 
 

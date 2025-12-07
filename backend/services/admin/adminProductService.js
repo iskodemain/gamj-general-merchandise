@@ -6,6 +6,7 @@ import ProductVariantValues from "../../models/productVariantValues.js";
 import ProductVariantCombination from "../../models/productVariantCombination.js";
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
+import { v4 as uuidv4 } from "uuid";
 
 
 export const addProductService = async (adminId, categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination) => {
@@ -808,3 +809,45 @@ export const fetchProductVariantCombinationService = async (adminId) => {
         throw new Error(error.message);
     }
 }
+
+
+export const addProductCategoryService = async (adminId, categoryName) => {
+  try {
+    // Validate Admin Exists
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return { success: false, message: "Admin user not found" };
+    }
+
+    // Validate category name
+    if (!categoryName || !categoryName.trim()) {
+      return { success: false, message: "Category name is required" };
+    }
+
+    const cleanName = categoryName.trim();
+
+    // Auto-generate categoryId
+    const lastCategory = await Category.findOne({
+      order: [["ID", "DESC"]],
+    });
+
+    const nextNumber = lastCategory ? lastCategory.ID + 1 : 1;
+    const categoryId = "CAT-" + nextNumber.toString().padStart(5, "0");
+
+    // Create Category Record
+    const created = await Category.create({
+      categoryId,
+      categoryName: cleanName,
+      createdBy: adminId,
+    });
+
+    return {
+      success: true,
+      data: created,
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
