@@ -851,3 +851,32 @@ export const addProductCategoryService = async (adminId, categoryName) => {
     throw new Error(error.message);
   }
 };
+
+
+export const updateProductCategoryService = async (adminId, categoryID, categoryName) => {
+  try {
+    console.log(categoryID)
+    // Validate Admin Exists
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return { success: false, message: "Admin user not found" };
+    }
+
+    const category = await Category.findByPk(categoryID);
+    if (!category) {
+      return { success: false, message: "Category not found" };
+    }
+
+    category.categoryName = categoryName.trim();
+    await category.save();
+
+    return { 
+      success: true, 
+      data: category 
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
