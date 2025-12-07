@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchAllProducts, fetchVariantName, fetchProductVariantValues, fetchProductCategory, addProductCategory, fetchProductVariantCombination, fetchInventoryStock } from '../controllers/customerProductController.js';
+import { fetchAllProducts, fetchVariantName, fetchProductVariantValues, fetchProductCategory, fetchProductVariantCombination, fetchInventoryStock } from '../controllers/customerProductController.js';
 
 import upload from '../middleware/multer.js';
 
@@ -18,7 +18,6 @@ productRouter.get('/product-variant-combination', fetchProductVariantCombination
 
 // PRODUCT CATEGORY
 productRouter.get('/category', fetchProductCategory);
-productRouter.post('/category/add', addProductCategory);
 
 
 // FETCH STOCKS

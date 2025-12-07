@@ -28,7 +28,8 @@ export const loginAdminService = async (identifier, password) => {
             return {success: false, message: 'Your account and/or password is incorrect, please try again'};
         }
 
-        const isMatch = await bcrypt.compare(password, admin.password);
+        // const isMatch = await bcrypt.compare(password, admin.password);
+         const isMatch = await (password, admin.password);
 
         if (!isMatch) {
             return {success: false, message: 'Your account and/or password is incorrect, please try again'};

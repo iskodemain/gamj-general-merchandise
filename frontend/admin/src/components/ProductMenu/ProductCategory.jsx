@@ -3,10 +3,13 @@ import './ProductCategory.css';
 import { FaPlus, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import { AdminContext } from '../../context/AdminContextProvider';
 import Navbar from '../Navbar';
+import Loading from '../Loading';
+import { toast } from 'react-toastify';
 
-function ProductCategory({ onBack }) {
-  const { productCategory } = useContext(AdminContext);
+function ProductCategory() {
+  const { productCategory, addProductCategory, toastSuccess } = useContext(AdminContext);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (productCategory && Array.isArray(productCategory)) {
@@ -14,7 +17,7 @@ function ProductCategory({ onBack }) {
     }
   }, [productCategory]);
 
-  const addNewCategory = () => {
+  const addNewCategory = async () => {
     const newCategory = {
       ID: Date.now(),
       categoryId: '',
@@ -40,31 +43,55 @@ function ProductCategory({ onBack }) {
     setCategories([]);
   };
 
-  const saveChanges = () => {
-    console.log('Categories to save:', categories);
-    alert('Changes saved (simulation)');
+  const saveChanges = async () => {
+    const newCategories = categories.filter((c) => !c.categoryId && c.categoryName.trim() !== "");
+
+    if (newCategories.length === 0) {
+      return;
+    }
+
+    setLoading(true);
+    let createdList = [];
+
+    for (const cat of newCategories) {
+      const created = await addProductCategory({ categoryName: cat.categoryName });
+
+      if (created) {
+        createdList.push(created);
+      }
+    }
+
+    setLoading(false);
+
+    if (createdList.length > 0) {
+      toast.success("Categories saved successfully!", toastSuccess);
+
+      // merge new saved categories into UI list
+      setCategories((prev) => {
+        const existing = prev.filter((c) => c.categoryId); // keep old ones
+        return [...existing, ...createdList]; // include new database records
+      });
+    }
   };
+
 
   return (
     <>
+      {loading && <Loading />}
       <Navbar TitleName="List of Product Categories" />
       <div className="category-container">
         <div className="category-card">
+          {/* Header with Back Button Only */}
           <div className="category-header">
-            <div className="category-header-left">
-              {onBack && (
-                <button className="category-back" onClick={onBack} aria-label="Back">
-                  <FaArrowLeft />
-                </button>
-              )}
-              <h1 className="category-title">All Product Categories</h1>
+            <div className="cat-header">
+              <button onClick={() => window.history.back()} className="cat-back">
+                <FaArrowLeft />
+              </button>
+              <h1 className="cat-title">Back</h1>
             </div>
-
-            <button className="category-add-btn" onClick={addNewCategory} aria-label="Add New">
-              <FaPlus /> <span className="category-add-text">Add New</span>
-            </button>
           </div>
 
+          {/* Category List */}
           <div className="category-list">
             {categories.length > 0 ? (
               categories.map((cat, idx) => (
@@ -89,6 +116,12 @@ function ProductCategory({ onBack }) {
             )}
           </div>
 
+          {/* Add New Button Below Categories */}
+          <button className="category-add-btn-bottom" onClick={addNewCategory}>
+            <FaPlus /> <span className="category-add-text">Add New</span>
+          </button>
+
+          {/* Action Buttons */}
           <div className="category-actions">
             <button className="category-save-btn" onClick={saveChanges}>
               Save Changes
