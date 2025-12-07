@@ -157,7 +157,7 @@ const Product = () => {
         const productStock = getStockFromInventory(productData.ID, null, matchCombo.ID);
         setPrice(Number(matchCombo.price));
         setStock(productStock);
-        setItemNotAvailable(productStock <= 0); // ✅ Show unavailable if stock = 0
+        setItemNotAvailable(productStock <= 0);
       } else {
         setItemNotAvailable(true);
         setPrice(Number(productData.price));
@@ -170,7 +170,8 @@ const Product = () => {
 
   const allVariantsSelected = selectedVariants.split(', ').filter(Boolean).length === Object.keys(variantGroups).length;
 
-  const isActionDisabled = productData ? (productData.hasVariant ? (!allVariantsSelected || stock <= 0 || itemNotAvailable) : productData.stockQuantity <= 0 || itemNotAvailable) : true;
+  // Around line 150-160, replace this:
+  const isActionDisabled = productData ? (productData.hasVariant ? (!allVariantsSelected || stock <= 0 || itemNotAvailable) :  stock <= 0 || itemNotAvailable) : true;
 
 
   // ADD TO CART

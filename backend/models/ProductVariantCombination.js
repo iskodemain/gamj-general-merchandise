@@ -33,11 +33,6 @@ const ProductVariantCombination = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    stock: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      defaultValue: 0,
-    },
     availability: {
       type: DataTypes.TINYINT,
       allowNull: false,
