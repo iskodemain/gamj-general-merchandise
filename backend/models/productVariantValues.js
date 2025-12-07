@@ -43,14 +43,6 @@ const ProductVariantValues = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    stock: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
-    },
-    expirationDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
   },
   {
     tableName: "productVariantValues",

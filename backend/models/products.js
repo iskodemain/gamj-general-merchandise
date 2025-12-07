@@ -74,10 +74,6 @@ const Products = sequelize.define(
         return images;
       },
     },
-    stockQuantity: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
-    },
     isBestSeller: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -102,10 +98,6 @@ const Products = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
-    },
-    expirationDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
     },
     createAt: {
       type: DataTypes.DATE,

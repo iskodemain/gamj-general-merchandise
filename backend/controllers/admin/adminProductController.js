@@ -5,21 +5,24 @@ import { fetchAllProductsService, fetchProductCategoryService, addProductService
 export const addProduct = async (req, res) => {
     try {
         const { ID } = req.admin;
+
         const image1 = req.files.image1?.[0];
         const image2 = req.files.image2?.[0];
         const image3 = req.files.image3?.[0];
         const image4 = req.files.image4?.[0];
 
-        const {categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination} = req.body;
+        const { categoryId, productName, productDescription, productDetails, price, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination} = req.body;
 
-        const result = await addProductService(ID, categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination);
+        const result = await addProductService( ID, categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination);
 
         res.json(result);
+
     } catch (error) {
         console.log(error);
-        res.json({success: false, message:error.message})
+        res.json({ success: false, message: error.message });
     }
-}
+};
+
 
 export const updateProduct = async (req, res) => {
     try {
@@ -29,14 +32,14 @@ export const updateProduct = async (req, res) => {
         const image3File = req.files.image3?.[0] || null;
         const image4File = req.files.image4?.[0] || null;
 
-        const {productID, categoryId, productName, productDescription, productDetails, price, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination, image1, image2, image3, image4} = req.body;
+        const {productID, categoryId, productName, productDescription, productDetails, price, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination, image1, image2, image3, image4} = req.body;
 
-        const result = await updateProductService(ID, productID, categoryId, productName, productDescription, productDetails, price, image1File, image2File, image3File, image4File, image1, image2, image3, image4, stockQuantity, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, expirationDate, variantNames, variantValues, variantCombination);
+        const result = await updateProductService(ID, productID, categoryId, productName, productDescription, productDetails, price, image1File, image2File, image3File, image4File, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination);
 
         res.json(result);
     } catch (error) {
         console.log(error);
-        res.json({success: false, message:error.message})
+        res.json({success: false, message: error.message})
     }
 }
 
