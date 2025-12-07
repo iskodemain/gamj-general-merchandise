@@ -7,7 +7,7 @@ import Loading from '../Loading';
 import { toast } from 'react-toastify';
 
 function ProductCategory() {
-  const { productCategory, addProductCategory, toastSuccess, updateProductCategory, deleteProductCategory } = useContext(AdminContext);
+  const { productCategory, addProductCategory, toastSuccess, updateProductCategory, deleteProductCategory, deleteAllProductCategories } = useContext(AdminContext);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -59,9 +59,27 @@ function ProductCategory() {
   };
 
 
-  const deleteAll = () => {
-    setCategories([]);
+  const deleteAllHandler = async () => {
+    if (!categories.length) return;
+
+    const hasExisting = categories.some(c => !c.isNew);
+
+    // If only NEW categories → clear UI instantly
+    if (!hasExisting) {
+        setCategories([]);
+        return;
+    }
+
+    setLoading(true);
+    const deleted = await deleteAllProductCategories();
+    setLoading(false);
+
+    if (deleted) {
+        setCategories([]); // update UI
+        toast.success("All categories deleted successfully!", toastSuccess);
+    }
   };
+
 
   const saveChanges = async () => {
     setLoading(true);
@@ -148,7 +166,7 @@ function ProductCategory() {
             <button className="category-save-btn" onClick={saveChanges}>
               Save Changes
             </button>
-            <button className="category-delete-all-btn" onClick={deleteAll}>Delete All</button>
+            <button className="category-delete-all-btn" onClick={deleteAllHandler}>Delete All</button>
           </div>
 
         </div>

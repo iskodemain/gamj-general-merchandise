@@ -906,3 +906,25 @@ export const deleteProductCategoryService = async (adminId, categoryID) => {
     throw new Error(error.message);
   }
 };
+
+export const deleteAllProductCategoriesService = async (adminId) => {
+  try {
+    // Validate admin
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return { success: false, message: "Admin user not found" };
+    }
+
+    // Delete all categories
+    await Category.destroy({ where: {} });
+
+    return {
+      success: true,
+      message: "All categories deleted successfully"
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
