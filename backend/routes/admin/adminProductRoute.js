@@ -1,7 +1,7 @@
 import express from 'express';
 import adminAuth from "../../middleware/adminAuth.js";
 
-import { fetchAllProducts, fetchProductCategory, addProduct, fetchVariantName, fetchProductVariantValues, fetchProductVariantCombination, updateProduct, addProductCategory, updateProductCategory } from '../../controllers/admin/adminProductController.js'
+import { fetchAllProducts, fetchProductCategory, addProduct, fetchVariantName, fetchProductVariantValues, fetchProductVariantCombination, updateProduct, addProductCategory, updateProductCategory, deleteProductCategory } from '../../controllers/admin/adminProductController.js'
 
 import upload from '../../middleware/multer.js';
 
@@ -56,9 +56,12 @@ adminProductRouter.get('/product-variant-combination', fetchProductVariantCombin
 adminProductRouter.post('/category/add', adminAuth, addProductCategory);
 
 
-
 // UPDATE PRODUCTS CATEGORIES
 adminProductRouter.put('/category/update', adminAuth, updateProductCategory);
+
+
+// DELETE PRODUCTS CATEGORIES
+adminProductRouter.delete('/category/delete', adminAuth, deleteProductCategory);
 
 
 
