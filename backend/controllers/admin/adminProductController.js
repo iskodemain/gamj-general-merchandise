@@ -1,4 +1,4 @@
-import { fetchAllProductsService, fetchProductCategoryService, addProductService, fetchVariantNameService, fetchProductVariantValuesService, fetchProductVariantCombinationService, updateProductService, addProductCategoryService } from "../../services/admin/adminProductService.js";
+import { fetchAllProductsService, fetchProductCategoryService, addProductService, fetchVariantNameService, fetchProductVariantValuesService, fetchProductVariantCombinationService, updateProductService, addProductCategoryService, updateProductCategoryService } from "../../services/admin/adminProductService.js";
 
 
 // ALL PRODUCTS 
@@ -106,6 +106,21 @@ export const addProductCategory = async (req, res) => {
         const { categoryName } = req.body;
         
         const result = await addProductCategoryService(ID, categoryName);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+
+
+export const updateProductCategory = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const { categoryID, categoryName } = req.body;
+        
+        const result = await updateProductCategoryService(ID, categoryID, categoryName);
         res.json(result);
     } catch (error) {
         console.log(error);

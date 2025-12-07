@@ -7,36 +7,45 @@ import Loading from '../Loading';
 import { toast } from 'react-toastify';
 
 function ProductCategory() {
-  const { productCategory, addProductCategory, toastSuccess } = useContext(AdminContext);
+  const { productCategory, addProductCategory, toastSuccess, updateProductCategory } = useContext(AdminContext);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // useEffect(() => {
+  //   if (productCategory && Array.isArray(productCategory)) {
+  //     setCategories(productCategory);
+  //   }
+  // }, [productCategory]);
+
   useEffect(() => {
     if (productCategory && Array.isArray(productCategory)) {
-      setCategories(productCategory);
+      // Deep clone so editing won't mutate original
+      setCategories(JSON.parse(JSON.stringify(productCategory)));
     }
   }, [productCategory]);
 
-  const addNewCategory = async () => {
-    const newCategory = {
-      ID: Date.now(),
-      categoryId: '',
-      categoryName: '',
-      createAt: new Date().toISOString(),
-    };
-    setCategories((prev) => [...prev, newCategory]);
+
+  const addNewCategory = () => {
+    setCategories(prev => [
+      ...prev,
+      {
+        ID: Date.now(),    // temporary ID for frontend only
+        isNew: true,
+        categoryName: ""
+      }
+    ]);
   };
 
   const updateCategory = (index, value) => {
-    setCategories((prev) => {
-      const copy = [...prev];
-      copy[index].categoryName = value;
-      return copy;
+    setCategories(prev => {
+      const list = [...prev];
+      list[index].categoryName = value;
+      return list;
     });
   };
 
   const deleteCategory = (index) => {
-    setCategories((prev) => prev.filter((_, i) => i !== index));
+    setCategories(prev => prev.filter((_, i) => i !== index));
   };
 
   const deleteAll = () => {
@@ -44,36 +53,41 @@ function ProductCategory() {
   };
 
   const saveChanges = async () => {
-    const newCategories = categories.filter((c) => !c.categoryId && c.categoryName.trim() !== "");
-
-    if (newCategories.length === 0) {
-      return;
-    }
-
     setLoading(true);
-    let createdList = [];
 
-    for (const cat of newCategories) {
-      const created = await addProductCategory({ categoryName: cat.categoryName });
+    let createdCount = 0;
+    let updatedCount = 0;
 
-      if (created) {
-        createdList.push(created);
+    for (const cat of categories) {
+      const name = cat.categoryName.trim();
+      if (!name) continue;
+
+      // NEW CATEGORY
+      if (cat.isNew) {
+        const created = await addProductCategory({ categoryName: name });
+        if (created) createdCount++;
+        continue;
+      }
+
+      // EXISTING CATEGORY — only update if changed
+      const original = productCategory.find(p => p.ID === cat.ID);
+
+      if (original && original.categoryName !== name) {
+        const updated = await updateProductCategory({
+          categoryID: cat.ID,
+          categoryName: name
+        });
+
+        if (updated) updatedCount++;
       }
     }
 
     setLoading(false);
 
-    if (createdList.length > 0) {
-      toast.success("Categories saved successfully!", toastSuccess);
-
-      // merge new saved categories into UI list
-      setCategories((prev) => {
-        const existing = prev.filter((c) => c.categoryId); // keep old ones
-        return [...existing, ...createdList]; // include new database records
-      });
+    if (createdCount > 0 || updatedCount > 0) {
+      toast.success("Changes saved successfully!", toastSuccess);
     }
   };
-
 
   return (
     <>
@@ -81,7 +95,7 @@ function ProductCategory() {
       <Navbar TitleName="List of Product Categories" />
       <div className="category-container">
         <div className="category-card">
-          {/* Header with Back Button Only */}
+
           <div className="category-header">
             <div className="cat-header">
               <button onClick={() => window.history.back()} className="cat-back">
@@ -91,7 +105,6 @@ function ProductCategory() {
             </div>
           </div>
 
-          {/* Category List */}
           <div className="category-list">
             {categories.length > 0 ? (
               categories.map((cat, idx) => (
@@ -116,20 +129,17 @@ function ProductCategory() {
             )}
           </div>
 
-          {/* Add New Button Below Categories */}
           <button className="category-add-btn-bottom" onClick={addNewCategory}>
             <FaPlus /> <span className="category-add-text">Add New</span>
           </button>
 
-          {/* Action Buttons */}
           <div className="category-actions">
             <button className="category-save-btn" onClick={saveChanges}>
               Save Changes
             </button>
-            <button className="category-delete-all-btn" onClick={deleteAll}>
-              Delete All
-            </button>
+            <button className="category-delete-all-btn" onClick={deleteAll}>Delete All</button>
           </div>
+
         </div>
       </div>
     </>
