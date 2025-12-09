@@ -216,11 +216,11 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   const getIndividualOptions = (currentStatus) => {
     switch (currentStatus) {
       case "Pending":
-        return ["Processing", "Out for Delivery", "Delivered", "Cancelled"];
+        return ["Processing", "Cancelled"];
       case "Processing":
-        return ["Out for Delivery", "Delivered", "Cancelled"];
+        return ["Out for Delivery"];
       case "Out for Delivery":
-        return ["Delivered", "Cancelled"];
+        return ["Delivered"];
       case "Delivered":
         return []; // no dropdown
       default:
@@ -234,9 +234,9 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   const getBulkOptions = () => {
     switch (orderStatus) {
       case "Pending":
-        return ["Processing", "Out for Delivery", "Delivered"];
+        return ["Processing"];
       case "Processing":
-        return ["Out for Delivery", "Delivered"];
+        return ["Out for Delivery"];
       case "Out for Delivery":
         return ["Delivered"];
       case "Delivered":
@@ -409,15 +409,15 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 
                     <button 
                       className="vap-status-pill" 
-                      disabled={orderStatus === "Delivered"}  // ⛔ disable dropdown entirely
+                      disabled={item.status === "Delivered"}
                       onClick={() =>
-                        orderStatus !== "Delivered" &&
+                        item.status !== "Delivered" &&
                         setOpenDropdown(openDropdown === item.id ? null : item.id)
                       }
                     >
                       <span className="vap-pill-label">{item.status}</span>
                       {
-                        orderStatus !== "Delivered" && <IoIosArrowDown />
+                        item.status !== "Delivered" && <IoIosArrowDown />
                       }
                     </button>
 
