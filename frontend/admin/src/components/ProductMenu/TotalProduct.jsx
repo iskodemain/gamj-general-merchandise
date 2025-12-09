@@ -113,6 +113,7 @@ function TotalProduct() {
           <table className="tp-table" cellSpacing="0">
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Image</th>
                 <th className="left">Name</th>
                 <th className="left">Category</th>
@@ -127,6 +128,7 @@ function TotalProduct() {
               {filteredProducts.length > 0 ? (
                 [...filteredProducts].reverse().map((p) => (
                   <tr key={p.ID} onClick={() => handleView(p.productId)} className='view-product'>
+                    <td className="left">{p.productId}</td>
                     <td>
                       <img
                         src={p.image1 || p.images?.[0]}
