@@ -10,7 +10,11 @@ const InventoryHistory = sequelize.define(
       primaryKey: true,
       allowNull: false,
     },
-
+    inventoryHistoryId: {
+      type: DataTypes.STRING(50),
+      unique: true,
+      allowNull: false, // it's auto-generated 
+    },
     productId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
