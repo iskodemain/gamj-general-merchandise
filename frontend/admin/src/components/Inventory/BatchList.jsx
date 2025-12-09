@@ -308,7 +308,6 @@ export default function BatchList() {
                   <th>Expiration</th>
                   <th>Date Received</th>
                   <th>Status</th>
-                  <th>Action</th>
                 </tr>
               </thead>
 
@@ -373,14 +372,6 @@ export default function BatchList() {
                           <span className={`batchlist-status-badge ${status.class}`}>
                             {status.text}
                           </span>
-                        </td>
-                        <td className="batchlist-cell-action">
-                          <button 
-                            className="batchlist-btn-view"
-                            onClick={() => handleView(row)}
-                          >
-                            View
-                          </button>
                         </td>
                       </tr>
                     );
@@ -454,15 +445,6 @@ export default function BatchList() {
                           {formatDate(row.dateReceived)}
                         </span>
                       </div>
-                    </div>
-
-                    <div className="batchlist-card-footer">
-                      <button 
-                        className="batchlist-btn-view"
-                        onClick={() => handleView(row)}
-                      >
-                        View Details
-                      </button>
                     </div>
                   </div>
                 );
