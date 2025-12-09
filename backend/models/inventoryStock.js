@@ -10,7 +10,11 @@ const InventoryStock = sequelize.define(
       primaryKey: true,
       allowNull: false,
     },
-
+    inventoryStockId: {
+      type: DataTypes.STRING(50),
+      unique: true,
+      allowNull: false, // it's auto-generated 
+    },
     productId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,

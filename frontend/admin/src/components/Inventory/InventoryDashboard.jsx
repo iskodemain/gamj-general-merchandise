@@ -95,13 +95,6 @@ export default function InventoryDashboard() {
     navigate("inventory/add");
   };
 
-  const handleRestock = () => {
-    navigate("inventory/add");
-  };
-
-  const handleViewDetails = () => {
-    
-  };
 
   return (
     <>
@@ -182,13 +175,13 @@ export default function InventoryDashboard() {
           <table className="inventory-table">
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Image</th>
                 <th>Product</th>
                 <th>Variant</th>
                 <th>Stock</th>
                 <th>Low Threshold</th>
                 <th>Status</th>
-                <th>Actions</th>
               </tr>
             </thead>
 
@@ -208,13 +201,10 @@ export default function InventoryDashboard() {
                   const status = computeStatus(stock.totalQuantity, stock.lowStockThreshold);
                   
                   return (
-                    <tr 
-                      key={stock.ID} 
-                      className={`
-                        ${status === "OUT" ? "out-row" : ""}
-                        ${status === "LOW" ? "low-row" : ""}
-                      `.trim()}
-                    >
+                    <tr key={stock.ID} className={`${status === "OUT" ? "out-row" : ""} ${status === "LOW" ? "low-row" : ""}`.trim()}>
+                      <td>
+                        {stock.inventoryStockId}
+                      </td>
                       <td>
                         <img src={image} alt="product" className="prod-img" />
                       </td>
@@ -230,20 +220,6 @@ export default function InventoryDashboard() {
                         <span className={`status-badge status-${status.toLowerCase()}`}>
                           {status === "OUT" ? "❌ OUT" : status === "LOW" ? "⚠️ LOW" : "✅ OK"}
                         </span>
-                      </td>
-                      <td>
-                        <button 
-                          onClick={() => handleRestock()} 
-                          className="action-btn action-btn-primary"
-                        >
-                          Restock
-                        </button>
-                        <button 
-                          onClick={() => handleViewDetails()}
-                          className="action-btn action-btn-secondary"
-                        >
-                          Details
-                        </button>
                       </td>
                     </tr>
                   );

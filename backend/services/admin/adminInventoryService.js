@@ -106,7 +106,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
         }
 
         // 2. Validate required fields
-        if (!productId || !quantityReceived || !batchNumber) {
+        if (!productId || !quantityReceived) {
             await t.rollback();
             return { success: false, message: "Missing required fields" };
         }
@@ -116,7 +116,21 @@ export const addStockService = async (adminId, productId, variantValueId, varian
             return { success: false, message: "Quantity must be greater than 0" };
         }
 
+        // AUTO-GENERATE INVENTORY BATCH ID
+        const lastBatch = await InventoryBatch.findOne({
+            order: [["ID", "DESC"]],
+        });
+
+        const nextBatchNo = lastBatch ? lastBatch.ID + 1 : 1;
+        const inventoryBatchId = "IBT-" + nextBatchNo.toString().padStart(5, "0");
+
+        // AUTO-GENERATE BATCH NUMBER IF NOT GIVEN
+        if (!batchNumber || !batchNumber.trim()) {
+            batchNumber = "BATCH-" + nextBatchNo.toString().padStart(5, "0");
+        }
+
         const batch = await InventoryBatch.create({
+            inventoryBatchId,
             productId,
             variantValueId,
             variantCombinationId,
@@ -143,8 +157,17 @@ export const addStockService = async (adminId, productId, variantValueId, varian
                 lowStockThreshold: lowStockThreshold ?? stock.lowStockThreshold
             }, { transaction: t });
         } else {
+            // AUTO-GENERATE INVENTORY STOCK ID
+            const lastStock = await InventoryStock.findOne({
+                order: [["ID", "DESC"]],
+            });
+
+            const nextStockNo = lastStock ? lastStock.ID + 1 : 1;
+            const inventoryStockId = "IST-" + nextStockNo.toString().padStart(5, "0");
+
             // Create new stock record
             stock = await InventoryStock.create({
+                inventoryStockId,
                 productId,
                 variantValueId,
                 variantCombinationId,
@@ -153,8 +176,15 @@ export const addStockService = async (adminId, productId, variantValueId, varian
             }, { transaction: t });
         }
 
+        // AUTO-GENERATE INVENTORY HISTORY ID
+        const lastHistory = await InventoryHistory.findOne({
+            order: [["ID", "DESC"]],
+        });
 
+        const nextHistoryNo = lastHistory ? lastHistory.ID + 1 : 1;
+        const inventoryHistoryId = "IHT-" + nextHistoryNo.toString().padStart(5, "0");
         await InventoryHistory.create({
+            inventoryHistoryId,
             productId,
             variantValueId,
             variantCombinationId,
