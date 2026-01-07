@@ -7,6 +7,11 @@ import { generateVerificationCode } from '../utils/codeGenerator.js';
 import { sendMail } from '../utils/mailer.js';
 import { validateEmail, validatePhone, validatePassword } from '../validators/userValidator.js';
 import { loginEmailTemplate, registrationEmailTemplate, resetPasswordEmailTemplate } from '../utils/emailTemplates.js';
+
+// 🔹 ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
  
 // CUSTOMER REGISTRATION INPUT
 let tempUserData = {};
@@ -184,8 +189,17 @@ export const registerCodeVerifyService = async (registerKey, code) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(userData.loginPassword, salt);
 
+        // AUTO-GENERATE CUSTOMER ID
+        const lastCustomer = await Customer.findOne({
+        order: [["ID", "DESC"]],
+        });
+
+        const nextCustomerNo = lastCustomer ? Number(lastCustomer.ID) + 1 : 1;
+        const customerId = withTimestamp("CUST", nextCustomerNo);
+
         // SAVE TO DATABASE
         const newUser = await Customer.create({
+            customerId,
             medicalInstitutionName: userData.medicalInstitutionName, 
             contactNumber: userData.contactNumber, 
             landlineNumber: userData.landlineNumber, 
@@ -201,24 +215,6 @@ export const registerCodeVerifyService = async (registerKey, code) => {
             loginPhoneNum: userData.loginPhoneNum, 
             loginEmail: userData.loginEmail, 
             loginPassword: hashedPassword
-        }, {
-            fields: [
-                'medicalInstitutionName',
-                'contactNumber',
-                'landlineNumber',
-                'emailAddress',
-                'fullAddress',
-                'proofType',
-                'imageProof',
-                'repFirstName',
-                'repLastName',
-                'repContactNumber',
-                'repEmailAddress',
-                'repJobPosition',
-                'loginPhoneNum',
-                'loginEmail',
-                'loginPassword'
-            ]
         });
 
         // CREATE TOKEN

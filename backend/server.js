@@ -20,7 +20,7 @@ import adminUsersRouter from './routes/admin/adminUsersRoute.js';
 import adminSettingsRouter from './routes/admin/adminSettingsRoute.js';
 import cusomerSettingsRouter from './routes/customerSettingsRoute.js';
 import adminInventoryRouter from './routes/admin/adminInventoryRoute.js';
-// import { sequelize } from './config/sequelize.js';
+import { sequelize } from './config/sequelize.js';
 
 // APP CONFIG
 const app = express();
@@ -121,7 +121,7 @@ io.on("connection", (socket) => {
 const startServer = async () => {
     try {
         await connectToDatabase();
-        // await sequelize.sync({ alter: true }); 
+        await sequelize.sync({ alter: true }); 
         console.log("Database synchronized successfully.");
         server.listen(port, () => {
             console.log("Server running on PORT: " + port);

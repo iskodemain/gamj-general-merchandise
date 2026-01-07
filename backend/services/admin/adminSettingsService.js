@@ -3,6 +3,11 @@ import SystemSettings from "../../models/systemSettings.js"
 import Admin from "../../models/admin.js";
 import fs from 'fs/promises';
 
+// ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
+
 export const fetchSettingsDataService = async () => {
     try {
         const settingData = await SystemSettings.findAll({});
@@ -35,13 +40,22 @@ export const updateSettingsDataService = async (adminId, body, files) => {
       };
     }
 
-    const settings = await SystemSettings.findOne();
+    let settings = await SystemSettings.findOne();
     if (!settings) {
-      return {
-        success: false,
-        message: "Settings record not found",
-      };
+      const lastSettings = await SystemSettings.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextSettingsNo = lastSettings ? Number(lastSettings.ID) + 1 : 1;
+
+      const systemSettingsId = withTimestamp("SETTINGS", nextSettingsNo);
+
+      settings = await SystemSettings.create({
+        systemSettingsId,
+        businessName: body.businessName || "Default Business Name",
+      });
     }
+
 
     let updatedData = {};
     const uploadsToDelete = []; 

@@ -4,6 +4,11 @@ import InventoryBatch from "../../models/inventoryBatch.js"
 import InventoryHistory from "../../models/inventoryHistory.js"
 import { sequelize } from "../../config/sequelize.js";
 
+// ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
+
 export const fetchInventoryStockService = async (adminId) => {
     try {
         const adminUser = await Admin.findByPk(adminId);
@@ -122,7 +127,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
         });
 
         const nextBatchNo = lastBatch ? lastBatch.ID + 1 : 1;
-        const inventoryBatchId = "IBT-" + nextBatchNo.toString().padStart(5, "0");
+        const inventoryBatchId = withTimestamp("IBT", nextBatchNo);
 
         // AUTO-GENERATE BATCH NUMBER IF NOT GIVEN
         if (!batchNumber || !batchNumber.trim()) {
@@ -163,7 +168,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
             });
 
             const nextStockNo = lastStock ? lastStock.ID + 1 : 1;
-            const inventoryStockId = "IST-" + nextStockNo.toString().padStart(5, "0");
+            const inventoryStockId = withTimestamp("IST", nextStockNo);
 
             // Create new stock record
             stock = await InventoryStock.create({
@@ -182,7 +187,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
         });
 
         const nextHistoryNo = lastHistory ? lastHistory.ID + 1 : 1;
-        const inventoryHistoryId = "IHT-" + nextHistoryNo.toString().padStart(5, "0");
+        const inventoryHistoryId = withTimestamp("IHT", nextHistoryNo);
         await InventoryHistory.create({
             inventoryHistoryId,
             productId,

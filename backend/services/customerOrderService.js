@@ -16,6 +16,11 @@ import fs from 'fs/promises';
 import { orderSendMail } from "../utils/mailer.js";
 import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate } from "../utils/emailTemplates.js";
 
+// 🔹 ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
+
 // CUSTOMER SIDE
 export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete) => {
   try {
@@ -57,24 +62,36 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       }
     }
 
+    // 🔹 AUTO-GENERATE ORDER ID
+    const lastOrder = await Orders.findOne({order: [['ID', 'DESC']]});
+    const nextOrderNo = lastOrder ? Number(lastOrder.ID) + 1 : 1;
+    const orderId = withTimestamp("ORDR", nextOrderNo);
+
     // Create main order
-    const order = await Orders.create(
-      {
-        customerId,
-        paymentMethod,
-      }, {
-        fields: [
-          'customerId',
-          'paymentMethod'
-        ]
+    const order = await Orders.create({
+      orderId,
+      customerId,
+      paymentMethod,
     });
+
+    // ORDER ITEM ID BASE
+    const lastOrderItem = await OrderItems.findOne({order: [['ID', 'DESC']]});
+    let nextOrderItemNo = lastOrderItem ? Number(lastOrderItem.ID) + 1 : 1;
+
+     // ⭐ FIXED — NOTIFICATION ID BASE (DECLARE ONCE)
+    const lastNotification = await Notifications.findOne({order: [["ID", "DESC"]]});
+    let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
 
     for (const item of orderItems) {
       const {productId, productVariantValueId, productVariantCombinationId, value, quantity, subTotal} = item;
 
+      const orderItemId = withTimestamp("OITM", nextOrderItemNo);
+      nextOrderItemNo++;
+
       // ✅ Create Order Item
       await OrderItems.create(
         {
+          orderItemId,
           orderId: order.ID,
           productId,
           productVariantValueId: productVariantValueId || null,
@@ -83,17 +100,6 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
           quantity: Number(quantity) || 0,
           subTotal: Number(subTotal) || 0,
         },
-        {
-          fields: [
-            "orderId",
-            "productId",
-            "productVariantValueId",
-            "productVariantCombinationId",
-            "value",
-            "quantity",
-            "subTotal",
-          ],
-        }
       );
 
       let newStock = 0;
@@ -136,29 +142,20 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       if (newStock <= 10) {
         const lowStockMessage = newStock === 0 ? `⚠️ The product "${productName}" is now OUT OF STOCK.` : `⚠️ The product "${productName}" is running low. Only ${newStock} left in stock!`;
 
+         // ⭐ FIXED — LOW STOCK NOTIFICATION ID
         const lowStockNotification = await Notifications.create({
-          senderId: null,
-          receiverId: null,               // ✅ null = broadcast to all users
-          receiverType: "All",            // ✅ notify all types
-          senderType: "System",
-          notificationType: "Product Update",
-          title: "Low Stock Alert",
-          message: lowStockMessage,
-          isRead: false,
-          createAt: new Date()
-        }, {
-          fields: [ 
-            "senderId", 
-            "receiverId",
-            "receiverType", 
-            "senderType", 
-            "notificationType", 
-            "title", 
-            "message", 
-            "isRead", 
-            "createAt"
-          ]
-        });
+            notificationId: withTimestamp("NTFY", nextNotificationNo++),
+            senderId: null,
+            receiverId: null,               // ✅ null = broadcast to all users
+            receiverType: "All",            // ✅ notify all types
+            senderType: "System",
+            notificationType: "Product Update",
+            title: "Low Stock Alert",
+            message: lowStockMessage,
+            isRead: false,
+            createAt: new Date()
+          }
+        );
 
         io.emit("lowStockAlert", lowStockNotification);
       }
@@ -174,79 +171,49 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
 
     // 1️⃣ CUSTOMER NOTIFICATION (specific customer only)
     const customerNotification = await Notifications.create({
-      senderId: null, // because it system
-      receiverId: customerId,
-      receiverType: "Customer",
-      senderType: "System",
-      notificationType: "Transaction",
-      title: userName,
-      message: notificationMessage,
-      isRead: false,
-      createAt: new Date()
-    }, {
-      fields: [ 
-        "senderId", 
-        "receiverId",
-        "receiverType", 
-        "senderType", 
-        "notificationType", 
-        "title", 
-        "message", 
-        "isRead", 
-        "createAt"
-      ]
-    });
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: null, // because it system
+        receiverId: customerId,
+        receiverType: "Customer",
+        senderType: "System",
+        notificationType: "Transaction",
+        title: userName,
+        message: notificationMessage,
+        isRead: false,
+        createAt: new Date()
+      }
+    );
 
     // 2️⃣ ADMIN NOTIFICATION (all admins)
     const adminNotification = await Notifications.create({
-      senderId: customerId,  // ✅ Who triggered this
-      receiverId: null,      // ✅ null = broadcast to ALL admins
-      receiverType: "Admin",
-      senderType: "System",
-      notificationType: "Transaction",
-      title: userName,
-      message: `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
-      isRead: false,
-      createAt: new Date()
-    }, {
-      fields: [ 
-        "senderId", 
-        "receiverId",
-        "receiverType", 
-        "senderType", 
-        "notificationType", 
-        "title", 
-        "message", 
-        "isRead", 
-        "createAt"
-      ]
-    });
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,  // ✅ Who triggered this
+        receiverId: null,      // ✅ null = broadcast to ALL admins
+        receiverType: "Admin",
+        senderType: "System",
+        notificationType: "Transaction",
+        title: userName,
+        message: `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
+        isRead: false,
+        createAt: new Date()
+      }
+    );
     
 
     // 2️⃣ ADMIN NOTIFICATION (all admins)
     const staffNotification = await Notifications.create({
-      senderId: customerId,  // ✅ Who triggered this
-      receiverId: null,      // ✅ null = broadcast to ALL admins
-      receiverType: "Staff",
-      senderType: "System",
-      notificationType: "Transaction",
-      title: userName,
-      message: `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
-      isRead: false,
-      createAt: new Date()
-    }, {
-      fields: [ 
-        "senderId", 
-        "receiverId",
-        "receiverType", 
-        "senderType", 
-        "notificationType", 
-        "title", 
-        "message", 
-        "isRead", 
-        "createAt"
-      ]
-    });
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,  // ✅ Who triggered this
+        receiverId: null,      // ✅ null = broadcast to ALL admins
+        receiverType: "Staff",
+        senderType: "System",
+        notificationType: "Transaction",
+        title: userName,
+        message: `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
+        isRead: false,
+        createAt: new Date()
+      }
+    );
 
 
     // SOCKET.IO EMITS

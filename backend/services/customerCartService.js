@@ -2,6 +2,11 @@ import Customer from "../models/customer.js";
 import Products from "../models/products.js";
 import Cart from "../models/cart.js";
 
+// 🔹 ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
+
 export const fetchCartItemService = async (customerId) => {
   try {
     const user = await Customer.findByPk(customerId);
@@ -93,18 +98,20 @@ export const addCartItemService = async (customerId, productId, value, quantity)
         };
     }
 
+    // AUTO-GENERATE CART ID
+    const lastCart = await Cart.findOne({
+      order: [["ID", "DESC"]],
+    });
+
+    const nextCartNo = lastCart ? Number(lastCart.ID) + 1 : 1;
+    const cartId = withTimestamp("CART", nextCartNo);
+
     const addedCartItem = await Cart.create({
+        cartId,
         customerId,
         productId,
         value: normalizedValue,
         quantity
-    }, {
-        fields: [
-            'customerId',
-            'productId',
-            'value',
-            'quantity'
-        ]
     });
 
     return {
