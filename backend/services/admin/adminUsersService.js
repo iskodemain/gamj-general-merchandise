@@ -11,8 +11,10 @@ import { userAccountApprovalTemplate, userAccountRejectedTemplate, userAccountCr
 import Notifications from "../../models/notifications.js";
 import { validateEmail, validatePhone, validatePassword } from '../../validators/userValidator.js';
 
-
-
+// 🔹 ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
 
 export const fetchAllCustomerService = async (adminId) => {
     try {
@@ -42,6 +44,7 @@ export const fetchAllCustomerService = async (adminId) => {
         throw new Error(error.message);
     }
 } 
+
 
 export const fetchAllStaffService = async (adminId) => {
     try {
@@ -211,7 +214,15 @@ export const approvedUserService = async (adminId, userID, userType) => {
 
       updated = customer;
 
+      const lastNotification = await Notifications.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextNotifNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+      const notificationId = withTimestamp("NTFY", nextNotifNo);
+
       await Notifications.create({
+        notificationId,
         senderId: adminUser.ID,
         receiverId: customer.ID,               
         receiverType: "Customer",            
@@ -221,18 +232,6 @@ export const approvedUserService = async (adminId, userID, userType) => {
         message: "Your account has been approved.",
         isRead: false,
         createAt: new Date()
-        }, {
-        fields: [ 
-            "senderId", 
-            "receiverId",
-            "receiverType", 
-            "senderType", 
-            "notificationType", 
-            "title", 
-            "message", 
-            "isRead", 
-            "createAt"
-        ]
       });
 
       await accountSendMail({
@@ -291,7 +290,15 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
 
       updated = customer;
 
+      const lastNotification = await Notifications.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextNotifNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+      const notificationId = withTimestamp("NTFY", nextNotifNo);
+
       await Notifications.create({
+        notificationId,
         senderId: adminUser.ID,
         receiverId: customer.ID,               
         receiverType: "Customer",            
@@ -301,18 +308,6 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
         message: `${rejectTitle} - ${rejectMessage}`,
         isRead: false,
         createAt: new Date()
-        }, {
-        fields: [ 
-            "senderId", 
-            "receiverId",
-            "receiverType", 
-            "senderType", 
-            "notificationType", 
-            "title", 
-            "message", 
-            "isRead", 
-            "createAt"
-        ]
       });
 
       await accountSendMail({
@@ -598,41 +593,30 @@ export const addNewUserService = async (adminId, data) => {
     let addNewUser = null;
 
     if (data.userType === "Customer") {
-      addNewUser = await Customer.create(
-        {
-          medicalInstitutionName: data.medicalInstitutionName,
-          contactNumber: data.contactNumber,
-          landlineNumber: data.landlineNumber,
-          emailAddress: data.emailAddress,
-          fullAddress: data.fullAddress,
-          repFirstName: data.repFirstName,
-          repLastName: data.repLastName,
-          repContactNumber: data.repContactNumber,
-          repEmailAddress: data.repEmailAddress,
-          repJobPosition: data.repJobPosition,
-          loginEmail: identifierType === "email" ? data.identifier : null,
-          loginPhoneNum: identifierType === "phone" ? data.identifier : null,
-          loginPassword: hashedPassword,
-          verifiedCustomer: true
-        }, {
-            fields: [
-            'medicalInstitutionName',
-            'contactNumber',
-            'landlineNumber',
-            'emailAddress',
-            'fullAddress',
-            'repFirstName',
-            'repLastName',
-            'repContactNumber',
-            'repEmailAddress',
-            'repJobPosition',
-            'loginPhoneNum',
-            'loginEmail',
-            'loginPassword',
-            'verifiedCustomer'
-          ]
-        }
-      );
+      const lastCustomer = await Customer.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextCustomerNo = lastCustomer ? Number(lastCustomer.ID) + 1 : 1;
+      const customerId = withTimestamp("CUST", nextCustomerNo);
+
+      addNewUser = await Customer.create({
+        customerId,
+        medicalInstitutionName: data.medicalInstitutionName,
+        contactNumber: data.contactNumber,
+        landlineNumber: data.landlineNumber,
+        emailAddress: data.emailAddress,
+        fullAddress: data.fullAddress,
+        repFirstName: data.repFirstName,
+        repLastName: data.repLastName,
+        repContactNumber: data.repContactNumber,
+        repEmailAddress: data.repEmailAddress,
+        repJobPosition: data.repJobPosition,
+        loginEmail: identifierType === "email" ? data.identifier : null,
+        loginPhoneNum: identifierType === "phone" ? data.identifier : null,
+        loginPassword: hashedPassword,
+        verifiedCustomer: true
+      });
 
       await accountSendMail({
         to: addNewUser.loginEmail || addNewUser.repEmailAddress || addNewUser.emailAddress,
@@ -643,25 +627,22 @@ export const addNewUserService = async (adminId, data) => {
     }
 
     if (data.userType === "Staff") {
-      addNewUser = await Staff.create(
-        {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          emailAddress: identifierType === "email" ? data.identifier : null,
-          phoneNumber: identifierType === "phone" ? data.identifier : null,
-          password: hashedPassword,
-          verifiedStaff: true
-        }, {
-            fields: [
-            'firstName',
-            'lastName',
-            'emailAddress',
-            'phoneNumber',
-            'password',
-            'verifiedStaff'
-          ]
-        }
-      );
+      const lastStaff = await Staff.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextStaffNo = lastStaff ? Number(lastStaff.ID) + 1 : 1;
+      const staffId = withTimestamp("STAFF", nextStaffNo);
+
+      addNewUser = await Staff.create({
+        staffId,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        emailAddress: identifierType === "email" ? data.identifier : null,
+        phoneNumber: identifierType === "phone" ? data.identifier : null,
+        password: hashedPassword,
+        verifiedStaff: true
+      });
       if (identifierType === "email") {
         await accountSendMail({
           to: addNewUser.emailAddress,
@@ -673,23 +654,21 @@ export const addNewUserService = async (adminId, data) => {
     }
 
     if (data.userType === "Admin") {
-      addNewUser = await Admin.create(
-        {
-          userName: data.userName,
-          emailAddress: identifierType === "email" ? data.identifier : null,
-          phoneNumber: identifierType === "phone" ? data.identifier : null,
-          password: hashedPassword,
-          verifiedAdmin: true
-        }, {
-            fields: [
-            'userName',
-            'emailAddress',
-            'phoneNumber',
-            'password',
-            'verifiedAdmin'
-          ]
-        }
-      );
+      const lastAdmin = await Admin.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextAdminNo = lastAdmin ? Number(lastAdmin.ID) + 1 : 1;
+      const adminId = withTimestamp("ADMIN", nextAdminNo);
+
+      addNewUser = await Admin.create({
+        adminId,
+        userName: data.userName,
+        emailAddress: identifierType === "email" ? data.identifier : null,
+        phoneNumber: identifierType === "phone" ? data.identifier : null,
+        password: hashedPassword,
+        verifiedAdmin: true
+      });
       if (identifierType === "email") {
         await accountSendMail({
           to: addNewUser.emailAddress,

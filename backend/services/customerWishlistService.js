@@ -2,6 +2,11 @@ import Customer from "../models/customer.js";
 import Products from "../models/products.js";
 import Wishlist from "../models/wishlist.js";
 
+// 🔹 ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
+
 export const fetchWishlistItemService = async (customerId) => {
   try {
     const user = await Customer.findByPk(customerId);
@@ -36,7 +41,6 @@ export const fetchWishlistItemService = async (customerId) => {
   }
 };
 
-
 export const addWishlistItemService = async (customerId, productId) => {
   try {
     const user = await Customer.findByPk(customerId);
@@ -55,14 +59,19 @@ export const addWishlistItemService = async (customerId, productId) => {
         }
     }
 
+    // 🔹 Get last wishlist record
+    const lastWishlist = await Wishlist.findOne({
+      order: [['ID', 'DESC']],
+    });
+
+    // 🔹 Generate next wishlist number
+    const nextWishlistNo = lastWishlist ? Number(lastWishlist.ID) + 1 : 1;
+    const wishlistId = withTimestamp("WLST", nextWishlistNo);
+
     const addedWishlistItem = await Wishlist.create({
+        wishlistId,
         customerId, 
         productId
-    }, {
-        fields: [
-            'customerId',
-            'productId'
-        ]
     });
 
     return {

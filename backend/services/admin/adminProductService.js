@@ -7,6 +7,9 @@ import ProductVariantCombination from "../../models/productVariantCombination.js
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
 
 export const addProductService = async ( adminId, categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination) => {
   try {
@@ -74,46 +77,36 @@ export const addProductService = async ( adminId, categoryId, productName, produ
 
       // Delete local temp files
       for (const img of images) {
-          try { await fs.unlink(img.path); } catch {}
+        try { await fs.unlink(img.path); } catch {}
       }
 
+
+      // AUTO-GENERATE PRODUCT ID ✅
+      const lastProduct = await Products.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextProductNo = lastProduct ? Number(lastProduct.ID) + 1 : 1;
+      const productId = withTimestamp("PRDT", nextProductNo);
+
       // CREATE PRODUCT — removed stock + expiration
-      const newProduct = await Products.create(
-        {
-          categoryId,
-          productName,
-          productDescription,
-          productDetails: productDetails || "",
-          price: Number(price),
-          image1: imagesUrl[0]?.secure_url,
-          image2: imagesUrl[1]?.secure_url || null,
-          image3: imagesUrl[2]?.secure_url || null,
-          image4: imagesUrl[3]?.secure_url || null,
-          isBestSeller,
-          isActive,
-          isOutOfStock,
-          hasVariant,
-          hasVariantCombination
-        },
-        {
-            fields: [
-              "categoryId",
-              "productName",
-              "productDescription",
-              "productDetails",
-              "price",
-              "image1",
-              "image2",
-              "image3",
-              "image4",
-              "isBestSeller",
-              "isActive",
-              "isOutOfStock",
-              "hasVariant",
-              "hasVariantCombination"
-            ]
-        }
-      );
+      const newProduct = await Products.create({
+        productId,
+        categoryId,
+        productName,
+        productDescription,
+        productDetails: productDetails || "",
+        price: Number(price),
+        image1: imagesUrl[0]?.secure_url,
+        image2: imagesUrl[1]?.secure_url || null,
+        image3: imagesUrl[2]?.secure_url || null,
+        image4: imagesUrl[3]?.secure_url || null,
+        isBestSeller,
+        isActive,
+        isOutOfStock,
+        hasVariant,
+        hasVariantCombination
+      });
 
       // ------------------------------
       //  NO VARIANTS
@@ -126,43 +119,54 @@ export const addProductService = async ( adminId, categoryId, productName, produ
       //  VARIANTS (NO COMBO)
       // ------------------------------
       if (hasVariant && !hasVariantCombination) {
-
-          if (!variantNames?.length)
-              return { success: false, message: "Variant name is required." };
-
+          if (!variantNames?.length) {
+            return { success: false, message: "Variant name is required." };
+          }
+              
           let variantNameRecord = await VariantName.findOne({
               where: { name: variantNames[0] }
           });
 
           if (!variantNameRecord) {
-              variantNameRecord = await VariantName.create(
-                  { name: variantNames[0] },
-                  { fields: ["name"] }
-              );
+            // VARIANT NAME ID
+            const lastVariantName = await VariantName.findOne({
+                order: [["ID", "DESC"]],
+            });
+
+            const nextVariantNameNo = lastVariantName ? lastVariantName.ID + 1 : 1;
+            const variantNameId = withTimestamp("VN", nextVariantNameNo);
+
+            variantNameRecord = await VariantName.create({ 
+                variantNameId,
+                name: variantNames[0]
+            });
           }
 
-          if (!variantValues?.length)
-              return { success: false, message: "Variant values are required." };
+          if (!variantValues?.length) {
+            return { success: false, message: "Variant values are required." };
+          }
+              
 
           const createdValues = [];
 
+          // AUTO-GENERATE PRODUCT VARIANT VALUE ID ✅
+          const lastVariantValue = await ProductVariantValues.findOne({
+            order: [["ID", "DESC"]],
+          });
+
+          let variantValueCounter = lastVariantValue ? Number(lastVariantValue.ID) : 0;
+
           for (const v of variantValues) {
-              const record = await ProductVariantValues.create(
-                  {
-                      productId: newProduct.ID,
-                      variantNameId: variantNameRecord.ID,
-                      value: v.name,
-                      price: v.price || null
-                  },
-                  {
-                      fields: [
-                          "productId",
-                          "variantNameId",
-                          "value",
-                          "price"
-                      ]
-                  }
-              );
+              variantValueCounter++;
+              const productVariantValueId = withTimestamp("PVV", variantValueCounter);
+
+              const record = await ProductVariantValues.create({   
+                    productVariantValueId,
+                    productId: newProduct.ID,
+                    variantNameId: variantNameRecord.ID,
+                    value: v.name,
+                    price: v.price || null
+                });
               createdValues.push(record);
           }
 
@@ -180,9 +184,10 @@ export const addProductService = async ( adminId, categoryId, productName, produ
       // ------------------------------
       if (hasVariant && hasVariantCombination) {
 
-          if (!variantNames?.length)
-              return { success: false, message: "Variant name is required." };
-
+          if (!variantNames?.length) {
+            return { success: false, message: "Variant name is required." };
+          }
+              
           const existingNames = await VariantName.findAll({
               where: { name: variantNames }
           });
@@ -190,43 +195,64 @@ export const addProductService = async ( adminId, categoryId, productName, produ
           const existing = existingNames.map(v => v.name);
           const newNames = variantNames.filter(n => !existing.includes(n));
 
+        //   const createdNames = await Promise.all(
+        //       newNames.map(name => VariantName.create({ name }, { fields: ["name"] }))
+        //   );
+
+          const lastVariantName = await VariantName.findOne({
+            order: [["ID", "DESC"]],
+          });
+
+          let variantNameCounter = lastVariantName ? Number(lastVariantName.ID) : 0;
+
           const createdNames = await Promise.all(
-              newNames.map(name => VariantName.create({ name }, { fields: ["name"] }))
+            newNames.map(async (name) => {
+                variantNameCounter++;
+
+                const variantNameId = withTimestamp("VN", variantNameCounter);
+
+                return VariantName.create({
+                    variantNameId,
+                    name
+                });
+            })
           );
 
           const allVariantNameRecords = [...existingNames, ...createdNames];
 
-          if (!variantValues?.length)
-              return { success: false, message: "Variant values are required." };
-
+          if (!variantValues?.length) {
+            return { success: false, message: "Variant values are required." };
+          }
+              
           const createdVariantValues = [];
 
+
+          // AUTO-GENERATE PRODUCT VARIANT VALUE ID ✅
+          const lastVariantValue = await ProductVariantValues.findOne({
+            order: [["ID", "DESC"]],
+          });
+          let variantValueCounter = lastVariantValue ? Number(lastVariantValue.ID) : 0;
+
           for (const val of variantValues) {
-              const vn = allVariantNameRecords.find(x => x.name === val.variantName);
+            const vn = allVariantNameRecords.find(x => x.name === val.variantName);
 
-              const record = await ProductVariantValues.create(
-                  {
-                      productId: newProduct.ID,
-                      variantNameId: vn.ID,
-                      value: val.name,
-                      price: val.price || null
-                  },
-                  {
-                      fields: [
-                          "productId",
-                          "variantNameId",
-                          "value",
-                          "price"
-                      ]
-                  }
-              );
+            variantValueCounter++;
+            const productVariantValueId = withTimestamp("PVV", variantValueCounter);
 
-              createdVariantValues.push(record);
+            const record = await ProductVariantValues.create({
+                productVariantValueId,
+                productId: newProduct.ID,
+                variantNameId: vn.ID,
+                value: val.name,
+                price: val.price || null
+            });
+            createdVariantValues.push(record);
           }
 
-          if (!variantCombination?.length)
-              return { success: false, message: "Variant combination is required." };
-
+          if (!variantCombination?.length) {
+            return { success: false, message: "Variant combination is required." };
+          }
+              
           const normalize = (value) => {
               if (!value?.trim()) return "";
               return value
@@ -239,27 +265,26 @@ export const addProductService = async ( adminId, categoryId, productName, produ
 
           const createdCombinations = [];
 
+          // AUTO-GENERATE PRODUCT VARIANT COMBINATION ID ✅
+          const lastCombination = await ProductVariantCombination.findOne({
+            order: [["ID", "DESC"]],
+          });
+          let comboCounter = lastCombination ? Number(lastCombination.ID) : 0;
+
           for (const combo of variantCombination) {
-              const formatted = normalize(combo.combinations);
+            comboCounter++;
+            const productVariantCombinationId = withTimestamp("PVC", comboCounter);
+            const formatted = normalize(combo.combinations);
 
-              const record = await ProductVariantCombination.create(
-                  {
-                      productId: newProduct.ID,
-                      combinations: formatted,
-                      price: combo.price || 0,
-                      availability: combo.availability ? 1 : 0
-                  },
-                  {
-                      fields: [
-                          "productId",
-                          "combinations",
-                          "price",
-                          "availability"
-                      ]
-                  }
-              );
+            const record = await ProductVariantCombination.create({
+                productVariantCombinationId,
+                productId: newProduct.ID,
+                combinations: formatted,
+                price: combo.price || 0,
+                availability: combo.availability ? 1 : 0
+            });
 
-              createdCombinations.push(record);
+            createdCombinations.push(record);
           }
 
           return {
@@ -467,17 +492,6 @@ export const updateProductService = async (adminId, productID, categoryId, produ
           return { success: false, message: 'Failed to clear previous variant data', error: delErr.message };
       }
 
-      // Helper: find or create VariantName
-      const findOrCreateVariantName = async (name) => {
-          let rec = await VariantName.findOne({ where: { name } });
-          if (!rec) {
-              rec = await VariantName.create({ name }, { fields: ['name'] });
-          }
-          return rec;
-      };
-
-      // ---------- mode branches ----------
-
       // NO VARIANTS
       if (!hasVariant && !hasVariantCombination) {
           return { success: true, message: 'Product updated successfully.' };
@@ -492,21 +506,41 @@ export const updateProductService = async (adminId, productID, categoryId, produ
           }
 
           let variantNameRecord = await VariantName.findOne({ where: { name: firstVariantName } });
+
           if (!variantNameRecord) {
-              variantNameRecord = await VariantName.create({ name: firstVariantName }, { fields: ['name'] });
+            const lastVariantName = await VariantName.findOne({
+                order: [["ID", "DESC"]],
+            });
+
+            const nextVariantNameNo = lastVariantName ? Number(lastVariantName.ID) + 1 : 1;
+            const variantNameId = withTimestamp("VN", nextVariantNameNo);
+
+            variantNameRecord = await VariantName.create({
+                variantNameId,
+                name: firstVariantName
+            });
           }
 
           const createdVariantValues = [];
+
+          const lastVariantValue = await ProductVariantValues.findOne({
+            order: [["ID", "DESC"]],
+          });
+
+          let variantValueCounter = lastVariantValue ? Number(lastVariantValue.ID) : 0;
+
           for (const item of (variantValues || [])) {
-              const rv = await ProductVariantValues.create({
-                  productId: existingProduct.ID,
-                  variantNameId: variantNameRecord.ID,
-                  value: item.name,
-                  price: item.price === '' ? null : item.price === null || item.price === undefined ? null : Number(item.price)
-              }, {
-                  fields: ['productId', 'variantNameId', 'value', 'price']
-              });
-              createdVariantValues.push(rv);
+            variantValueCounter++;
+            const productVariantValueId = withTimestamp("PVV", variantValueCounter);
+
+            const rv = await ProductVariantValues.create({
+                productVariantValueId,
+                productId: existingProduct.ID,
+                variantNameId: variantNameRecord.ID,
+                value: item.name,
+                price: item.price === '' ? null : item.price === null || item.price === undefined ? null : Number(item.price)
+            });
+            createdVariantValues.push(rv);
           }
 
           return {
@@ -525,45 +559,83 @@ export const updateProductService = async (adminId, productID, categoryId, produ
           const existingNames = existingVariantNames.map(v => v.name);
           const newNames = (variantNames || []).filter(n => !existingNames.includes(n));
 
+
+          const lastVariantName = await VariantName.findOne({
+            order: [["ID", "DESC"]],
+          });
+
+          let variantNameCounter = lastVariantName ? Number(lastVariantName.ID) : 0;
+
           const createdNames = [];
           for (const n of newNames) {
-              const rec = await VariantName.create({ name: n }, { fields: ['name'] });
-              createdNames.push(rec);
+            variantNameCounter++;
+            const variantNameId = withTimestamp("VN", variantNameCounter);
+
+            const rec = await VariantName.create({
+                variantNameId,
+                name: n
+            });
+            createdNames.push(rec);
           }
 
           const variantNameRecords = [...existingVariantNames, ...createdNames];
 
           // create product variant values (flat list)
           const variantValueRecs = [];
+
+          const lastVariantValue = await ProductVariantValues.findOne({
+            order: [["ID", "DESC"]],
+          });
+          let variantValueCounter = lastVariantValue ? Number(lastVariantValue.ID) : 0;
+
           for (const item of (variantValues || [])) {
               let vn = variantNameRecords.find(v => v.name === item.variantName);
+              
               if (!vn) {
-                  vn = await VariantName.create({ name: item.variantName }, { fields: ['name'] });
+                variantNameCounter++;
+                const variantNameId = withTimestamp("VN", variantNameCounter);
+                vn = await VariantName.create({ 
+                    variantNameId,
+                    name: item.variantName 
+                });
               }
+
+              variantValueCounter++;
+              const productVariantValueId = withTimestamp("PVV", variantValueCounter);
+
               const rec = await ProductVariantValues.create({
+                  productVariantValueId,
                   productId: existingProduct.ID,
                   variantNameId: vn.ID,
                   value: item.name,
                   price: item.price === '' ? null : item.price === null || item.price === undefined ? null : Number(item.price)
-              }, {
-                  fields: ['productId', 'variantNameId', 'value', 'price']
               });
               variantValueRecs.push(rec);
           }
 
           // create combinations
           const combinationRecords = [];
+
+          const lastCombination = await ProductVariantCombination.findOne({
+            order: [["ID", "DESC"]],
+          });
+
+          let comboCounter = lastCombination ? Number(lastCombination.ID) : 0;
+
           for (const combo of (variantCombination || [])) {
-              const normalized = combo.combinations ? String(combo.combinations).split(',').map(s => s.trim()).filter(Boolean).sort().join(', ') : '';
-              const rec = await ProductVariantCombination.create({
-                  productId: existingProduct.ID,
-                  combinations: normalized,
-                  price: combo.price === '' ? 0 : combo.price === null || combo.price === undefined ? 0 : Number(combo.price),
-                  availability: combo.availability ? 1 : 0
-              }, {
-                  fields: ['productId', 'combinations', 'price', 'availability']
-              });
-              combinationRecords.push(rec);
+            const normalized = combo.combinations ? String(combo.combinations).split(',').map(s => s.trim()).filter(Boolean).sort().join(', ') : '';
+
+            comboCounter++;
+            const productVariantCombinationId = withTimestamp("PVC", comboCounter);
+
+            const rec = await ProductVariantCombination.create({
+                productVariantCombinationId,
+                productId: existingProduct.ID,
+                combinations: normalized,
+                price: combo.price === '' ? 0 : combo.price === null || combo.price === undefined ? 0 : Number(combo.price),
+                availability: combo.availability ? 1 : 0
+            });
+            combinationRecords.push(rec);
           }
 
           return {
@@ -762,7 +834,7 @@ export const addProductCategoryService = async (adminId, categoryName) => {
     });
 
     const nextNumber = lastCategory ? lastCategory.ID + 1 : 1;
-    const categoryId = "CAT-" + nextNumber.toString().padStart(5, "0");
+    const categoryId = withTimestamp("CAT", nextNumber);
 
     // Create Category Record
     const created = await Category.create({

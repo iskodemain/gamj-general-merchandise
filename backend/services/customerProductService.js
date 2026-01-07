@@ -333,33 +333,6 @@ export const fetchAllProductsService = async () => {
     }
 }
 
-// Product Category (ADD) ---- ADMIN PART
-export const addProductCategoryService = async (categoryName) => {
-    try {
-        if (!categoryName) {
-            return {
-                success: false,
-                message: "Category name is required."
-            };
-        }
-        const newCategory = await Category.create({ 
-                categoryName 
-            }, {
-                fields: [
-                    'categoryName'
-                ]
-            });
-        return {
-            success: true,
-            message: "Category added successfully.",
-            category: newCategory
-        };
-    } catch (error) {
-        console.log(error);
-        throw new Error(error.message);
-    }
-}
-
 // Variant Names (FETCH)
 export const fetchVariantNameService = async () => {
     try {

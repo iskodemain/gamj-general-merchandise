@@ -13,6 +13,11 @@ import RefundProof from "../../models/refundProof.js";
 import {v2 as cloudinary} from 'cloudinary';
 
 
+// ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
+
 
 export const fetchOrdersService = async (adminId) => {
     try {
@@ -222,20 +227,22 @@ export const updateOrderStatusService = async (adminId, data) => {
       // CANCELLED → CREATE OrderCancel
       // -------------------------
       if (changeStatus === "Cancelled") {
+        // 🔹 AUTO-GENERATE cancelId
+        const lastCancel = await OrderCancel.findOne({
+          order: [["ID", "DESC"]],
+        });
+
+        const nextCancelNo = lastCancel ? Number(lastCancel.ID) + 1 : 1;
+        const cancelId = withTimestamp("OCAN", nextCancelNo);
+
         const cancelledData = await OrderCancel.create({
+          cancelId,
           orderItemId: orderItem.ID,
           customerId: customer.ID,
           cancelComments: cancelComments,
           cancellationStatus: "Processing",
           cancelledBy: "Admin",
-        }, {
-        fields: [
-          'orderItemId',
-          'customerId',
-          'cancelComments',
-          'cancellationStatus',
-          'cancelledBy'
-        ]});
+        });
 
         io.emit("addCancelOrder", {
           orderCancelId: cancelledData.ID,
@@ -291,7 +298,16 @@ export const updateOrderStatusService = async (adminId, data) => {
       // -------------------------
       // CREATE NOTIFICATIONS
       // -------------------------
+      const lastNotif = await Notifications.findOne({
+        order: [["ID", "DESC"]],
+      });
+      let notifCounter = lastNotif ? Number(lastNotif.ID) : 0;
+
+
+      notifCounter++;
+      const customerNotificationId = withTimestamp("NTFY", notifCounter);
       const customerNotif = await Notifications.create({
+        notificationId: customerNotificationId,
         senderId: null,
         receiverId: customer.ID,
         receiverType: "Customer",
@@ -301,21 +317,13 @@ export const updateOrderStatusService = async (adminId, data) => {
         message: notifMessage,
         isRead: false,
         createAt: new Date()
-      }, {
-        fields: [ 
-            "senderId", 
-            "receiverId",
-            "receiverType", 
-            "senderType", 
-            "notificationType", 
-            "title", 
-            "message", 
-            "isRead", 
-            "createAt"
-        ]
-     });
+      });
 
+
+      notifCounter++;
+      const adminNotificationId = withTimestamp("NTFY", notifCounter);
       const adminNotif = await Notifications.create({
+        notificationId: adminNotificationId,
         senderId: customer.ID,
         receiverId: null,
         receiverType: "Admin",
@@ -325,21 +333,13 @@ export const updateOrderStatusService = async (adminId, data) => {
         message: AdminStaffNotifMessage,
         isRead: false,
         createAt: new Date()
-      }, {
-        fields: [ 
-            "senderId", 
-            "receiverId",
-            "receiverType", 
-            "senderType", 
-            "notificationType", 
-            "title", 
-            "message", 
-            "isRead", 
-            "createAt"
-        ]
-     });
+      });
 
+
+      notifCounter++;
+      const staffNotificationId = withTimestamp("NTFY", notifCounter);
       const staffNotif = await Notifications.create({
+        notificationId: staffNotificationId,
         senderId: customer.ID,
         receiverId: null,
         receiverType: "Staff",
@@ -349,19 +349,7 @@ export const updateOrderStatusService = async (adminId, data) => {
         message: AdminStaffNotifMessage,
         isRead: false,
         createAt: new Date()
-      }, {
-        fields: [ 
-            "senderId", 
-            "receiverId",
-            "receiverType", 
-            "senderType", 
-            "notificationType", 
-            "title", 
-            "message", 
-            "isRead", 
-            "createAt"
-        ]
-     });
+      });
 
       // Queue for socket emission
       notificationsToEmit.push({ customerNotif, adminNotif, staffNotif });
@@ -646,24 +634,25 @@ export const submitRefundProofService = async (adminId, body, file) => {
         console.error("Image unlink failed: ", unlinkErr.message);
       }
     }
+    
+    // 6. AUTO-GENERATE refundProofId
+    const lastRefundProof = await RefundProof.findOne({
+      order: [["ID", "DESC"]],
+    });
+
+    const nextRefundProofNo = lastRefundProof ? Number(lastRefundProof.ID) + 1 : 1;
+    const refundProofId = withTimestamp("RFDP", nextRefundProofNo);
 
     // ----------------------------------
-    // 6. Save RefundProof record
+    // 7. Save RefundProof record
     // ----------------------------------
     const createdProof = await RefundProof.create({
+      refundProofId,
       customerId: body.customerID,
       refundId: body.refundID,
       refundAmount: body.refundAmount,
       receiptImage: cloudResult ? cloudResult.secure_url : body.receiptImage, // supports image URL fallback
       transactionID: body.transactionID
-    }, {
-      fields: [
-        'customerId',
-        'refundId',
-        'refundAmount',
-        'receiptImage',
-        'transactionID'
-      ]
     });
 
     return {
@@ -755,10 +744,19 @@ export const cancelSubmitAsRefundService = async (adminId, body, file) => {
       }
     }
 
+    // 6. AUTO-GENERATE refundProofId
+    const lastRefundProof = await RefundProof.findOne({
+      order: [["ID", "DESC"]],
+    });
+
+    const nextRefundProofNo = lastRefundProof ? Number(lastRefundProof.ID) + 1 : 1;
+    const refundProofId = withTimestamp("RFDP", nextRefundProofNo);
+
     // ----------------------------------
-    // 6. Save RefundProof record
+    // 7. Save RefundProof record
     // ----------------------------------
     await RefundProof.create({
+      refundProofId,
       customerId: body.customerID,
       cancelId: body.cancelID,
       refundAmount: body.refundAmount,
