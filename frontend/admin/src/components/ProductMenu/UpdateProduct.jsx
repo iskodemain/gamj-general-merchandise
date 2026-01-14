@@ -446,13 +446,16 @@ function UpdateProduct() {
     formData.append('variantValues', JSON.stringify(finalVariantValues || []));
     formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
 
-    console.log("FormData:", Object.fromEntries(formData));
-
     setLoading(true);
-    await updateProduct(formData);
-    setLoading(false);
+    const update = await updateProduct(formData);
+    
+    if (update) {
+      setTimeout(() => {
+        window.location.href = "/products/totalproduct";
+      }, 500);
+    }
 
-    navigate('/products/totalproduct');
+    setLoading(false);
   };
 
   const handleDelete = async () => {
