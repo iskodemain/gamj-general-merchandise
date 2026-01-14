@@ -46,7 +46,7 @@ const Customer = sequelize.define(
     profileImage: {
       type: DataTypes.STRING(2048),
       allowNull: false,
-      defaultValue: 'https://res.cloudinary.com/dxm5frxoh/image/upload/v1754024552/profile_icon_htchbq.png',
+      defaultValue: 'https://res.cloudinary.com/dxm5frxoh/image/upload/v1767962446/profile_icon_wuxouv.png',
     },
     repFirstName: {
       type: DataTypes.STRING(255),
