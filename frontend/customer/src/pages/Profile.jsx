@@ -231,14 +231,17 @@ const Profile = () => {
       return;
     }
 
-    if (!proofType) {
-      toast.error("You forgot to select a proof type.", { ...toastError });
-      return;
-    }
+    // Proof validation ONLY if user is NOT verified
+    if (!verifiedUser) {
+      if (!proofType) {
+        toast.error("You forgot to select a proof type.", { ...toastError });
+        return;
+      }
 
-    if (!newImageProof && !imageProof) {
-      toast.error("Uploading proof of legitimacy is required.", { ...toastError });
-      return;
+      if (!newImageProof && !imageProof) {
+        toast.error("Uploading proof of legitimacy is required.", { ...toastError });
+        return;
+      }
     }
 
     if (!repFirstName) {

@@ -48,11 +48,21 @@ export const updateCustomerEditProfileService = async (ID, medicalInstitutionNam
             }
         }
 
-        if (!user.imageProof && !imageProof) {
-            return {
-                success: false,
-                message: 'Proof of legitimacy is required.'
-            };
+        // Require proof ONLY if user is NOT verified
+        if (!user.verifiedCustomer) {
+            if (!proofType) {
+                return {
+                    success: false,
+                    message: 'Proof type is required.'
+                };
+            }
+
+            if (!user.imageProof && !imageProof) {
+                return {
+                    success: false,
+                    message: 'Proof of legitimacy is required.'
+                };
+            }
         }
 
         // EMAIL ADDRESS

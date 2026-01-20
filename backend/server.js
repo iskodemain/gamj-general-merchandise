@@ -121,7 +121,7 @@ io.on("connection", (socket) => {
 const startServer = async () => {
     try {
         await connectToDatabase();
-        // await sequelize.sync({ alter: true }); 
+        await sequelize.sync({ alter: true }); 
         console.log("Database synchronized successfully.");
         server.listen(port, () => {
             console.log("Server running on PORT: " + port);
