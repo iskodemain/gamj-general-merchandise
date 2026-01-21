@@ -9,6 +9,7 @@ import RefundProof from "../models/refundProof.js";
 import OrderRefund from "../models/orderRefund.js";
 import Notifications from "../models/notifications.js";
 import Cart from "../models/cart.js";
+import OrderTransaction from "../models/orderTransaction.js";
 import { Op } from "sequelize";
 import { io } from "../server.js";
 import {v2 as cloudinary} from 'cloudinary';
@@ -165,6 +166,24 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
     // Fetch the complete order record to include auto-generated orderId
     const fullOrder = await Orders.findByPk(order.ID);
 
+    // CREATION OF ORDER TRANSATION RECORD
+    const totalAmount = orderItems.reduce((sum, item) => sum + Number(item.subTotal || 0), 0);
+
+    const lastTransaction = await OrderTransaction.findOne({order: [['ID', 'DESC']]});
+    const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
+    const transactionId = withTimestamp('TRXN', nextTransactionNo);
+
+    await OrderTransaction.create({
+      transactionId,
+      orderId: fullOrder.ID,
+      orderItemId: null, 
+      customerId,
+      transactionType: 'Order Placed',
+      totalAmount,
+      paymentMethod: fullOrder.paymentMethod,
+      transactionDate: new Date(),
+    });
+
     // ✅ Create notification for both Admin & Staff
     const notificationMessage = `placed a new order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`;
     const userName = user.medicalInstitutionName;
@@ -199,7 +218,6 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       }
     );
     
-
     // 2️⃣ ADMIN NOTIFICATION (all admins)
     const staffNotification = await Notifications.create({
         notificationId: withTimestamp("NTFY", nextNotificationNo++),

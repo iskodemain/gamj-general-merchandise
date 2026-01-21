@@ -16,6 +16,11 @@ const extractCloudinaryPublicId = (url, folder) => {
     return `${folder}/${filename}`;
 };
 
+// 🔹 ID GENERATOR
+const withTimestamp = (prefix, number) => {
+  return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
+};
+
 export const fetchCustomerEditProfileService = async (ID) => {
     try {
         const user = await Customer.findByPk(ID);
@@ -341,7 +346,16 @@ export const updateCustomerDeliveryInfoService = async (customerId, medicalInsti
         });
 
         if (!user) {
+            // GET LAST DELIVERY RECORD
+            const lastDelivery = await DeliveryInfo.findOne({
+                order: [["ID", "DESC"]],
+            });
+
+            // GENERATE DELIVERY ID
+            const nextDeliveryNo = lastDelivery ? Number(lastDelivery.ID) + 1 : 1;
+            const deliveryId = withTimestamp("DLV", nextDeliveryNo);
             user = await DeliveryInfo.create({
+                deliveryId,
                 customerId,                       
                 medicalInstitutionName,
                 emailAddress,
@@ -352,19 +366,6 @@ export const updateCustomerDeliveryInfoService = async (customerId, medicalInsti
                 barangayId,
                 contactNumber,
                 updateAt: new Date(),
-            }, {
-                fields: [
-                    'customerId',
-                    'medicalInstitutionName',
-                    'emailAddress',
-                    'provinceId',
-                    'cityId',
-                    'detailedAddress',
-                    'zipCode',
-                    'barangayId',
-                    'contactNumber',
-                    'updateAt'
-                ]
             });
 
             return {
