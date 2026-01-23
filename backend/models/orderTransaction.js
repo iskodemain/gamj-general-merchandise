@@ -53,7 +53,6 @@ const OrderTransaction = sequelize.define(
     transactionType: {
       type: DataTypes.ENUM(
         'Order Placed',
-        'Payment Received',
         'Order Processing',
         'Out for Delivery',
         'Order Delivered',
@@ -61,9 +60,10 @@ const OrderTransaction = sequelize.define(
         'Order Refund Requested',
         'Order Refund Approved',
         'Order Refund Completed',
+        'Order Refund Rejected',
         'Order Cancellation Request',
         'Order Cancellation Processed',
-        'Cancellation Request Cancelled'
+        'Order Cancellation Request Cancelled'
       ),
       allowNull: false,
     },

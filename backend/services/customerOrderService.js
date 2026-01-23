@@ -79,7 +79,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
     const lastOrderItem = await OrderItems.findOne({order: [['ID', 'DESC']]});
     let nextOrderItemNo = lastOrderItem ? Number(lastOrderItem.ID) + 1 : 1;
 
-     // ⭐ FIXED — NOTIFICATION ID BASE (DECLARE ONCE)
+    // ⭐ FIXED — NOTIFICATION ID BASE (DECLARE ONCE)
     const lastNotification = await Notifications.findOne({order: [["ID", "DESC"]]});
     let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
 
@@ -405,11 +405,17 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         updatedStock = productStock + quantityToRestore;
         await product.update({ stockQuantity: updatedStock });
       }
-      
+
+      // 🔹 AUTO-GENERATE ORDER ID
+      const lastCancelOrder = await OrderCancel.findOne({order: [['ID', 'DESC']]});
+      const nextCancelOrderNo = lastCancelOrder ? Number(lastCancelOrder.ID) + 1 : 1;
+      const cancelId = withTimestamp("OCAN", nextCancelOrderNo);
+
       // ✅ 6. Update order item status to Cancelled
       await orderItem.update({ orderStatus: "Cancelled" });
 
       const cancelRecord = await OrderCancel.create({
+        cancelId,
         orderItemId,
         customerId,
         reasonForCancellation,
@@ -417,20 +423,35 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         cancelPaypalEmail: cancelPaypalEmail || null,
         cancellationStatus,
         cancelledBy,
-      }, {
-        fields: [
-          'orderItemId',
-          'customerId',
-          'reasonForCancellation',
-          'cancelComments',
-          'cancelPaypalEmail',
-          'cancellationStatus',
-          'cancelledBy'
-        ]
       });
+
+      // Fetch the complete order record to include auto-generated orderId
+      const fullOrder = await Orders.findByPk(orderItem.orderId);
+
+      // 🔹 AUTO-GENERATE TRANSACTION ID & CREATE ORDER TRANSACTION
+      const lastTransaction = await OrderTransaction.findOne({order: [['ID', 'DESC']]});
+      const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
+      const transactionId = withTimestamp('TRXN', nextTransactionNo);
+
+      await OrderTransaction.create({
+        transactionId,
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId,
+        transactionType: 'Order Cancelled',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+
+      // ⭐ FIXED — NOTIFICATION ID BASE (DECLARE ONCE)
+      const lastNotification = await Notifications.findOne({order: [["ID", "DESC"]]});
+      let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
 
       // Notify the CUSTOMER (stock restoration)
       const stockRestoration = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: null,
         receiverId: customerId,
         receiverType: "Customer",
@@ -440,27 +461,13 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         message: `Your cancelled order for "${product.productName}" has been processed. ${quantityToRestore} stock has been restored.`,
         isRead: false,
         createAt: new Date()
-      }, {
-          fields: [ 
-            "senderId", 
-            "receiverId",
-            "receiverType", 
-            "senderType", 
-            "notificationType", 
-            "title", 
-            "message", 
-            "isRead", 
-            "createAt"
-          ]
       });
-
-      // Fetch the complete order record to include auto-generated orderId
-      const fullOrder = await Orders.findByPk(orderItem.orderId);
 
       const userName = user.medicalInstitutionName;
 
       // 1️⃣ CUSTOMER NOTIFICATION (specific customer only)
       const customerNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: customerId, 
         receiverId: customerId,
         receiverType: "Customer",
@@ -470,22 +477,11 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         message: `You cancelled your ${product.productName} order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
         isRead: false,
         createAt: new Date()
-      }, {
-        fields: [ 
-          "senderId", 
-          "receiverId",
-          "receiverType", 
-          "senderType", 
-          "notificationType", 
-          "title", 
-          "message", 
-          "isRead", 
-          "createAt"
-        ]
       });
 
       // 2️⃣ ADMIN NOTIFICATION (all admins)
       const adminNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: customerId,  // ✅ Who triggered this
         receiverId: null,      // ✅ null = broadcast to ALL admins
         receiverType: "Admin",
@@ -495,23 +491,12 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         message: `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
         isRead: false,
         createAt: new Date()
-      }, {
-        fields: [ 
-          "senderId", 
-          "receiverId",
-          "receiverType", 
-          "senderType", 
-          "notificationType", 
-          "title", 
-          "message", 
-          "isRead", 
-          "createAt"
-        ]
       });
       
 
       // 2️⃣ ADMIN NOTIFICATION (all admins)
       const staffNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: customerId,
         receiverId: null,
         receiverType: "Staff",
@@ -521,18 +506,6 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         message: `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
         isRead: false,
         createAt: new Date(),
-      }, {
-        fields: [ 
-          "senderId", 
-          "receiverId",
-          "receiverType", 
-          "senderType", 
-          "notificationType", 
-          "title", 
-          "message", 
-          "isRead", 
-          "createAt"
-        ]
       });
 
       io.emit("addCancelOrder", {
@@ -603,7 +576,6 @@ export const fetchOrderCancelService = async (customerId) => {
         throw new Error(error.message);
     }
 }
-
 
 export const removeCancelOrderService = async (customerId, orderItemId) => {
   try {  
