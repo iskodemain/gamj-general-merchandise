@@ -66,13 +66,13 @@ Developed as an academic and industry-aligned system, it follows modern **full�
 
 ## 🛠️ Technology Stack
 
-| Layer          | Technology                   |
-| -------------- | ---------------------------- |
-| Frontend       | ReactJS (Vite), Tailwind CSS |
-| Backend        | Node.js, Express.js          |
-| Database       | MySQL                        |
-| ORM            | Sequelize                    |
-| Authentication | JWT                          |
-| File Storage   | Cloudinary                   |
+| Layer          | Technology                               |
+| -------------- | ---------------------------------------- |
+| Frontend       | ReactJS (Vite), Tailwind CSS, Custom CSS |
+| Backend        | Node.js, Express.js                      |
+| Database       | MySQL                                    |
+| ORM            | Sequelize                                |
+| Authentication | JWT                                      |
+| File Storage   | Cloudinary                               |
 
 ---
