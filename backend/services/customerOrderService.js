@@ -10,6 +10,9 @@ import OrderRefund from "../models/orderRefund.js";
 import Notifications from "../models/notifications.js";
 import Cart from "../models/cart.js";
 import OrderTransaction from "../models/orderTransaction.js";
+import InventoryStock from "../models/inventoryStock.js";
+import InventoryBatch from "../models/inventoryBatch.js";
+import InventoryHistory from "../models/inventoryHistory.js";
 import { Op } from "sequelize";
 import { io } from "../server.js";
 import {v2 as cloudinary} from 'cloudinary';
@@ -86,63 +89,96 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
     for (const item of orderItems) {
       const {productId, productVariantValueId, productVariantCombinationId, value, quantity, subTotal} = item;
 
-      const orderItemId = withTimestamp("OITM", nextOrderItemNo);
-      nextOrderItemNo++;
-
-      // ✅ Create Order Item
-      await OrderItems.create(
-        {
-          orderItemId,
-          orderId: order.ID,
+      const inventoryStock = await InventoryStock.findOne({
+        where: {
           productId,
-          productVariantValueId: productVariantValueId || null,
-          productVariantCombinationId: productVariantCombinationId || null,
-          value: value || "",
-          quantity: Number(quantity) || 0,
-          subTotal: Number(subTotal) || 0,
+          variantValueId: productVariantValueId || null,
+          variantCombinationId: productVariantCombinationId || null,
         },
-      );
+      });
 
-      let newStock = 0;
-      let productName = "";
-
-       // ✅ Update stock
-      if (productVariantCombinationId) {
-        const variantCombo = await ProductVariantCombination.findByPk(productVariantCombinationId);
-        newStock = Math.max((variantCombo.stock || 0) - quantity, 0);
-        await variantCombo.update({ stock: newStock });
-
-        const product = await Products.findByPk(productId);
-        productName = product.productName; // FOR NOTIFICATION
-        const allVariantCombos = await ProductVariantCombination.findAll({ where: { productId } });
-        const hasStock = allVariantCombos.some(v => v.stock > 0);
-        await product.update({ isOutOfStock: !hasStock });
-      } 
-      else if (productVariantValueId) {
-        const variantValue = await ProductVariantValues.findByPk(productVariantValueId);
-        newStock = Math.max((variantValue.stock || 0) - quantity, 0);
-        await variantValue.update({ stock: newStock });
-
-        const product = await Products.findByPk(productId);
-        productName = product.productName; // FOR NOTIFICATION
-        const allVariantValues = await ProductVariantValues.findAll({ where: { productId } });
-        const hasStock = allVariantValues.some(v => v.stock > 0);
-        await product.update({ isOutOfStock: !hasStock });
-      } 
-      else {
-        const product = await Products.findByPk(productId);
-        newStock = Math.max((product.stockQuantity || 0) - quantity, 0);
-        await product.update({
-          stockQuantity: newStock,
-          isOutOfStock: newStock <= 0 ? true : false,
-        });
-        productName = product.productName; // FOR NOTIFICATION
+      if (!inventoryStock) {
+        return {
+          success: false,
+          message: "Inventory record not found for product",
+        };
       }
 
-      // NEW SECTION: LOW STOCK ALERT
-      if (newStock <= 10) {
-        const lowStockMessage = newStock === 0 ? `⚠️ The product "${productName}" is now OUT OF STOCK.` : `⚠️ The product "${productName}" is running low. Only ${newStock} left in stock!`;
+      if (inventoryStock.totalQuantity < quantity) {
+        return {
+          success: false,
+          message: "Insufficient stock available",
+        };
+      }
 
+      const product = await Products.findByPk(productId);
+      const productName = product.productName;
+
+      // ✅ UPDATE INVENTORY STOCK
+      const newTotalQuantity = Math.max((inventoryStock.totalQuantity || 0) - quantity, 0);
+      await inventoryStock.update({ 
+        totalQuantity: newTotalQuantity,
+        updatedAt: new Date()
+      });
+
+      // ✅ UPDATE INVENTORY BATCH
+      let remainingToDeduct = quantity;
+      const inventoryBatches = await InventoryBatch.findAll({
+        where: {
+          productId,
+          variantValueId: productVariantValueId || null,
+          variantCombinationId: productVariantCombinationId || null,
+          remainingQuantity: { [Op.gt]: 0 },
+        },
+        order: [
+          ['expirationDate', 'ASC'],  // FIFO: oldest expiration first
+          ['dateReceived', 'ASC'],     // Then by date received
+        ],
+      });
+
+      for (const batch of inventoryBatches) {
+        if (remainingToDeduct <= 0) break;
+
+        const batchRemaining = Number(batch.remainingQuantity || 0);
+        const deductFromBatch = Math.min(batchRemaining, remainingToDeduct);
+
+        await batch.update({
+          remainingQuantity: batchRemaining - deductFromBatch,
+        });
+
+        remainingToDeduct -= deductFromBatch;
+      }
+
+      if (remainingToDeduct > 0) {
+        return {
+          success: false,
+          message: "Inventory batch inconsistency detected",
+        };
+      }
+
+      // 🧾 INVENTORY HISTORY — STOCK OUT (ORDER)
+      const lastInventoryHistory = await InventoryHistory.findOne({
+        order: [['ID', 'DESC']]
+      });
+
+      const nextInventoryHistoryNo = lastInventoryHistory ? Number(lastInventoryHistory.ID) + 1 : 1;
+
+      await InventoryHistory.create({
+        inventoryHistoryId: withTimestamp("IHST", nextInventoryHistoryNo),
+        productId,
+        variantValueId: productVariantValueId || null,
+        variantCombinationId: productVariantCombinationId || null,
+        type: "OUT",                          // ✅ matches ENUM
+        quantity: Number(quantity),
+        referenceId: orderId,                 // OR fullOrder.orderId
+        remarks: `Order placed by ${user.medicalInstitutionName}`,
+        createdAt: new Date(),
+      });
+
+
+      // NEW SECTION: LOW STOCK ALERT
+      if (newTotalQuantity <= inventoryStock.lowStockThreshold) {
+        const lowStockMessage = newTotalQuantity === 0 ? `⚠️ The product "${productName}" is now OUT OF STOCK.` : `⚠️ The product "${productName}" is running low. Only ${newTotalQuantity} left in stock!`;
          // ⭐ FIXED — LOW STOCK NOTIFICATION ID
         const lowStockNotification = await Notifications.create({
             notificationId: withTimestamp("NTFY", nextNotificationNo++),
@@ -160,9 +196,25 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
 
         io.emit("lowStockAlert", lowStockNotification);
       }
+
+      const orderItemId = withTimestamp("OITM", nextOrderItemNo);
+      nextOrderItemNo++;
+
+      // ✅ Create Order Item
+      await OrderItems.create(
+        {
+          orderItemId,
+          orderId: order.ID,
+          productId,
+          productVariantValueId: productVariantValueId || null,
+          productVariantCombinationId: productVariantCombinationId || null,
+          value: value || "",
+          quantity: Number(quantity) || 0,
+          subTotal: Number(subTotal) || 0,
+        },
+      );
     }
 
-    
     // Fetch the complete order record to include auto-generated orderId
     const fullOrder = await Orders.findByPk(order.ID);
 
