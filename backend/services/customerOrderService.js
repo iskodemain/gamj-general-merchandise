@@ -410,61 +410,98 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         };
       }
 
-      // ✅ 4. Determine variant structure
-      const { hasVariant, hasVariantCombination } = product;
 
       // --- Important variables ---
       const quantityToRestore = Number(orderItem.quantity || 0);
-      let updatedStock;
 
-      const productStock = Number(product.stockQuantity || 0);
+      /* ================================
+        1️⃣ RESTORE INVENTORY STOCK
+      ================================= */
+      const inventoryStock = await InventoryStock.findOne({
+        where: {
+          productId: orderItem.productId,
+          variantValueId: orderItem.productVariantValueId || null,
+          variantCombinationId: orderItem.productVariantCombinationId || null,
+        },
+      });
 
-      // ✅ 5. Update stock logic
-      if (hasVariant && !hasVariantCombination) {
-        // 👉 Product has individual variant values (e.g., size = "Small", "Medium") but no combined sets
-        const variantValue = await ProductVariantValues.findOne({
-          where: { productId: product.ID, value: orderItem.value },
+      if (!inventoryStock) {
+        return {
+          success: false,
+          message: "Inventory stock record not found",
+        };
+      }
+
+      const newTotalQuantity = Number(inventoryStock.totalQuantity || 0) + quantityToRestore;
+
+      await inventoryStock.update({
+        totalQuantity: newTotalQuantity,
+        updatedAt: new Date(),
+      });
+
+      /* ================================
+       2️⃣ RESTORE INVENTORY BATCH (FIFO REVERSE)
+        - Restore stock to FIFO / oldest-consumed batches (FEFO)
+      ================================= */
+      const restoreBatch = await InventoryBatch.findOne({
+        where: {
+          productId: orderItem.productId,
+          variantValueId: orderItem.productVariantValueId || null,
+          variantCombinationId: orderItem.productVariantCombinationId || null,
+        },
+        order: [
+          ["expirationDate", "ASC"],
+          ["dateReceived", "ASC"],
+        ],
+      });
+
+      if (restoreBatch) {
+        const maxCapacity = Number(restoreBatch.quantityReceived);
+        const currentRemaining = Number(restoreBatch.remainingQuantity);
+
+        const newRemaining = Math.min(
+          maxCapacity,
+          currentRemaining + quantityToRestore
+        );
+
+        await restoreBatch.update({
+          remainingQuantity: newRemaining,
         });
-
-        if (variantValue) {
-          const variantStock = Number(variantValue.stock || 0);
-          updatedStock = variantStock + quantityToRestore;
-          await variantValue.update({ stock: updatedStock });
-        }
-
-        // Also update main product stock
-        await product.update({ stockQuantity: productStock + quantityToRestore });
+      } else {
+        return {
+          success: false,
+          message: "No inventory batch found for restoration",
+        };
       }
 
-      else if (hasVariant && hasVariantCombination) {
-        // 👉 Product uses combination variants (e.g., size + color)
-        const variantCombination = await ProductVariantCombination.findOne({
-          where: { productId: product.ID, combinations: orderItem.value },
-        });
+      /* ================================
+        3️⃣ INVENTORY HISTORY (IN)
+      ================================= */
+      const lastInventoryHistory = await InventoryHistory.findOne({
+        order: [["ID", "DESC"]],
+      });
 
-        if (variantCombination) {
-          const comboStock = Number(variantCombination.stock || 0);
-          updatedStock = comboStock + quantityToRestore;
-          await variantCombination.update({ stock: updatedStock });
-        }
+      const nextInventoryHistoryNo = lastInventoryHistory ? Number(lastInventoryHistory.ID) + 1 : 1;
 
-        // Also update main product stock
-        await product.update({ stockQuantity: productStock + quantityToRestore });
-      }
+      await InventoryHistory.create({
+        inventoryHistoryId: withTimestamp("IHST", nextInventoryHistoryNo),
+        productId: orderItem.productId,
+        variantValueId: orderItem.productVariantValueId || null,
+        variantCombinationId: orderItem.productVariantCombinationId || null,
+        type: "IN",
+        quantity: quantityToRestore,
+        referenceId: `CANCEL-${orderItem.orderId}`,
+        remarks: `Order cancelled by ${user.medicalInstitutionName}`,
+        createdAt: new Date(),
+      });
 
-      else {
-        // 👉 Product has no variants — just update its main stock
-        updatedStock = productStock + quantityToRestore;
-        await product.update({ stockQuantity: updatedStock });
-      }
+      // ✅ 6. Update order item status to Cancelled
+      await orderItem.update({ orderStatus: "Cancelled" });
 
       // 🔹 AUTO-GENERATE ORDER ID
       const lastCancelOrder = await OrderCancel.findOne({order: [['ID', 'DESC']]});
       const nextCancelOrderNo = lastCancelOrder ? Number(lastCancelOrder.ID) + 1 : 1;
       const cancelId = withTimestamp("OCAN", nextCancelOrderNo);
-
-      // ✅ 6. Update order item status to Cancelled
-      await orderItem.update({ orderStatus: "Cancelled" });
 
       const cancelRecord = await OrderCancel.create({
         cancelId,
