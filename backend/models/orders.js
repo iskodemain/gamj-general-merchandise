@@ -33,6 +33,10 @@ const Orders = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    }
   },
   {
     tableName: 'orders',

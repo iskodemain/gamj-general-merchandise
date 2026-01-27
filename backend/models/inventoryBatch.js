@@ -67,17 +67,19 @@ const InventoryBatch = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
-
     dateReceived: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-
     supplier: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    }
   },
   {
     tableName: "InventoryBatch",
