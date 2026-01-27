@@ -234,7 +234,24 @@ export const addProductService = async ( adminId, categoryId, productName, produ
           let variantValueCounter = lastVariantValue ? Number(lastVariantValue.ID) : 0;
 
           for (const val of variantValues) {
-            const vn = allVariantNameRecords.find(x => x.name === val.variantName);
+            let vn = allVariantNameRecords.find(x => x.name === val.variantName);
+
+            // 🔐 GUARANTEE variant name exists
+            if (!vn) {
+                const lastVariantName = await VariantName.findOne({
+                order: [["ID", "DESC"]],
+                });
+
+                const nextNo = lastVariantName ? Number(lastVariantName.ID) + 1 : 1;
+                const variantNameId = withTimestamp("VN", nextNo);
+
+                vn = await VariantName.create({
+                variantNameId,
+                name: val.variantName,
+                });
+
+                allVariantNameRecords.push(vn);
+            }
 
             variantValueCounter++;
             const productVariantValueId = withTimestamp("PVV", variantValueCounter);
