@@ -44,17 +44,17 @@ const Reports = () => {
   ====================== */
   const filteredOrderTransactions = useMemo(
     () =>
-      fetchOrderTransaction.filter(t =>
-        inRange(t.transactionDate, orderFrom, orderTo)
-      ),
+      fetchOrderTransaction
+        .filter(t => inRange(t.transactionDate, orderFrom, orderTo))
+        .sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)),
     [fetchOrderTransaction, orderFrom, orderTo]
   );
 
   const filteredInventoryHistory = useMemo(
     () =>
-      fetchInventoryHistory.filter(h =>
-        inRange(h.createdAt, inventoryFrom, inventoryTo)
-      ),
+      fetchInventoryHistory
+        .filter(h => inRange(h.createdAt, inventoryFrom, inventoryTo))
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
     [fetchInventoryHistory, inventoryFrom, inventoryTo]
   );
 
