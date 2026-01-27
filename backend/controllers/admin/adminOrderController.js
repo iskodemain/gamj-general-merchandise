@@ -1,4 +1,4 @@
-import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, adminDeleteOrderItemService } from "../../services/admin/adminOrderService.js";
+import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, adminDeleteOrderItemService, fetchOrderTransactionService } from "../../services/admin/adminOrderService.js";
 
 export const fetchOrders = async (req, res) => {
     try {
@@ -45,7 +45,6 @@ export const updateOrderStatus = async (req, res) => {
     }
 }
 
-
 export const fetchRefundProof = async (req, res) => {
     try {
         const { ID } = req.admin;
@@ -56,7 +55,6 @@ export const fetchRefundProof = async (req, res) => {
         res.json({success: false, message:error.message})
     }
 }
-
 
 export const processRefundRequest = async (req, res) => {
     try {
@@ -69,7 +67,6 @@ export const processRefundRequest = async (req, res) => {
         res.json({success: false, message:error.message})
     }
 }
-
 
 export const approveRefundRequest = async (req, res) => {
     try {
@@ -95,7 +92,6 @@ export const sucessfullyProcessedRefund = async (req, res) => {
     }
 }
 
-
 export const rejectedRefundRequest = async (req, res) => {
     try {
         const { refundID, newStatus, rejectedReason } = req.body;
@@ -108,7 +104,6 @@ export const rejectedRefundRequest = async (req, res) => {
     }
 }
 
-
 export const submitRefundProof = async (req, res) => {
   try {
       const { ID } = req.admin;
@@ -120,7 +115,6 @@ export const submitRefundProof = async (req, res) => {
   }
 };
 
-
 export const cancelSubmitAsRefund = async (req, res) => {
   try {
       const { ID } = req.admin;
@@ -131,7 +125,6 @@ export const cancelSubmitAsRefund = async (req, res) => {
       res.json({ success: false, message: error.message });
   }
 };
-
 
 export const cancelSubmitAsCompleted = async (req, res) => {
     try {
@@ -156,6 +149,18 @@ export const adminDeleteOrderItem = async (req, res) => {
         res.json({success: false, message:error.message})
     }
 }
+
+export const fetchOrderTransaction = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const result = await fetchOrderTransactionService(ID);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
 
 
 
