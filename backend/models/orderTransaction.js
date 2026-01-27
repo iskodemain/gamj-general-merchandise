@@ -77,12 +77,15 @@ const OrderTransaction = sequelize.define(
       type: DataTypes.ENUM('Cash On Delivery', 'Paypal'),
       allowNull: true,
     },
-
     transactionDate: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    }
   },
   {
     tableName: 'orderTransaction',
