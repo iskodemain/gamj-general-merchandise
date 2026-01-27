@@ -20,7 +20,7 @@ ChartJS.register(
 );
 
 function Overview() {
-  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList, fetchReturnRefundOrders, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory} = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList, fetchReturnRefundOrders, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory, fetchOrderTransaction, customerList } = useContext(AdminContext);
 
   // timeframe toggle for line chart
   const [timeframe, setTimeframe] = useState("weekly"); // 'daily' or 'weekly'
@@ -262,25 +262,34 @@ function Overview() {
   // Section (5) Recent transactions (limited)
   // ---------------------------------
   const recentTransactions = useMemo(() => {
-    // flattened list using orders; show limited number (6)
-    const list = fetchOrders
-      .map((o) => {
-        const customer = deliveryInfoList.find(
-          (c) => c.customerId === o.customerId
-        );
+    // Use fetchOrderTransaction to match Transactions.jsx
+    const transactions = Array.isArray(fetchOrderTransaction) ? fetchOrderTransaction : [];
+    
+    const list = transactions
+      .map((transaction) => {
+        // Get customer name from customerList
+        const customer = customerList?.find(c => c.ID === transaction.customerId);
+        const customerName = customer?.medicalInstitutionName || 'Unknown Customer';
+        
+        // Get order ID string from fetchOrders
+        const order = fetchOrders?.find(o => o.ID === transaction.orderId);
+        const orderIdString = order?.orderId || 'N/A';
 
         return {
-          id: o.ID,
-          orderId: o.orderId,
-          name: customer.medicalInstitutionName,
-          date: o.dateOrdered,
-          amount: 0,
-          paymentMethod: o.paymentMethod,
+          id: transaction.ID,
+          transactionId: transaction.transactionId,
+          orderId: orderIdString,
+          name: customerName,
+          date: transaction.transactionDate,
+          amount: parseFloat(transaction.totalAmount || 0),
+          paymentMethod: transaction.paymentMethod,
+          transactionType: transaction.transactionType,
         };
       })
       .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
     return list.slice(0, 6);
-  }, [fetchOrders]);
+  }, [fetchOrderTransaction, customerList, fetchOrders]);
 
   // -----------------------------
   // Chart config helpers
@@ -382,6 +391,24 @@ function Overview() {
     const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
     const weekNo = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
     return weekNo;
+  }
+
+  function getTypeColor(type) {
+    const typeColors = {
+      'Order Placed': '#43A047',
+      'Order Processing': '#1976D2',
+      'Out for Delivery': '#FF9800',
+      'Order Delivered': '#4CAF50',
+      'Order Cancelled': '#F44336',
+      'Order Refund Requested': '#9C27B0',
+      'Order Refund Approved': '#00BCD4',
+      'Order Refund Completed': '#009688',
+      'Order Refund Rejected': '#E91E63',
+      'Order Cancellation Request': '#FF5722',
+      'Order Cancellation Processed': '#795548',
+      'Order Cancellation Request Cancelled': '#607D8B',
+    };
+    return typeColors[type] || '#43A047';
   }
 
   return (
@@ -543,13 +570,26 @@ function Overview() {
               {recentTransactions.length ? (
                 recentTransactions.map((t) => (
                   <div className="trans-row" key={t.id}>
-                    <div className="trans-left">
-                      <div className="trans-name">{t.name}</div>
-                      <div className="trans-meta">{new Date(t.date).toLocaleString()}</div>
+                    <div className="trans-header">
+                      <div className="trans-id">
+                        <span className="trans-id-label">ID:</span> {t.transactionId}
+                      </div>
+                      <div className="trans-date">{new Date(t.date).toLocaleString()}</div>
                     </div>
-                    <div className="trans-right">
-                      <div className="trans-amount">₱{t.amount.toFixed(2)}</div>
-                      <div className="trans-method">{t.paymentMethod}</div>
+                    <div className="trans-body">
+                      <div className="trans-left">
+                        <div
+                          className="trans-type-badge"
+                          style={{ backgroundColor: getTypeColor(t.transactionType) }}
+                        >
+                          {t.transactionType}
+                        </div>
+                        <div className="trans-customer">{t.name}</div>
+                      </div>
+                      <div className="trans-right">
+                        <div className="trans-amount">₱{t.amount.toFixed(2)}</div>
+                        <div className="trans-method">{t.paymentMethod}</div>
+                      </div>
                     </div>
                   </div>
                 ))

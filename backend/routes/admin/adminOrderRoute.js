@@ -1,6 +1,6 @@
 import express from 'express';
 import adminAuth from '../../middleware/adminAuth.js';
-import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem } from '../../controllers/admin/adminOrderController.js';
+import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchOrderTransaction } from '../../controllers/admin/adminOrderController.js';
 
 import upload from '../../middleware/multer.js';
 
@@ -11,6 +11,7 @@ adminOrderRouter.get('/list', adminAuth, fetchOrders);
 adminOrderRouter.get('/list-cancel-order', adminAuth, fetchOrderCancel);
 adminOrderRouter.get('/list-return-refund', adminAuth, fetchOrderReturnAndRefund);
 adminOrderRouter.get('/list-refund-proof', adminAuth, fetchRefundProof);
+adminOrderRouter.get('/list-order-transaction', adminAuth, fetchOrderTransaction);
 
 
 

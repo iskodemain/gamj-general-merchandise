@@ -11,6 +11,7 @@ import { orderStatusUpdateTemplate } from "../../utils/emailTemplates.js";
 import { io } from "../../server.js";
 import RefundProof from "../../models/refundProof.js";
 import {v2 as cloudinary} from 'cloudinary';
+import OrderTransaction from "../../models/orderTransaction.js";
 
 
 // ID GENERATOR
@@ -488,7 +489,6 @@ export const approveRefundRequestService = async (adminId, refundID, newStatus) 
   }
 };
 
-
 export const sucessfullyProcessedRefundService = async (adminId, refundID, newStatus) => {
   try {
     // Verify admin exists
@@ -524,7 +524,6 @@ export const sucessfullyProcessedRefundService = async (adminId, refundID, newSt
     throw new Error(error.message);
   }
 };
-
 
 export const rejectedRefundRequestService = async (adminId, refundID, newStatus, rejectedReason) => {
   try {
@@ -562,7 +561,6 @@ export const rejectedRefundRequestService = async (adminId, refundID, newStatus,
     throw new Error(error.message);
   }
 };
-
 
 export const submitRefundProofService = async (adminId, body, file) => {
   try {
@@ -672,7 +670,6 @@ export const submitRefundProofService = async (adminId, body, file) => {
 };
 
 // CANCELLED ORDER BY CUSTOMER
-
 export const cancelSubmitAsRefundService = async (adminId, body, file) => {
   try {
     // ----------------------------------
@@ -783,7 +780,6 @@ export const cancelSubmitAsRefundService = async (adminId, body, file) => {
   }
 };
 
-
 export const cancelSubmitAsCompletedService = async (adminId, cancelID, newStatus) => {
   try {
     // Verify admin exists
@@ -819,7 +815,6 @@ export const cancelSubmitAsCompletedService = async (adminId, cancelID, newStatu
   }
 };
 
-
 export const adminDeleteOrderItemService = async (adminId, orderItemID) => {
   try {
     // Verify admin exists
@@ -854,5 +849,36 @@ export const adminDeleteOrderItemService = async (adminId, orderItemID) => {
     throw new Error(error.message);
   }
 };
+
+
+
+export const fetchOrderTransactionService = async (adminId) => {
+    try {
+      const adminUser = await Admin.findByPk(adminId);
+      if (!adminUser) {
+          return {
+              success: false,
+              message: 'User not found'
+          }
+      }
+
+      const orderTransaction = await OrderTransaction.findAll({});
+      if (orderTransaction.length === 0) {
+          return {
+              success: true,
+              orderTransaction: [],
+          };
+      }
+
+      return {
+          success: true,
+          orderTransaction
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
 
 

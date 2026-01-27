@@ -187,6 +187,150 @@
   width: 100% !important;
 }
 
+/* ORDER TRANSACTION RELATED */
+.ov-trans-card {
+  padding: 0;
+}
+
+.ov-trans-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.trans-row {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.trans-row:last-child {
+  border-bottom: none;
+}
+
+.trans-row:hover {
+  background-color: #f9f9f9;
+}
+
+.trans-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trans-id {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.trans-id-label {
+  color: #888;
+  font-weight: 500;
+}
+
+.trans-date {
+  font-size: 12px;
+  color: #888;
+}
+
+.trans-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.trans-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.trans-type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.trans-customer {
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+.trans-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.trans-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #43A047;
+  white-space: nowrap;
+}
+
+.trans-method {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .trans-row {
+    padding: 14px 16px;
+  }
+
+  .trans-type-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .trans-amount {
+    font-size: 16px;
+  }
+
+  .trans-body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .trans-right {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trans-id {
+    font-size: 12px;
+  }
+
+  .trans-date {
+    font-size: 11px;
+  }
+
+  .trans-customer {
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 700px) {
   .ov-card-body .chartjs-render-monitor {
     font-size: 12px !important;
