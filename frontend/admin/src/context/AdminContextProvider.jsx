@@ -48,6 +48,30 @@ const AdminContextProvider = (props) => {
   const [fetchInventoryBatch, setFetchInventoryBatch] = useState([]); 
   const [fetchInventoryHistory, setFetchInventoryHistory] = useState([]); 
   const [fetchOrderTransaction, setFetchOrderTransaction] = useState([]); 
+  const [fetchNotifications, setFetchNotifications] = useState([]); 
+
+  /*---------------------------FETCH NOTIFICATION-----------------------------*/
+  const handleFetchNotification = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/admin/notification", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setFetchNotifications(response.data.notifications)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchNotification();
+      }
+  }, [token]);
 
   /*--------------------------- DELETE PRODUCT -----------------------------*/
   const deleteProduct = async (productID) => {
@@ -1137,7 +1161,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications
   }  
   return (
     <AdminContext.Provider value={value}>
