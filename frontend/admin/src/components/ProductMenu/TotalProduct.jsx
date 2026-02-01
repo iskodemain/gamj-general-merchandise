@@ -3,16 +3,32 @@ import './TotalProduct.css';
 import { FaTrash, FaSearch } from 'react-icons/fa';
 import Navbar from '../Navbar';
 import { AdminContext } from '../../context/AdminContextProvider';
+import Loading from '../Loading';
 
 function TotalProduct() {
-  const { products, productCategory, navigate } = useContext(AdminContext);
+  const { products, productCategory, navigate, deleteProduct } = useContext(AdminContext);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('');
   const [sortBy, setSortBy] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleDelete = (id) => {
-    // You can replace this later with a modal confirmation
-    alert(`Delete product ID: ${id}`);
+  // 🔴 ADDED: delete modal states
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleDelete = async (ID) => {
+    setLoading(true);
+    const success = await deleteProduct(ID);
+    setLoading(false);
+
+    if (success) {
+      setShowDeleteModal(false);
+      setSelectedProduct(null);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
   };
 
   const handleView = (productId) => {
@@ -59,6 +75,7 @@ function TotalProduct() {
 
   return (
     <>
+      {loading && <Loading />}
       <Navbar TitleName="Total Products" />
       <div className="tp-container">
         <div className="tp-card">
@@ -148,7 +165,12 @@ function TotalProduct() {
                       )}
                     </td>
                     <td className="center tp-actions">
-                      <button className="tp-trash" onClick={() => handleDelete(p.ID)}>
+                      <button className="tp-trash" 
+                        onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedProduct(p);
+                        setShowDeleteModal(true);
+                      }}>
                         <FaTrash />
                       </button>
                     </td>
@@ -165,6 +187,43 @@ function TotalProduct() {
           </table>
         </div>
       </div>
+
+      {/* 🔴 INLINE DELETE CONFIRMATION MODAL */}
+      {showDeleteModal && (
+        <div
+          className="delete-modal-overlay"
+          onClick={() => !loading && setShowDeleteModal(false)}
+        >
+          <div
+            className="delete-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Delete Product</h3>
+            <p>
+              Are you sure you want to delete <br />
+              <strong>{selectedProduct?.productName}</strong>?
+            </p>
+
+            <div className="delete-modal-actions">
+              <button
+                className="btn-cancel"
+                disabled={loading}
+                onClick={() => setShowDeleteModal(false)}
+              >
+                No
+              </button>
+
+              <button
+                className="btn-delete"
+                disabled={loading}
+                onClick={() => handleDelete(selectedProduct.ID)}
+              >
+                {loading ? 'Deleting...' : 'Yes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

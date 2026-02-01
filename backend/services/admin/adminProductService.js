@@ -674,6 +674,32 @@ export const updateProductService = async (adminId, productID, categoryId, produ
   }
 }
 
+// Delete product
+export const deleteProductService = async (adminId, productID) => {
+    try {
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+
+        const product = await Products.findByPk(productID);
+        if (!product) {
+            return { success: false, message: "Product not found" };
+        }
+
+        await product.destroy();
+
+        return { success: true, message: 'Product deleted successfully.' };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
 // Fetch All Product
 export const fetchAllProductsService = async (adminId) => {
     try {
