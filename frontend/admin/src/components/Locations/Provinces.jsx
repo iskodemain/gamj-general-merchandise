@@ -1,86 +1,204 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./Provinces.css";
+import { AdminContext } from "../../context/AdminContextProvider";
 
 function Provinces({ onBack }) {
-  const [provinces, setProvinces] = useState(["Cavite", "Metro Manila"]);
+  const { provinces, addProvince, updateProvince, deleteProvince } = useContext(AdminContext);
+  const [provincesList, setProvincesList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
+  // Initialize provinces list from context
+  useEffect(() => {
+    if (provinces && provinces.length > 0) {
+      setProvincesList([...provinces]);
+    } else {
+      // Start with one empty row if no provinces exist
+      setProvincesList([{ ID: null, provinceId: null, provinceName: "" }]);
+    }
+  }, [provinces]);
+
+  // Handle input change for existing or new provinces
   function handleChange(index, value) {
-    const next = [...provinces];
-    next[index] = value;
-    setProvinces(next);
+    const updatedList = [...provincesList];
+    updatedList[index] = {
+      ...updatedList[index],
+      provinceName: value
+    };
+    setProvincesList(updatedList);
+    setHasChanges(true);
   }
 
+  // Add a new empty province row
   function handleAdd() {
-    // add an empty input row for a new province
-    setProvinces((prev) => [...prev, ""]);
+    setProvincesList((prev) => [
+      ...prev,
+      { ID: null, provinceId: null, provinceName: "" }
+    ]);
+    setHasChanges(true);
   }
 
-  function handleDelete(index) {
-    const next = provinces.filter((_, i) => i !== index);
-    // keep at least one empty input so UI doesn't collapse
-    setProvinces(next.length ? next : [""]);
+  // Delete a province
+  async function handleDelete(index) {
+    const province = provincesList[index];
+    
+    // Confirm deletion
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${province.provinceName || 'this province'}"?`
+    );
+    
+    if (!confirmDelete) return;
+
+    setIsLoading(true);
+
+    try {
+      // If province has an ID, delete from backend
+      if (province.ID && deleteProvince) {
+        await deleteProvince(province.ID);
+      }
+      
+      // Remove from local state
+      const updatedList = provincesList.filter((_, i) => i !== index);
+      
+      // Keep at least one empty input
+      if (updatedList.length === 0) {
+        setProvincesList([{ ID: null, provinceId: null, provinceName: "" }]);
+      } else {
+        setProvincesList(updatedList);
+      }
+      
+      setHasChanges(false);
+    } catch (error) {
+      console.error("Error deleting province:", error);
+      alert("Failed to delete province. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function handleSave() {
-    console.log("Saved provinces:", provinces);
-    alert("Saved " + provinces.filter(Boolean).length + " province(s).");
+  // Save all changes
+  async function handleSave() {
+    setIsLoading(true);
+
+    try {
+      const validProvinces = provincesList.filter(p => p.provinceName.trim() !== "");
+      
+      if (validProvinces.length === 0) {
+        alert("Please add at least one province before saving.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Process each province
+      for (const province of validProvinces) {
+        if (province.ID) {
+          // Update existing province
+          if (updateProvince) {
+            await updateProvince(province.ID, { provinceName: province.provinceName });
+          }
+        } else {
+          // Add new province
+          if (addProvince) {
+            await addProvince({ provinceName: province.provinceName });
+          }
+        }
+      }
+
+      alert(`Successfully saved ${validProvinces.length} province(s)!`);
+      setHasChanges(false);
+      
+      // Optionally go back after save
+      // if (onBack) onBack();
+    } catch (error) {
+      console.error("Error saving provinces:", error);
+      alert("Failed to save provinces. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // Handle back with unsaved changes warning
+  function handleBack() {
+    if (hasChanges) {
+      const confirmLeave = window.confirm(
+        "You have unsaved changes. Are you sure you want to leave?"
+      );
+      if (!confirmLeave) return;
+    }
+    
+    if (onBack) {
+      onBack();
+    } else {
+      window.history.back();
+    }
   }
 
   return (
-    <div className="provinces-page" role="region" aria-label="Provinces form">
-      <h1 className="prov-title">List of Provinces Available for Order Delivery.</h1>
+    <div className="province-page-container" role="region" aria-label="Provinces management">
+      <div className="province-content-card">
+        <h1 className="province-page-title">List of Provinces Available for Order Delivery</h1>
 
-      <div className="form-section">
-        <label className="section-label">List of provinces</label>
+        <div className="province-form-section">
+          <label className="province-section-label">Manage Provinces</label>
 
-        <div className="inputs-list">
-          {provinces.map((p, i) => (
-            <div className="input-row" key={i}>
-              <input
-                className="province-input"
-                placeholder="Enter the name of the province."
-                value={p}
-                onChange={(e) => handleChange(i, e.target.value)}
-                aria-label={`Province ${i + 1}`}
-              />
+          <div className="province-inputs-list">
+            {provincesList.map((province, index) => (
+              <div className="province-input-row" key={index}>
+                <input
+                  className="province-text-input"
+                  placeholder="Enter the name of the province"
+                  value={province.provinceName || ""}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  aria-label={`Province ${index + 1}`}
+                  disabled={isLoading}
+                />
 
-              <div className="row-actions">
-                {i === provinces.length - 1 ? (
-                  <button
-                    type="button"
-                    className="btn btn-add"
-                    onClick={handleAdd}
-                    aria-label={`Add province after ${i + 1}`}
-                  >
-                    Add More
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn-delete"
-                    onClick={() => handleDelete(i)}
-                    aria-label={`Delete province ${i + 1}`}
-                  >
-                    Delete
-                  </button>
-                )}
+                <div className="province-row-actions">
+                  {index === provincesList.length - 1 ? (
+                    <button
+                      type="button"
+                      className="province-btn province-btn-add"
+                      onClick={handleAdd}
+                      aria-label="Add new province"
+                      disabled={isLoading}
+                    >
+                      Add More
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="province-btn province-btn-delete"
+                      onClick={() => handleDelete(index)}
+                      aria-label={`Delete ${province.provinceName || 'province'}`}
+                      disabled={isLoading}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="form-actions">
-        <button type="button" className="btn btn-save" onClick={handleSave}>
-          Save Changes
-        </button>
-        <button
-          type="button"
-          className="btn btn-neutral"
-          onClick={() => (onBack ? onBack() : window.history.back())}
-        >
-          Back
-        </button>
+        <div className="province-form-actions">
+          <button
+            type="button"
+            className="province-btn province-btn-save"
+            onClick={handleSave}
+            disabled={isLoading || !hasChanges}
+          >
+            {isLoading ? "Saving..." : "Save Changes"}
+          </button>
+          <button
+            type="button"
+            className="province-btn province-btn-back"
+            onClick={handleBack}
+            disabled={isLoading}
+          >
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );
