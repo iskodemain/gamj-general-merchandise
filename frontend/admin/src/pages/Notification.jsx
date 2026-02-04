@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import './notification.css';
 import Navbar from '../components/Navbar';
 import { AdminContext } from '../context/AdminContextProvider';
+import { assets } from '../assets/assets';
 
 function Notification() {
     const { fetchNotifications } = useContext(AdminContext);
@@ -10,7 +11,11 @@ function Notification() {
     // Update notifications when fetchNotifications changes
     useEffect(() => {
         if (fetchNotifications && Array.isArray(fetchNotifications)) {
-            setNotifications(fetchNotifications);
+            // Filter only Admin notifications
+            const adminNotifications = fetchNotifications.filter(
+                n => n.receiverType === 'Admin'
+            );
+            setNotifications(adminNotifications);
         }
     }, [fetchNotifications]);
 
@@ -57,32 +62,14 @@ function Notification() {
             .toUpperCase();
     }
 
-    // Dismiss notification
-    function dismiss(id) {
-        setNotifications(prev => prev.filter(n => n.ID !== id));
-        // TODO: Add API call to mark as dismissed/deleted
-    }
-
-    // Remove all notifications
-    function removeAll() {
-        if (window.confirm('Are you sure you want to remove all notifications?')) {
-            setNotifications([]);
-            // TODO: Add API call to clear all notifications
-        }
-    }
-
-    // Mark all as read
-    function markAllAsRead() {
-        setNotifications(prev => 
-            prev.map(n => ({ ...n, isRead: true }))
-        );
-        // TODO: Add API call to mark all as read
-    }
-
     // Refresh notifications from context
     function refresh() {
         if (fetchNotifications && Array.isArray(fetchNotifications)) {
-            setNotifications(fetchNotifications);
+            // Filter only Admin notifications
+            const adminNotifications = fetchNotifications.filter(
+                n => n.receiverType === 'Admin'
+            );
+            setNotifications(adminNotifications);
         }
     }
 
@@ -98,11 +85,6 @@ function Notification() {
                             <span className="notif-badge-count">{notifications.length}</span>
                         )}
                     </h2>
-                    {notifications.length > 0 && (
-                        <button className="notif-mark-read-btn" onClick={markAllAsRead}>
-                            Mark all as read
-                        </button>
-                    )}
                 </div>
 
                 <div className="notif-list">
@@ -117,17 +99,10 @@ function Notification() {
                     )}
 
                     {notifications.map(n => (
-                        <div
-                            key={n.ID}
-                            className={`notif-item ${!n.isRead ? 'notif-unread' : ''}`}
-                        >
+                        <div key={n.ID} className="notif-item">
                             <div className="notif-content-left">
-                                <div 
-                                    className="notif-avatar" 
-                                    aria-hidden="true"
-                                    data-type={n.notificationType}
-                                >
-                                    {initials(n.title)}
+                                <div className="notif-avatar">
+                                    <img src={assets.admin_gamj_logo} alt="Admin Gamj Logo" />
                                 </div>
                                 <div className="notif-text-wrapper">
                                     <div className="notif-text-main">
@@ -141,15 +116,6 @@ function Notification() {
                                     </div>
                                 </div>
                             </div>
-
-                            <button
-                                className="notif-dismiss-btn"
-                                onClick={() => dismiss(n.ID)}
-                                aria-label={`Dismiss notification ${n.ID}`}
-                                title="Dismiss"
-                            >
-                                ✕
-                            </button>
                         </div>
                     ))}
                 </div>
@@ -158,9 +124,6 @@ function Notification() {
                     <div className="notif-actions">
                         <button className="notif-btn notif-btn-refresh" onClick={refresh}>
                             Refresh
-                        </button>
-                        <button className="notif-btn notif-btn-remove" onClick={removeAll}>
-                            Remove All
                         </button>
                     </div>
                 )}

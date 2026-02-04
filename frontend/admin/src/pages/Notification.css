@@ -47,23 +47,6 @@
     font-weight: 600;
 }
 
-.notif-mark-read-btn {
-    padding: 8px 16px;
-    background: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    color: #555;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.notif-mark-read-btn:hover {
-    background: #e8e8e8;
-    border-color: #d0d0d0;
-}
-
 /* Notification List */
 .notif-list {
     display: flex;
@@ -92,7 +75,7 @@
     background: #a8a8a8;
 }
 
-/* Notification Item */
+/* Notification Item - Default Read Style */
 .notif-item {
     display: flex;
     align-items: flex-start;
@@ -111,17 +94,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Unread notifications */
-.notif-item.notif-unread {
-    background: #43A047;
-    color: #fff;
-    border: 1px solid #43A047;
-}
-
-.notif-item.notif-unread:hover {
-    background: #3d8f41;
-}
-
 /* Left Section: Avatar + Text */
 .notif-content-left {
     display: flex;
@@ -136,46 +108,19 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    color: #2e7d32;
+    background: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 13px;
     flex-shrink: 0;
-    text-transform: uppercase;
+    overflow: hidden;
+    padding: 6px;
 }
 
-.notif-item.notif-unread .notif-avatar {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
-}
-
-/* Different colors for different notification types */
-.notif-avatar[data-type="Transaction"] {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    color: #1565c0;
-}
-
-.notif-avatar[data-type="Order Cancellation"] {
-    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-    color: #c62828;
-}
-
-.notif-avatar[data-type="Product Update"] {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-    color: #e65100;
-}
-
-.notif-avatar[data-type="Account"] {
-    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-    color: #6a1b9a;
-}
-
-.notif-item.notif-unread .notif-avatar[data-type] {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+.notif-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 /* Text Content */
@@ -232,52 +177,8 @@
     border-radius: 10px;
     font-weight: 500;
     text-transform: capitalize;
-}
-
-/* Receiver Badge Colors (for read notifications) */
-.notif-item:not(.notif-unread) .notif-badge-receiver {
     background: rgba(0, 0, 0, 0.08);
     color: rgba(0, 0, 0, 0.6);
-}
-
-/* Receiver Badge Colors (for unread notifications) */
-.notif-item.notif-unread .notif-time,
-.notif-item.notif-unread .notif-separator {
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.notif-item.notif-unread .notif-badge-receiver {
-    background: rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.95);
-}
-
-/* Dismiss Button */
-.notif-dismiss-btn {
-    background: transparent;
-    border: none;
-    color: #9aa0a6;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-    line-height: 1;
-    height: fit-content;
-}
-
-.notif-dismiss-btn:hover {
-    background: rgba(0, 0, 0, 0.08);
-    color: #666;
-}
-
-.notif-item.notif-unread .notif-dismiss-btn {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.notif-item.notif-unread .notif-dismiss-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
 }
 
 /* Empty State */
@@ -334,14 +235,6 @@
     background: #388e3c;
 }
 
-.notif-btn-remove {
-    background: #ea4335;
-}
-
-.notif-btn-remove:hover {
-    background: #d33828;
-}
-
 /* ============================================ */
 /* RESPONSIVE DESIGN - TABLET (768px and below) */
 /* ============================================ */
@@ -360,11 +253,6 @@
         min-width: 22px;
         height: 22px;
         font-size: 11px;
-    }
-
-    .notif-mark-read-btn {
-        padding: 7px 14px;
-        font-size: 12px;
     }
 
     .notif-list {
@@ -417,11 +305,6 @@
         padding: 0 6px;
     }
 
-    .notif-mark-read-btn {
-        width: 100%;
-        padding: 8px 12px;
-    }
-
     .notif-list {
         gap: 8px;
         max-height: 450px;
@@ -454,11 +337,6 @@
     .notif-badge-receiver {
         font-size: 10px;
         padding: 2px 6px;
-    }
-
-    .notif-dismiss-btn {
-        font-size: 16px;
-        padding: 4px 6px;
     }
 
     .notif-actions {
@@ -515,10 +393,6 @@
         padding: 1px 5px;
     }
 
-    .notif-dismiss-btn {
-        font-size: 15px;
-    }
-
     .notif-btn {
         padding: 9px;
         font-size: 12px;
@@ -563,11 +437,6 @@
         padding: 0 5px;
     }
 
-    .notif-mark-read-btn {
-        padding: 7px 10px;
-        font-size: 11px;
-    }
-
     .notif-list {
         gap: 7px;
         max-height: 400px;
@@ -605,11 +474,6 @@
 
     .notif-meta {
         gap: 4px;
-    }
-
-    .notif-dismiss-btn {
-        font-size: 14px;
-        padding: 3px 5px;
     }
 
     .notif-actions {
@@ -661,11 +525,6 @@
         padding: 0 4px;
     }
 
-    .notif-mark-read-btn {
-        padding: 6px 8px;
-        font-size: 10px;
-    }
-
     .notif-list {
         gap: 6px;
         max-height: 350px;
@@ -704,11 +563,6 @@
 
     .notif-meta {
         gap: 3px;
-    }
-
-    .notif-dismiss-btn {
-        font-size: 13px;
-        padding: 2px 4px;
     }
 
     .notif-actions {
@@ -763,11 +617,6 @@
         font-size: 8px;
     }
 
-    .notif-mark-read-btn {
-        padding: 5px 7px;
-        font-size: 9px;
-    }
-
     .notif-list {
         gap: 5px;
         max-height: 300px;
@@ -806,11 +655,6 @@
 
     .notif-meta {
         gap: 3px;
-    }
-
-    .notif-dismiss-btn {
-        font-size: 12px;
-        padding: 2px 3px;
     }
 
     .notif-actions {
@@ -865,12 +709,6 @@
         font-size: 7px;
     }
 
-    .notif-mark-read-btn {
-        padding: 4px 6px;
-        font-size: 8px;
-        border-radius: 4px;
-    }
-
     .notif-list {
         gap: 4px;
         max-height: 250px;
@@ -916,11 +754,6 @@
         font-size: 8px;
     }
 
-    .notif-dismiss-btn {
-        font-size: 11px;
-        padding: 1px 2px;
-    }
-
     .notif-actions {
         margin-top: 10px;
         padding-top: 6px;
@@ -949,9 +782,7 @@
 }
 
 /* Focus styles for accessibility */
-.notif-dismiss-btn:focus-visible,
-.notif-btn:focus-visible,
-.notif-mark-read-btn:focus-visible {
+.notif-btn:focus-visible {
     outline: 2px solid #4a9eff;
     outline-offset: 2px;
 }
