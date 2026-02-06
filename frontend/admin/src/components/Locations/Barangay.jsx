@@ -2,13 +2,14 @@ import React, { useState, useContext, useEffect } from "react";
 import "./Barangay.css";
 import { AdminContext } from "../../context/AdminContextProvider";
 import Navbar from "../Navbar";
+import { toast } from "react-toastify";
 
 function Barangay({ onBack }) {
-  const { provinces, cities, barangays, addBarangay, updateBarangay, deleteBarangay } = useContext(AdminContext);
+  const { provinces, cities, barangays, addBarangay, updateBarangay, deleteBarangay, toastSuccess  } = useContext(AdminContext);
   const [selectedProvinceId, setSelectedProvinceId] = useState(null);
   const [selectedCityId, setSelectedCityId] = useState(null);
   const [filteredCities, setFilteredCities] = useState([]);
-  const [filteredBarangays, setFilteredBarangays] = useState([]);
+  const [barangaysList, setBarangaysList] = useState([]);
   const [newBarangayName, setNewBarangayName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -44,174 +45,128 @@ function Barangay({ onBack }) {
       const filtered = barangays.filter(
         barangay => barangay.cityId === selectedCityId && barangay.provinceId === selectedProvinceId
       );
-      setFilteredBarangays([...filtered]);
+      setBarangaysList([...filtered]);
     } else {
-      setFilteredBarangays([]);
+      setBarangaysList([]);
     }
   }, [selectedCityId, selectedProvinceId, barangays]);
 
   // Handle province selection change
   function handleProvinceChange(e) {
-    if (hasChanges) {
-      const confirmChange = window.confirm(
-        "You have unsaved changes. Changing province will discard them. Continue?"
-      );
-      if (!confirmChange) return;
-    }
-    
     setSelectedProvinceId(Number(e.target.value));
-    setNewBarangayName("");
-    setHasChanges(false);
   }
 
   // Handle city selection change
   function handleCityChange(e) {
-    if (hasChanges) {
-      const confirmChange = window.confirm(
-        "You have unsaved changes. Changing city will discard them. Continue?"
-      );
-      if (!confirmChange) return;
-    }
-    
     setSelectedCityId(Number(e.target.value));
-    setNewBarangayName("");
-    setHasChanges(false);
   }
 
-  // Handle existing barangay name change
-  function handleBarangayChange(index, newName) {
-    const updatedBarangays = [...filteredBarangays];
-    updatedBarangays[index] = {
-      ...updatedBarangays[index],
-      barangayName: newName
-    };
-    setFilteredBarangays(updatedBarangays);
+  function handleAddBarangay() {
+    const name = newBarangayName.trim();
+    if (!name || !selectedCityId || !selectedProvinceId) return;
+
+    setBarangaysList(prev => [
+      ...prev,
+      {
+        ID: Date.now(),       // temp ID for React rendering
+        isNew: true,
+        barangayName: name,
+        cityId: selectedCityId,
+        provinceId: selectedProvinceId
+      }
+    ]);
+
+    setNewBarangayName("");
     setHasChanges(true);
   }
 
-  // Add new barangay to the list
-  function handleAddBarangay() {
-    const barangayName = newBarangayName.trim();
-    
-    if (!barangayName) {
-      alert("Please enter a barangay name.");
-      return;
-    }
-
-    if (!selectedProvinceId) {
-      alert("Please select a province first.");
-      return;
-    }
-
-    if (!selectedCityId) {
-      alert("Please select a city first.");
-      return;
-    }
-
-    // Add to local state with temporary ID
-    const newBarangay = {
-      ID: null,
-      barangayId: null,
-      provinceId: selectedProvinceId,
-      cityId: selectedCityId,
-      barangayName: barangayName
-    };
-
-    setFilteredBarangays(prev => [...prev, newBarangay]);
-    setNewBarangayName("");
+  // Handle existing barangay name change
+  function handleBarangayChange(index, value) {
+    const updated = [...barangaysList];
+    updated[index] = { ...updated[index], barangayName: value };
+    setBarangaysList(updated);
     setHasChanges(true);
   }
 
   // Delete a barangay
   async function handleDeleteBarangay(index) {
-    const barangay = filteredBarangays[index];
-    
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete "${barangay.barangayName}"?`
-    );
-    
-    if (!confirmDelete) return;
+    const barangay = barangaysList[index];
+
+    if (barangay.isNew) {
+      setBarangaysList(prev => prev.filter((_, i) => i !== index));
+      setHasChanges(true);
+      return;
+    }
 
     setIsLoading(true);
+    const deleted = await deleteBarangay(barangay.ID);
+    setIsLoading(false);
 
-    try {
-      // If barangay has an ID, delete from backend
-      if (barangay.ID && deleteBarangay) {
-        await deleteBarangay(barangay.ID);
-      }
-
-      // Remove from local state
-      const updatedBarangays = filteredBarangays.filter((_, i) => i !== index);
-      setFilteredBarangays(updatedBarangays);
-      setHasChanges(false);
-    } catch (error) {
-      console.error("Error deleting barangay:", error);
-      alert("Failed to delete barangay. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (deleted) {
+      setBarangaysList(prev => prev.filter((_, i) => i !== index));
+      toast.success("Barangay deleted successfully!", toastSuccess);
     }
   }
 
   // Save all changes
   async function handleSaveChanges() {
-    if (!selectedProvinceId) {
-      alert("Please select a province.");
-      return;
-    }
-
-    if (!selectedCityId) {
-      alert("Please select a city.");
-      return;
-    }
-
     setIsLoading(true);
 
-    try {
-      const validBarangays = filteredBarangays.filter(barangay => barangay.barangayName.trim() !== "");
+    let created = 0;
+    let updated = 0;
 
-      // Process each barangay
-      for (const barangay of validBarangays) {
-        if (barangay.ID) {
-          // Update existing barangay
-          if (updateBarangay) {
-            await updateBarangay(barangay.ID, {
-              barangayName: barangay.barangayName,
-              cityId: selectedCityId,
-              provinceId: selectedProvinceId
-            });
-          }
-        } else {
-          // Add new barangay
-          if (addBarangay) {
-            await addBarangay({
-              barangayName: barangay.barangayName,
-              cityId: selectedCityId,
-              provinceId: selectedProvinceId
-            });
-          }
-        }
+    // Create array with all barangays to save
+    const allBarangaysToSave = [...barangaysList];
+
+    // Add the pending barangay from input field if it has a value
+    const pendingBarangayName = newBarangayName.trim();
+    if (pendingBarangayName && selectedCityId && selectedProvinceId) {
+      allBarangaysToSave.push({
+        ID: Date.now(),
+        isNew: true,
+        barangayName: pendingBarangayName,
+        cityId: selectedCityId,
+        provinceId: selectedProvinceId
+      });
+    }
+
+    // Loop through allBarangaysToSave
+    for (const barangay of allBarangaysToSave) {
+      const name = barangay.barangayName.trim();
+      if (!name) continue;
+
+      if (barangay.isNew) {
+        const res = await addBarangay({
+          barangayName: name,
+          cityId: selectedCityId,
+          provinceId: selectedProvinceId
+        });
+        if (res) created++;
+        continue;
       }
 
-      alert(`Successfully saved ${validBarangays.length} barangay(s)!`);
+      const original = barangays.find(b => b.ID === barangay.ID);
+      if (original && original.barangayName !== name) {
+        const res = await updateBarangay({
+          barangayID: barangay.ID,
+          barangayName: name,
+          cityId: selectedCityId,
+          provinceId: selectedProvinceId
+        });
+        if (res) updated++;
+      }
+    }
+
+    setIsLoading(false);
+
+    if (created || updated) {
+      toast.success("Changes saved successfully!", toastSuccess);
       setHasChanges(false);
-      setNewBarangayName("");
-    } catch (error) {
-      console.error("Error saving barangays:", error);
-      alert("Failed to save barangays. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   }
 
   // Handle back with unsaved changes warning
   function handleBack() {
-    if (hasChanges) {
-      const confirmLeave = window.confirm(
-        "You have unsaved changes. Are you sure you want to leave?"
-      );
-      if (!confirmLeave) return;
-    }
-    
     if (onBack) {
       onBack();
     } else {
@@ -294,7 +249,7 @@ function Barangay({ onBack }) {
 
             <div className="barangay-inputs-list">
               {/* Existing Barangays */}
-              {filteredBarangays.map((barangay, index) => (
+              {barangaysList.map((barangay, index) => (
                 <div className="barangay-input-row" key={index}>
                   <input
                     className="barangay-text-input"
@@ -324,7 +279,10 @@ function Barangay({ onBack }) {
                   className="barangay-text-input"
                   placeholder="Enter the name of the barangay"
                   value={newBarangayName}
-                  onChange={(e) => setNewBarangayName(e.target.value)}
+                  onChange={(e) => {
+                    setNewBarangayName(e.target.value);
+                    setHasChanges(e.target.value.trim() !== "");
+                  }}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -340,7 +298,7 @@ function Barangay({ onBack }) {
                     className="barangay-btn barangay-btn-add"
                     onClick={handleAddBarangay}
                     aria-label="Add barangay"
-                    disabled={isLoading || !selectedCityId || !newBarangayName.trim()}
+                    disabled={isLoading}
                   >
                     Add More
                   </button>

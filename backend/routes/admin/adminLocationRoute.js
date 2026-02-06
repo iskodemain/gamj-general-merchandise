@@ -1,7 +1,7 @@
 import express from 'express';
 import adminAuth from '../../middleware/adminAuth.js';
 
-import { addProvince, updateProvince, deleteProvince, fetchProvinces, fetchCities, fetchBarangays, addCities, updateCities, deleteCities } from "../../controllers/admin/adminLocationController.js";
+import { addProvince, updateProvince, deleteProvince, fetchProvinces, fetchCities, fetchBarangays, addCities, updateCities, deleteCities, addBarangays, updateBarangays, deleteBarangays } from "../../controllers/admin/adminLocationController.js";
 
 const adminLocationRouter = express.Router();
 
@@ -19,7 +19,9 @@ adminLocationRouter.delete('/cities/delete', adminAuth, deleteCities);
 
 // BARANGAYS
 adminLocationRouter.get('/barangays/fetch', adminAuth, fetchBarangays);
-
+adminLocationRouter.post('/barangays/add', adminAuth, addBarangays);
+adminLocationRouter.put('/barangays/update', adminAuth, updateBarangays);
+adminLocationRouter.delete('/barangays/delete', adminAuth, deleteBarangays);
 
 
 export default adminLocationRouter;

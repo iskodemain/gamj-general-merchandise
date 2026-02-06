@@ -1,4 +1,4 @@
-import { addProvinceService, updateProvinceService, deleteProvinceService, fetchProvincesService, fetchCitiesService, fetchBarangaysService, addCitiesService, updateCitiesService, deleteCitiesService } from "../../services/admin/adminLocationService.js";
+import { addProvinceService, updateProvinceService, deleteProvinceService, fetchProvincesService, fetchCitiesService, fetchBarangaysService, addCitiesService, updateCitiesService, deleteCitiesService, addBarangaysService, updateBarangaysService, deleteBarangaysService } from "../../services/admin/adminLocationService.js";
 
 export const fetchProvinces = async (req, res) => {
     try {
@@ -106,6 +106,45 @@ export const fetchBarangays = async (req, res) => {
     try {
         const { ID } = req.admin;
         const result = await fetchBarangaysService(ID);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const addBarangays = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const { barangayName, cityId, provinceId } = req.body;
+        
+        const result = await addBarangaysService(ID, barangayName, cityId, provinceId);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const updateBarangays = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const { barangayID, barangayName, cityId, provinceId } = req.body;
+        
+        const result = await updateBarangaysService(ID, barangayID, barangayName, cityId, provinceId);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const deleteBarangays = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const { barangayID } = req.body;
+        
+        const result = await deleteBarangaysService(ID, barangayID);
         res.json(result);
     } catch (error) {
         console.log(error);

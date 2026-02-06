@@ -299,3 +299,121 @@ export const fetchBarangaysService = async (adminID) => {
         throw new Error(error.message);
     }
 }
+
+export const addBarangaysService = async (adminID, barangayName, cityId, provinceId) => {
+  try {
+    // Validate Admin Exists
+    const adminUser = await Admin.findByPk(adminID);
+    if (!adminUser) {
+      return { success: false, message: "Admin user not found" };
+    }
+
+    // Validate province name
+    if (!barangayName || !barangayName.trim()) {
+      return { success: false, message: "Barangay name is required" };
+    }
+
+    const city = await Cities.findByPk(cityId);
+    if (!city) {
+      return { success: false, message: "City not found" };
+    }
+
+    const province = await Provinces.findByPk(provinceId);
+    if (!province) {
+      return { success: false, message: "Province not found" };
+    }
+
+    const cleanName = barangayName.trim();
+
+    // Auto-generate barangayId
+    const lastBarangay = await Barangays.findOne({
+      order: [["ID", "DESC"]],
+    });
+
+    const nextNumber = lastBarangay ? lastBarangay.ID + 1 : 1;
+    const barangayId = withTimestamp("BRGY", nextNumber);
+
+    // Create Barangay Record
+    const created = await Barangays.create({
+      barangayId,
+      barangayName: cleanName,
+      provinceId,
+      cityId
+    });
+
+    return {
+      success: true,
+      data: created,
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+
+export const updateBarangaysService = async (adminID, barangayID, barangayName, cityId, provinceId) => {
+  try {
+    // Validate Admin Exists
+    const adminUser = await Admin.findByPk(adminID);
+    if (!adminUser) {
+      return { success: false, message: "Admin user not found" };
+    }
+
+    const barangay = await Barangays.findByPk(barangayID);
+    if (!barangay) {
+      return { success: false, message: "Barangay not found" };
+    }
+
+    const city = await Cities.findByPk(cityId);
+    if (!city) {
+      return { success: false, message: "City not found" };
+    }
+
+    const province = await Provinces.findByPk(provinceId);
+    if (!province) {
+      return { success: false, message: "Province not found" };
+    }
+
+    barangay.barangayName = barangayName.trim();
+    barangay.provinceId = provinceId;
+    barangay.cityId = cityId;
+    await barangay.save();
+    return { 
+      success: true, 
+      data: barangay 
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+
+export const deleteBarangaysService = async (adminID, barangayID) => {
+  try {
+    // Validate Admin Exists
+    const adminUser = await Admin.findByPk(adminID);
+    if (!adminUser) {
+      return { success: false, message: "Admin user not found" };
+    }
+
+    const barangay = await Barangays.findByPk(barangayID);
+    if (!barangay) {
+      return { success: false, message: "Barangay not found" };
+    }
+
+    await barangay.destroy();
+
+    return { 
+      success: true, 
+      data: barangay 
+    };
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
