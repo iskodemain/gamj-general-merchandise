@@ -2,12 +2,13 @@ import React, { useState, useContext, useEffect } from "react";
 import "./Cities.css";
 import { AdminContext } from "../../context/AdminContextProvider";
 import Navbar from "../Navbar";
+import { toast } from "react-toastify";
 
 function Cities({ onBack }) {
-  const { provinces, cities, addCity, updateCity, deleteCity } = useContext(AdminContext);
+  const { provinces, cities, addCity, updateCity, deleteCity, toastSuccess } = useContext(AdminContext);
   const [selectedProvinceId, setSelectedProvinceId] = useState(null);
-  const [filteredCities, setFilteredCities] = useState([]);
   const [newCityName, setNewCityName] = useState("");
+  const [citiesList, setCitiesList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -20,149 +21,122 @@ function Cities({ onBack }) {
 
   // Filter cities whenever province selection or cities data changes
   useEffect(() => {
-    if (selectedProvinceId && cities) {
-      const filtered = cities.filter(city => city.provinceId === selectedProvinceId);
-      setFilteredCities([...filtered]);
-    } else {
-      setFilteredCities([]);
-    }
+    if (!selectedProvinceId) return;
+
+    const list = cities
+      ?.filter(city => Number(city.provinceId) === Number(selectedProvinceId))
+      .map(city => ({ ...city, isNew: false })) || [];
+
+    setCitiesList(list);
+    setHasChanges(false);
   }, [selectedProvinceId, cities]);
 
   // Handle province selection change
   function handleProvinceChange(e) {
-    if (hasChanges) {
-      const confirmChange = window.confirm(
-        "You have unsaved changes. Changing province will discard them. Continue?"
-      );
-      if (!confirmChange) return;
-    }
-    
     setSelectedProvinceId(Number(e.target.value));
-    setNewCityName("");
-    setHasChanges(false);
   }
 
-  // Handle existing city name change
-  function handleCityChange(index, newName) {
-    const updatedCities = [...filteredCities];
-    updatedCities[index] = {
-      ...updatedCities[index],
-      cityName: newName
-    };
-    setFilteredCities(updatedCities);
+  function handleAddCity() {
+    const name = newCityName.trim();
+    if (!name || !selectedProvinceId) return;
+
+    setCitiesList(prev => [
+      ...prev,
+      {
+        ID: Date.now(),       // temp ID for React rendering
+        isNew: true,
+        cityName: name,
+        provinceId: selectedProvinceId
+      }
+    ]);
+
+    setNewCityName("");
     setHasChanges(true);
   }
 
-  // Add new city to the list
-  function handleAddCity() {
-    const cityName = newCityName.trim();
-    
-    if (!cityName) {
-      alert("Please enter a city name.");
-      return;
-    }
-
-    if (!selectedProvinceId) {
-      alert("Please select a province first.");
-      return;
-    }
-
-    // Add to local state with temporary ID
-    const newCity = {
-      ID: null,
-      cityId: null,
-      provinceId: selectedProvinceId,
-      cityName: cityName
-    };
-
-    setFilteredCities(prev => [...prev, newCity]);
-    setNewCityName("");
+  // Handle existing city name change
+  function handleCityChange(index, value) {
+    const updated = [...citiesList];
+    updated[index] = { ...updated[index], cityName: value };
+    setCitiesList(updated);
     setHasChanges(true);
   }
 
   // Delete a city
   async function handleDeleteCity(index) {
-    const city = filteredCities[index];
-    
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete "${city.cityName}"?`
-    );
-    
-    if (!confirmDelete) return;
+    const city = citiesList[index];
 
-    setIsLoading(true);
-
-    try {
-      // If city has an ID, delete from backend
-      if (city.ID && deleteCity) {
-        await deleteCity(city.ID);
-      }
-
-      // Remove from local state
-      const updatedCities = filteredCities.filter((_, i) => i !== index);
-      setFilteredCities(updatedCities);
-      setHasChanges(false);
-    } catch (error) {
-      console.error("Error deleting city:", error);
-      alert("Failed to delete city. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  // Save all changes
-  async function handleSaveChanges() {
-    if (!selectedProvinceId) {
-      alert("Please select a province.");
+    if (city.isNew) {
+      setCitiesList(prev => prev.filter((_, i) => i !== index));
+      setHasChanges(true);
       return;
     }
 
     setIsLoading(true);
+    const deleted = await deleteCity(city.ID);
+    setIsLoading(false);
 
-    try {
-      const validCities = filteredCities.filter(city => city.cityName.trim() !== "");
-
-      // Process each city
-      for (const city of validCities) {
-        if (city.ID) {
-          // Update existing city
-          if (updateCity) {
-            await updateCity(city.ID, {
-              cityName: city.cityName,
-              provinceId: selectedProvinceId
-            });
-          }
-        } else {
-          // Add new city
-          if (addCity) {
-            await addCity({
-              cityName: city.cityName,
-              provinceId: selectedProvinceId
-            });
-          }
-        }
-      }
-
-      alert(`Successfully saved ${validCities.length} city/cities!`);
-      setHasChanges(false);
-      setNewCityName("");
-    } catch (error) {
-      console.error("Error saving cities:", error);
-      alert("Failed to save cities. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (deleted) {
+      setCitiesList(prev => prev.filter((_, i) => i !== index));
+      toast.success("City deleted successfully!", toastSuccess);
     }
   }
 
+
+  // Save all changes
+  async function handleSaveChanges() {
+    setIsLoading(true);
+
+    let created = 0;
+    let updated = 0;
+
+    const allCitiesToSave = [...citiesList];
+
+    const pendingCityName = newCityName.trim();
+    if (pendingCityName && selectedProvinceId) {
+      allCitiesToSave.push({
+        ID: Date.now(),
+        isNew: true,
+        cityName: pendingCityName,
+        provinceId: selectedProvinceId
+      });
+    }
+
+    for (const city of allCitiesToSave) {
+      const name = city.cityName.trim();
+      if (!name) continue;
+
+      if (city.isNew) {
+        const res = await addCity({
+          cityName: name,
+          provinceId: selectedProvinceId
+        });
+        if (res) created++;
+        continue;
+      }
+
+      const original = cities.find(c => c.ID === city.ID);
+      if (original && original.cityName !== name) {
+        const res = await updateCity({
+          cityID: city.ID,
+          cityName: name,
+          provinceId: selectedProvinceId
+        });
+        if (res) updated++;
+      }
+    }
+
+    setIsLoading(false);
+
+    if (created || updated) {
+      toast.success("Changes saved successfully!", toastSuccess);
+      setHasChanges(false);
+    }
+  }
+
+
   // Handle back with unsaved changes warning
   function handleBack() {
-    if (hasChanges) {
-      const confirmLeave = window.confirm(
-        "You have unsaved changes. Are you sure you want to leave?"
-      );
-      if (!confirmLeave) return;
-    }
-    
     if (onBack) {
       onBack();
     } else {
@@ -172,6 +146,7 @@ function Cities({ onBack }) {
 
   // Get selected province name for display
   const selectedProvince = provinces?.find(p => p.ID === selectedProvinceId);
+
 
   return (
     <>
@@ -217,7 +192,7 @@ function Cities({ onBack }) {
 
             <div className="city-inputs-list">
               {/* Existing Cities */}
-              {filteredCities.map((city, index) => (
+              {citiesList.map((city, index) => (
                 <div className="city-input-row" key={index}>
                   <input
                     className="city-text-input"
@@ -247,7 +222,10 @@ function Cities({ onBack }) {
                   className="city-text-input"
                   placeholder="Enter the name of the city"
                   value={newCityName}
-                  onChange={(e) => setNewCityName(e.target.value)}
+                  onChange={(e) => {
+                    setNewCityName(e.target.value);
+                    setHasChanges(e.target.value.trim() !== "");
+                  }}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -261,9 +239,9 @@ function Cities({ onBack }) {
                   <button
                     type="button"
                     className="city-btn city-btn-add"
-                    onClick={handleAddCity}
                     aria-label="Add city"
-                    disabled={isLoading || !selectedProvinceId || !newCityName.trim()}
+                    onClick={handleAddCity}
+                    disabled={isLoading}
                   >
                     Add More
                   </button>
