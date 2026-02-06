@@ -51,10 +51,66 @@ const AdminContextProvider = (props) => {
   const [fetchNotifications, setFetchNotifications] = useState([]); 
 
   /*---------------------------DELETE BARANGAYS-----------------------------*/
+  const deleteBarangay = async (barangayID) => {
+    if (!token) return;
+    try {
+      const response = await axios.delete(
+        backendUrl + "/api/location/barangays/delete",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { barangayID }    // ✅ Correct way to send body in DELETE
+        }
+      );
+
+      if (response.data.success) {
+        return true;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
 
   /*---------------------------UPDATE BARANGAYS-----------------------------*/
+  const updateBarangay = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.put(backendUrl + "/api/location/barangays/update", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
 
   /*---------------------------ADD BARANGAYS-----------------------------*/
+  const addBarangay = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.post(backendUrl + "/api/location/barangays/add", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
 
   /*---------------------------FETCH BARANGAYS-----------------------------*/
   const fetchBarangays = async () => {
@@ -1336,7 +1392,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay
   }  
   return (
     <AdminContext.Provider value={value}>
