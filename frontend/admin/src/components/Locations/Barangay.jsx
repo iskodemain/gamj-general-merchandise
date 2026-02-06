@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import "./Barangay.css";
 import { AdminContext } from "../../context/AdminContextProvider";
+import Navbar from "../Navbar";
 
 function Barangay({ onBack }) {
   const { provinces, cities, barangays, addBarangay, updateBarangay, deleteBarangay } = useContext(AdminContext);
@@ -223,150 +224,153 @@ function Barangay({ onBack }) {
   const selectedCity = filteredCities?.find(c => c.ID === selectedCityId);
 
   return (
-    <div className="barangay-page-container">
-      <div className="barangay-content-card" role="region" aria-label="Barangays management">
-        <div className="barangay-header">
-          <h2 className="barangay-page-title">List of Barangays Available for Order Delivery</h2>
-        </div>
-
-        {/* Province Selector */}
-        <div className="barangay-province-section">
-          <label className="barangay-section-label" htmlFor="barangay-province-select">
-            Select a province
-          </label>
-          <div className="barangay-selector-row">
-            <select
-              id="barangay-province-select"
-              className="barangay-select"
-              value={selectedProvinceId || ""}
-              onChange={handleProvinceChange}
-              aria-label="Select province"
-              disabled={isLoading || !provinces || provinces.length === 0}
-            >
-              {!provinces || provinces.length === 0 ? (
-                <option value="">No provinces available</option>
-              ) : (
-                provinces.map(province => (
-                  <option key={province.ID} value={province.ID}>
-                    {province.provinceName}
-                  </option>
-                ))
-              )}
-            </select>
+    <>
+      <Navbar TitleName="Barangays" />
+      <div className="barangay-page-container">
+        <div className="barangay-content-card" role="region" aria-label="Barangays management">
+          <div className="barangay-header">
+            <h2 className="barangay-page-title">List of Barangays Available for Order Delivery</h2>
           </div>
-        </div>
 
-        {/* City Selector */}
-        <div className="barangay-city-section">
-          <label className="barangay-section-label" htmlFor="barangay-city-select">
-            Select a city
-          </label>
-          <div className="barangay-selector-row">
-            <select
-              id="barangay-city-select"
-              className="barangay-select"
-              value={selectedCityId || ""}
-              onChange={handleCityChange}
-              aria-label="Select city"
-              disabled={isLoading || !filteredCities || filteredCities.length === 0}
-            >
-              {!filteredCities || filteredCities.length === 0 ? (
-                <option value="">No cities available for this province</option>
-              ) : (
-                filteredCities.map(city => (
-                  <option key={city.ID} value={city.ID}>
-                    {city.cityName}
-                  </option>
-                ))
-              )}
-            </select>
+          {/* Province Selector */}
+          <div className="barangay-province-section">
+            <label className="barangay-section-label" htmlFor="barangay-province-select">
+              Select a province
+            </label>
+            <div className="barangay-selector-row">
+              <select
+                id="barangay-province-select"
+                className="barangay-select"
+                value={selectedProvinceId || ""}
+                onChange={handleProvinceChange}
+                aria-label="Select province"
+                disabled={isLoading || !provinces || provinces.length === 0}
+              >
+                {!provinces || provinces.length === 0 ? (
+                  <option value="">No provinces available</option>
+                ) : (
+                  provinces.map(province => (
+                    <option key={province.ID} value={province.ID}>
+                      {province.provinceName}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
           </div>
-        </div>
 
-        {/* Barangays List */}
-        <div className="barangay-form-section">
-          <label className="barangay-section-label">
-            List of barangays in {selectedCity?.cityName || "selected city"}, {selectedProvince?.provinceName || ""}
-          </label>
+          {/* City Selector */}
+          <div className="barangay-city-section">
+            <label className="barangay-section-label" htmlFor="barangay-city-select">
+              Select a city
+            </label>
+            <div className="barangay-selector-row">
+              <select
+                id="barangay-city-select"
+                className="barangay-select"
+                value={selectedCityId || ""}
+                onChange={handleCityChange}
+                aria-label="Select city"
+                disabled={isLoading || !filteredCities || filteredCities.length === 0}
+              >
+                {!filteredCities || filteredCities.length === 0 ? (
+                  <option value="">No cities available for this province</option>
+                ) : (
+                  filteredCities.map(city => (
+                    <option key={city.ID} value={city.ID}>
+                      {city.cityName}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          </div>
 
-          <div className="barangay-inputs-list">
-            {/* Existing Barangays */}
-            {filteredBarangays.map((barangay, index) => (
-              <div className="barangay-input-row" key={index}>
+          {/* Barangays List */}
+          <div className="barangay-form-section">
+            <label className="barangay-section-label">
+              List of barangays in {selectedCity?.cityName || "selected city"}, {selectedProvince?.provinceName || ""}
+            </label>
+
+            <div className="barangay-inputs-list">
+              {/* Existing Barangays */}
+              {filteredBarangays.map((barangay, index) => (
+                <div className="barangay-input-row" key={index}>
+                  <input
+                    className="barangay-text-input"
+                    value={barangay.barangayName}
+                    onChange={(e) => handleBarangayChange(index, e.target.value)}
+                    aria-label={`Barangay ${barangay.barangayName}`}
+                    disabled={isLoading}
+                    placeholder="Barangay name"
+                  />
+                  <div className="barangay-row-actions">
+                    <button
+                      type="button"
+                      className="barangay-btn barangay-btn-delete"
+                      onClick={() => handleDeleteBarangay(index)}
+                      aria-label={`Delete ${barangay.barangayName}`}
+                      disabled={isLoading}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {/* Add New Barangay Row */}
+              <div className="barangay-input-row">
                 <input
                   className="barangay-text-input"
-                  value={barangay.barangayName}
-                  onChange={(e) => handleBarangayChange(index, e.target.value)}
-                  aria-label={`Barangay ${barangay.barangayName}`}
-                  disabled={isLoading}
-                  placeholder="Barangay name"
+                  placeholder="Enter the name of the barangay"
+                  value={newBarangayName}
+                  onChange={(e) => setNewBarangayName(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddBarangay();
+                    }
+                  }}
+                  aria-label="New barangay name"
+                  disabled={isLoading || !selectedCityId}
                 />
                 <div className="barangay-row-actions">
                   <button
                     type="button"
-                    className="barangay-btn barangay-btn-delete"
-                    onClick={() => handleDeleteBarangay(index)}
-                    aria-label={`Delete ${barangay.barangayName}`}
-                    disabled={isLoading}
+                    className="barangay-btn barangay-btn-add"
+                    onClick={handleAddBarangay}
+                    aria-label="Add barangay"
+                    disabled={isLoading || !selectedCityId || !newBarangayName.trim()}
                   >
-                    Delete
+                    Add More
                   </button>
                 </div>
               </div>
-            ))}
-
-            {/* Add New Barangay Row */}
-            <div className="barangay-input-row">
-              <input
-                className="barangay-text-input"
-                placeholder="Enter the name of the barangay"
-                value={newBarangayName}
-                onChange={(e) => setNewBarangayName(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddBarangay();
-                  }
-                }}
-                aria-label="New barangay name"
-                disabled={isLoading || !selectedCityId}
-              />
-              <div className="barangay-row-actions">
-                <button
-                  type="button"
-                  className="barangay-btn barangay-btn-add"
-                  onClick={handleAddBarangay}
-                  aria-label="Add barangay"
-                  disabled={isLoading || !selectedCityId || !newBarangayName.trim()}
-                >
-                  Add More
-                </button>
-              </div>
             </div>
           </div>
-        </div>
 
-        {/* Form Actions */}
-        <div className="barangay-form-actions">
-          <button
-            type="button"
-            className="barangay-btn barangay-btn-save"
-            onClick={handleSaveChanges}
-            disabled={isLoading || !hasChanges || !selectedCityId}
-          >
-            {isLoading ? "Saving..." : "Save Changes"}
-          </button>
-          <button
-            type="button"
-            className="barangay-btn barangay-btn-back"
-            onClick={handleBack}
-            disabled={isLoading}
-          >
-            Back
-          </button>
+          {/* Form Actions */}
+          <div className="barangay-form-actions">
+            <button
+              type="button"
+              className="barangay-btn barangay-btn-save"
+              onClick={handleSaveChanges}
+              disabled={isLoading || !hasChanges || !selectedCityId}
+            >
+              {isLoading ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              className="barangay-btn barangay-btn-back"
+              onClick={handleBack}
+              disabled={isLoading}
+            >
+              Back
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

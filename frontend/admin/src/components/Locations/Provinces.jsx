@@ -1,9 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
 import "./Provinces.css";
 import { AdminContext } from "../../context/AdminContextProvider";
+import { toast } from 'react-toastify';
+import Navbar from "../Navbar";
 
 function Provinces({ onBack }) {
-  const { provinces, addProvince, updateProvince, deleteProvince } = useContext(AdminContext);
+  const { provinces, addProvince, updateProvince, deleteProvince, toastSuccess } = useContext(AdminContext);
   const [provincesList, setProvincesList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -14,10 +16,11 @@ function Provinces({ onBack }) {
       setProvincesList([...provinces]);
     } else {
       // Start with one empty row if no provinces exist
-      setProvincesList([{ ID: null, provinceId: null, provinceName: "" }]);
+      setProvincesList([{ ID: Date.now(), isNew: true, provinceName: "" }]);
     }
   }, [provinces]);
 
+  
   // Handle input change for existing or new provinces
   function handleChange(index, value) {
     const updatedList = [...provincesList];
@@ -33,7 +36,7 @@ function Provinces({ onBack }) {
   function handleAdd() {
     setProvincesList((prev) => [
       ...prev,
-      { ID: null, provinceId: null, provinceName: "" }
+      { ID: Date.now(), isNew: true, provinceName: "" }
     ]);
     setHasChanges(true);
   }
@@ -41,91 +44,65 @@ function Provinces({ onBack }) {
   // Delete a province
   async function handleDelete(index) {
     const province = provincesList[index];
-    
-    // Confirm deletion
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete "${province.provinceName || 'this province'}"?`
-    );
-    
-    if (!confirmDelete) return;
+
+    if (province.isNew) {
+      setProvincesList(prev => prev.filter((_, i) => i !== index));
+      setHasChanges(true);
+      return;
+    }
 
     setIsLoading(true);
+    const deleted = await deleteProvince(province.ID);
+    setIsLoading(false);
 
-    try {
-      // If province has an ID, delete from backend
-      if (province.ID && deleteProvince) {
-        await deleteProvince(province.ID);
-      }
-      
-      // Remove from local state
-      const updatedList = provincesList.filter((_, i) => i !== index);
-      
-      // Keep at least one empty input
-      if (updatedList.length === 0) {
-        setProvincesList([{ ID: null, provinceId: null, provinceName: "" }]);
-      } else {
-        setProvincesList(updatedList);
-      }
-      
-      setHasChanges(false);
-    } catch (error) {
-      console.error("Error deleting province:", error);
-      alert("Failed to delete province. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (deleted) {
+      // Remove from UI
+      setProvincesList(prev => prev.filter((_, i) => i !== index));
+      toast.success("Province deleted successfully!", toastSuccess);
     }
   }
 
   // Save all changes
-  async function handleSave() {
+  const handleSave = async () => {
     setIsLoading(true);
 
-    try {
-      const validProvinces = provincesList.filter(p => p.provinceName.trim() !== "");
-      
-      if (validProvinces.length === 0) {
-        alert("Please add at least one province before saving.");
-        setIsLoading(false);
-        return;
+    let createdCount = 0;
+    let updatedCount = 0;
+
+    for (const prov of provincesList) {
+      const name = prov.provinceName.trim();
+      if (!name) continue;
+
+      // NEW CATEGORY
+      if (prov.isNew) {
+        const created = await addProvince({ provinceName: name });
+        if (created) createdCount++;
+        continue;
       }
 
-      // Process each province
-      for (const province of validProvinces) {
-        if (province.ID) {
-          // Update existing province
-          if (updateProvince) {
-            await updateProvince(province.ID, { provinceName: province.provinceName });
-          }
-        } else {
-          // Add new province
-          if (addProvince) {
-            await addProvince({ provinceName: province.provinceName });
-          }
-        }
-      }
+      // EXISTING CATEGORY — only update if changed
+      const original = provinces.find(p => p.ID === prov.ID);
 
-      alert(`Successfully saved ${validProvinces.length} province(s)!`);
+      if (original && original.provinceName !== name) {
+        const updated = await updateProvince({
+          provinceID: prov.ID,
+          provinceName: name
+        });
+
+        if (updated) updatedCount++;
+      }
+    }
+
+    setIsLoading(false);
+
+    if (createdCount > 0 || updatedCount > 0) {
+      toast.success("Changes saved successfully!", toastSuccess);
       setHasChanges(false);
-      
-      // Optionally go back after save
-      // if (onBack) onBack();
-    } catch (error) {
-      console.error("Error saving provinces:", error);
-      alert("Failed to save provinces. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   }
 
   // Handle back with unsaved changes warning
   function handleBack() {
-    if (hasChanges) {
-      const confirmLeave = window.confirm(
-        "You have unsaved changes. Are you sure you want to leave?"
-      );
-      if (!confirmLeave) return;
-    }
-    
     if (onBack) {
       onBack();
     } else {
@@ -134,73 +111,76 @@ function Provinces({ onBack }) {
   }
 
   return (
-    <div className="province-page-container" role="region" aria-label="Provinces management">
-      <div className="province-content-card">
-        <h1 className="province-page-title">List of Provinces Available for Order Delivery</h1>
+    <>
+      <Navbar TitleName="Provinces" />
+      <div className="province-page-container" role="region" aria-label="Provinces management">
+        <div className="province-content-card">
+          <h1 className="province-page-title">List of Provinces Available for Order Delivery</h1>
 
-        <div className="province-form-section">
-          <label className="province-section-label">Manage Provinces</label>
+          <div className="province-form-section">
+            <label className="province-section-label">Manage Provinces</label>
 
-          <div className="province-inputs-list">
-            {provincesList.map((province, index) => (
-              <div className="province-input-row" key={index}>
-                <input
-                  className="province-text-input"
-                  placeholder="Enter the name of the province"
-                  value={province.provinceName || ""}
-                  onChange={(e) => handleChange(index, e.target.value)}
-                  aria-label={`Province ${index + 1}`}
-                  disabled={isLoading}
-                />
+            <div className="province-inputs-list">
+              {provincesList.map((province, index) => (
+                <div className="province-input-row" key={index}>
+                  <input
+                    className="province-text-input"
+                    placeholder="Enter the name of the province"
+                    value={province.provinceName || ""}
+                    onChange={(e) => handleChange(index, e.target.value)}
+                    aria-label={`Province ${index + 1}`}
+                    disabled={isLoading}
+                  />
 
-                <div className="province-row-actions">
-                  {index === provincesList.length - 1 ? (
-                    <button
-                      type="button"
-                      className="province-btn province-btn-add"
-                      onClick={handleAdd}
-                      aria-label="Add new province"
-                      disabled={isLoading}
-                    >
-                      Add More
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="province-btn province-btn-delete"
-                      onClick={() => handleDelete(index)}
-                      aria-label={`Delete ${province.provinceName || 'province'}`}
-                      disabled={isLoading}
-                    >
-                      Delete
-                    </button>
-                  )}
+                  <div className="province-row-actions">
+                    {index === provincesList.length - 1 ? (
+                      <button
+                        type="button"
+                        className="province-btn province-btn-add"
+                        onClick={handleAdd}
+                        aria-label="Add new province"
+                        disabled={isLoading}
+                      >
+                        Add More
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="province-btn province-btn-delete"
+                        onClick={() => handleDelete(index)}
+                        aria-label={`Delete ${province.provinceName || 'province'}`}
+                        disabled={isLoading}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          <div className="province-form-actions">
+            <button
+              type="button"
+              className="province-btn province-btn-save"
+              onClick={handleSave}
+              disabled={isLoading || !hasChanges}
+            >
+              {isLoading ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              className="province-btn province-btn-back"
+              onClick={handleBack}
+              disabled={isLoading}
+            >
+              Back
+            </button>
           </div>
         </div>
-
-        <div className="province-form-actions">
-          <button
-            type="button"
-            className="province-btn province-btn-save"
-            onClick={handleSave}
-            disabled={isLoading || !hasChanges}
-          >
-            {isLoading ? "Saving..." : "Save Changes"}
-          </button>
-          <button
-            type="button"
-            className="province-btn province-btn-back"
-            onClick={handleBack}
-            disabled={isLoading}
-          >
-            Back
-          </button>
-        </div>
       </div>
-    </div>
+    </>
   );
 }
 

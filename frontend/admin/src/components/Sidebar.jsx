@@ -63,6 +63,12 @@ function Sidebar({ currentView }) {
           onClick={() => {navigate("/user-management"); setIsSidebarOpen(false)}}
         />
         <MenuItem
+          icon={assets.dl_icon}
+          label="Delivery Locations"
+          active={currentView === "delivery locations"}
+          onClick={() => {navigate("/delivery-locations"); setIsSidebarOpen(false)}}
+        />
+        <MenuItem
           icon={assets.reports_icon}
           label="Reports"
           active={currentView === "reports"}

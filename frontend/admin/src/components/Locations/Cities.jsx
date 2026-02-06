@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import "./Cities.css";
 import { AdminContext } from "../../context/AdminContextProvider";
+import Navbar from "../Navbar";
 
 function Cities({ onBack }) {
   const { provinces, cities, addCity, updateCity, deleteCity } = useContext(AdminContext);
@@ -173,123 +174,126 @@ function Cities({ onBack }) {
   const selectedProvince = provinces?.find(p => p.ID === selectedProvinceId);
 
   return (
-    <div className="city-page-container">
-      <div className="city-content-card" role="region" aria-label="Cities management">
-        <div className="city-header">
-          <h2 className="city-page-title">List of Cities Available for Order Delivery</h2>
-        </div>
-
-        {/* Province Selector */}
-        <div className="city-province-section">
-          <label className="city-section-label" htmlFor="city-province-select">
-            Select a province
-          </label>
-          <div className="city-province-row">
-            <select
-              id="city-province-select"
-              className="city-province-select"
-              value={selectedProvinceId || ""}
-              onChange={handleProvinceChange}
-              aria-label="Select province"
-              disabled={isLoading || !provinces || provinces.length === 0}
-            >
-              {!provinces || provinces.length === 0 ? (
-                <option value="">No provinces available</option>
-              ) : (
-                provinces.map(province => (
-                  <option key={province.ID} value={province.ID}>
-                    {province.provinceName}
-                  </option>
-                ))
-              )}
-            </select>
+    <>
+      <Navbar TitleName="Cities" />
+      <div className="city-page-container">
+        <div className="city-content-card" role="region" aria-label="Cities management">
+          <div className="city-header">
+            <h2 className="city-page-title">List of Cities Available for Order Delivery</h2>
           </div>
-        </div>
 
-        {/* Cities List */}
-        <div className="city-form-section">
-          <label className="city-section-label">
-            List of cities in {selectedProvince?.provinceName || "selected province"}
-          </label>
+          {/* Province Selector */}
+          <div className="city-province-section">
+            <label className="city-section-label" htmlFor="city-province-select">
+              Select a province
+            </label>
+            <div className="city-province-row">
+              <select
+                id="city-province-select"
+                className="city-province-select"
+                value={selectedProvinceId || ""}
+                onChange={handleProvinceChange}
+                aria-label="Select province"
+                disabled={isLoading || !provinces || provinces.length === 0}
+              >
+                {!provinces || provinces.length === 0 ? (
+                  <option value="">No provinces available</option>
+                ) : (
+                  provinces.map(province => (
+                    <option key={province.ID} value={province.ID}>
+                      {province.provinceName}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          </div>
 
-          <div className="city-inputs-list">
-            {/* Existing Cities */}
-            {filteredCities.map((city, index) => (
-              <div className="city-input-row" key={index}>
+          {/* Cities List */}
+          <div className="city-form-section">
+            <label className="city-section-label">
+              List of cities in {selectedProvince?.provinceName || "selected province"}
+            </label>
+
+            <div className="city-inputs-list">
+              {/* Existing Cities */}
+              {filteredCities.map((city, index) => (
+                <div className="city-input-row" key={index}>
+                  <input
+                    className="city-text-input"
+                    value={city.cityName}
+                    onChange={(e) => handleCityChange(index, e.target.value)}
+                    aria-label={`City ${city.cityName}`}
+                    disabled={isLoading}
+                    placeholder="City name"
+                  />
+                  <div className="city-row-actions">
+                    <button
+                      type="button"
+                      className="city-btn city-btn-delete"
+                      onClick={() => handleDeleteCity(index)}
+                      aria-label={`Delete ${city.cityName}`}
+                      disabled={isLoading}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {/* Add New City Row */}
+              <div className="city-input-row">
                 <input
                   className="city-text-input"
-                  value={city.cityName}
-                  onChange={(e) => handleCityChange(index, e.target.value)}
-                  aria-label={`City ${city.cityName}`}
-                  disabled={isLoading}
-                  placeholder="City name"
+                  placeholder="Enter the name of the city"
+                  value={newCityName}
+                  onChange={(e) => setNewCityName(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddCity();
+                    }
+                  }}
+                  aria-label="New city name"
+                  disabled={isLoading || !selectedProvinceId}
                 />
                 <div className="city-row-actions">
                   <button
                     type="button"
-                    className="city-btn city-btn-delete"
-                    onClick={() => handleDeleteCity(index)}
-                    aria-label={`Delete ${city.cityName}`}
-                    disabled={isLoading}
+                    className="city-btn city-btn-add"
+                    onClick={handleAddCity}
+                    aria-label="Add city"
+                    disabled={isLoading || !selectedProvinceId || !newCityName.trim()}
                   >
-                    Delete
+                    Add More
                   </button>
                 </div>
               </div>
-            ))}
-
-            {/* Add New City Row */}
-            <div className="city-input-row">
-              <input
-                className="city-text-input"
-                placeholder="Enter the name of the city"
-                value={newCityName}
-                onChange={(e) => setNewCityName(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddCity();
-                  }
-                }}
-                aria-label="New city name"
-                disabled={isLoading || !selectedProvinceId}
-              />
-              <div className="city-row-actions">
-                <button
-                  type="button"
-                  className="city-btn city-btn-add"
-                  onClick={handleAddCity}
-                  aria-label="Add city"
-                  disabled={isLoading || !selectedProvinceId || !newCityName.trim()}
-                >
-                  Add More
-                </button>
-              </div>
             </div>
           </div>
-        </div>
 
-        {/* Form Actions */}
-        <div className="city-form-actions">
-          <button
-            type="button"
-            className="city-btn city-btn-save"
-            onClick={handleSaveChanges}
-            disabled={isLoading || !hasChanges || !selectedProvinceId}
-          >
-            {isLoading ? "Saving..." : "Save Changes"}
-          </button>
-          <button
-            type="button"
-            className="city-btn city-btn-back"
-            onClick={handleBack}
-            disabled={isLoading}
-          >
-            Back
-          </button>
+          {/* Form Actions */}
+          <div className="city-form-actions">
+            <button
+              type="button"
+              className="city-btn city-btn-save"
+              onClick={handleSaveChanges}
+              disabled={isLoading || !hasChanges || !selectedProvinceId}
+            >
+              {isLoading ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              className="city-btn city-btn-back"
+              onClick={handleBack}
+              disabled={isLoading}
+            >
+              Back
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -43,6 +43,7 @@ import reports_icon from './reports-icon.png'
 import transaction_icon from "./transaction-icon.png"
 import rejected_user_icon from "./rejected-user-icon.png"
 import add_user_icon from "./add-user-icon.png"
+import dl_icon from "./dl-icon.png"
 
 export const assets = {
     add_user_icon,
@@ -87,5 +88,6 @@ export const assets = {
     pending_orders_icon,
     processing_orders_icon,
     outfordelivery_orders_icon,
-    delivered_orders_icon
+    delivered_orders_icon,
+    dl_icon
 }

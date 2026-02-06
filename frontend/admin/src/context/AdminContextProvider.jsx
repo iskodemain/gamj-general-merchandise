@@ -50,6 +50,149 @@ const AdminContextProvider = (props) => {
   const [fetchOrderTransaction, setFetchOrderTransaction] = useState([]); 
   const [fetchNotifications, setFetchNotifications] = useState([]); 
 
+  /*---------------------------DELETE BARANGAYS-----------------------------*/
+
+  /*---------------------------UPDATE BARANGAYS-----------------------------*/
+
+  /*---------------------------ADD BARANGAYS-----------------------------*/
+
+  /*---------------------------FETCH BARANGAYS-----------------------------*/
+  const fetchBarangays = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/location/barangays/fetch", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setBarangays(response.data.barangays)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+        fetchBarangays();
+      }
+  }, [token]);
+
+  /*---------------------------DELETE CITIES-----------------------------*/
+
+  /*---------------------------UPDATE CITIES-----------------------------*/
+
+  /*---------------------------ADD CITIES-----------------------------*/
+
+  /*---------------------------FETCH CITIES-----------------------------*/
+  const fetchCities = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/location/cities/fetch", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setCities(response.data.cities)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+        fetchCities();
+      }
+  }, [token]);
+
+  /*--------------------------- DELETE PROVINCE -----------------------------*/
+  const deleteProvince = async (provinceID) => {
+    if (!token) return;
+    try {
+      const response = await axios.delete(
+        backendUrl + "/api/location/provinces/delete",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { provinceID }    // ✅ Correct way to send body in DELETE
+        }
+      );
+
+      if (response.data.success) {
+        return true;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*--------------------------- UPDATE PROVINCE -----------------------------*/
+  const updateProvince = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.put(backendUrl + "/api/location/provinces/update", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*--------------------------- ADD PROVINCE -----------------------------*/
+  const addProvince = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.post(backendUrl + "/api/location/provinces/add", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------FETCH PROVINCES-----------------------------*/
+  const fetchProvinces = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/location/provinces/fetch", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setProvinces(response.data.provinces)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+      if (token) {
+        fetchProvinces();
+      }
+  }, [token]);
+
   /*---------------------------FETCH NOTIFICATION-----------------------------*/
   const handleFetchNotification = async () => {
     try {
@@ -744,50 +887,26 @@ const AdminContextProvider = (props) => {
     }, [token]);
 
   /*--------------------------FETCH CANCELLED ORDERS----------------------------*/
-    const handleFetchCancelledOrders = async() => {
-        try {
-            const response = await axios.get(backendUrl + "/api/order/list-cancel-order", {
-                headers: {
-                Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.data.success) {
-                setFetchCancelledOrders(response.data.orderCancel);
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        }
-    }
-    useEffect(() => {
-        if (token) {
-        handleFetchCancelledOrders();
-        }
-    }, [token]);
-
-  /*--------------------------FETCH LOCATIONS----------------------------*/
-    const handleFetchLocations = async() => {
-        try {
-            const response = await axios.get(backendUrl + "/api/users/locations", {
-                headers: {
-                Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.data.success) {
-                setBarangays(response.data.barangays);
-                setCities(response.data.cities);
-                setProvinces(response.data.provinces);
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
-        }
-    }
-    useEffect(() => {
-        if (token) {
-        handleFetchLocations();
-        }
-    }, [token]);
+  const handleFetchCancelledOrders = async() => {
+      try {
+          const response = await axios.get(backendUrl + "/api/order/list-cancel-order", {
+              headers: {
+              Authorization: `Bearer ${token}`
+              }
+          });
+          if (response.data.success) {
+              setFetchCancelledOrders(response.data.orderCancel);
+          }
+      } catch (error) {
+          console.log(error);
+          toast.error(error.message, {...toastError});
+      }
+  }
+  useEffect(() => {
+      if (token) {
+      handleFetchCancelledOrders();
+      }
+  }, [token]);
 
   /*--------------------------FETCH DELIVERY INFORMATION----------------------------*/
   const handleFetchDeliveryInfo = async() => {
@@ -1161,7 +1280,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince
   }  
   return (
     <AdminContext.Provider value={value}>

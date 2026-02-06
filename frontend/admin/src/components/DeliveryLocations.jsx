@@ -1,54 +1,24 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import "./DeliveryLocations.css";
-import Provinces from "./Locations/Provinces";
-import Cities from "./Locations/Cities";
-import Barangay from "./Locations/Barangay";
 import Navbar from "./Navbar";
 import { AdminContext } from "../context/AdminContextProvider";
 
 export default function DeliveryLocations() {
-  const { barangays, cities, provinces } = useContext(AdminContext);
-  const [view, setView] = useState("dashboard");
+  const { barangays, cities, provinces, navigate } = useContext(AdminContext);
 
   // Calculate dynamic counts from backend data
   const provincesCount = provinces?.length || 0;
   const citiesCount = cities?.length || 0;
   const barangaysCount = barangays?.length || 0;
 
-  if (view === "provinces") {
-    return (
-      <section className="delivery-location-container" aria-label="Provinces">
-        <div className="delivery-location-panel">
-          <Provinces onBack={() => setView("dashboard")} />
-        </div>
-      </section>
-    );
-  }
-
-  if (view === "cities") {
-    return (
-      <section className="delivery-location-container" aria-label="Cities">
-        <div className="delivery-location-panel">
-          <Cities onBack={() => setView("dashboard")} />
-        </div>
-      </section>
-    );
-  }
-
-  if (view === "barangay") {
-    return (
-      <section className="delivery-location-container" aria-label="Barangay">
-        <div className="delivery-location-panel">
-          <Barangay onBack={() => setView("dashboard")} />
-        </div>
-      </section>
-    );
-  }
-
   return (
     <>
       <Navbar TitleName="Delivery Locations" />
-      <section className="delivery-location-container" aria-label="Delivery locations summary">
+
+      <section
+        className="delivery-location-container"
+        aria-label="Delivery locations summary"
+      >
         <div className="delivery-stats-grid">
           {/* Country Card - Non-clickable */}
           <div className="delivery-stat-card delivery-country">
@@ -56,16 +26,16 @@ export default function DeliveryLocations() {
             <div className="delivery-stat-country">Philippines</div>
           </div>
 
-          {/* Provinces Card - Clickable */}
+          {/* Provinces Card */}
           <div
             className="delivery-stat-card delivery-provinces delivery-clickable"
             role="button"
             tabIndex={0}
-            onClick={() => setView("provinces")}
+            onClick={() => navigate("/delivery-locations/provinces")}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                setView("provinces");
+                navigate("/delivery-locations/provinces");
               }
             }}
             aria-label={`Open provinces list. Total: ${provincesCount}`}
@@ -74,16 +44,16 @@ export default function DeliveryLocations() {
             <div className="delivery-stat-number">{provincesCount}</div>
           </div>
 
-          {/* Cities Card - Clickable */}
+          {/* Cities Card */}
           <div
             className="delivery-stat-card delivery-cities delivery-clickable"
             role="button"
             tabIndex={0}
-            onClick={() => setView("cities")}
+            onClick={() => navigate("/delivery-locations/cities")}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                setView("cities");
+                navigate("/delivery-locations/cities");
               }
             }}
             aria-label={`Open cities list. Total: ${citiesCount}`}
@@ -92,16 +62,16 @@ export default function DeliveryLocations() {
             <div className="delivery-stat-number">{citiesCount}</div>
           </div>
 
-          {/* Barangays Card - Clickable */}
+          {/* Barangays Card */}
           <div
             className="delivery-stat-card delivery-barangays delivery-clickable"
             role="button"
             tabIndex={0}
-            onClick={() => setView("barangay")}
+            onClick={() => navigate("/delivery-locations/barangays")}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                setView("barangay");
+                navigate("/delivery-locations/barangays");
               }
             }}
             aria-label={`Open barangay list. Total: ${barangaysCount}`}
