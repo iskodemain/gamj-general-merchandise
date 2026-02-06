@@ -71,10 +71,10 @@ const App = () => {
       <Route path="/processing" element={<Processing />} />
       <Route path="/outfordelivery" element={<OutforDelivery />} />
       <Route path="/delivered" element={<Delivered />} />
-      <Route path="/locations" element={<DeliveryLocations />} />
-      <Route path="/provinces" element={<Provinces />} />
-      <Route path="/cities" element={<Cities />} />
-      <Route path="/barangay" element={<Barangay />} />
+      <Route path="/delivery-locations" element={<DeliveryLocations />} />
+      <Route path="/delivery-locations/provinces" element={<Provinces />} />
+      <Route path="/delivery-locations/cities" element={<Cities />} />
+      <Route path="/delivery-locations/barangays" element={<Barangay />} />
       <Route path="/cancelorder" element={<CancelOrder />} />
       <Route path="/cancelreview" element={<CancelReview />} />
       <Route path="/return" element={<Refund />} />

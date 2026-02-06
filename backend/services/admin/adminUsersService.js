@@ -138,54 +138,6 @@ export const fetchDeliveryInfoService = async (adminId) => {
     }
 }
 
-
-export const fetchLocationDataService = async (adminId) => {
-    try {
-        const adminUser = await Admin.findByPk(adminId);
-        if (!adminUser) {
-            return {
-                success: false,
-                message: 'User not found'
-            }
-        }
-
-        const provinces = await Provinces.findAll({});
-        if (!provinces.length) {
-            return {
-                success: true,
-                provinces: []
-            }
-        }
-
-        const cities = await Cities.findAll({});
-        if (!cities.length) {
-            return {
-                success: true,
-                cities: []
-            }
-        }
-
-        const barangays = await Barangays.findAll({});
-        if (!barangays.length) {
-            return {
-                success: true,
-                barangays: []
-            }
-        }
-
-        return {
-            success: true,
-            provinces,
-            cities,
-            barangays
-        }
-        
-    } catch (error) {
-        console.log(error);
-        throw new Error(error.message);
-    }
-}
-
 export const approvedUserService = async (adminId, userID, userType) => {
   try {
     // Verify admin exists
