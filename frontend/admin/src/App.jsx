@@ -50,6 +50,8 @@ import Inventory from "./pages/Inventory.jsx";
 import InventoryDashboard from "./components/Inventory/InventoryDashboard.jsx";
 import AddStock from "./components/Inventory/AddStock.jsx";
 import BatchList from "./components/Inventory/BatchList.jsx";
+import OrderTransactions from "./components/Transactions/OrderTransactions.jsx";
+import InventoryTransactions from "./components/Transactions/InventoryTransactions.jsx";
 
 //components
 // icon 
@@ -103,6 +105,8 @@ const App = () => {
       <Route path="/activeorders" element={<ActiveOrders />} /> 
       <Route path="/reports" element={<Reports />} /> 
       <Route path="/transactions" element={<Transactions />} /> 
+      <Route path="/transactions/order" element={<OrderTransactions />} /> 
+      <Route path="/transactions/inventory" element={<InventoryTransactions />} /> 
       <Route path="/allusers" element={<AllUsers />} /> 
       <Route path="/rejectedusers" element={<RejectedUsers />} /> 
       <Route path="/addnewuser" element={<AddNewUser />} />

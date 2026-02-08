@@ -7,7 +7,7 @@ import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
 
 function Orders() {
-  const { navigate, fetchOrders, fetchOrderItems, fetchCancelledOrders, fetchReturnRefundOrders } = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, fetchCancelledOrders, fetchReturnRefundOrders, fetchOrderTransaction } = useContext(AdminContext);
 
   const stats = useMemo(() => {
     const ACTIVE = ["Pending", "Processing", "Out for Delivery", "Delivered"];
@@ -22,9 +22,10 @@ function Orders() {
     const activeOrders = activeSet.size;
     const cancellations = fetchCancelledOrders.length;
     const returnsRefunds = fetchReturnRefundOrders.length;
+    const orderTransactions = fetchOrderTransaction.length;
 
-    return { activeOrders, cancellations, returnsRefunds };
-  }, [fetchOrders, fetchOrderItems, fetchCancelledOrders]);
+    return { activeOrders, cancellations, returnsRefunds, orderTransactions };
+  }, [fetchOrders, fetchOrderItems, fetchCancelledOrders, fetchOrderTransaction]);
 
   return (
     <>
@@ -62,6 +63,13 @@ function Orders() {
               number={stats.returnsRefunds}
               date="Updated: Sep 25, 2025"
               onClick={() => navigate("/returnandrefund")}
+            />
+            <OverviewCard
+              icon={assets.order_transaction}
+              title="Order Transactions"
+              number={stats.orderTransactions}
+              date="Updated: Sep 25, 2025"
+              onClick={() => navigate("/transactions/order")}
             />
           </div>
         </section>

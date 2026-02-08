@@ -44,8 +44,18 @@ import transaction_icon from "./transaction-icon.png"
 import rejected_user_icon from "./rejected-user-icon.png"
 import add_user_icon from "./add-user-icon.png"
 import dl_icon from "./dl-icon.png"
+import order_transaction from "./order-transaction.png"
+import inventory_transaction from "./inventory-transaction.png"
+import add_inventory_icon from "./add-inventory-icon.png"
+import inventory_batch_icon from "./inventory-batch-icon.png"
+import inventory_dashboard_icon from "./inventory-dashboard-icon.png"
 
 export const assets = {
+    inventory_dashboard_icon,
+    inventory_batch_icon,
+    order_transaction,
+    inventory_transaction,
+    add_inventory_icon,
     add_user_icon,
     rejected_user_icon,
     transaction_icon,
