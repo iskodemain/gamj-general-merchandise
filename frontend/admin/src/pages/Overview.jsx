@@ -557,7 +557,7 @@ function Overview() {
         {/* ===== Fifth section: Recent Transactions (limited) ===== */}
         <section className="ov-row ov-section-full">
           <div className="ov-section-head">
-            <h3>Recent Transactions</h3>
+            <h3>Recent Order Transactions</h3>
             <div className="ov-actions">
               <button className="ov-viewall-btn" onClick={() => navigate("/transactions")}>
                 View All

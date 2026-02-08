@@ -6,11 +6,11 @@ import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
 
 function Inventory() {
-  const { navigate, fetchInventoryStock, fetchInventoryBatch } = useContext(AdminContext);
+  const { navigate, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory } = useContext(AdminContext);
   
   return (
     <>
-      <Navbar TitleName="User Management" />
+      <Navbar TitleName="Inventory" />
 
       <main className="inventory-main-container">
         <section className="inventory-main-section">
@@ -24,27 +24,35 @@ function Inventory() {
           {/* ✅ FIXED - ONE grid container with ALL cards inside */}
           <div className="inventory-main-grid">
             <OverviewCard
-              icon={assets.all_users_icon}
+              icon={assets.inventory_dashboard_icon}
               title="Inventory Dashboard"
               number={fetchInventoryStock.length}
               date="Updated: Sep 25, 2025"
               onClick={() => navigate("/inventory/list")}
             />
+
+            <OverviewCard
+              icon={assets.inventory_batch_icon}
+              title="Inventory Batches"
+              number={fetchInventoryBatch.length}
+              date="Updated: Sep 25, 2025"
+              onClick={() => navigate("/inventory/batch")}
+            />
+
+            <OverviewCard
+              icon={assets.inventory_transaction}
+              title="Inventory Transactions"
+              number={fetchInventoryHistory.length}
+              date="Updated: Sep 25, 2025"
+              onClick={() => navigate("/transactions/inventory")}
+            />
             
             <OverviewCard
-              icon={assets.all_users_icon}
+              icon={assets.add_inventory_icon}
               title="Add Stock"
               number={"+"}
               date="Updated: Sep 25, 2025"
               onClick={() => navigate("/inventory/add")}
-            />
-
-            <OverviewCard
-              icon={assets.all_users_icon}
-              title="Batch List"
-              number={fetchInventoryBatch.length}
-              date="Updated: Sep 25, 2025"
-              onClick={() => navigate("/inventory/batch")}
             />
           </div>
         </section>
