@@ -47,28 +47,24 @@ function Orders() {
               icon={assets.all_orders_icon}
               title="Active Orders"
               number={stats.activeOrders}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/activeorders")}
             />
             <OverviewCard
               icon={assets.order_cancellation_icon}
               title="Order Cancellation"
               number={stats.cancellations}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/cancelorder")}
             />
             <OverviewCard
               icon={assets.returnandrefund_icon}
               title="Return and Refund"
               number={stats.returnsRefunds}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/returnandrefund")}
             />
             <OverviewCard
               icon={assets.order_transaction}
               title="Order Transactions"
               number={stats.orderTransactions}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/transactions/order")}
             />
           </div>

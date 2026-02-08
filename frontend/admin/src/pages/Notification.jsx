@@ -117,7 +117,7 @@ function Notification() {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    )).reverse()}
                 </div>
 
                 {notifications.length > 0 && (

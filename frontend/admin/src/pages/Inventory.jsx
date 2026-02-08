@@ -27,7 +27,6 @@ function Inventory() {
               icon={assets.inventory_dashboard_icon}
               title="Inventory Dashboard"
               number={fetchInventoryStock.length}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/inventory/list")}
             />
 
@@ -35,7 +34,6 @@ function Inventory() {
               icon={assets.inventory_batch_icon}
               title="Inventory Batches"
               number={fetchInventoryBatch.length}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/inventory/batch")}
             />
 
@@ -43,7 +41,6 @@ function Inventory() {
               icon={assets.inventory_transaction}
               title="Inventory Transactions"
               number={fetchInventoryHistory.length}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/transactions/inventory")}
             />
             
@@ -51,7 +48,6 @@ function Inventory() {
               icon={assets.add_inventory_icon}
               title="Add Stock"
               number={"+"}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/inventory/add")}
             />
           </div>

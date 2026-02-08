@@ -559,7 +559,7 @@ function Overview() {
           <div className="ov-section-head">
             <h3>Recent Order Transactions</h3>
             <div className="ov-actions">
-              <button className="ov-viewall-btn" onClick={() => navigate("/transactions")}>
+              <button className="ov-viewall-btn" onClick={() => navigate("/transactions/order")}>
                 View All
               </button>
             </div>
