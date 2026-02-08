@@ -100,35 +100,30 @@ function Orders() {
               icon={assets.all_users_icon}
               title="All Users"
               number={allUsers}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/allusers")}
             />
             <OverviewCard
               icon={assets.verified_user_icon}
               title="Verified Users"
               number={verifiedUsers}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/verifiedusers")}
             />
             <OverviewCard
               icon={assets.unverified_user_icon}
               title="Unverified Users"
               number={unverifiedUsers}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/unverifiedusers")}
             />
             <OverviewCard
               icon={assets.rejected_user_icon}
               title="Rejected Users"
               number={rejectedUsers}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate("/rejectedusers")}
             />
             <OverviewCard
               icon={assets.add_user_icon}
               title="Add New User"
               number={"+"}
-              date="Updated: Sep 25, 2025"
               onClick={() => navigate('/addnewuser')}
             />
             
