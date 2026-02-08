@@ -199,13 +199,6 @@ export default function BatchList() {
     sortBy,
   ]);
 
-  // Handler: View batch details
-  const handleView = (batch) => {
-    // Navigate to batch detail page or open modal
-    console.log("View batch:", batch);
-    // Example: navigate(`/admin/inventory/batch/${batch.ID}`);
-  };
-
   // Get display status
   const getStatusDisplay = (row) => {
     if (row.expirationStatus === "expired") return { text: "EXPIRED", class: "expired" };
@@ -306,6 +299,7 @@ export default function BatchList() {
                   <th>Remaining</th>
                   <th>Supplier</th>
                   <th>Expiration</th>
+                  <th>Manufacturing Date</th>
                   <th>Date Received</th>
                   <th>Status</th>
                 </tr>
@@ -347,7 +341,7 @@ export default function BatchList() {
                           </span>
                         </td>
                         <td className="batchlist-cell-supplier">
-                          {row.supplier || "-"}
+                          {row.supplier || "—"}
                         </td>
                         <td className="batchlist-cell-expiry">
                           {row.expirationDate ? (
@@ -364,6 +358,9 @@ export default function BatchList() {
                           ) : (
                             "—"
                           )}
+                        </td>
+                        <td className="batchlist-cell-mfg-date">
+                          {row.manufacturingDate ? formatDate(row.manufacturingDate) : "—"}
                         </td>
                         <td className="batchlist-cell-date">
                           {formatDate(row.dateReceived)}
@@ -429,13 +426,20 @@ export default function BatchList() {
 
                       <div className="batchlist-card-row">
                         <span className="batchlist-card-label">Supplier:</span>
-                        <span className="batchlist-card-value">{row.supplier || "-"}</span>
+                        <span className="batchlist-card-value">{row.supplier || "—"}</span>
                       </div>
 
                       <div className="batchlist-card-row">
                         <span className="batchlist-card-label">Expiration:</span>
                         <span className="batchlist-card-value">
                           {row.expirationDate ? formatDate(row.expirationDate) : "—"}
+                        </span>
+                      </div>
+
+                      <div className="batchlist-card-row">
+                        <span className="batchlist-card-label">Manufacturing Date:</span>
+                        <span className="batchlist-card-value">
+                          {row.manufacturingDate ? formatDate(row.manufacturingDate) : "—"}
                         </span>
                       </div>
 

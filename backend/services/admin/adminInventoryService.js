@@ -100,7 +100,7 @@ export const fetchInventoryHistoryService = async (adminId) => {
 }
 
 
-export const addStockService = async (adminId, productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, notes, lowStockThreshold) => {
+export const addStockService = async (adminId, productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, manufacturingDate, notes, lowStockThreshold) => {
     try {
         const t = await sequelize.transaction();
 
@@ -141,6 +141,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
             variantCombinationId,
             quantityReceived,
             remainingQuantity: quantityReceived,
+            manufacturingDate,
             expirationDate,
             supplier,
             batchNumber,

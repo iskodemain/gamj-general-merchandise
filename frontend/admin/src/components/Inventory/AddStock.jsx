@@ -24,6 +24,7 @@ export default function AddStock() {
   const [expirationDate, setExpirationDate] = useState("");
   const [supplier, setSupplier] = useState("");
   const [batchNumber, setBatchNumber] = useState("");
+  const [manufacturingDate, setManufacturingDate] = useState("");
   const [notes, setNotes] = useState("");
   const [lowStockThreshold, setLowStockThreshold] = useState("");
 
@@ -116,6 +117,7 @@ export default function AddStock() {
             expirationDate: expirationDate || null,
             supplier: supplier || null,
             batchNumber,
+            manufacturingDate: manufacturingDate || null,
             notes: notes || null,
             lowStockThreshold: Number(lowStockThreshold)
             };
@@ -336,7 +338,8 @@ export default function AddStock() {
                   />
                 </div>
               </div>
-              <div className="addstock-form-group">
+              <div className="addstock-form-row">
+                <div className="addstock-form-group">
                   <label className="addstock-label" htmlFor="batchNumber">
                     Batch Number
                   </label>
@@ -350,6 +353,22 @@ export default function AddStock() {
                     disabled={loading}
                   />
                 </div>
+
+                <div className="addstock-form-group">
+                  <label className="addstock-label" htmlFor="manufacturingDate">
+                    Manufacturing Date
+                  </label>
+                  <input
+                    id="manufacturingDate"
+                    type="date"
+                    className="addstock-input"
+                    value={manufacturingDate}
+                    onChange={(e) => setManufacturingDate(e.target.value)}
+                    max={new Date().toISOString().split('T')[0]}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Section 3: Additional Notes */}

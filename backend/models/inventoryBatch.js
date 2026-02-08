@@ -67,6 +67,12 @@ const InventoryBatch = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+
+    manufacturingDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    
     dateReceived: {
       type: DataTypes.DATE,
       allowNull: false,

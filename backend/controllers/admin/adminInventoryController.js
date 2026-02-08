@@ -39,9 +39,9 @@ export const fetchInventoryHistory = async (req, res) => {
 
 export const addStock = async (req, res) => {
     try {
-        const { productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, notes, lowStockThreshold } = req.body;
+        const { productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, manufacturingDate, notes, lowStockThreshold } = req.body;
         const { ID } = req.admin;
-        const result = await addStockService(ID, productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, notes, lowStockThreshold);
+        const result = await addStockService(ID, productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, manufacturingDate, notes, lowStockThreshold);
         res.json(result);
     } catch (error) {
         console.log(error);

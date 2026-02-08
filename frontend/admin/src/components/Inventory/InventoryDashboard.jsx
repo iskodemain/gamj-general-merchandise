@@ -223,7 +223,7 @@ export default function InventoryDashboard() {
                       </td>
                     </tr>
                   );
-                })
+                }).reverse()
               )}
             </tbody>
           </table>
