@@ -4,13 +4,15 @@ import './Orders.css';
 import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { RiDeleteBinFill } from "react-icons/ri";
+import { MdOutlineUploadFile } from "react-icons/md";
 import CancelOrderModal from '../components/Orders/CancelOrderModal';
 import RefundReceiptModal from '../components/Orders/RefundReceiptModal';
 import RefundOrderModal from '../components/Orders/RefundOrderModal';
 import RejectedRefundModal from '../components/Orders/RejectedRefundModal';
+import OrderProofPayment from '../components/Orders/OrderProofPayment';
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId } = useContext(ShopContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [timeUpdated, setTimeUpdated] = useState(Date.now());
@@ -21,6 +23,13 @@ function Orders() {
 
   const getRefundStatusForItem = (orderItemId) => {
     return fetchOrderRefund.find(refund => refund.orderItemId === orderItemId);
+  };
+
+  // Check if order has payment proof
+  const getPaymentProofForOrder = (orderId, customerId) => {
+    return fetchOrderProofPayment.find(
+      proof => proof.orderId === orderId && proof.customerId === customerId
+    );
   };
 
   const handleViewReceipt = (orderItemId) => {
@@ -189,6 +198,7 @@ function Orders() {
       { viewRefundReceipt && (<RefundReceiptModal/>) }
       { refundOrder && (<RefundOrderModal/>) } 
       { showRejectedRefund && (<RejectedRefundModal/>) } 
+      {showOrderProofPayment && (<OrderProofPayment />)}
       <div className="spc-above">
         <div className="orders-title-ctn">
           <p className='mytext'>MY <span className='ordertext'>ORDERS</span></p>
@@ -207,7 +217,42 @@ function Orders() {
         ) : (
           <>
             {sortedOrders.map(order => (
-              <div key={order.ID}>
+              <div key={order.ID} className="order-group-card">
+                {/* ORDER HEADER */}
+                <div className="order-group-header">
+                  {order.paymentMethod === 'Paypal' &&
+                    order.items.some(item => item.orderStatus === 'Pending') && (
+                      (() => {
+                        const paymentProof = getPaymentProofForOrder(order.ID, order.customerId);
+                        const hasProof = !!paymentProof;
+                        
+                        return (
+                          <button 
+                            className={hasProof ? "review-receipt-btn" : "upload-receipt-btn"}
+                            onClick={() => {
+                              setOrderId(order.ID);
+                              setCustomerId(order.customerId)
+                              setShowOrderProofPayment(true);
+                            }}
+                          >
+                            <MdOutlineUploadFile className="upload-icon" />
+                            <span className="upload-btn-text">
+                              {hasProof ? 'Review Receipt' : 'Upload Receipt'}
+                            </span>
+                            {!hasProof && <span className="required-star">*</span>}
+                          </button>
+                        );
+                      })()
+                  )}
+
+                  <p className="order-group-id">
+                    Order ID: <span>{order.orderId || order.ID}</span>
+                  </p>
+                  <p className="order-group-date">
+                    {new Date(order.dateOrdered).toDateString()}
+                  </p>
+                </div>
+
                 {order.items.map(item => (
                   <div
                     key={item.ID}

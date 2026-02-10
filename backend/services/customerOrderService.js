@@ -13,6 +13,7 @@ import OrderTransaction from "../models/orderTransaction.js";
 import InventoryStock from "../models/inventoryStock.js";
 import InventoryBatch from "../models/inventoryBatch.js";
 import InventoryHistory from "../models/inventoryHistory.js";
+import PaymentProof from "../models/paymentProof.js";
 import { Op } from "sequelize";
 import { io } from "../server.js";
 import {v2 as cloudinary} from 'cloudinary';
@@ -374,6 +375,137 @@ export const fetchOrdersService = async (customerId) => {
           message: "Orders and order items fetched successfully.",
           orders,
           orderItems,
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+export const fetchOrderPaymentProofService = async (customerId) => {
+    try {
+      // Validate customer exists
+      const user = await Customer.findByPk(customerId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const paymentProof = await PaymentProof.findAll({ where: { customerId: user.ID } });
+      if (paymentProof.length === 0) {
+        return {
+          success: false,
+          paymentProof: [],
+        };
+      }
+
+      return {
+        success: true,
+        paymentProof
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+export const addOrderPaymentProofService = async (customerId, orderId, referenceId, amountPaid, receiptImage) => {
+    try {
+      const user = await Customer.findByPk(customerId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      orderId = Number(orderId);
+      const orders = await Orders.findByPk(orderId);
+      if (!orders) {
+        return {
+          success: false,
+          message: "Order not found",
+        };
+      }
+
+      // Upload to clodinary
+      const [upload1] = await Promise.all([
+        cloudinary.uploader.upload(receiptImage.path, {
+          folder: 'gamj/orderPaymentProof',
+          resource_type: 'image',
+        }),
+      ]);
+      
+      // Delete local file
+      try {
+        await Promise.all([fs.unlink(receiptImage.path)]);
+      } catch (unlinkError) {
+        console.error('Warning: Failed to delete temp image(s):', unlinkError.message);
+      }
+
+      // Auto-generate paymentProofId
+      const lastPaymentProof = await PaymentProof.findOne({
+        order: [["ID", "DESC"]]
+      });
+  
+      const nextNumber = lastPaymentProof ? lastPaymentProof.ID + 1 : 1;
+      const paymentProofId = withTimestamp("PAYP", nextNumber);
+
+      const newOrderPaymentProof = await PaymentProof.create({
+        paymentProofId,
+        customerId,
+        orderId, 
+        referenceId, 
+        amountPaid, 
+        receiptImage: upload1.secure_url
+      });
+
+      // ⭐ FIXED — NOTIFICATION ID BASE (DECLARE ONCE)
+      const lastNotification = await Notifications.findOne({order: [["ID", "DESC"]]});
+      let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+
+      const userName = user.medicalInstitutionName;
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const adminNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,  // ✅ Who triggered this
+        receiverId: null,      // ✅ null = broadcast to ALL admins
+        receiverType: "Admin",
+        senderType: "System",
+        notificationType: `Transaction` ,
+        title: `${userName} - Upload Proof of Payment`,
+        message: `${userName} proof of payment order #(${orders.orderId}).`,
+        isRead: false,
+        createAt: new Date()
+      });
+      
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const staffNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Staff",
+        senderType: "System",
+        notificationType: "Transaction",
+        title: `${userName} - Upload Proof of Payment`,
+        message: `${userName} proof of payment order #(${orders.orderId}).`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      io.emit("newNotification_Admin", adminNotification);
+      io.emit("newNotification_Staff", staffNotification);
+
+      return {
+        success: true,
+        message: "Order proof of payment submitted successfully",
+        newOrderPaymentProof
       };
 
     } catch (error) {

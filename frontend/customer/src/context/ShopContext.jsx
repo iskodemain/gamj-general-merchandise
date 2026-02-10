@@ -52,6 +52,88 @@ const ShopContextProvider = (props) => {
     const [showPaypalModal, setShowPaypalModal] = useState(false);
     const [settingsData, setSettingsData] = useState([])
     const [fetchInventoryStock, setFetchInventoryStock] = useState([]); 
+    const [showOrderProofPayment, setShowOrderProofPayment] = useState(false);
+    const [orderId, setOrderId] = useState(null);
+    const [customerId, setCustomerId] = useState(null);
+    const [fetchOrderProofPayment, setFetchOrderProofPayment] = useState([]); 
+
+    /*----------------------DELETE ORDER PROOF PAYMENT-----------------------*/
+    const deleteOrderProofPayment = async(paymentProofID) => {
+        if (token) {
+            try {
+                const response = await axios.delete(backendUrl + "/api/order/payment-proof/add", {
+                    headers: { Authorization: `Bearer ${token}`},
+                    data: { paymentProofID }
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message, { ...toastSuccess });
+                    return true;
+                } else {
+                    toast.error(response.data.message, { ...toastError });
+                    return false;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
+    /*--------------------------ADD ORDER PROOF PAYMENT----------------------------*/
+    const addOrderProofPayment = async (orderId, referenceId, amountPaid, receiptImage) => {
+        if (token) {
+            try {
+                const formData = new FormData();
+                formData.append('orderId', orderId);
+                formData.append('referenceId', referenceId);
+                formData.append('amountPaid', amountPaid);
+                
+                if (receiptImage instanceof File) {
+                    formData.append("receiptImage", receiptImage);
+                }
+
+                const response = await axios.post(backendUrl + "/api/order/payment-proof/add", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message, {...toastSuccess});
+                    return true;
+                } else {
+                    toast.error(response.data.message, {...toastError});
+                    return false;
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error.message, { ...toastError });
+                return false;
+            }
+        }
+    };
+
+    /*---------------------------FETCH BUSINESS INFO DATA-----------------------------*/
+    const handleFetchOrderProofPayment = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/order/payment-proof", {
+                headers: {
+                Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                setFetchOrderProofPayment(response.data.paymentProof)
+            } else {
+                toast.error(response.data.message, { ...toastError });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    useEffect(() => {
+        if (token) {
+            handleFetchOrderProofPayment();
+        }
+    }, [token]);
 
     /*---------------------------FETCH BUSINESS INFO DATA-----------------------------*/
     const handleFetchInventoryStock = async () => {
@@ -1346,7 +1428,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund, fetchNotifications, setFetchNotifications, cartItemsToDelete, setCartItemsToDelete, deleteNotification, readNotification, paypalClientId, showPaypalModal, setShowPaypalModal, rejectedCustomer, setRejectedCustomer, settingsData, fetchInventoryStock
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund, fetchNotifications, setFetchNotifications, cartItemsToDelete, setCartItemsToDelete, deleteNotification, readNotification, paypalClientId, showPaypalModal, setShowPaypalModal, rejectedCustomer, setRejectedCustomer, settingsData, fetchInventoryStock, showOrderProofPayment, setShowOrderProofPayment, orderId, setOrderId, addOrderProofPayment, fetchOrderProofPayment, deleteOrderProofPayment, customerId, setCustomerId
     }
 
     return (
