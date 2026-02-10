@@ -1,3 +1,99 @@
+.upload-receipt-btn {
+  border: 2px solid #43A047;
+  color: #43A047;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  min-width: 160px;
+  height: 2.2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* TEXT */
+.upload-receipt-btn .upload-btn-text {
+  color: #252525;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+/* ICON */
+.upload-receipt-btn .upload-icon {
+  font-size: 1.3rem;
+  color: #43A047;
+  transition: color 0.3s ease;
+}
+
+/* HOVER STATE */
+.upload-receipt-btn:hover {
+  background: #43A047;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(67, 160, 71, 0.3);
+}
+
+/* TEXT & ICON TURN WHITE ON HOVER */
+.upload-receipt-btn:hover .upload-btn-text,
+.upload-receipt-btn:hover .upload-icon {
+  color: #ffffff;
+}
+
+/* REQUIRED STAR */
+.required-star {
+  color: #d10000;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* ===================== REVIEW RECEIPT BUTTON ===================== */
+.review-receipt-btn {
+  border: 2px solid #2196F3;
+  color: #2196F3;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  min-width: 160px;
+  height: 2.2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.review-receipt-btn .upload-btn-text {
+  color: #2196F3;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.review-receipt-btn .upload-icon {
+  font-size: 1.3rem;
+  color: #2196F3;
+  transition: color 0.3s ease;
+}
+
+.review-receipt-btn:hover {
+  background: #2196F3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.review-receipt-btn:hover .upload-btn-text,
+.review-receipt-btn:hover .upload-icon {
+  color: #ffffff;
+}
+
+
 .orders-title-ctn {
   display: flex;
   align-items: center;
@@ -34,6 +130,43 @@
   font-size: 1rem;
   font-weight: 600;
   color: #494949;
+}
+
+/* ORDER GROUP CONTAINER */
+.order-group-card {
+  background: #ffffff;
+  border-radius: 0.8rem;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 1.2rem;
+  overflow: hidden;
+}
+
+/* ORDER HEADER */
+.order-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  gap: 1rem;
+  background: #f9f9f9;
+  border-bottom: 1px solid #e6e6e6;
+  flex-wrap: wrap;
+}
+
+.order-group-id {
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.order-group-id span {
+  color: #222;
+}
+
+.order-group-date {
+  font-size: 0.75rem;
+  color: #888;
 }
 
 .list-order-items {
@@ -436,21 +569,6 @@
   margin-top: 1.5rem;  /* 24px */
 }
 
-/* MAIN-CTN-CONTAINER */
-@media (min-width: 640px) { /* sm */
-  .main-ctn-orders {
-    padding-left: 5vw;  /* sm:px-[5vw] */
-    padding-right: 5vw;
-  }
-}
-
-@media (min-width: 768px) { /* md */
-  .main-ctn-orders {
-    padding-left: 7vw;  /* md:px-[7vw] */
-    padding-right: 7vw;
-  }
-}
-
 @media (min-width: 1024px) { /* lg */
   .main-ctn-orders {
     padding-left: 9vw;  /* lg:px-[9vw] */
@@ -458,9 +576,12 @@
   }
 }
 
-
 /* LIST-ORDER-ITEMS */
-@media (min-width: 768px) {
+@media (min-width: 768px) { /* md */
+  .main-ctn-orders {
+    padding-left: 7vw;  /* md:px-[7vw] */
+    padding-right: 7vw;
+  }
   .list-order-items {
     flex-direction: row; /* md:flex-row */
     align-items: center; /* md:items-center */
@@ -468,13 +589,18 @@
   }
 }
 
-
-@media (min-width: 640px) { /* sm breakpoint */
+/* MAIN-CTN-CONTAINER */
+@media (min-width: 640px) { /* sm */
+  .main-ctn-orders {
+    padding-left: 5vw;  /* sm:px-[5vw] */
+    padding-right: 5vw;
+  }
   .order-line {
     width: 3rem; /* 48px */
     height: 3px;
   }
 }
+
 
 @media (min-width: 460px) {
   .product-name {
@@ -523,6 +649,14 @@
   }
   .valid-date-text {
     font-size: 0.7rem;
+  }
+  .upload-receipt-btn {
+    width: 200px;
+    font-size: 0.9rem;
+  }
+  .review-receipt-btn {
+    width: 200px;
+    font-size: 0.9rem;
   }
 
 }

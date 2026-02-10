@@ -5,7 +5,6 @@ import OrderSummary from '../components/OrderSummary'
 import Infos from '../components/Infos'
 import Footer from '../components/Footer'
 import { ShopContext } from '../context/ShopContext'
-import axios from 'axios'
 import { toast } from "react-toastify";
 import { assets } from '../assets/assets'
 import UnavailableNote from '../components/Notice/UnavailableNote'
