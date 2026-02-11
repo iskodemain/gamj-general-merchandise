@@ -49,6 +49,33 @@ const AdminContextProvider = (props) => {
   const [fetchInventoryHistory, setFetchInventoryHistory] = useState([]); 
   const [fetchOrderTransaction, setFetchOrderTransaction] = useState([]); 
   const [fetchNotifications, setFetchNotifications] = useState([]); 
+  const [fetchOrderProofPayment, setFetchOrderProofPayment] = useState([]); 
+
+  const [showOrderPaymentProof, setShowOrderPaymentProof] = useState(false);
+  const [selectedPaymentProof, setSelectedPaymentProof] = useState(null);
+
+  /*---------------------------FETCH ORDER PROOF OF PAYMENT-----------------------------*/
+  const handleFetchOrderProofPayment = async () => {
+      try {
+          const response = await axios.get(backendUrl + "/api/order/list-payment-proof", {
+              headers: {
+              Authorization: `Bearer ${token}`
+              }
+          });
+          if (response.data.success) {
+              setFetchOrderProofPayment(response.data.allPaymentProof)
+          } else {
+              toast.error(response.data.message, { ...toastError });
+          }
+      } catch (error) {
+          console.log(error);
+      }
+  }
+  useEffect(() => {
+      if (token) {
+          handleFetchOrderProofPayment();
+      }
+  }, [token]);
 
   /*---------------------------DELETE BARANGAYS-----------------------------*/
   const deleteBarangay = async (barangayID) => {
@@ -1392,7 +1419,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof
   }  
   return (
     <AdminContext.Provider value={value}>

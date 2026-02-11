@@ -112,7 +112,7 @@ const ShopContextProvider = (props) => {
         }
     };
 
-    /*---------------------------FETCH BUSINESS INFO DATA-----------------------------*/
+    /*---------------------------FETCH ORDER PROOF OF PAYMENT-----------------------------*/
     const handleFetchOrderProofPayment = async () => {
         try {
             const response = await axios.get(backendUrl + "/api/order/payment-proof", {

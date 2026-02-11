@@ -5,10 +5,11 @@ import ViewAll from "./ViewAll";
 import Navbar from "./Navbar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
+import OrderPaymentProof from "./Modal/OrderPaymentProof.jsx";
 
 
 function Pending() {
-  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces } = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces,fetchOrderProofPayment, setShowOrderPaymentProof, setSelectedPaymentProof, showOrderPaymentProof } = useContext(AdminContext);
 
   const [showViewAll, setShowViewAll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -68,6 +69,21 @@ function Pending() {
     });
   };
 
+  const getPaymentProofForOrder = (orderId, customerId) => {
+    return fetchOrderProofPayment.find(
+      proof => proof.orderId === orderId && proof.customerId === customerId
+    );
+  };
+
+  // Handle review receipt click
+  const handleReviewReceipt = (orderId, customerId) => {
+    const proof = getPaymentProofForOrder(orderId, customerId);
+    if (proof) {
+      setSelectedPaymentProof(proof);
+      setShowOrderPaymentProof(true);
+    }
+  };
+
   // STEP 1: Only Pending orders from "orders"
   // Only show orders that have at least one item with status "Processing"
   const pendingOrders = fetchOrders?.filter((order) => {
@@ -80,6 +96,7 @@ function Pending() {
 
   return (
     <>
+      {showOrderPaymentProof && <OrderPaymentProof />}
       <Navbar TitleName="Pending Orders" />
       <div className="pending-products-container">
         {!showViewAll &&
@@ -235,20 +252,54 @@ function Pending() {
                               </div>
                             </div>
 
-                            {/* VIEW ALL BUTTON */}
-                            <button
-                              type="button"
-                              className="pending-product-view-all-btn"
-                              onClick={() => {
-                                const clean = viewPendingOrders.find(
-                                  (o) => o.orderId === order.orderId
-                                );
-                                setSelectedOrder(clean);
-                                setShowViewAll(true);
-                              }}
-                            >
-                              View All
-                            </button>
+                            {/* BUTTONS CONTAINER */}
+                            <div className="pending-product-buttons-container">
+                              {/* PAYMENT PROOF STATUS */}
+                              {order.paymentMethod === 'Paypal' && (
+                                (() => {
+                                  const proof = getPaymentProofForOrder(order.ID, order.customerId);
+                                  
+                                  if (proof) {
+                                    return (
+                                      <button
+                                        type="button"
+                                        className="pending-review-receipt-btn"
+                                        onClick={() => handleReviewReceipt(order.ID, order.customerId)}
+                                      >
+                                        <svg className="pending-receipt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Review Receipt
+                                      </button>
+                                    );
+                                  } else {
+                                    return (
+                                      <div className="pending-no-receipt-indicator">
+                                        <svg className="pending-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <span>No Receipt Uploaded</span>
+                                      </div>
+                                    );
+                                  }
+                                })()
+                              )}
+
+                              {/* VIEW ALL BUTTON */}
+                              <button
+                                type="button"
+                                className="pending-product-view-all-btn"
+                                onClick={() => {
+                                  const clean = viewPendingOrders.find(
+                                    (o) => o.orderId === order.orderId
+                                  );
+                                  setSelectedOrder(clean);
+                                  setShowViewAll(true);
+                                }}
+                              >
+                                View All
+                              </button>
+                            </div>
 
                           </div>
                         </div>

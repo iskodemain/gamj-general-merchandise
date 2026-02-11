@@ -12,6 +12,7 @@ import { io } from "../../server.js";
 import RefundProof from "../../models/refundProof.js";
 import {v2 as cloudinary} from 'cloudinary';
 import OrderTransaction from "../../models/orderTransaction.js";
+import PaymentProof from "../../models/paymentProof.js";
 
 
 // ID GENERATOR
@@ -53,6 +54,36 @@ export const fetchOrdersService = async (adminId) => {
             orders,
             orderItems,
         };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+export const fetchOrderPaymentProofService = async (adminId) => {
+    try {
+      // Validate customer exists
+      const user = await Admin.findByPk(adminId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const allPaymentProof = await PaymentProof.findAll({});
+      if (allPaymentProof.length === 0) {
+        return {
+          success: false,
+          allPaymentProof: [],
+        };
+      }
+
+      return {
+        success: true,
+        allPaymentProof
+      };
 
     } catch (error) {
         console.log(error);
