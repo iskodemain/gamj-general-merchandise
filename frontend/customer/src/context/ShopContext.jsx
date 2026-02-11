@@ -61,7 +61,7 @@ const ShopContextProvider = (props) => {
     const deleteOrderProofPayment = async(paymentProofID) => {
         if (token) {
             try {
-                const response = await axios.delete(backendUrl + "/api/order/payment-proof/add", {
+                const response = await axios.delete(backendUrl + "/api/order/payment-proof/delete", {
                     headers: { Authorization: `Bearer ${token}`},
                     data: { paymentProofID }
                 });

@@ -413,6 +413,89 @@ export const fetchOrderPaymentProofService = async (customerId) => {
     }
 }
 
+export const deleteOrderPaymentProofService = async (customerId, paymentProofID) => {
+    try {
+      // Validate customer exists
+      const user = await Customer.findByPk(customerId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const paymentProof = await PaymentProof.findOne({
+        where: {
+          ID: paymentProofID,
+          customerId: customerId 
+        }
+      });
+      if (!paymentProof) {
+        return {
+          success: false,
+          message: "Payment proof not found",
+        };
+      }
+
+      const orders = await Orders.findByPk(paymentProof.orderId);
+      if (!orders) {
+        return {
+          success: false,
+          message: "Order not found",
+        };
+      }
+
+      await paymentProof.destroy();
+
+      // ⭐ FIXED — NOTIFICATION ID BASE (DECLARE ONCE)
+      const lastNotification = await Notifications.findOne({order: [["ID", "DESC"]]});
+      let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+
+      const userName = user.medicalInstitutionName;
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const adminNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,  // ✅ Who triggered this
+        receiverId: null,      // ✅ null = broadcast to ALL admins
+        receiverType: "Admin",
+        senderType: "System",
+        notificationType: `Transaction` ,
+        title: `${userName} - Delete Proof of Payment`,
+        message: `${userName} delete proof of payment for order #(${orders.orderId}).`,
+        isRead: false,
+        createAt: new Date()
+      });
+      
+
+      // 2️⃣ ADMIN NOTIFICATION (all admins)
+      const staffNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Staff",
+        senderType: "System",
+        notificationType: "Transaction",
+        title: `${userName} - Delete Proof of Payment`,
+        message: `${userName} delete proof of payment for order #(${orders.orderId}).`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      io.emit("newNotification_Admin", adminNotification);
+      io.emit("newNotification_Staff", staffNotification);
+
+      return {
+        success: true,
+        message: "Order proof of payment successfully deleted"
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
 export const addOrderPaymentProofService = async (customerId, orderId, referenceId, amountPaid, receiptImage) => {
     try {
       const user = await Customer.findByPk(customerId);
@@ -479,7 +562,7 @@ export const addOrderPaymentProofService = async (customerId, orderId, reference
         senderType: "System",
         notificationType: `Transaction` ,
         title: `${userName} - Upload Proof of Payment`,
-        message: `${userName} proof of payment order #(${orders.orderId}).`,
+        message: `${userName} proof of payment for order #(${orders.orderId}).`,
         isRead: false,
         createAt: new Date()
       });
@@ -494,7 +577,7 @@ export const addOrderPaymentProofService = async (customerId, orderId, reference
         senderType: "System",
         notificationType: "Transaction",
         title: `${userName} - Upload Proof of Payment`,
-        message: `${userName} proof of payment order #(${orders.orderId}).`,
+        message: `${userName} proof of payment for order #(${orders.orderId}).`,
         isRead: false,
         createAt: new Date(),
       });
