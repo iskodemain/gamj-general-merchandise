@@ -1138,35 +1138,28 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         console.error('Warning: Failed to delete temp image(s):', unlinkError.message);
       }
 
-      const newOrderRefund = await OrderRefund.create(
-        {
-          customerId,
-          orderItemId,
-          reasonForRefund,
-          refundComments: refundComments || null,
-          imageProof1: upload1.secure_url,
-          imageProof2: upload2.secure_url,
-          refundResolution,
-          otherReason: otherReason || null,
-          refundMethod: refundMethod || null,
-          refundPaypalEmail: refundPaypalEmail || null,
-          refundStatus: refundStatus || 'Pending',
-          dateRequest: new Date(),
-        }, {
-          fields: [
-            'customerId',
-            'orderItemId',
-            'reasonForRefund',
-            'refundComments',
-            'imageProof1',
-            'imageProof2',
-            'refundResolution',
-            'otherReason',
-            'refundMethod',
-            'refundPaypalEmail',
-            'refundStatus',
-            'dateRequest'
-          ]
+      // ✅ AUTO-GENERATE refundId
+      const lastRefund = await OrderRefund.findOne({
+        order: [["ID", "DESC"]]
+      });
+
+      const nextNumber = lastRefund ? lastRefund.ID + 1 : 1;
+      const refundId = withTimestamp("RFND", nextNumber);
+
+      const newOrderRefund = await OrderRefund.create({
+        refundId,
+        customerId,
+        orderItemId,
+        reasonForRefund,
+        refundComments: refundComments || null,
+        imageProof1: upload1.secure_url,
+        imageProof2: upload2.secure_url,
+        refundResolution,
+        otherReason: otherReason || null,
+        refundMethod: refundMethod || null,
+        refundPaypalEmail: refundPaypalEmail || null,
+        refundStatus: refundStatus || 'Pending',
+        dateRequest: new Date(),
       });
 
       // 5️⃣ Reset the order item status if needed
@@ -1210,8 +1203,15 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         };
       }
 
+      // ✅ AUTO-GENERATE notificationId
+      const lastNotification = await Notifications.findOne({
+        order: [["ID", "DESC"]]
+      });
+      let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+
       // 1️⃣ CUSTOMER NOTIFICATION (specific customer only)
       const customerNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: customerId, 
         receiverId: customerId,
         receiverType: "Customer",
@@ -1221,22 +1221,11 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         message: `You have requested a return/refund for ${product.productName} order #${fullOrder.orderId}. ${notificationMessage}`,
         isRead: false,
         createAt: new Date()
-      }, {
-        fields: [ 
-          "senderId", 
-          "receiverId",
-          "receiverType", 
-          "senderType", 
-          "notificationType", 
-          "title", 
-          "message", 
-          "isRead", 
-          "createAt"
-        ]
       });
 
       // 2️⃣ ADMIN NOTIFICATION (all admins)
       const adminNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: customerId,  // ✅ Who triggered this
         receiverId: null,      // ✅ null = broadcast to ALL admins
         receiverType: "Admin",
@@ -1246,23 +1235,12 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         message: `${userName} has requested a return/refund for ${product.productName} (Order #${fullOrder.orderId}). Preferred refund method: ${refundMethod ? refundMethod : ''}.`,
         isRead: false,
         createAt: new Date()
-      }, {
-        fields: [ 
-          "senderId", 
-          "receiverId",
-          "receiverType", 
-          "senderType", 
-          "notificationType", 
-          "title", 
-          "message", 
-          "isRead", 
-          "createAt"
-        ]
       });
       
 
       // 2️⃣ ADMIN NOTIFICATION (all admins)
       const staffNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: customerId,
         receiverId: null,
         receiverType: "Staff",
@@ -1272,18 +1250,6 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         message: `${userName} has requested a return/refund for ${product.productName} (Order #${fullOrder.orderId}). Preferred refund method: ${refundMethod ? refundMethod : ''}.`,
         isRead: false,
         createAt: new Date(),
-      }, {
-        fields: [ 
-          "senderId", 
-          "receiverId",
-          "receiverType", 
-          "senderType", 
-          "notificationType", 
-          "title", 
-          "message", 
-          "isRead", 
-          "createAt"
-        ]
       });
 
       io.emit("newNotification_Customer", customerNotification);
