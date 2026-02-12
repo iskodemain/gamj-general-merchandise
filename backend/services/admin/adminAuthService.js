@@ -118,6 +118,7 @@ export const loginCodeVerifyService = async (loginToken, code) => {
             success: true,
             message: 'Login successfully!',
             token: adminAuthToken, // Eto na yung permanent token for headers
+            admin
         };
     } catch (error) {
         console.log(error);

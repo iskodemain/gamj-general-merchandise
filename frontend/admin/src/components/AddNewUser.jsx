@@ -26,8 +26,6 @@ function AddNewUser() {
     repContact: "",
     repEmail: "",
     repJob: "",
-    firstName: "",
-    lastName: "",
     userName: "",
     identifier: "",
     password: ""
@@ -119,10 +117,8 @@ function AddNewUser() {
       };
     }
     else if (userType === "Staff") {
-      if (!form.firstName.trim())
-        return toastErrorField("First name is required.");
-      if (!form.lastName.trim())
-        return toastErrorField("Last name is required.");
+      if (!form.userName.trim())
+        return toastErrorField("Username is required.");
       if (!form.identifier.trim())
         return toastErrorField("Account email/phone is required.");
       if (!form.password.trim())
@@ -130,8 +126,7 @@ function AddNewUser() {
 
       payload = {
         ...payload,
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
+        userName: form.userName.trim(),
         identifier: form.identifier.trim(),
         password: form.password.trim()
       };
@@ -341,29 +336,15 @@ function AddNewUser() {
 
         <section className="add-user-info-section">
           <h3 className="add-user-section-title">Staff Details</h3>
-
-          <div className="add-user-form-row">
-            <div className="add-user-form-group">
-              <label>First Name</label>
-              <input
-                type="text"
-                value={form.firstName}
-                onChange={(e) =>
-                  setForm({ ...form, firstName: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="add-user-form-group">
-              <label>Last Name</label>
-              <input
-                type="text"
-                value={form.lastName}
-                onChange={(e) =>
-                  setForm({ ...form, lastName: e.target.value })
-                }
-              />
-            </div>
+          <div className="add-user-form-group">
+            <label>User Name</label>
+            <input
+              type="text"
+              value={form.userName}
+              onChange={(e) =>
+                setForm({ ...form, userName: e.target.value })
+              }
+            />
           </div>
         </section>
 

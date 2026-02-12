@@ -4,7 +4,7 @@ import { assets } from "../assets/assets.js";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 
 function Sidebar({ currentView }) {
-    const { setIsSidebarOpen, navigate, adminProfileInfo } = useContext(AdminContext);
+    const { setIsSidebarOpen, navigate, adminProfileInfo, currentUser } = useContext(AdminContext);
 
   return (
     <aside className="sidebar">
@@ -21,7 +21,7 @@ function Sidebar({ currentView }) {
         
         <div className="sidebar-brand">
           <span className="sidebar-brand-title">{adminProfileInfo.userName}</span>
-          <span className="sidebar-brand-role">{adminProfileInfo.adminHead ? "Admin Head" : "Admin"}</span>
+          <span className="sidebar-brand-role">{adminProfileInfo.userType}</span>
         </div>
       </div>
 
@@ -56,31 +56,40 @@ function Sidebar({ currentView }) {
           active={currentView === "transactions"}
           onClick={() => {navigate("/transactions"); setIsSidebarOpen(false)}}
         />
-        <MenuItem
-          icon={assets.staff_icon}
-          label="User Management"
-          active={currentView === "user management"}
-          onClick={() => {navigate("/user-management"); setIsSidebarOpen(false)}}
-        />
-        <MenuItem
-          icon={assets.dl_icon}
-          label="Delivery Locations"
-          active={currentView === "delivery locations"}
-          onClick={() => {navigate("/delivery-locations"); setIsSidebarOpen(false)}}
-        />
+        {
+          ['Super Admin'].includes(currentUser) && 
+          <MenuItem
+            icon={assets.staff_icon}
+            label="User Management"
+            active={currentView === "user management"}
+            onClick={() => {navigate("/user-management"); setIsSidebarOpen(false)}}
+          />
+        }
+        {
+          ['Super Admin', 'Admin'].includes(currentUser) &&
+          <MenuItem
+            icon={assets.dl_icon}
+            label="Delivery Locations"
+            active={currentView === "delivery locations"}
+            onClick={() => {navigate("/delivery-locations"); setIsSidebarOpen(false)}}
+          />
+        }
         <MenuItem
           icon={assets.reports_icon}
           label="Reports"
           active={currentView === "reports"}
           onClick={() => {navigate("/reports"); setIsSidebarOpen(false)}}
         />
-        <MenuItem
-          icon={assets.settings_icon}
-          label="Settings"
-          active={currentView === "settings"}
-          onClick={() => {navigate("/settings"); setIsSidebarOpen(false);}}
-        />
-        
+
+        {
+          ['Super Admin'].includes(currentUser) && 
+          <MenuItem
+            icon={assets.settings_icon}
+            label="Settings"
+            active={currentView === "settings"}
+            onClick={() => {navigate("/settings"); setIsSidebarOpen(false);}}
+          />
+        }
       </nav>
     </aside>
   );

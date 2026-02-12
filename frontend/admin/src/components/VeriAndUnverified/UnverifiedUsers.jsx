@@ -8,7 +8,7 @@ import Navbar from '../Navbar.jsx';
 import { AdminContext } from '../../context/AdminContextProvider.jsx';
 
 function UnverifiedUsers() {
-  const { navigate, customerList, adminList, staffList } = useContext(AdminContext);
+  const { navigate, customerList, adminList } = useContext(AdminContext);
 
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState('');
@@ -20,6 +20,7 @@ function UnverifiedUsers() {
   const unifiedUsers = useMemo(() => {
     const list = [];
 
+    // ✅ Customers - Only unverified and not rejected
     (customerList || []).forEach((c) => {
       if (Number(c.verifiedCustomer) !== 0) return;
       if (Number(c.rejectedCustomer) !== 0) return;
@@ -38,31 +39,21 @@ function UnverifiedUsers() {
       list.push(user);
     });
 
-    (staffList || []).forEach((s) => {
-      if (Number(s.verifiedStaff) !== 0) return;
-      const user = {
-        ID: s.ID,
-        __type: "Staff",
-        original: s,
-        displayName:
-          `${s.firstName || ""} ${s.lastName || ""}`.trim() ||
-          s.emailAddress ||
-          `Staff-${s.ID}`,
-        createAt: s.createAt || s.updateAt || null,
-        status: "Unverified"
-      };
-      list.push(user);
-    });
-
+    // ✅ Admins and Staff from adminList - Only unverified
     (adminList || []).forEach((a) => {
+      // Skip Super Admin (adminHead = true)
       if (Number(a.adminHead) === 1) return;
-      if (Number(a.verifiedAdmin) !== 0) return;
+      // Only unverified users
+      if (Number(a.verifiedUser) !== 0) return;
+
+      // Determine type based on userType field
+      const userType = a.userType === 'Staff' ? 'Staff' : 'Admin';
 
       const user = {
         ID: a.ID,
-        __type: "Admin",
+        __type: userType,
         original: a,
-        displayName: a.userName || a.emailAddress || `Admin-${a.ID}`,
+        displayName: a.userName || a.emailAddress || `${userType}-${a.ID}`,
         createAt: a.createAt || a.updateAt || null,
         status: "Unverified"
       };
@@ -70,7 +61,7 @@ function UnverifiedUsers() {
     });
 
     return list;
-  }, [customerList, staffList, adminList]);
+  }, [customerList, adminList]);
 
   const filteredUsers = useMemo(() => {
     let list = [...unifiedUsers];
@@ -223,7 +214,7 @@ function UnverifiedUsers() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="center empty">No unverified users found.</td>
+                  <td colSpan="6" className="center empty">No unverified users found.</td>
                 </tr>
               )}
             </tbody>

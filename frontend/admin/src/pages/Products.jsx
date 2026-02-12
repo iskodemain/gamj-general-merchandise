@@ -11,18 +11,6 @@ function Products() {
   const totalCategories = productCategory?.length || 0;
   const totalProducts = products?.length || 0;
 
-  const mostStockProducts = products?.filter(
-    (p) => p.stockQuantity >= 1000
-  ).length || 0;
-
-  const lowStockProducts = products?.filter(
-    (p) => p.stockQuantity <= 10
-  ).length || 0;
-
-  const outOfStockProducts = products?.filter(
-    (p) => p.isOutOfStock === true
-  ).length || 0;
-
   return (
     <>
       <Navbar TitleName="Products" />

@@ -9,7 +9,7 @@ import Loading from "../Loading.jsx";
 import { toast } from "react-toastify";
 
 function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
-  const { customerList, staffList, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, toastError } = useContext(AdminContext);
+  const { customerList, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, toastError } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   // Confirmation modal state
@@ -51,13 +51,18 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
   const user = useMemo(() => {
     if (userType === "Customer") {
       return customerList.find((c) => c.ID === ID) || null;
-    } else if (userType === "Staff") {
-      return staffList.find((s) => s.ID === ID) || null;
-    } else if (userType === "Admin") {
-      return adminList.find((a) => a.ID === ID) || null;
     }
+
+    // 🔥 STAFF & ADMIN now both come from adminList
+    if (userType === "Staff" || userType === "Admin") {
+      return adminList.find(
+        (a) => a.ID === ID && a.userType === userType
+      ) || null;
+    }
+
     return null;
-  }, [userType, ID, customerList, staffList, adminList]);
+  }, [userType, ID, customerList, adminList]);
+
 
   // password visibility
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -86,9 +91,8 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
       };
     } else if (userType === "Staff") {
       return {
-        firstName: user?.firstName || "",
-        lastName: user?.lastName || "",
-        identifier: user?.emailAddress || user?.phoneNumber,
+        userName: user?.userName || "",
+        identifier: user?.emailAddress || user?.phoneNumber || "",
         password: ""
       };
     } else {
@@ -275,13 +279,8 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     }
 
     else if (userType === "Staff") {
-      if (!form.firstName.trim()) {
-        toast.error("First name is required.", toastError);
-        setLoading(false);
-        return;
-      }
-      if (!form.lastName.trim()) {
-        toast.error("Last name is required.", toastError);
+      if (!form.userName.trim()) {
+        toast.error("Username is required.", toastError);
         setLoading(false);
         return;
       }
@@ -293,8 +292,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
 
       payload = {
         ...payload,
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
+        userName: form.userName.trim(),
         identifier: form.identifier.trim(),
         password: form.password.trim()
       };
@@ -325,7 +323,6 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     if (saved) {
       setTimeout(() => window.location.reload(), 500);
     }
-
     setLoading(false);
   };
 
@@ -716,36 +713,62 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
             <div className="verified-staff-view">
               <div className="profile-card">
                 <div className="header-section">
-                  <h2 className="profile-title">Profile Information</h2>
-                  <div className="avatar-circle"><FaUserLarge className="avatar-icon" /></div>
+                  <h2 className="profile-title">
+                    Profile Information -{" "}
+                    {user?.verifiedUser ? (
+                      <span className="verified-color">(Verified)</span>
+                    ) : (
+                      <span className="unverified-color">(Unverified)</span>
+                    )}
+                  </h2>
+                  <div className="avatar-circle">
+                    <FaUserLarge className="avatar-icon" />
+                  </div>
                 </div>
 
                 <section className="info-section">
                   <h3 className="section-title">Staff Information</h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>First Name</label>
-                      <input type="text" value={form.firstName} onChange={(e) => setForm((s) => ({ ...s, firstName: e.target.value }))} />
-                    </div>
-                    <div className="form-group">
-                      <label>Last Name</label>
-                      <input type="text" value={form.lastName} onChange={(e) => setForm((s) => ({ ...s, lastName: e.target.value }))} />
-                    </div>
+
+                  <div className="form-group">
+                    <label>Username</label>
+                    <input
+                      type="text"
+                      value={form.userName}
+                      onChange={(e) =>
+                        setForm((s) => ({ ...s, userName: e.target.value }))
+                      }
+                    />
                   </div>
                 </section>
 
                 <section className="info-section">
                   <h3 className="section-title">User Account</h3>
+
                   <div className="form-group">
-                    <label>Email or phone number</label>
-                    <input type="text" value={form.identifier} onChange={(e) => setForm((s) => ({ ...s, identifier: e.target.value }))} />
+                    <label>Email or Phone Number</label>
+                    <input
+                      type="text"
+                      value={form.identifier}
+                      onChange={(e) =>
+                        setForm((s) => ({ ...s, identifier: e.target.value }))
+                      }
+                    />
                   </div>
 
                   <div className="form-group">
                     <label>Change Password</label>
                     <div className="password-input">
-                      <input type={passwordVisible ? "text" : "password"} value={form.password} onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))} />
-                      <button className="toggle-password" onClick={togglePasswordVisibility} aria-label={passwordVisible ? "Hide password" : "Show password"}>
+                      <input
+                        type={passwordVisible ? "text" : "password"}
+                        value={form.password}
+                        onChange={(e) =>
+                          setForm((s) => ({ ...s, password: e.target.value }))
+                        }
+                      />
+                      <button
+                        className="toggle-password"
+                        onClick={togglePasswordVisibility}
+                      >
                         {passwordVisible ? <FaRegEyeSlash /> : <FaRegEye />}
                       </button>
                     </div>
@@ -753,8 +776,26 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                 </section>
 
                 <div className="vui-action-buttons">
-                  <button className="btn-save1" onClick={() => openModal(handleSave, "Are you sure you want to save all changes?")}>Save Changes</button>
-                  <button className="btn-delete" onClick={() => openModal(handleDelete, "Are you sure you want to delete this account permanently?")}>Delete Account</button>
+                  <button
+                    className="btn-save1"
+                    onClick={() =>
+                      openModal(handleSave, "Are you sure you want to save all changes?")
+                    }
+                  >
+                    Save Changes
+                  </button>
+
+                  <button
+                    className="btn-delete"
+                    onClick={() =>
+                      openModal(
+                        handleDelete,
+                        "Are you sure you want to delete this account permanently?"
+                      )
+                    }
+                  >
+                    Delete Account
+                  </button>
                 </div>
               </div>
             </div>

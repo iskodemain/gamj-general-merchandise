@@ -43,37 +43,7 @@ export const fetchAllCustomerService = async (adminId) => {
         console.log(error);
         throw new Error(error.message);
     }
-} 
-
-
-export const fetchAllStaffService = async (adminId) => {
-    try {
-        const adminUser = await Admin.findByPk(adminId);
-        if (!adminUser) {
-            return {
-                success: false,
-                message: 'User not found'
-            }
-        }
-
-        const staffList = await Staff.findAll({});
-            if (staffList.length === 0) {
-                return {
-                    success: true,
-                    staffList: [],
-                };
-            }
-        
-        return {
-            success: true,
-            staffList
-        }
-        
-    } catch (error) {
-        console.log(error);
-        throw new Error(error.message);
-    }
-} 
+}; // PENDING
 
 
 export const fetchAllAdminService = async (adminId) => {
@@ -96,14 +66,15 @@ export const fetchAllAdminService = async (adminId) => {
         
         return {
             success: true,
-            adminList
+            adminList,
+            adminUserType: adminUser.userType
         }
         
     } catch (error) {
         console.log(error);
         throw new Error(error.message);
     }
-} 
+}; // GOODS NA
 
 
 export const fetchDeliveryInfoService = async (adminId) => {
@@ -136,7 +107,7 @@ export const fetchDeliveryInfoService = async (adminId) => {
         console.log(error);
         throw new Error(error.message);
     }
-}
+};
 
 export const approvedUserService = async (adminId, userID, userType) => {
   try {
@@ -211,7 +182,7 @@ export const approvedUserService = async (adminId, userID, userType) => {
     console.error(error);
     throw new Error(error.message);
   }
-};
+}; // GOODS NA
 
 export const rejectUserService = async (adminId, userID, userType, rejectTitle, rejectMessage) => {
   try {
@@ -287,7 +258,7 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
     console.error(error);
     throw new Error(error.message);
   }
-};
+}; // GOODS NA
 
 export const deleteUserService = async (adminId, userID, userType) => {
   try {
@@ -318,12 +289,17 @@ export const deleteUserService = async (adminId, userID, userType) => {
 
     // DELETE STAFF
     else if (userType === "Staff") {
-      userToDelete = await Staff.findByPk(userID);
+      const userToDelete = await Admin.findOne({
+        where: { 
+          ID: userID,
+          userType: 'Staff'
+        }
+      });
 
       if (!userToDelete) {
         return {
           success: false,
-          message: "Staff user not found",
+          message: "Staff user not found"
         };
       }
       await userToDelete.update({ forceLogout: true });
@@ -332,12 +308,17 @@ export const deleteUserService = async (adminId, userID, userType) => {
 
     // DELETE ADMIN
     else if (userType === "Admin") {
-      userToDelete = await Admin.findByPk(userID);
+      const userToDelete = await Admin.findOne({
+        where: { 
+          ID: userID,
+          userType: 'Admin'
+        }
+      });
 
       if (!userToDelete) {
         return {
           success: false,
-          message: "Admin user not found",
+          message: "Staff user not found"
         };
       }
       await userToDelete.update({ forceLogout: true });
@@ -362,7 +343,7 @@ export const deleteUserService = async (adminId, userID, userType) => {
     console.error(error);
     throw new Error(error.message);
   }
-};
+}; // GOODS NA
 
 export const saveUserInfoService = async (adminId, data) => {
   try {
@@ -425,34 +406,63 @@ export const saveUserInfoService = async (adminId, data) => {
           repJobPosition: data.repJobPosition,
           loginEmail: identifierType === "email" ? data.identifier : null,
           loginPhoneNum: identifierType === "phone" ? data.identifier : null,
-          loginPassword: hashedPassword
+          loginPassword: hashedPassword,
+          updateAt: new Date()
         },
         { where: { ID: data.ID } }
       );
     }
 
     if (data.userType === "Staff") {
-      updated = await Staff.update(
-        {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          emailAddress: identifierType === "email" ? data.identifier : null,
-          phoneNumber: identifierType === "phone" ? data.identifier : null,
-          password: hashedPassword
-        },
-        { where: { ID: data.ID } }
-      );
-    }
+      const staffUser = await Admin.findOne({
+        where: { 
+          ID: data.ID,
+          userType: 'Staff'
+        }
+      });
 
-    if (data.userType === "Admin") {
+      if (!staffUser) {
+        return {
+          success: false,
+          message: "Staff user not found"
+        };
+      }
       updated = await Admin.update(
         {
           userName: data.userName,
           emailAddress: identifierType === "email" ? data.identifier : null,
           phoneNumber: identifierType === "phone" ? data.identifier : null,
-          password: hashedPassword
+          password: hashedPassword,
+          updateAt: new Date()
         },
-        { where: { ID: data.ID } }
+        { where: { ID: data.ID, userType: 'Staff' } }
+      );
+    }
+
+    if (data.userType === "Admin") {
+      const adminToUpdate = await Admin.findOne({
+        where: { 
+          ID: data.ID,
+          userType: 'Admin'
+        }
+      });
+
+      if (!adminToUpdate) {
+        return {
+          success: false,
+          message: "Admin user not found"
+        };
+      }
+
+      updated = await Admin.update(
+        {
+          userName: data.userName,
+          emailAddress: identifierType === "email" ? data.identifier : null,
+          phoneNumber: identifierType === "phone" ? data.identifier : null,
+          password: hashedPassword,
+          updateAt: new Date()
+        },
+        { where: { ID: data.ID, userType: 'Admin' } }
       );
     }
 
@@ -466,7 +476,7 @@ export const saveUserInfoService = async (adminId, data) => {
     console.error(error);
     throw new Error(error.message);
   }
-};
+}; // GOODS NA
 
 export const addNewUserService = async (adminId, data) => {
   try {
@@ -505,19 +515,13 @@ export const addNewUserService = async (adminId, data) => {
       }
     });
 
-    const existsStaff = await Staff.findOne({
-      where: {
-        [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
-      }
-    });
-
     const existsAdmin = await Admin.findOne({
       where: {
         [identifierType === "email" ? "emailAddress" : "phoneNumber"]: data.identifier
       }
     });
 
-    if (existsCustomer || existsStaff || existsAdmin) {
+    if (existsCustomer || existsAdmin) {
       return {
         success: false,
         message: "This email or phone number is already used by another account."
@@ -579,27 +583,27 @@ export const addNewUserService = async (adminId, data) => {
     }
 
     if (data.userType === "Staff") {
-      const lastStaff = await Staff.findOne({
+      const lastAdmin = await Admin.findOne({
         order: [["ID", "DESC"]],
       });
 
-      const nextStaffNo = lastStaff ? Number(lastStaff.ID) + 1 : 1;
-      const staffId = withTimestamp("STAFF", nextStaffNo);
+      const nextAdminNo = lastAdmin ? Number(lastAdmin.ID) + 1 : 1;
+      const adminId = withTimestamp("ADMIN", nextAdminNo);
 
-      addNewUser = await Staff.create({
-        staffId,
-        firstName: data.firstName,
-        lastName: data.lastName,
+      addNewUser = await Admin.create({
+        adminId,
+        userName: data.userName,
         emailAddress: identifierType === "email" ? data.identifier : null,
         phoneNumber: identifierType === "phone" ? data.identifier : null,
         password: hashedPassword,
-        verifiedStaff: true
+        userType: "Staff",
+        verifiedUser: true,
       });
       if (identifierType === "email") {
         await accountSendMail({
           to: addNewUser.emailAddress,
           subject: 'Your GAMJ Account Has Been Created by Admin',
-          html: userAccountCreatedTemplate(addNewUser.firstName + " " + addNewUser.lastName),
+          html: userAccountCreatedTemplate(addNewUser.userName),
           attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
         });
       }
@@ -619,7 +623,8 @@ export const addNewUserService = async (adminId, data) => {
         emailAddress: identifierType === "email" ? data.identifier : null,
         phoneNumber: identifierType === "phone" ? data.identifier : null,
         password: hashedPassword,
-        verifiedAdmin: true
+        userType: "Admin",
+        verifiedUser: true
       });
       if (identifierType === "email") {
         await accountSendMail({
@@ -641,4 +646,4 @@ export const addNewUserService = async (adminId, data) => {
     console.error(error);
     throw new Error(error.message);
   }
-};
+}; // GOODS NA

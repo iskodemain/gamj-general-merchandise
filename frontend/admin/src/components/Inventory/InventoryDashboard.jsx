@@ -4,7 +4,7 @@ import Navbar from '../Navbar';
 import { AdminContext } from '../../context/AdminContextProvider';
 
 export default function InventoryDashboard() {
-  const { navigate, fetchInventoryStock, products, productVariantValues, productVariantCombination } = useContext(AdminContext);
+  const { navigate, fetchInventoryStock, products, productVariantValues, productVariantCombination, currentUser } = useContext(AdminContext);
 
   // State for filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -159,9 +159,13 @@ export default function InventoryDashboard() {
             </select>
 
             {/* Add Stock Button */}
-            <button onClick={handleAddStock} className="add-stock-btn">
-              + Add Stock
-            </button>
+            {
+              ['Super Admin', 'Admin'].includes(currentUser) &&
+              <button onClick={handleAddStock} className="add-stock-btn">
+                + Add Stock
+              </button>
+            }
+            
           </div>
         </div>
 

@@ -15,7 +15,6 @@ import Cities from "./components/Locations/Cities";
 import Barangay from "./components/Locations/Barangay";
 import CancelOrder from "./components/CancelOrder";
 import CancelReview from "./components/Cancellation/CancelOrderReview";
-import Refund from "./components/Cancellation/Refund";
 import AdminCancel from "./components/Cancellation/AdminCancel";
 import CustomerCancel from "./components/Cancellation/CustomerCancel";
 import ReturnAndRefund from "./components/ReturnAndRefund";
@@ -30,12 +29,10 @@ import Products from "./pages/Products.jsx";
 import AddProduct from "./components/ProductMenu/AddProduct";
 import ProductCategory from './components/ProductMenu/ProductCategory.jsx'
 import TotalProduct from "./components/ProductMenu/TotalProduct";
-import MostStock from "./components/ProductMenu/MostStock";
-import LowStock from "./components/ProductMenu/LowStock";
+
 import Notification from "./pages/Notification.jsx";
 import Overview from "./pages/Overview.jsx";
 import { AdminContext } from "./context/AdminContextProvider.jsx";
-import OutOfStock from "./components/ProductMenu/OutOfStock.jsx";
 import Settings from "./pages/Settings.jsx";
 import UpdateProduct from "./components/ProductMenu/UpdateProduct.jsx";
 import Orders from "./pages/Orders.jsx";
@@ -52,6 +49,7 @@ import AddStock from "./components/Inventory/AddStock.jsx";
 import BatchList from "./components/Inventory/BatchList.jsx";
 import OrderTransactions from "./components/Transactions/OrderTransactions.jsx";
 import InventoryTransactions from "./components/Transactions/InventoryTransactions.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 //components
 // icon 
@@ -67,53 +65,126 @@ const App = () => {
       <Route path="*" element={token ? <Navigate to="/overview" /> : <LoginAdmin />}/>
       <Route path="/" element={token ? <Navigate to="/overview" /> : <LoginAdmin />} />
       <Route path="/verify" element={token || !loginToken ? <Navigate to="/"/> : <Verification/>} />
-      <Route path="/overview" element={token ? <Overview/> : <Navigate to="/"/>} />
-      <Route path="/pending" element={<Pending />} />
-      <Route path="/view" element={<ViewAll />} />
-      <Route path="/processing" element={<Processing />} />
-      <Route path="/outfordelivery" element={<OutforDelivery />} />
-      <Route path="/delivered" element={<Delivered />} />
-      <Route path="/delivery-locations" element={<DeliveryLocations />} />
-      <Route path="/delivery-locations/provinces" element={<Provinces />} />
-      <Route path="/delivery-locations/cities" element={<Cities />} />
-      <Route path="/delivery-locations/barangays" element={<Barangay />} />
-      <Route path="/cancelorder" element={<CancelOrder />} />
-      <Route path="/cancelreview" element={<CancelReview />} />
-      <Route path="/return" element={<Refund />} />
-      <Route path="/admincancel" element={<AdminCancel />} />
-      <Route path="/customercancel" element={<CustomerCancel />} />
-      <Route path="/returnandrefund" element={<ReturnAndRefund />} />
-      <Route path="/unverifiedusers" element={<UnverifiedUsers />} />
-      <Route path="/unverifiedcustomerreview" element={<UnverifiedCustomerReview />} />
-      <Route path="/verifiedusers" element={<VerifiedUsers />} />
-      <Route path="/verifiedcustomerview" element={<VerifiedCustomerView />} />
-      <Route path="/verifiedstaffview" element={<VerifiedStaffView />} />
-      <Route path="/unverifiedstaffview" element={<UnverifiedStaffView />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/products/addproduct" element={<AddProduct />} />
-      <Route path="/products/updateproduct/:productId" element={<UpdateProduct />} />
-      <Route path="/products/productcategory" element={<ProductCategory />} />
-      <Route path="/products/totalproduct" element={<TotalProduct />} />
-      <Route path="/products/moststock" element={<MostStock />} />
-      <Route path="/products/lowstock" element={<LowStock />} />
-      <Route path="/products/outofstock" element={<OutOfStock />} />
-      <Route path="/notifications" element={<Notification />} />
-      <Route path="/user-management" element={<UserManagement />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/activeorders" element={<ActiveOrders />} /> 
-      <Route path="/reports" element={<Reports />} /> 
-      <Route path="/transactions" element={<Transactions />} /> 
-      <Route path="/transactions/order" element={<OrderTransactions />} /> 
-      <Route path="/transactions/inventory" element={<InventoryTransactions />} /> 
-      <Route path="/allusers" element={<AllUsers />} /> 
-      <Route path="/rejectedusers" element={<RejectedUsers />} /> 
-      <Route path="/addnewuser" element={<AddNewUser />} />
-      <Route path="/inventory" element={<Inventory />} />
-      <Route path="/inventory/list" element={<InventoryDashboard />} />
-      <Route path="/inventory/add" element={<AddStock />} />
-      <Route path="/inventory/batch" element={<BatchList />} />
+
+      {/* ALL AUTHENTICATED USERS (Super Admin, Admin, Staff) */}
+      <Route path="/overview" element={<ProtectedRoute><Overview/></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
+
+      {/* ORDERS - ALL AUTHENTICATED USERS */}
+      <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+      <Route path="/activeorders" element={<ProtectedRoute><ActiveOrders /></ProtectedRoute>} /> 
+      <Route path="/pending" element={<ProtectedRoute><Pending /></ProtectedRoute>} />
+      <Route path="/view" element={<ProtectedRoute><ViewAll /></ProtectedRoute>} />
+      <Route path="/processing" element={<ProtectedRoute><Processing /></ProtectedRoute>} />
+      <Route path="/outfordelivery" element={<ProtectedRoute><OutforDelivery /></ProtectedRoute>} />
+      <Route path="/delivered" element={<ProtectedRoute><Delivered /></ProtectedRoute>} />
+      <Route path="/cancelorder" element={<ProtectedRoute><CancelOrder /></ProtectedRoute>} />
+      <Route path="/cancelreview" element={<ProtectedRoute><CancelReview /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/admincancel" element={<ProtectedRoute><AdminCancel /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/customercancel" element={<ProtectedRoute><CustomerCancel /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/returnandrefund" element={<ProtectedRoute><ReturnAndRefund /></ProtectedRoute>} /> {/* PENDING */}
+
+      {/* PRODUCTS - ALL AUTHENTICATED USERS */}
+      <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
+      <Route path="/products/productcategory" element={<ProtectedRoute><ProductCategory /></ProtectedRoute>} />
+      <Route path="/products/totalproduct" element={<ProtectedRoute><TotalProduct /></ProtectedRoute>} />
+
+      {/* INVENTORY - ALL AUTHENTICATED USERS */}
+      <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+      <Route path="/inventory/list" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
+      <Route path="/inventory/batch" element={<ProtectedRoute><BatchList /></ProtectedRoute>} />
+
+      {/* TRANSACTIONS - ALL AUTHENTICATED USERS */}
+      <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} /> 
+      <Route path="/transactions/order" element={<ProtectedRoute><OrderTransactions /></ProtectedRoute>} /> 
+      <Route path="/transactions/inventory" element={<ProtectedRoute><InventoryTransactions /></ProtectedRoute>} /> 
+      <Route path="/products/addproduct" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
+      <Route path="/products/updateproduct/:productId" element={<ProtectedRoute><UpdateProduct /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute ><Reports /></ProtectedRoute>} />
+
+      {/* SUPER ADMIN & ADMIN ONLY - Staff CANNOT access */}
+      <Route path="/inventory/add" element={
+        <ProtectedRoute allowedRoles={['Super Admin', 'Admin']}>
+          <AddStock />
+        </ProtectedRoute>
+      } />
+      <Route path="/delivery-locations" element={
+        <ProtectedRoute allowedRoles={['Super Admin', 'Admin']}>
+          <DeliveryLocations />
+        </ProtectedRoute>
+      } />
+      <Route path="/delivery-locations/provinces" element={
+        <ProtectedRoute allowedRoles={['Super Admin', 'Admin']}>
+          <Provinces />
+        </ProtectedRoute>
+      } />
+      <Route path="/delivery-locations/cities" element={
+        <ProtectedRoute allowedRoles={['Super Admin', 'Admin']}>
+          <Cities />
+        </ProtectedRoute>
+      } />
+      <Route path="/delivery-locations/barangays" element={
+        <ProtectedRoute allowedRoles={['Super Admin', 'Admin']}>
+          <Barangay />
+        </ProtectedRoute>
+      } />
+      
+
+      {/* SUPER ADMIN ONLY - Admin & Staff CANNOT access */}
+      <Route path="/user-management" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <UserManagement />
+        </ProtectedRoute>
+      } />
+      <Route path="/allusers" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <AllUsers />
+        </ProtectedRoute>
+      } /> 
+      <Route path="/addnewuser" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <AddNewUser />
+        </ProtectedRoute>
+      } />
+      <Route path="/verifiedusers" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <VerifiedUsers />
+        </ProtectedRoute>
+      } />
+      <Route path="/unverifiedusers" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <UnverifiedUsers />
+        </ProtectedRoute>
+      } />
+      <Route path="/verifiedcustomerview" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <VerifiedCustomerView />
+        </ProtectedRoute>
+      } />
+      <Route path="/unverifiedcustomerreview" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <UnverifiedCustomerReview />
+        </ProtectedRoute>
+      } />
+      <Route path="/verifiedstaffview" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <VerifiedStaffView />
+        </ProtectedRoute>
+      } />
+      <Route path="/unverifiedstaffview" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <UnverifiedStaffView />
+        </ProtectedRoute>
+      } />
+      <Route path="/rejectedusers" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <RejectedUsers />
+        </ProtectedRoute>
+      } /> 
+      <Route path="/settings" element={<ProtectedRoute allowedRoles={['Super Admin']}>
+        <Settings />
+      </ProtectedRoute>} />
     </Routes>
    </div>
   )
