@@ -6,7 +6,7 @@ import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
 
 function Inventory() {
-  const { navigate, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory } = useContext(AdminContext);
+  const { navigate, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory, currentUser } = useContext(AdminContext);
   
   return (
     <>
@@ -44,12 +44,15 @@ function Inventory() {
               onClick={() => navigate("/transactions/inventory")}
             />
             
-            <OverviewCard
-              icon={assets.add_inventory_icon}
-              title="Add Stock"
-              number={"+"}
-              onClick={() => navigate("/inventory/add")}
-            />
+            {
+              ['Super Admin', 'Admin'].includes(currentUser) &&
+              <OverviewCard
+                icon={assets.add_inventory_icon}
+                title="Add Stock"
+                number={"+"}
+                onClick={() => navigate("/inventory/add")}
+              />
+            }
           </div>
         </section>
       </main>

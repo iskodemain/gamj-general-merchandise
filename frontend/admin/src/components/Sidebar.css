@@ -3,7 +3,7 @@
   top: 2rem;
   left: 0;
   width: 260px;
-  height: 100vh;
+  height: calc(100vh - 2rem);
   background: #ffffff;
   box-shadow: 3px 0 7px rgba(0, 0, 0, 0.097);
   display: flex;
@@ -101,6 +101,8 @@
   flex-direction: column;
   padding: 20px 10px;
   gap: 4px;
+  flex: 1;
+  overflow-y: auto; 
 }
 
 .sidebar-item {

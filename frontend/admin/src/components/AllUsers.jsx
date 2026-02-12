@@ -11,7 +11,7 @@ import ViewUserInfo from "./VeriAndUnverified/ViewUserInfo.jsx"
 import Loading from './Loading.jsx';
 
 function AllUsers() {
-  const { navigate, customerList, adminList, staffList, handleDeletetUser } = useContext(AdminContext);
+  const { navigate, customerList, adminList, handleDeletetUser } = useContext(AdminContext);
 
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState('');   
@@ -41,7 +41,6 @@ function AllUsers() {
     setModalOpen(false);
   };
 
-
   // Defensive helpers for truthy/falsey values that may be 1/0 or true/false or strings
   const isTrue = (val) => val === 1 || val === true || val === '1' || val === 'true';
   const isFalse = (val) => val === 0 || val === false || val === '0' || val === 'false';
@@ -53,20 +52,15 @@ function AllUsers() {
       if (isTrue(u.rejectedCustomer)) return 'Rejected';
       if (isTrue(u.verifiedCustomer)) return 'Verified';
       if (isFalse(u.verifiedCustomer)) return 'Unverified';
-      // fallback: if missing/unknown treat as Unverified
       return 'Unverified';
     }
 
-    if (u.__type === 'Staff') {
-      if (isTrue(u.verifiedStaff)) return 'Verified';
-      return 'Unverified';
-    }
-
-    if (u.__type === 'Admin') {
-      // Exclude adminHead before calling this, but handle defensively
+    // ✅ For Admin and Staff (both from adminList)
+    if (u.__type === 'Admin' || u.__type === 'Staff') {
+      // Exclude Super Admin (adminHead = true)
       if (isTrue(u.adminHead)) return 'Excluded';
-      if (isTrue(u.verifiedAdmin)) return 'Verified';
-      if (isFalse(u.verifiedAdmin)) return 'Unverified';
+      if (isTrue(u.verifiedUser)) return 'Verified';
+      if (isFalse(u.verifiedUser)) return 'Unverified';
       return 'Unverified';
     }
 
@@ -74,11 +68,11 @@ function AllUsers() {
   };
 
   // Build unified user list with consistent fields:
-  // { ID, __type: 'admin'|'staff'|'customer', displayName, status, createAt, original }
+  // { ID, __type: 'Admin'|'Staff'|'Customer', displayName, status, createAt, original }
   const unifiedUsers = useMemo(() => {
     const list = [];
 
-    // Customers
+    // ✅ Customers
     (customerList || []).forEach((c) => {
       const user = {
         ID: c.ID,
@@ -97,41 +91,35 @@ function AllUsers() {
       list.push(user);
     });
 
-    // Staff
-    (staffList || []).forEach((s) => {
-      const user = {
-        ID: s.ID,
-        __type: 'Staff',
-        original: s,
-        displayName:
-          `${s.firstName || ''} ${s.lastName || ''}`.trim() ||
-          s.emailAddress ||
-          `Staff-${s.ID}`,
-        createAt: s.createAt || s.updateAt || null,
-        verifiedStaff: s.verifiedStaff,
-      };
-      user.status = getUserStatus(user);
-      list.push(user);
-    });
-
-    // Admins — exclude adminHead === true
+    // ✅ Admins and Staff (from adminList)
     (adminList || []).forEach((a) => {
-      if (isTrue(a.adminHead)) return; // skip admin head entirely
+      // Skip Super Admin (adminHead = true)
+      if (isTrue(a.adminHead)) return;
+
+      // Determine type based on userType field
+      const userType = a.userType === 'Staff' ? 'Staff' : 'Admin';
+
       const user = {
         ID: a.ID,
-        __type: 'Admin',
+        __type: userType,  // ✅ 'Admin' or 'Staff' based on userType
         original: a,
-        displayName: a.userName || a.emailAddress || `Admin-${a.ID}`,
+        displayName: a.userName || a.emailAddress || `${userType}-${a.ID}`,
         createAt: a.createAt || a.updateAt || null,
-        verifiedAdmin: a.verifiedAdmin,
+        verifiedUser: a.verifiedUser,
         adminHead: a.adminHead,
+        userType: a.userType,  // Store original userType for reference
       };
+      
       user.status = getUserStatus(user);
-      if (user.status !== 'Excluded') list.push(user);
+      
+      // Only add if not excluded
+      if (user.status !== 'Excluded') {
+        list.push(user);
+      }
     });
 
     return list;
-  }, [customerList, staffList, adminList]);
+  }, [customerList, adminList]);
 
   // Filter + Search + Sort
   const filteredUsers = useMemo(() => {
@@ -201,7 +189,6 @@ function AllUsers() {
         }
 
         setLoading(false);
-
       },
       `Are you sure you want to permanently delete this ${type}?`
     );
@@ -227,12 +214,12 @@ function AllUsers() {
     <>
       <Navbar TitleName="All Users" />
       {loading && <Loading/>}
+      
       {/* Confirmation Modal */}
       {modalOpen && (
         <div className="conf-modal-overlay">
           <div className="conf-modal-box">
             <p className="conf-modal-message">{modalMessage}</p>
-
             <div className="conf-modal-buttons">
               <button className="conf-btn-confirm" onClick={confirmAction}>Yes</button>
               <button className="conf-btn-cancel" onClick={cancelAction}>No</button>
@@ -240,15 +227,16 @@ function AllUsers() {
           </div>
         </div>
       )}
+      
       <div className="display-all-users-container">
-          <div className="display-all-back-ctn">
-            <button className="display-all-back-btn" onClick={() => navigate("/user-management")}>
-                <FaArrowLeft />
-            </button>
-            <h3 className="display-all-text-title">Back</h3>
-          </div>
-        <div className="display-all-users-card">
+        <div className="display-all-back-ctn">
+          <button className="display-all-back-btn" onClick={() => navigate("/user-management")}>
+            <FaArrowLeft />
+          </button>
+          <h3 className="display-all-text-title">Back</h3>
+        </div>
         
+        <div className="display-all-users-card">
           {/* Controls */}
           <div className="display-all-users-controls">
             <div className="display-all-users-controls-left">
@@ -259,9 +247,9 @@ function AllUsers() {
                   onChange={(e) => setFilterType(e.target.value)}
                 >
                   <option value="">All Types</option>
-                  <option value="admin">Admin</option>
-                  <option value="staff">Staff</option>
-                  <option value="customer">Customer</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Staff">Staff</option>
+                  <option value="Customer">Customer</option>
                 </select>
               </label>
 
@@ -292,7 +280,9 @@ function AllUsers() {
             </div>
 
             <div className="display-all-users-controls-right">
-              <button onClick={() => navigate('/addnewuser')} className="display-all-users-add-btn">Add User</button>
+              <button onClick={() => navigate('/addnewuser')} className="display-all-users-add-btn">
+                Add User
+              </button>
 
               <div className="display-all-users-search">
                 <input
@@ -341,7 +331,9 @@ function AllUsers() {
                       {u.createAt ? new Date(u.createAt).toLocaleString() : '-'}
                     </td>
                     <td className="center display-all-users-actions">
-                      <button onClick={() => handleView(u.ID, u.__type, u.status)} className='display-all-users-view'>View All</button>
+                      <button onClick={() => handleView(u.ID, u.__type, u.status)} className='display-all-users-view'>
+                        View All
+                      </button>
                       {u.status === 'Rejected' && (
                         <button
                           className="display-all-users-trash"

@@ -36,6 +36,10 @@ const Admin = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    userType: {
+      type: DataTypes.ENUM('Super Admin', 'Admin', 'Staff'),
+      allowNull: false,
+    },
     createAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -44,14 +48,15 @@ const Admin = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
-    verifiedAdmin: {
+    verifiedUser: {
       type: DataTypes.BOOLEAN,
+      allowNull: false,
       defaultValue: false,
     },
     adminHead: {
       type: DataTypes.BOOLEAN,
-      allowNull: true,
-      unique: true,
+      allowNull: false,
+      defaultValue: false,
     },
     verificationCode: {
       type: DataTypes.STRING(10),

@@ -33,7 +33,6 @@ const AdminContextProvider = (props) => {
   const [fetchOrders, setFetchOrders] = useState([]);
   const [fetchOrderItems, setFetchOrderItems] = useState([]);
   const [customerList, setCustomerList] = useState([]);
-  const [staffList, setStaffList] = useState([]);
   const [adminList, setAdminList] = useState([]);
   const [deliveryInfoList, setDeliveryInfoList] = useState([]);
   const [barangays, setBarangays] = useState([]);
@@ -53,6 +52,8 @@ const AdminContextProvider = (props) => {
 
   const [showOrderPaymentProof, setShowOrderPaymentProof] = useState(false);
   const [selectedPaymentProof, setSelectedPaymentProof] = useState(null);
+
+  const [currentUser, setCurrentUser] = useState(null);
 
   /*---------------------------FETCH ORDER PROOF OF PAYMENT-----------------------------*/
   const handleFetchOrderProofPayment = async () => {
@@ -1079,7 +1080,8 @@ const AdminContextProvider = (props) => {
             }
         });
         if (response.data.success) {
-            setAdminList(response.data.adminList);
+            setAdminList(response.data.adminList); 
+            setCurrentUser(response.data.adminUserType); 
         }
     } catch (error) {
         console.log(error);
@@ -1089,29 +1091,6 @@ const AdminContextProvider = (props) => {
   useEffect(() => {
       if (token) {
       handleFetchAllAdmin();
-      }
-  }, [token]);
-  
-
-  /*--------------------------FETCH STAFF----------------------------*/
-  const handleFetchAllStaff = async() => {
-    try {
-        const response = await axios.get(backendUrl + "/api/users/staff", {
-            headers: {
-            Authorization: `Bearer ${token}`
-            }
-        });
-        if (response.data.success) {
-            setStaffList(response.data.staffList);
-        }
-    } catch (error) {
-        console.log(error);
-        toast.error(error.message, {...toastError});
-    }
-  }
-  useEffect(() => {
-      if (token) {
-      handleFetchAllStaff();
       }
   }, [token]);
 
@@ -1342,6 +1321,7 @@ const AdminContextProvider = (props) => {
           localStorage.setItem("adminAuthToken", response.data.token);
           setToken(response.data.token);
           toast.success(response.data.message, { ...toastSuccess });
+          
           navigate("/overview");
           return true
 
@@ -1419,7 +1399,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, staffList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser
   }  
   return (
     <AdminContext.Provider value={value}>

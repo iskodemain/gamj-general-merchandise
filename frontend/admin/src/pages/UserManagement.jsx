@@ -1,86 +1,71 @@
-// src/components/Overview.jsx
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { assets } from "../assets/assets.js";
 import Navbar from "../components/Navbar.jsx";
 import "./Orders.css";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useState } from "react";
-import { useEffect } from "react";
 
 function Orders() {
-    const { navigate, customerList, adminList, staffList } = useContext(AdminContext);
+  const { navigate, customerList, adminList } = useContext(AdminContext);
 
-    const [verifiedUsers, setVerifiedUsers] = useState(0);
-    const [unverifiedUsers, setUnverifiedUsers] = useState(0);
-    const [rejectedUsers, setRejectedUsers] = useState(0);
-    const [allUsers, setAllUsers] = useState(0);
+  const [verifiedUsers, setVerifiedUsers] = useState(0);
+  const [unverifiedUsers, setUnverifiedUsers] = useState(0);
+  const [rejectedUsers, setRejectedUsers] = useState(0);
+  const [allUsers, setAllUsers] = useState(0);
 
-    useEffect(() => {
-        if (!customerList || !staffList || !adminList) return;
+  useEffect(() => {
+    if (!customerList || !adminList) return;
 
-        let verified = 0;
-        let unverified = 0;
-        let rejected = 0;
-        let totalUsers = 0;
+    let verified = 0;
+    let unverified = 0;
+    let rejected = 0;
+    let totalUsers = 0;
 
-        /* ---------------------------
-        PROCESS CUSTOMERS
-        ----------------------------*/
-        customerList.forEach((cust) => {
-            totalUsers += 1;
+    /* ---------------------------
+       PROCESS CUSTOMERS
+    ----------------------------*/
+    customerList.forEach((cust) => {
+      totalUsers += 1;
 
-            if (cust.rejectedCustomer === 1 || cust.rejectedCustomer === true) {
-                rejected += 1;
-                return;
-            }
+      if (cust.rejectedCustomer === 1 || cust.rejectedCustomer === true) {
+        rejected += 1;
+        return;
+      }
 
-            if (cust.verifiedCustomer === 1 || cust.verifiedCustomer === true) {
-                verified += 1;
-            } else {
-                unverified += 1;
-            }
-        });
+      if (cust.verifiedCustomer === 1 || cust.verifiedCustomer === true) {
+        verified += 1;
+      } else {
+        unverified += 1;
+      }
+    });
 
-        /* ---------------------------
-        PROCESS STAFF
-        ----------------------------*/
-        staffList.forEach((staff) => {
-            totalUsers += 1;
+    /* ---------------------------
+       PROCESS ADMINS & STAFF
+       (EXCLUDE adminHead === true)
+    ----------------------------*/
+    adminList.forEach((admin) => {
+      // Skip Super Admin
+      if (admin.adminHead === 1 || admin.adminHead === true) return;
 
-            if (staff.verifiedStaff === 1 || staff.verifiedStaff === true) {
-                verified += 1;
-            } else {
-                unverified += 1;
-            }
-        });
+      totalUsers += 1;
 
-        /* ---------------------------
-        PROCESS ADMINS
-        (EXCLUDE adminHead === true)
-        ----------------------------*/
-        adminList.forEach((admin) => {
-            if (admin.adminHead === 1 || admin.adminHead === true) return;
+      if (admin.verifiedUser === 1 || admin.verifiedUser === true) {
+        verified += 1;
+      } else {
+        unverified += 1;
+      }
+    });
 
-            totalUsers += 1;
+    /* ---------------------------
+       UPDATE STATE
+    ----------------------------*/
+    setAllUsers(totalUsers);
+    setVerifiedUsers(verified);
+    setUnverifiedUsers(unverified);
+    setRejectedUsers(rejected);
 
-            if (admin.verifiedAdmin === 1 || admin.verifiedAdmin === true) {
-                verified += 1;
-            } else {
-                unverified += 1;
-            }
-        });
+  }, [customerList, adminList]);
 
-        /* ---------------------------
-        UPDATE STATE
-        ----------------------------*/
-        setAllUsers(totalUsers);
-        setVerifiedUsers(verified);
-        setUnverifiedUsers(unverified);
-        setRejectedUsers(rejected);
-
-    }, [customerList, staffList, adminList]);
-  
   return (
     <>
       <Navbar TitleName="User Management" />
@@ -91,7 +76,7 @@ function Orders() {
         <section className="ordersView-section">
           <div className="ordersView-header">
             <button className="ordersView-back-btn" onClick={() => navigate("/overview")}>
-                <FaArrowLeft />
+              <FaArrowLeft />
             </button>
             <h3 className="ordersView-header-title">Back</h3>
           </div>
@@ -126,7 +111,6 @@ function Orders() {
               number={"+"}
               onClick={() => navigate('/addnewuser')}
             />
-            
           </div>
         </section>
       </main>
