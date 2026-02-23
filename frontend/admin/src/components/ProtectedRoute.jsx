@@ -6,8 +6,6 @@ import { AdminContext } from '../context/AdminContextProvider';
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     const { token, currentUser } = useContext(AdminContext);
 
-    if (token === undefined) return null;
-
     if (!token) {
         return <Navigate to="/" replace />;
     }
