@@ -49,11 +49,73 @@ const AdminContextProvider = (props) => {
   const [fetchOrderTransaction, setFetchOrderTransaction] = useState([]); 
   const [fetchNotifications, setFetchNotifications] = useState([]); 
   const [fetchOrderProofPayment, setFetchOrderProofPayment] = useState([]); 
-
   const [showOrderPaymentProof, setShowOrderPaymentProof] = useState(false);
   const [selectedPaymentProof, setSelectedPaymentProof] = useState(null);
-
   const [currentUser, setCurrentUser] = useState(null);
+
+  const [fetchReturnRefundPolicy, setFetchReturnRefundPolicy] = useState([]); 
+
+  /*--------------------------- UPDATE RETURN REFUND POLICY -----------------------------*/
+  const updateReturnRefundPolicy = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.put(backendUrl + "/api/return-refund-policy/update", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------ADD RETURN REFUND POLICY-----------------------------*/
+  const addReturnRefundPolicy = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.post(backendUrl + "/api/return-refund-policy/add", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------FETCH ORDER PROOF OF PAYMENT-----------------------------*/
+  const handleFetchReturnRefundPolicy = async () => {
+      try {
+          const response = await axios.get(backendUrl + "/api/return-refund-policy/fetch", {
+              headers: {
+              Authorization: `Bearer ${token}`
+              }
+          });
+          if (response.data.success) {
+              setFetchReturnRefundPolicy(response.data.returnRefundPolicy)
+          } else {
+              toast.error(response.data.message, { ...toastError });
+          }
+      } catch (error) {
+          console.log(error);
+      }
+  }
+  useEffect(() => {
+      if (token) {
+          handleFetchReturnRefundPolicy();
+      }
+  }, [token]);
+
 
   /*---------------------------FETCH ORDER PROOF OF PAYMENT-----------------------------*/
   const handleFetchOrderProofPayment = async () => {
@@ -1367,7 +1429,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser, fetchReturnRefundPolicy, addReturnRefundPolicy, updateReturnRefundPolicy
   }  
   return (
     <AdminContext.Provider value={value}>

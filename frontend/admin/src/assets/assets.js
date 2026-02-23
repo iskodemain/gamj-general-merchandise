@@ -49,8 +49,10 @@ import inventory_transaction from "./inventory-transaction.png"
 import add_inventory_icon from "./add-inventory-icon.png"
 import inventory_batch_icon from "./inventory-batch-icon.png"
 import inventory_dashboard_icon from "./inventory-dashboard-icon.png"
+import return_policy_icon from "./return_policy_icon.png"
 
 export const assets = {
+    return_policy_icon,
     inventory_dashboard_icon,
     inventory_batch_icon,
     order_transaction,

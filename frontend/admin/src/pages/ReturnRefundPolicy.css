@@ -1,0 +1,402 @@
+/* ===================== BASE CONTAINER ===================== */
+.rrp-page-container {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.rrp-content-wrapper {
+  width: 100%;
+  max-width: 700px;
+}
+
+.rrp-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 50px 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  animation: rrpSlideUp 0.5s ease-out;
+}
+
+@keyframes rrpSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===================== TITLE ===================== */
+.rrp-main-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #43A047;
+  text-align: center;
+  margin-bottom: 40px;
+  line-height: 1.3;
+}
+
+/* ===================== FORM ===================== */
+.rrp-form {
+  width: 100%;
+}
+
+.rrp-form-group {
+  margin-bottom: 30px;
+}
+
+.rrp-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin-bottom: 10px;
+}
+
+.rrp-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #E0E0E0;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #2d2d2d;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.rrp-input:focus {
+  outline: none;
+  border-color: #43A047;
+  box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.1);
+}
+
+.rrp-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.rrp-input::placeholder {
+  color: #999;
+}
+
+.rrp-helper-text {
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* ===================== SUBMIT BUTTON ===================== */
+.rrp-submit-btn {
+  width: 100%;
+  padding: 16px 30px;
+  background: linear-gradient(135deg, #43A047 0%, #66BB6A 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.rrp-submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
+}
+
+.rrp-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.rrp-btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rrpSpin 0.6s linear infinite;
+}
+
+@keyframes rrpSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===================== INFO FOOTER ===================== */
+.rrp-info-footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #E0E0E0;
+}
+
+.rrp-info-text {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ===================== LOADING CONTAINER ===================== */
+.rrp-loading-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+}
+
+.rrp-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(67, 160, 71, 0.2);
+  border-top-color: #43A047;
+  border-radius: 50%;
+  animation: rrpSpin 0.8s linear infinite;
+  margin-bottom: 20px;
+}
+
+.rrp-loading-container p {
+  font-size: 16px;
+  color: #43A047;
+  font-weight: 600;
+}
+
+/* ===================== RESPONSIVE - TABLET (768px) ===================== */
+@media screen and (max-width: 768px) {
+  .rrp-page-container {
+    padding: 30px 15px;
+  }
+
+  .rrp-card {
+    padding: 40px 30px;
+  }
+
+  .rrp-main-title {
+    font-size: 28px;
+    margin-bottom: 35px;
+  }
+
+  .rrp-label {
+    font-size: 15px;
+  }
+
+  .rrp-input {
+    padding: 13px 16px;
+    font-size: 14px;
+  }
+
+  .rrp-submit-btn {
+    padding: 15px 28px;
+    font-size: 15px;
+  }
+}
+
+/* ===================== RESPONSIVE - MOBILE (480px) ===================== */
+@media screen and (max-width: 480px) {
+  .rrp-page-container {
+    padding: 25px 12px;
+  }
+
+  .rrp-card {
+    padding: 35px 25px;
+    border-radius: 16px;
+  }
+
+  .rrp-main-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+
+  .rrp-form-group {
+    margin-bottom: 25px;
+  }
+
+  .rrp-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .rrp-input {
+    padding: 12px 14px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .rrp-helper-text {
+    font-size: 12px;
+  }
+
+  .rrp-submit-btn {
+    padding: 14px 24px;
+    font-size: 14px;
+    margin-top: 35px;
+  }
+
+  .rrp-info-footer {
+    margin-top: 25px;
+    padding-top: 18px;
+  }
+
+  .rrp-info-text {
+    font-size: 12px;
+  }
+}
+
+/* ===================== RESPONSIVE - SMALL MOBILE (320px) ===================== */
+@media screen and (max-width: 320px) {
+  .rrp-page-container {
+    padding: 20px 10px;
+  }
+
+  .rrp-card {
+    padding: 30px 20px;
+    border-radius: 14px;
+  }
+
+  .rrp-main-title {
+    font-size: 22px;
+    margin-bottom: 25px;
+  }
+
+  .rrp-form-group {
+    margin-bottom: 22px;
+  }
+
+  .rrp-label {
+    font-size: 13px;
+    margin-bottom: 7px;
+  }
+
+  .rrp-input {
+    padding: 11px 13px;
+    font-size: 13px;
+    border-radius: 7px;
+  }
+
+  .rrp-helper-text {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  .rrp-submit-btn {
+    padding: 13px 22px;
+    font-size: 13px;
+    margin-top: 30px;
+    border-radius: 8px;
+  }
+
+  .rrp-btn-spinner {
+    width: 16px;
+    height: 16px;
+  }
+
+  .rrp-info-footer {
+    margin-top: 22px;
+    padding-top: 16px;
+  }
+
+  .rrp-info-text {
+    font-size: 11px;
+  }
+
+  .rrp-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  .rrp-loading-container p {
+    font-size: 14px;
+  }
+}
+
+/* ===================== RESPONSIVE - MINIMUM 200PX ===================== */
+@media screen and (max-width: 200px) {
+  .rrp-page-container {
+    padding: 15px 8px;
+  }
+
+  .rrp-card {
+    padding: 25px 15px;
+    border-radius: 12px;
+  }
+
+  .rrp-main-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+
+  .rrp-form-group {
+    margin-bottom: 18px;
+  }
+
+  .rrp-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .rrp-input {
+    padding: 10px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    border-width: 1px;
+  }
+
+  .rrp-helper-text {
+    font-size: 10px;
+    margin-top: 5px;
+  }
+
+  .rrp-submit-btn {
+    padding: 12px 18px;
+    font-size: 12px;
+    margin-top: 25px;
+    border-radius: 7px;
+  }
+
+  .rrp-btn-spinner {
+    width: 14px;
+    height: 14px;
+  }
+
+  .rrp-info-footer {
+    margin-top: 18px;
+    padding-top: 14px;
+  }
+
+  .rrp-info-text {
+    font-size: 10px;
+  }
+
+  .rrp-spinner {
+    width: 35px;
+    height: 35px;
+    border-width: 3px;
+  }
+
+  .rrp-loading-container p {
+    font-size: 12px;
+  }
+}

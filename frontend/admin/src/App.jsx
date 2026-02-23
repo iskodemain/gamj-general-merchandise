@@ -50,6 +50,7 @@ import BatchList from "./components/Inventory/BatchList.jsx";
 import OrderTransactions from "./components/Transactions/OrderTransactions.jsx";
 import InventoryTransactions from "./components/Transactions/InventoryTransactions.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ReturnRefundPolicy from "./pages/ReturnRefundPolicy.jsx";
 
 //components
 // icon 
@@ -182,9 +183,16 @@ const App = () => {
           <RejectedUsers />
         </ProtectedRoute>
       } /> 
-      <Route path="/settings" element={<ProtectedRoute allowedRoles={['Super Admin']}>
-        <Settings />
-      </ProtectedRoute>} />
+      <Route path="/settings" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <Settings />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/return-refund-policy" element={
+          <ReturnRefundPolicy />
+      } />
+
     </Routes>
    </div>
   )
