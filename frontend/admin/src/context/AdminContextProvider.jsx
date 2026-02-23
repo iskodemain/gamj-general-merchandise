@@ -1339,63 +1339,31 @@ const AdminContextProvider = (props) => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       (error) => {
+
         if (error.response && error.response.status === 401) {
-          const data = error.response.data;
 
-          if (data.forceLogout) {
-            toast.error("Your account has been removed.", { ...toastError });
-            navigate("/login");
+          toast.error("Session expired. Please log in again.", { ...toastError });
 
-            localStorage.removeItem("adminAuthToken");
-            localStorage.removeItem("adminLoginToken");
-            sessionStorage.clear();
+          // Clear everything
+          localStorage.removeItem("adminAuthToken");
+          localStorage.removeItem("adminLoginToken");
+          sessionStorage.clear();
 
-            setToken("");
-            setLoginToken("");
-            setLoginIdentifier("");
+          setToken("");
+          setLoginToken("");
+          setLoginIdentifier("");
+          setCurrentUser(null);
 
-            return Promise.reject(error);
-          }
-
-          if (data.message === "Unauthorized: Token missing or malformed.") {
-            toast.error("Please log in again.", { ...toastError });
-            navigate("/login");
-
-            localStorage.removeItem("adminAuthToken");
-            localStorage.removeItem("adminLoginToken");
-            sessionStorage.clear();
-
-            setToken("");
-            setLoginToken("");
-            setLoginIdentifier("");
-
-            return Promise.reject(error);
-          }
-
-          if (data.message === "Invalid or expired token. Please log in again.") {
-            toast.error("Session expired. Please log in again.", { ...toastError });
-            navigate("/login");
-
-            localStorage.removeItem("adminAuthToken");
-            localStorage.removeItem("adminLoginToken");
-            sessionStorage.clear();
-
-            setToken("");
-            setLoginToken("");
-            setLoginIdentifier("");
-
-            return Promise.reject(error);
-          }
-
+          navigate("/", { replace: true });
         }
 
         return Promise.reject(error);
       }
     );
 
-    // Cleanup interceptor when component unmounts
     return () => axios.interceptors.response.eject(interceptor);
-  }, []);
+
+  }, [navigate]);
 
 
   const value = {
