@@ -80,7 +80,15 @@ function Sidebar({ currentView }) {
           active={currentView === "reports"}
           onClick={() => {navigate("/reports"); setIsSidebarOpen(false)}}
         />
-
+        {
+          ['Super Admin'].includes(currentUser) && 
+          <MenuItem
+            icon={assets.return_policy_icon}
+            label="Return & refund policy"
+            active={currentView === "return refund policy"}
+            onClick={() => {navigate("/return-refund-policy"); setIsSidebarOpen(false);}}
+          />
+        }
         {
           ['Super Admin'].includes(currentUser) && 
           <MenuItem

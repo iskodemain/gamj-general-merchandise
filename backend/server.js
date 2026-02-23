@@ -22,6 +22,7 @@ import cusomerSettingsRouter from './routes/customerSettingsRoute.js';
 import adminInventoryRouter from './routes/admin/adminInventoryRoute.js';
 import adminNotificationRouter from './routes/admin/adminNotificationRoute.js';
 import adminLocationRouter from './routes/admin/adminLocationRoute.js';
+import adminPolicyRoute from './routes/admin/adminPolicyRoute.js';
 import { sequelize } from './config/sequelize.js';
 
 // APP CONFIG
@@ -66,6 +67,7 @@ app.use('/api/settings', adminSettingsRouter);
 app.use('/api/inventory', adminInventoryRouter);
 app.use('/api/admin/notification', adminNotificationRouter);
 app.use('/api/location', adminLocationRouter);
+app.use('/api/return-refund-policy', adminPolicyRoute);
 
 
 // TEST
