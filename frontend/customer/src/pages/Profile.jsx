@@ -198,8 +198,7 @@ const Profile = () => {
         setRejectedCustomer(response.data.user.rejectedCustomer);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message, {...toastError});
+        // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -371,8 +370,7 @@ const Profile = () => {
         setSelectedBarangay(response.data.user.barangayId); 
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message, {...toastError});
+      // ✅ SILENT - Form just shows empty);
     }
   }
   useEffect(() => {
@@ -531,8 +529,7 @@ const Profile = () => {
         setIdentifier(response.data.identifier);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message, {...toastError});
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {

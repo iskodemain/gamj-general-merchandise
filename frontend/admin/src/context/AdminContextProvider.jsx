@@ -107,7 +107,7 @@ const AdminContextProvider = (props) => {
               toast.error(response.data.message, { ...toastError });
           }
       } catch (error) {
-          console.log(error);
+          // ✅ SILENT - Form just shows empty
       }
   }
   useEffect(() => {
@@ -131,7 +131,7 @@ const AdminContextProvider = (props) => {
               toast.error(response.data.message, { ...toastError });
           }
       } catch (error) {
-          console.log(error);
+          // ✅ SILENT - Form just shows empty
       }
   }
   useEffect(() => {
@@ -216,7 +216,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -301,7 +301,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -386,7 +386,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -409,7 +409,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -457,7 +457,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   };
   useEffect(() => {
@@ -590,7 +590,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -613,7 +613,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -637,7 +637,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -836,7 +836,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -883,7 +883,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -949,7 +949,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      console.log(error);
+      // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -1078,8 +1078,7 @@ const AdminContextProvider = (props) => {
                 setFetchReturnRefundOrders(response.data.returnRefundOrders);
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -1100,8 +1099,7 @@ const AdminContextProvider = (props) => {
               setFetchCancelledOrders(response.data.orderCancel);
           }
       } catch (error) {
-          console.log(error);
-          toast.error(error.message, {...toastError});
+          // ✅ SILENT - Form just shows empty
       }
   }
   useEffect(() => {
@@ -1122,8 +1120,7 @@ const AdminContextProvider = (props) => {
               setDeliveryInfoList(response.data.deliveryInfoList);
           }
       } catch (error) {
-          console.log(error);
-          toast.error(error.message, {...toastError});
+          // ✅ SILENT - Form just shows empty
       }
   }
   useEffect(() => {
@@ -1146,8 +1143,7 @@ const AdminContextProvider = (props) => {
             setCurrentUser(response.data.adminUserType); 
         }
     } catch (error) {
-        console.log(error);
-        toast.error(error.message, {...toastError});
+        // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -1168,8 +1164,7 @@ const AdminContextProvider = (props) => {
                 setCustomerList(response.data.customerList);
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -1191,8 +1186,7 @@ const AdminContextProvider = (props) => {
                 setFetchOrderItems(response.data.orderItems);
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, {...toastError});
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -1209,8 +1203,7 @@ const AdminContextProvider = (props) => {
             setProductVariantCombination(response.data.productVariantCombination);
         } 
       } catch (error) {
-          console.log(error);
-          toast.error(error.message, { ...toastError });
+          // ✅ SILENT - Form just shows empty
       }
 
     };
@@ -1228,8 +1221,7 @@ const AdminContextProvider = (props) => {
               setProductVariantValues(response.data.productVariantValues);
           }
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, { ...toastError });
+            // ✅ SILENT - Form just shows empty
         }
     };
     useEffect(() => {
@@ -1247,8 +1239,7 @@ const AdminContextProvider = (props) => {
             setVariantName(response.data.variantName);
         }
       } catch (error) {
-          console.log(error);
-          toast.error(error.message, { ...toastError });
+          // ✅ SILENT - Form just shows empty
       }
     };
     useEffect(() => {
@@ -1314,7 +1305,7 @@ const AdminContextProvider = (props) => {
           setProducts(response.data.products);
       } 
     } catch (error) {
-        console.log(error);
+        // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
@@ -1335,7 +1326,7 @@ const AdminContextProvider = (props) => {
           setProductCategory(response.data.productCategory);
       } 
     } catch (error) {
-        console.log(error);
+        // ✅ SILENT - Form just shows empty
     }
   }
   useEffect(() => {
