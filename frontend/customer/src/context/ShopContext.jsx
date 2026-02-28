@@ -126,7 +126,7 @@ const ShopContextProvider = (props) => {
                 toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -145,7 +145,7 @@ const ShopContextProvider = (props) => {
             toast.error(response.data.message, { ...toastError });
         }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -156,14 +156,14 @@ const ShopContextProvider = (props) => {
     /*---------------------------FETCH BUSINESS INFO DATA-----------------------------*/
     const fetchSettingsData = async () => {
         try {
-        const response = await axios.get(backendUrl + "/api/business-info");
-        if (response.data.success) {
-            setSettingsData(response.data.settingData)
-        } else {
-            toast.error(response.data.message, { ...toastError });
-        }
+            const response = await axios.get(backendUrl + "/api/business-info");
+            if (response.data.success) {
+                setSettingsData(response.data.settingData)
+            } else {
+                toast.error(response.data.message, { ...toastError });
+            }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -183,7 +183,7 @@ const ShopContextProvider = (props) => {
                 setFetchNotifications(response.data.notifications);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -275,7 +275,7 @@ const ShopContextProvider = (props) => {
                 setFetchOrderRefund(response.data.orderRefund);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -345,7 +345,7 @@ const ShopContextProvider = (props) => {
                 setFetchRefundProof(response.data.refundProof);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -479,7 +479,7 @@ const ShopContextProvider = (props) => {
                 setFetchOrderItems(response.data.orderItems);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -502,7 +502,7 @@ const ShopContextProvider = (props) => {
                 setFetchCancelledOrders(response.data.orderCancel);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -574,7 +574,7 @@ const ShopContextProvider = (props) => {
                 setHasDeliveryInfo(false);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -598,7 +598,7 @@ const ShopContextProvider = (props) => {
                 setRejectedCustomer(response.data.user.rejectedCustomer)
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -643,7 +643,7 @@ const ShopContextProvider = (props) => {
                 setProductCategory(response.data.productCategory);
             } 
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty;
         }
     }
     useEffect(() => {
@@ -658,7 +658,7 @@ const ShopContextProvider = (props) => {
                 setProducts(response.data.products);
             } 
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         }
     }
     useEffect(() => {
@@ -673,8 +673,7 @@ const ShopContextProvider = (props) => {
                 setProductVariantCombination(response.data.productVariantCombination);
             } 
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, { ...toastError });
+            // ✅ SILENT - Form just shows empty
         }
     };
     useEffect(() => {
@@ -689,8 +688,7 @@ const ShopContextProvider = (props) => {
                 setProductVariantValues(response.data.productVariantValues);
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, { ...toastError });
+            // ✅ SILENT - Form just shows empty
         }
     };
     useEffect(() => {
@@ -705,8 +703,7 @@ const ShopContextProvider = (props) => {
                 setVariantName(response.data.variantName);
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, { ...toastError });
+            // ✅ SILENT - Form just shows empty
         }
     };
     useEffect(() => {
@@ -728,9 +725,9 @@ const ShopContextProvider = (props) => {
     const handleFetchLocation = async () => {
         try {
             const response = await axios.get(`${backendUrl}/api/customer/location`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             if (response.data.success) {
@@ -739,8 +736,7 @@ const ShopContextProvider = (props) => {
                 setBarangays(response.data.barangays || []);
             } 
         } catch (error) {
-            console.log(error);
-            toast.error(error.message, { ...toastError });
+            // ✅ SILENT - Form just shows empty
         }
     };
 
@@ -806,7 +802,7 @@ const ShopContextProvider = (props) => {
                 setWishListItems(response.data.wishlistItems);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         } 
     }
     useEffect(() => {
@@ -872,7 +868,7 @@ const ShopContextProvider = (props) => {
                 setCartItems(response.data.cartItems);
             }
         } catch (error) {
-            console.log(error);
+            // ✅ SILENT - Form just shows empty
         } 
     }
     useEffect(() => {
