@@ -4,8 +4,7 @@ import { fetchReturnRefundPolicyService, addReturnRefundPolicyService, updateRet
 
 export const fetchReturnRefundPolicy = async (req, res) => {
     try {
-        const { ID } = req.admin;
-        const result = await fetchReturnRefundPolicyService(ID);
+        const result = await fetchReturnRefundPolicyService();
         res.json(result);
     } catch (error) {
         console.log(error);

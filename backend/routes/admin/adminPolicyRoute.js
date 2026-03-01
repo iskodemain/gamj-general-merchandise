@@ -8,7 +8,7 @@ import adminAuth from "../../middleware/adminAuth.js";
 const adminPolicyRoute = express.Router();
 
 // FETCH
-adminPolicyRoute.get('/fetch', adminAuth, fetchReturnRefundPolicy);
+adminPolicyRoute.get('/fetch', fetchReturnRefundPolicy);
 
 // ADD
 adminPolicyRoute.post('/add', adminAuth, addReturnRefundPolicy);
