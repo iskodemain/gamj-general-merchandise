@@ -7,16 +7,8 @@ const withTimestamp = (prefix, number) => {
 };
 
 // 🔹 FETCH RETURN REFUND POLICY (Single Record)
-export const fetchReturnRefundPolicyService = async (adminId) => {
+export const fetchReturnRefundPolicyService = async () => {
     try {
-        const adminUser = await Admin.findByPk(adminId);
-        if (!adminUser) {
-            return {
-                success: false,
-                message: 'User not found'
-            };
-        }
-
         // Fetch the single policy record (first record in table)
         const returnRefundPolicy = await ReturnRefundPolicy.findOne({
             order: [['updatedAt', 'DESC']] // Get the most recently updated policy

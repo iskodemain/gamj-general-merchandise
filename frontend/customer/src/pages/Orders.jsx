@@ -12,7 +12,7 @@ import RejectedRefundModal from '../components/Orders/RejectedRefundModal';
 import OrderProofPayment from '../components/Orders/OrderProofPayment';
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId, fetchReturnRefundPolicy } = useContext(ShopContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [timeUpdated, setTimeUpdated] = useState(Date.now());
@@ -165,24 +165,26 @@ function Orders() {
 
   const isReturnValid = (deliveredDate) => {
     if (!deliveredDate) return false;
+    const validDays = fetchReturnRefundPolicy?.returnRefundDays || 0;
     const deliveryDate = new Date(deliveredDate);
     deliveryDate.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const diffDays = Math.floor((today - deliveryDate) / (1000 * 60 * 60 * 24));
-    return diffDays >= 0 && diffDays <= 7;
+    return diffDays >= 0 && diffDays <= validDays;
   };
 
 
   const getReturnDaysLeft = (deliveredDate) => {
     if (!deliveredDate) return null;
+    const validDays = fetchReturnRefundPolicy?.returnRefundDays || 0;
     const deliveryDate = new Date(deliveredDate);
     deliveryDate.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const diffDays = Math.floor((today - deliveryDate) / (1000 * 60 * 60 * 24));
-    const daysLeft = 7 - diffDays;
-    return daysLeft > 0 && daysLeft <= 7 ? daysLeft : 0;
+    const daysLeft = validDays - diffDays;
+    return daysLeft > 0 && daysLeft <= validDays ? daysLeft : 0;
   };
 
   useEffect(() => {

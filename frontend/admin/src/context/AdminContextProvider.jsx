@@ -179,14 +179,10 @@ const AdminContextProvider = (props) => {
     }
   };
 
-  /*---------------------------FETCH ORDER PROOF OF PAYMENT-----------------------------*/
+  /*---------------------------FETCH RETUNR AND REFUND POLICY-----------------------------*/
   const handleFetchReturnRefundPolicy = async () => {
       try {
-          const response = await axios.get(backendUrl + "/api/return-refund-policy/fetch", {
-              headers: {
-              Authorization: `Bearer ${token}`
-              }
-          });
+          const response = await axios.get(backendUrl + "/api/return-refund-policy/fetch");
           if (response.data.success) {
               setFetchReturnRefundPolicy(response.data.returnRefundPolicy)
           } else {
@@ -197,10 +193,8 @@ const AdminContextProvider = (props) => {
       }
   }
   useEffect(() => {
-      if (token) {
-          handleFetchReturnRefundPolicy();
-      }
-  }, [token]);
+    handleFetchReturnRefundPolicy();
+  }, []);
 
 
   /*---------------------------FETCH ORDER PROOF OF PAYMENT-----------------------------*/
