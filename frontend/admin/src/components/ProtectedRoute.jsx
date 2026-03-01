@@ -10,6 +10,10 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
         return <Navigate to="/" replace />;
     }
 
+    if (currentUser === null) {
+        return null; // or loading spinner
+    }
+
     if (allowedRoles.length === 0) {
         return children;
     }

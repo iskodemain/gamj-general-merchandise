@@ -4,11 +4,11 @@ import { assets } from "../assets/assets.js";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 
 function Sidebar({ currentView }) {
-    const { setIsSidebarOpen, navigate, adminProfileInfo, currentUser } = useContext(AdminContext);
+    const { setIsSidebarOpen, adminProfileInfo, currentUser } = useContext(AdminContext);
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header" onClick={() => {navigate("/profile"); setIsSidebarOpen(false)}}>
+      <div className="sidebar-header" onClick={() => {window.location.href = "/profile"; setIsSidebarOpen(false)}}>
 
         <div className="sidebar-toggle-arrow" 
           onClick={(e) => {
@@ -30,31 +30,31 @@ function Sidebar({ currentView }) {
           icon={assets.overview_icon}
           label="Overview"
           active={currentView === "overview"}
-          onClick={() => {navigate("/overview"); setIsSidebarOpen(false)}}
+          onClick={() => {window.location.href = "/overview"; setIsSidebarOpen(false)}}
         />
         <MenuItem
           icon={assets.products_icon}
           label="Products"
           active={currentView === "products"}
-          onClick={() => {navigate("/products"); setIsSidebarOpen(false);}}
+          onClick={() => {window.location.href = "/products"; setIsSidebarOpen(false);}}
         />
         <MenuItem
           icon={assets.inventory_icon}
           label="Inventory"
           active={currentView === "inventory"}
-          onClick={() => {navigate("/inventory"); setIsSidebarOpen(false)}}
+          onClick={() => {window.location.href = "/inventory"; setIsSidebarOpen(false)}}
         />
         <MenuItem
           icon={assets.orders_icon}
           label="Orders"
           active={currentView === "orders"}
-          onClick={() => {navigate("/orders"); setIsSidebarOpen(false);}}
+          onClick={() => {window.location.href = "/orders"; setIsSidebarOpen(false);}}
         />
         <MenuItem
           icon={assets.transaction_icon}
           label="Transactions"
           active={currentView === "transactions"}
-          onClick={() => {navigate("/transactions"); setIsSidebarOpen(false)}}
+          onClick={() => {window.location.href = "/transactions"; setIsSidebarOpen(false)}}
         />
         {
           ['Super Admin'].includes(currentUser) && 
@@ -62,7 +62,7 @@ function Sidebar({ currentView }) {
             icon={assets.staff_icon}
             label="User Management"
             active={currentView === "user management"}
-            onClick={() => {navigate("/user-management"); setIsSidebarOpen(false)}}
+            onClick={() => {window.location.href = "/user-management"; setIsSidebarOpen(false)}}
           />
         }
         {
@@ -71,14 +71,14 @@ function Sidebar({ currentView }) {
             icon={assets.dl_icon}
             label="Delivery Locations"
             active={currentView === "delivery locations"}
-            onClick={() => {navigate("/delivery-locations"); setIsSidebarOpen(false)}}
+            onClick={() => {window.location.href = "/delivery-locations"; setIsSidebarOpen(false)}}
           />
         }
         <MenuItem
           icon={assets.reports_icon}
           label="Reports"
           active={currentView === "reports"}
-          onClick={() => {navigate("/reports"); setIsSidebarOpen(false)}}
+          onClick={() => {window.location.href = "/reports"; setIsSidebarOpen(false)}}
         />
         {
           ['Super Admin'].includes(currentUser) && 
@@ -86,7 +86,7 @@ function Sidebar({ currentView }) {
             icon={assets.return_policy_icon}
             label="Return & refund policy"
             active={currentView === "return refund policy"}
-            onClick={() => {navigate("/return-refund-policy"); setIsSidebarOpen(false);}}
+            onClick={() => {window.location.href = "/return-refund-policy"; setIsSidebarOpen(false);}}
           />
         }
         {
@@ -95,7 +95,7 @@ function Sidebar({ currentView }) {
             icon={assets.settings_icon}
             label="Settings"
             active={currentView === "settings"}
-            onClick={() => {navigate("/settings"); setIsSidebarOpen(false);}}
+            onClick={() => {window.location.href = "/settings"; setIsSidebarOpen(false);}}
           />
         }
       </nav>

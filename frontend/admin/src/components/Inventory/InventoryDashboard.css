@@ -27,17 +27,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.stat-card-ok {
-  border-left-color: #27ae60;
-}
-
-.stat-card-low {
-  border-left-color: #f39c12;
-}
-
-.stat-card-out {
-  border-left-color: #e74c3c;
-}
+.stat-card-ok  { border-left-color: #27ae60; }
+.stat-card-low { border-left-color: #f39c12; }
+.stat-card-out { border-left-color: #e74c3c; }
 
 .stat-label {
   font-size: 13px;
@@ -121,14 +113,8 @@
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.add-stock-btn:hover {
-  background-color: #7ED957;
-  transform: translateY(-1px);
-}
-
-.add-stock-btn:active {
-  transform: translateY(0);
-}
+.add-stock-btn:hover  { background-color: #7ED957; transform: translateY(-1px); }
+.add-stock-btn:active { transform: translateY(0); }
 
 /* ==================== Results Count ==================== */
 .results-count {
@@ -178,26 +164,13 @@
   transition: background-color 0.2s ease;
 }
 
-.inventory-table tbody tr:hover {
-  background-color: #f8f9fa;
-}
+.inventory-table tbody tr:hover { background-color: #f8f9fa; }
 
 /* Row Status Colors */
-.low-row {
-  background-color: #fff3cd;
-}
-
-.low-row:hover {
-  background-color: #ffe69c;
-}
-
-.out-row {
-  background-color: #f8d7da;
-}
-
-.out-row:hover {
-  background-color: #f5c2c7;
-}
+.low-row       { background-color: #fff3cd; }
+.low-row:hover { background-color: #ffe69c; }
+.out-row       { background-color: #f8d7da; }
+.out-row:hover { background-color: #f5c2c7; }
 
 /* ==================== Product Image ==================== */
 .prod-img {
@@ -228,20 +201,9 @@
   text-align: center;
 }
 
-.status-ok {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.status-low {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status-out {
-  background-color: #f8d7da;
-  color: #721c24;
-}
+.status-ok  { background-color: #d4edda; color: #155724; }
+.status-low { background-color: #fff3cd; color: #856404; }
+.status-out { background-color: #f8d7da; color: #721c24; }
 
 /* ==================== Action Buttons ==================== */
 .action-btn {
@@ -255,31 +217,13 @@
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.action-btn:hover {
-  transform: translateY(-1px);
-}
+.action-btn:hover  { transform: translateY(-1px); }
+.action-btn:active { transform: translateY(0); }
 
-.action-btn:active {
-  transform: translateY(0);
-}
-
-.action-btn-primary {
-  background-color: #43A047;
-  color: white;
-}
-
-.action-btn-primary:hover {
-  background-color: #7ED957;
-}
-
-.action-btn-secondary {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.action-btn-secondary:hover {
-  background-color: #7f8c8d;
-}
+.action-btn-primary        { background-color: #43A047; color: white; }
+.action-btn-primary:hover  { background-color: #7ED957; }
+.action-btn-secondary      { background-color: #95a5a6; color: white; }
+.action-btn-secondary:hover{ background-color: #7f8c8d; }
 
 /* ==================== No Results ==================== */
 .no-results {
@@ -287,6 +231,304 @@
   padding: 40px;
   font-size: 16px;
   color: #7f8c8d;
+}
+
+/* ==================== Low Threshold Column Header ==================== */
+.th-threshold-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* The ⚙ settings icon button in the table header */
+.threshold-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(73, 80, 87, 0.3);
+  border-radius: 6px;
+  color: #495057;
+  cursor: pointer;
+  padding: 3px 5px;
+  font-size: 13px;
+  line-height: 1;
+  transition: background 0.2s, border-color 0.2s, transform 0.25s;
+  flex-shrink: 0;
+}
+
+.threshold-settings-btn:hover {
+  background: #43A047;
+  border-color: #43A047;
+  color: #fff;
+}
+
+
+/* ==================== Threshold Modal — Overlay ==================== */
+.threshold-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.50);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: overlayIn 0.2s ease;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ==================== Threshold Modal — Box ==================== */
+.threshold-modal {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+  width: 100%;
+  max-width: 460px;
+  min-width: 200px;        /* handles very small screens */
+  padding: 26px 24px 22px;
+  box-sizing: border-box;
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);    }
+}
+
+/* Modal Header row */
+.threshold-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.threshold-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.threshold-modal-header-icon {
+  font-size: 20px;
+  color: #f39c12;
+  flex-shrink: 0;
+}
+
+.threshold-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.threshold-modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 17px;
+  color: #adb5bd;
+  cursor: pointer;
+  padding: 2px 7px;
+  border-radius: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s;
+}
+
+.threshold-modal-close-btn:hover {
+  color: #2c3e50;
+  background: #f1f3f5;
+}
+
+.threshold-modal-close-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.threshold-modal-subtitle {
+  font-size: 13px;
+  color: #6c757d;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+/* ==================== Threshold Modal — Form ==================== */
+.threshold-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.threshold-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.threshold-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.threshold-required {
+  color: #e74c3c;
+  margin-left: 2px;
+}
+
+.threshold-select,
+.threshold-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2c3e50;
+  background: #f8f9fa;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.threshold-select:focus,
+.threshold-input:focus {
+  border-color: #43A047;
+  box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.12);
+  background: #fff;
+}
+
+.threshold-select:disabled,
+.threshold-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.threshold-hint {
+  font-size: 11.5px;
+  color: #adb5bd;
+  line-height: 1.4;
+}
+
+/* ==================== Threshold Modal — Action Buttons ==================== */
+.threshold-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.threshold-btn {
+  padding: 9px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  min-width: 90px;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s;
+}
+
+.threshold-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.threshold-btn-cancel {
+  background: #f1f3f5;
+  color: #495057;
+}
+.threshold-btn-cancel:hover:not(:disabled) {
+  background: #dee2e6;
+}
+
+.threshold-btn-submit {
+  background: #43A047;
+  color: #fff;
+}
+.threshold-btn-submit:hover:not(:disabled) {
+  background: #388E3C;
+  transform: translateY(-1px);
+}
+.threshold-btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* InventoryDashboard.css - Add these new styles */
+
+/* Threshold cell with edit button */
+.threshold-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.edit-threshold-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 4px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.edit-threshold-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+/* Modal actions layout */
+.threshold-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.threshold-modal-actions-right {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.threshold-btn-delete {
+  background: #f44336;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.threshold-btn-delete:hover:not(:disabled) {
+  background: #da190b;
+}
+
+.threshold-select:disabled,
+.threshold-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* ==================== Responsive Design ==================== */
@@ -332,6 +574,21 @@
     font-size: 11px;
     padding: 5px 10px;
   }
+
+  /* Modal adjustments for tablets/phones */
+  .threshold-modal {
+    padding: 20px 16px 18px;
+    border-radius: 12px;
+  }
+
+  .threshold-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .threshold-btn {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -341,5 +598,40 @@
 
   .stat-value {
     font-size: 28px;
+  }
+
+  .threshold-modal-title {
+    font-size: 15px;
+  }
+
+  .threshold-select,
+  .threshold-input {
+    font-size: 13px;
+  }
+}
+
+/* Minimum 200px mobile support */
+@media (max-width: 240px) {
+  .threshold-overlay {
+    padding: 8px;
+  }
+
+  .threshold-modal {
+    padding: 14px 10px;
+  }
+
+  .threshold-modal-title {
+    font-size: 13px;
+  }
+
+  .threshold-select,
+  .threshold-input {
+    font-size: 12px;
+    padding: 7px 8px;
+  }
+
+  .threshold-btn {
+    font-size: 12px;
+    padding: 8px 12px;
   }
 }

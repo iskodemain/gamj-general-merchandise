@@ -58,7 +58,9 @@ function PlaceOrder() {
       setLoading(true); 
       const success = await addOrder(paymentMethod, orderItems, cartItemsToDelete);
       setLoading(false); 
-      if (success) navigate('/orders');
+      if (success) {
+        window.location.href = "/orders"
+      }
     }
 
     if (paymentMethod === "Paypal") {

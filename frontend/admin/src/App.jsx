@@ -190,7 +190,9 @@ const App = () => {
       } />
 
       <Route path="/return-refund-policy" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
           <ReturnRefundPolicy />
+        </ProtectedRoute>
       } />
 
     </Routes>

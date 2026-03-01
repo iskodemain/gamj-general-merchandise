@@ -92,7 +92,7 @@ const PaypalModal = () => {
                 if (capture.data?.success) {
                   toast.success("Payment successful!");
                   handleClose();
-                  navigate("/orders");
+                  window.location.href = "/orders";
                 } else {
                   toast.error("Payment failed, please try again.");
                 }
