@@ -1,106 +1,277 @@
-import { useContext, useState, useMemo } from 'react';
+import { useContext, useState, useMemo, useEffect } from 'react';
 import './InventoryDashboard.css';
 import Navbar from '../Navbar';
 import { AdminContext } from '../../context/AdminContextProvider';
+import { FiSettings, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import Loading from '../Loading.jsx';
 
 export default function InventoryDashboard() {
-  const { navigate, fetchInventoryStock, products, productVariantValues, productVariantCombination, currentUser } = useContext(AdminContext);
+  const {
+    navigate,
+    fetchInventoryStock,
+    products,
+    productVariantValues,
+    productVariantCombination,
+    currentUser,
+    toastError,
+    toastSuccess,
+    fetchInventorySettings,
+    addInventorySettings,
+    updateInventorySettings,
+    deleteInventorySettings
+  } = useContext(AdminContext);
 
-  // State for filters
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('product'); // product, stock-asc, stock-desc, status
-  const [filterStatus, setFilterStatus] = useState('all'); // all, low, ok, out
+  const [sortBy, setSortBy] = useState('product'); 
+  const [filterStatus, setFilterStatus] = useState('all'); 
+  const [loading, setLoading] = useState(false); 
 
-  // Helper functions
+  // Modal states
+  const [showModal, setShowModal] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingSettingsId, setEditingSettingsId] = useState(null);
+  const [thresholdProduct, setThresholdProduct] = useState('');
+  const [thresholdVariant, setThresholdVariant] = useState('');
+  const [thresholdCombo, setThresholdCombo] = useState('');
+  const [lowStockThreshold, setLowStockThreshold] = useState('');
+  const [thresholdLoading, setThresholdLoading] = useState(false);
+
+  const selectedProductData = products.find(p => p.ID === Number(thresholdProduct));
+  const hasVariants = selectedProductData?.hasVariant;
+  const hasVariantCombination = selectedProductData?.hasVariantCombination;
+
+  useEffect(() => {
+    if (!isEditMode) {
+      setThresholdVariant('');
+      setThresholdCombo('');
+    }
+  }, [thresholdProduct, isEditMode]);
+
+  // ✅ Helper: Find threshold for a stock item
+  const getThresholdForStock = (stock) => {
+    const setting = fetchInventorySettings.find(s => 
+      s.productId === stock.productId &&
+      s.variantValueId === stock.variantValueId &&
+      s.variantCombinationId === stock.variantCombinationId
+    );
+    return setting;
+  };
+
   const resolveVariant = (stock) => {
     if (stock.variantCombinationId) {
       const combo = productVariantCombination.find(c => c.ID === stock.variantCombinationId);
-      return combo ? combo.combinations : "-";
+      return combo ? combo.combinations : '-';
     }
     if (stock.variantValueId) {
       const single = productVariantValues.find(v => v.ID === stock.variantValueId);
-      return single ? single.value : "-";
+      return single ? single.value : '-';
     }
-    return "-";
+    return '-';
   };
 
   const resolveProductName = (id) => {
     const p = products.find(pr => pr.ID === id);
-    return p ? p.productName : "Unknown";
+    return p ? p.productName : 'Unknown';
   };
 
-  const computeStatus = (qty, threshold) => {
-    if (qty === 0) return "OUT";
-    return qty <= threshold ? "LOW" : "OK";
+  const computeStatus = (qty, thresholdSettings) => {
+    if (qty === 0) return 'OUT';
+    if (!thresholdSettings) return 'OK'; // No threshold set
+    return qty <= thresholdSettings.lowStockThreshold ? 'LOW' : 'OK';
   };
 
-  // Filtered and sorted data
+  // ── Filtered & Sorted Data ───────────────────────────────────────────────
   const filteredAndSortedData = useMemo(() => {
     let result = [...fetchInventoryStock];
 
-    // Apply search filter
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       result = result.filter(stock => {
         const productName = resolveProductName(stock.productId).toLowerCase();
-        const variant = resolveVariant(stock).toLowerCase();
+        const variant     = resolveVariant(stock).toLowerCase();
         return productName.includes(search) || variant.includes(search);
       });
     }
 
-    // Apply status filter
     if (filterStatus !== 'all') {
       result = result.filter(stock => {
-        const status = computeStatus(stock.totalQuantity, stock.lowStockThreshold);
+        const thresholdSettings = getThresholdForStock(stock);
+        const status = computeStatus(stock.totalQuantity, thresholdSettings);
         return status.toLowerCase() === filterStatus.toLowerCase();
       });
     }
 
-    // Apply sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'product':
           return resolveProductName(a.productId).localeCompare(resolveProductName(b.productId));
-        
         case 'stock-asc':
           return a.totalQuantity - b.totalQuantity;
-        
         case 'stock-desc':
           return b.totalQuantity - a.totalQuantity;
-        
-        case 'status':
-          const statusA = computeStatus(a.totalQuantity, a.lowStockThreshold);
-          const statusB = computeStatus(b.totalQuantity, b.lowStockThreshold);
+        case 'status': {
           const statusOrder = { OUT: 0, LOW: 1, OK: 2 };
-          return statusOrder[statusA] - statusOrder[statusB];
-        
+          const thresholdA = getThresholdForStock(a);
+          const thresholdB = getThresholdForStock(b);
+          return statusOrder[computeStatus(a.totalQuantity, thresholdA)]
+               - statusOrder[computeStatus(b.totalQuantity, thresholdB)];
+        }
         default:
           return 0;
       }
     });
 
     return result;
-  }, [fetchInventoryStock, searchTerm, sortBy, filterStatus, products, productVariantValues, productVariantCombination]);
+  }, [fetchInventoryStock, searchTerm, sortBy, filterStatus, products, productVariantValues, productVariantCombination, fetchInventorySettings]);
 
-  // Statistics
+  // ── Statistics ───────────────────────────────────────────────────────────
   const stats = useMemo(() => {
     const total = fetchInventoryStock.length;
-    const low = fetchInventoryStock.filter(s => computeStatus(s.totalQuantity, s.lowStockThreshold) === "LOW").length;
+    const low = fetchInventoryStock.filter(s => {
+      const thresholdSettings = getThresholdForStock(s);
+      return computeStatus(s.totalQuantity, thresholdSettings) === 'LOW';
+    }).length;
     const out = fetchInventoryStock.filter(s => s.totalQuantity === 0).length;
-    const ok = total - low - out;
+    const ok  = total - low - out;
     return { total, low, out, ok };
-  }, [fetchInventoryStock]);
+  }, [fetchInventoryStock, fetchInventorySettings]);
 
-  const handleAddStock = () => {
-    navigate("inventory/add");
+  // ── Modal Helpers ────────────────────────────────────────────────────────
+  const openAddModal = () => {
+    setIsEditMode(false);
+    setEditingSettingsId(null);
+    setThresholdProduct('');
+    setThresholdVariant('');
+    setThresholdCombo('');
+    setLowStockThreshold('');
+    setShowModal(true);
   };
 
+  const openEditModal = (stock) => {
+    const thresholdSettings = getThresholdForStock(stock);
+    if (!thresholdSettings) return;
 
+    setIsEditMode(true);
+    setEditingSettingsId(thresholdSettings.ID);
+    setThresholdProduct(String(stock.productId));
+    setThresholdVariant(stock.variantValueId ? String(stock.variantValueId) : '');
+    setThresholdCombo(stock.variantCombinationId ? String(stock.variantCombinationId) : '');
+    setLowStockThreshold(String(thresholdSettings.lowStockThreshold));
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setIsEditMode(false);
+    setEditingSettingsId(null);
+  };
+
+  const isFormValid = () => {
+    if (!thresholdProduct) return false;
+    if (lowStockThreshold === '' || Number(lowStockThreshold) < 1) return false;
+    if (!isEditMode) {
+      if (hasVariantCombination && !thresholdCombo) return false;
+      if (hasVariants && !hasVariantCombination && !thresholdVariant) return false;
+    }
+    return true;
+  };
+
+  // ✅ ADD/UPDATE HANDLER
+  const handleThresholdSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!thresholdProduct) {
+      toast.error('Please select a product', { ...toastError });
+      return;
+    }
+    if (lowStockThreshold === '' || Number(lowStockThreshold) < 1) {
+      toast.error('Please enter a valid low stock threshold.', { ...toastError });
+      return;
+    }
+
+    if (!isEditMode) {
+      if (hasVariantCombination && !thresholdCombo) {
+        toast.error('This product requires a variant combination', { ...toastError });
+        return;
+      }
+      if (hasVariants && !hasVariantCombination && !thresholdVariant) {
+        toast.error('This product requires a variant selection', { ...toastError });
+        return;
+      }
+    }
+
+    setThresholdLoading(true);
+    setLoading(true);
+
+    let result;
+
+    if (isEditMode) {
+      // UPDATE
+      const payload = {
+        productInventorySettingsID: editingSettingsId,
+        lowStockThreshold: Number(lowStockThreshold),
+      };
+      result = await updateInventorySettings(payload);
+    } else {
+      // ADD
+      const payload = {
+        productId: Number(thresholdProduct),
+        variantValueId: thresholdVariant ? Number(thresholdVariant) : null,
+        variantCombinationId: thresholdCombo ? Number(thresholdCombo) : null,
+        lowStockThreshold: Number(lowStockThreshold),
+      };
+      result = await addInventorySettings(payload);
+    }
+
+    if (result) {
+      toast.success(isEditMode ? 'Threshold updated successfully!' : 'Threshold added successfully!', { ...toastSuccess });
+      closeModal();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+
+    setThresholdLoading(false);
+    setLoading(false);
+  };
+
+  // ✅ DELETE HANDLER
+  const handleDeleteThreshold = async () => {
+    if (!editingSettingsId) return;
+
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this threshold setting? This action cannot be undone.'
+    );
+
+    if (!confirmDelete) return;
+
+    setThresholdLoading(true);
+    setLoading(true);
+
+    const result = await deleteInventorySettings(editingSettingsId);
+
+    if (result) {
+      toast.success('Threshold deleted successfully!', { ...toastSuccess });
+      closeModal();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } 
+    setThresholdLoading(false);
+    setLoading(false);
+  };
+
+  const isAdminUser = ['Super Admin', 'Admin'].includes(currentUser);
+
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <>
+      {loading && <Loading />}
       <Navbar TitleName="Inventory Dashboard" />
 
       <div className="inventory-dashboard-container">
+
         {/* Statistics Cards */}
         <div className="stats-container">
           <div className="stat-card">
@@ -123,7 +294,6 @@ export default function InventoryDashboard() {
 
         {/* Controls Bar */}
         <div className="controls-bar">
-          {/* Search */}
           <input
             type="text"
             placeholder="🔍 Search products or variants..."
@@ -132,11 +302,9 @@ export default function InventoryDashboard() {
             className="search-input"
           />
 
-          {/* Filters & Sort */}
           <div className="right-controls">
-            {/* Filter by Status */}
-            <select 
-              value={filterStatus} 
+            <select
+              value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="filter-select"
             >
@@ -146,9 +314,8 @@ export default function InventoryDashboard() {
               <option value="out">❌ Out of Stock</option>
             </select>
 
-            {/* Sort */}
-            <select 
-              value={sortBy} 
+            <select
+              value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="sort-select"
             >
@@ -158,14 +325,11 @@ export default function InventoryDashboard() {
               <option value="status">Sort: Status (Critical First)</option>
             </select>
 
-            {/* Add Stock Button */}
-            {
-              ['Super Admin', 'Admin'].includes(currentUser) &&
-              <button onClick={handleAddStock} className="add-stock-btn">
+            {isAdminUser && (
+              <button onClick={() => navigate('inventory/add')} className="add-stock-btn">
                 + Add Stock
               </button>
-            }
-            
+            )}
           </div>
         </div>
 
@@ -184,7 +348,21 @@ export default function InventoryDashboard() {
                 <th>Product</th>
                 <th>Variant</th>
                 <th>Stock</th>
-                <th>Low Threshold</th>
+                <th>
+                  <div className="th-threshold-wrap">
+                    <span>Low Threshold</span>
+                    {isAdminUser && (
+                      <button
+                        className="threshold-settings-btn"
+                        onClick={openAddModal}
+                        title="Set Low Stock Threshold"
+                        aria-label="Open low stock threshold settings"
+                      >
+                        <FiSettings />
+                      </button>
+                    )}
+                  </div>
+                </th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -193,36 +371,49 @@ export default function InventoryDashboard() {
               {filteredAndSortedData.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="no-results">
-                    {searchTerm || filterStatus !== 'all' 
-                      ? '🔍 No items match your filters' 
+                    {searchTerm || filterStatus !== 'all'
+                      ? '🔍 No items match your filters'
                       : 'No inventory data available'}
                   </td>
                 </tr>
               ) : (
                 filteredAndSortedData.map(stock => {
                   const product = products.find(p => p.ID === stock.productId);
-                  const image = product?.images?.[0] || 'https://via.placeholder.com/50';
-                  const status = computeStatus(stock.totalQuantity, stock.lowStockThreshold);
-                  
+                  const image   = product?.images?.[0] || 'https://via.placeholder.com/50';
+                  const thresholdSettings = getThresholdForStock(stock);
+                  const status  = computeStatus(stock.totalQuantity, thresholdSettings);
+
                   return (
-                    <tr key={stock.ID} className={`${status === "OUT" ? "out-row" : ""} ${status === "LOW" ? "low-row" : ""}`.trim()}>
-                      <td>
-                        {stock.inventoryStockId}
-                      </td>
+                    <tr
+                      key={stock.ID}
+                      className={`${status === 'OUT' ? 'out-row' : ''} ${status === 'LOW' ? 'low-row' : ''}`.trim()}
+                    >
+                      <td>{stock.inventoryStockId}</td>
                       <td>
                         <img src={image} alt="product" className="prod-img" />
                       </td>
-                      <td>
-                        <strong>{resolveProductName(stock.productId)}</strong>
-                      </td>
+                      <td><strong>{resolveProductName(stock.productId)}</strong></td>
                       <td>{resolveVariant(stock)}</td>
                       <td>
                         <span className="stock-badge">{stock.totalQuantity}</span>
                       </td>
-                      <td>{stock.lowStockThreshold}</td>
+                      <td>
+                        <div className="threshold-cell">
+                          <span>{thresholdSettings ? thresholdSettings.lowStockThreshold : '-'}</span>
+                          {thresholdSettings && isAdminUser && (
+                            <button
+                              className="edit-threshold-btn"
+                              onClick={() => openEditModal(stock)}
+                              title="Edit threshold"
+                            >
+                              <FiEdit2 />
+                            </button>
+                          )}
+                        </div>
+                      </td>
                       <td>
                         <span className={`status-badge status-${status.toLowerCase()}`}>
-                          {status === "OUT" ? "❌ OUT" : status === "LOW" ? "⚠️ LOW" : "✅ OK"}
+                          {status === 'OUT' ? '❌ OUT' : status === 'LOW' ? '⚠️ LOW' : '✅ OK'}
                         </span>
                       </td>
                     </tr>
@@ -233,6 +424,191 @@ export default function InventoryDashboard() {
           </table>
         </div>
       </div>
+
+      {/* ── Low Stock Threshold Modal ───────────────────────────────────────── */}
+      {showModal && (
+        <div
+          className="threshold-overlay"
+          onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="threshold-modal-title"
+        >
+          <div className="threshold-modal" onClick={(e) => e.stopPropagation()}>
+
+            {/* Header */}
+            <div className="threshold-modal-header">
+              <div className="threshold-modal-title-group">
+                {isEditMode ? <FiEdit2 className="threshold-modal-header-icon" /> : <FiSettings className="threshold-modal-header-icon" />}
+                <h2 id="threshold-modal-title" className="threshold-modal-title">
+                  {isEditMode ? 'Edit Low Stock Threshold' : 'Add Low Stock Threshold'}
+                </h2>
+              </div>
+              <button
+                className="threshold-modal-close-btn"
+                onClick={closeModal}
+                aria-label="Close modal"
+                disabled={thresholdLoading}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="threshold-modal-subtitle">
+              {isEditMode 
+                ? 'Update the minimum quantity before this product is flagged as low stock.'
+                : 'Configure the minimum quantity before a product is flagged as low stock.'}
+            </p>
+
+            {/* Form */}
+            <form className="threshold-form" onSubmit={handleThresholdSubmit} >
+
+              {/* Product dropdown */}
+              <div className="threshold-form-group">
+                <label className="threshold-label" htmlFor="t-product">
+                  Product <span className="threshold-required">*</span>
+                </label>
+                <select
+                  id="t-product"
+                  className="threshold-select"
+                  value={thresholdProduct}
+                  onChange={(e) => setThresholdProduct(e.target.value)}
+                  disabled={thresholdLoading || isEditMode}
+                >
+                  <option value="">-- Select Product --</option>
+                  {products.map((p) => {
+                    const isSimpleProduct = !p.hasVariant && !p.hasVariantCombination;
+                    const alreadyExists = isSimpleProduct && fetchInventorySettings.some(
+                      s => s.productId === p.ID && !s.variantValueId && !s.variantCombinationId
+                    );
+                    return (
+                      <option key={p.ID} value={p.ID} disabled={alreadyExists}>
+                        {p.productName}{alreadyExists ? ' (already set)' : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              {/* Single variant dropdown */}
+              {thresholdProduct && hasVariants && !hasVariantCombination && (
+                <div className="threshold-form-group">
+                  <label className="threshold-label" htmlFor="t-variant">
+                    Variant <span className="threshold-required">*</span>
+                  </label>
+                  <select
+                    id="t-variant"
+                    className="threshold-select"
+                    value={thresholdVariant}
+                    onChange={(e) => setThresholdVariant(e.target.value)}
+                    disabled={thresholdLoading || isEditMode}
+                  >
+                    <option value="">-- Select Variant --</option>
+                    {productVariantValues
+                      .filter((v) => v.productId === Number(thresholdProduct))
+                      .map((v) => {
+                        const alreadyExists = fetchInventorySettings.some(
+                          s => s.productId === Number(thresholdProduct) && s.variantValueId === v.ID
+                        );
+                        return (
+                          <option key={v.ID} value={v.ID} disabled={alreadyExists}>
+                            {v.value}{alreadyExists ? ' (already set)' : ''}
+                          </option>
+                        );
+                      })}
+                  </select>
+                </div>
+              )}
+
+              {/* Variant combination dropdown */}
+              {thresholdProduct && hasVariantCombination && (
+                <div className="threshold-form-group">
+                  <label className="threshold-label" htmlFor="t-combo">
+                    Variant Combination <span className="threshold-required">*</span>
+                  </label>
+                  <select
+                    id="t-combo"
+                    className="threshold-select"
+                    value={thresholdCombo}
+                    onChange={(e) => setThresholdCombo(e.target.value)}
+                    disabled={thresholdLoading || isEditMode}
+                  >
+                    <option value="">-- Select Combination --</option>
+                    {productVariantCombination
+                      .filter((c) => c.productId === Number(thresholdProduct))
+                      .map((c) => {
+                        const alreadyExists = fetchInventorySettings.some(
+                          s => s.productId === Number(thresholdProduct) && s.variantCombinationId === c.ID
+                        );
+                        return (
+                          <option key={c.ID} value={c.ID} disabled={alreadyExists}>
+                            {c.combinations}{alreadyExists ? ' (already set)' : ''}
+                          </option>
+                        );
+                      })}
+                  </select>
+                </div>
+              )}
+
+              {/* Low Stock Threshold input */}
+              <div className="threshold-form-group">
+                <label className="threshold-label" htmlFor="t-threshold">
+                  Low Stock Threshold <span className="threshold-required">*</span>
+                </label>
+                <input
+                  id="t-threshold"
+                  type="number"
+                  className="threshold-input"
+                  value={lowStockThreshold}
+                  onChange={(e) => setLowStockThreshold(e.target.value)}
+                  placeholder="e.g. 10"
+                  min="1"
+                  disabled={thresholdLoading}
+                />
+                <span className="threshold-hint">
+                  Stock at or below this number will be flagged as ⚠️ LOW.
+                </span>
+              </div>
+
+              {/* Action buttons */}
+              <div className="threshold-modal-actions">
+                {isEditMode && (
+                  <button
+                    type="button"
+                    className="threshold-btn threshold-btn-delete"
+                    onClick={handleDeleteThreshold}
+                    disabled={thresholdLoading}
+                  >
+                    <FiTrash2 /> Delete
+                  </button>
+                )}
+                <div className="threshold-modal-actions-right">
+                  <button
+                    type="button"
+                    className="threshold-btn threshold-btn-cancel"
+                    onClick={closeModal}
+                    disabled={thresholdLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="threshold-btn threshold-btn-submit"
+                    disabled={thresholdLoading || !isFormValid()}
+                  >
+                    {thresholdLoading 
+                      ? 'Saving...' 
+                      : isEditMode 
+                        ? 'Save Changes' 
+                        : 'Add Threshold'}
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

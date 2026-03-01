@@ -42,8 +42,8 @@ function Navbar({TitleName}) {
           </div>
 
           <div className="navbar-icons">
-            <button onClick={() => navigate("/settings")}><img src={assets.settings_icon} alt="Setings"className="navbar-icon"/></button>
-            <button onClick={() => navigate("/notifications")}><img src={assets.notification_icon} alt="Notifications"className="navbar-icon"/></button>
+            <button onClick={() => window.location.href = "/settings"}><img src={assets.settings_icon} alt="Setings"className="navbar-icon"/></button>
+            <button onClick={() => window.location.href = "/notifications"}><img src={assets.notification_icon} alt="Notifications"className="navbar-icon"/></button>
             <button onClick={() => logout()}><img src={assets.logout_icon} alt="Logout" className="navbar-icon"/></button>
           </div>
         </div>

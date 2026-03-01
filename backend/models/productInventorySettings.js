@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/sequelize.js";
 
-const InventoryStock = sequelize.define(
-  "InventoryStock",
+const ProductInventorySettings = sequelize.define(
+  "ProductInventorySettings",
   {
     ID: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -10,14 +10,14 @@ const InventoryStock = sequelize.define(
       primaryKey: true,
       allowNull: false,
     },
-    inventoryStockId: {
+    productInventorySettingsId: {
       type: DataTypes.STRING(50),
       unique: true,
-      allowNull: false, // it's auto-generated 
+      allowNull: false, // Auto-generated like your other IDs
     },
     productId: {
       type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
+      allowNull: false, 
       references: {
         model: "products",
         key: "ID",
@@ -25,7 +25,6 @@ const InventoryStock = sequelize.define(
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     },
-
     variantValueId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
@@ -33,10 +32,9 @@ const InventoryStock = sequelize.define(
         model: "productVariantValues",
         key: "ID",
       },
-      onDelete: "SET NULL",
+      onDelete: "CASCADE",
       onUpdate: "CASCADE",
     },
-
     variantCombinationId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
@@ -44,13 +42,16 @@ const InventoryStock = sequelize.define(
         model: "productVariantCombination",
         key: "ID",
       },
-      onDelete: "SET NULL",
+      onDelete: "CASCADE",
       onUpdate: "CASCADE",
     },
-    totalQuantity: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: false,
-      defaultValue: 0,
+    lowStockThreshold: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false
+    },   
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
@@ -58,27 +59,27 @@ const InventoryStock = sequelize.define(
     },
   },
   {
-    tableName: "InventoryStock",
+    tableName: "ProductInventorySettings",
     timestamps: false,
   }
 );
 
 // Associations
-InventoryStock.associate = (models) => {
-  InventoryStock.belongsTo(models.Products, {
+ProductInventorySettings.associate = (models) => {
+  ProductInventorySettings.belongsTo(models.Products, {
     foreignKey: "productId",
     targetKey: "ID",
   });
 
-  InventoryStock.belongsTo(models.ProductVariantValues, {
+  ProductInventorySettings.belongsTo(models.ProductVariantValues, {
     foreignKey: "variantValueId",
     targetKey: "ID",
   });
 
-  InventoryStock.belongsTo(models.ProductVariantCombination, {
+  ProductInventorySettings.belongsTo(models.ProductVariantCombination, {
     foreignKey: "variantCombinationId",
     targetKey: "ID",
   });
 };
 
-export default InventoryStock;
+export default ProductInventorySettings;

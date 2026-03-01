@@ -20,7 +20,15 @@ ChartJS.register(
 );
 
 function Overview() {
-  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList, fetchReturnRefundOrders, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory, fetchOrderTransaction, customerList } = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, fetchCancelledOrders, deliveryInfoList, customerList, fetchReturnRefundOrders, fetchInventoryStock, fetchInventoryBatch, fetchInventoryHistory, fetchOrderTransaction, fetchInventorySettings } = useContext(AdminContext);
+
+  const getThresholdForStock = (stock) => {
+    return fetchInventorySettings.find(s =>
+      s.productId === stock.productId &&
+      s.variantValueId === stock.variantValueId &&
+      s.variantCombinationId === stock.variantCombinationId
+    );
+  };
 
   // timeframe toggle for line chart
   const [timeframe, setTimeframe] = useState("weekly"); // 'daily' or 'weekly'
@@ -44,14 +52,21 @@ function Overview() {
     const returnsRefunds = fetchReturnRefundOrders.length || 0;
 
     // ---- INVENTORY (REAL) ----
+    
     const availableStock = fetchInventoryStock.reduce(
       (sum, item) => sum + (item.totalQuantity || 0),
       0
     );
 
-    const lowStockAlerts = fetchInventoryStock.filter(
-      item => item.totalQuantity <= item.lowStockThreshold
-    ).length;
+    const lowStockAlerts = fetchInventoryStock.filter(item => {
+      if (item.totalQuantity === 0) return false; // that's OUT, not LOW
+      const setting = fetchInventorySettings.find(s =>
+        s.productId === item.productId &&
+        s.variantValueId === item.variantValueId &&
+        s.variantCombinationId === item.variantCombinationId
+      );
+      return setting && item.totalQuantity <= setting.lowStockThreshold;
+    }).length;
 
     const outOfStock = fetchInventoryStock.filter(
       item => item.totalQuantity === 0
@@ -69,7 +84,8 @@ function Overview() {
     fetchOrderItems,
     fetchCancelledOrders,
     fetchReturnRefundOrders,
-    fetchInventoryStock
+    fetchInventoryStock,
+    fetchInventorySettings
   ]);
 
   // -----------------------------------------
@@ -203,13 +219,17 @@ function Overview() {
   }, [fetchOrderItems]);
 
   const inventoryStatusOverview = useMemo(() => {
-    const inStock = fetchInventoryStock.filter(
-      item => item.totalQuantity > item.lowStockThreshold
-    ).length;
+    const inStock = fetchInventoryStock.filter(item => {
+      if (item.totalQuantity === 0) return false;
+      const setting = getThresholdForStock(item);
+      return !setting || item.totalQuantity > setting.lowStockThreshold;
+    }).length;
 
-    const lowStock = fetchInventoryStock.filter(
-      item => item.totalQuantity > 0 && item.totalQuantity <= item.lowStockThreshold
-    ).length;
+    const lowStock = fetchInventoryStock.filter(item => {
+      if (item.totalQuantity === 0) return false;
+      const setting = getThresholdForStock(item);
+      return setting && item.totalQuantity <= setting.lowStockThreshold;
+    }).length;
 
     const outOfStock = fetchInventoryStock.filter(
       item => item.totalQuantity === 0
@@ -219,7 +239,7 @@ function Overview() {
       labels: ["In Stock", "Low Stock", "Out of Stock"],
       data: [inStock, lowStock, outOfStock]
     };
-  }, [fetchInventoryStock]);
+  }, [fetchInventoryStock, fetchInventorySettings]);
 
 
   // ---------------------------------
@@ -244,7 +264,11 @@ function Overview() {
 
   const lowStockItems = useMemo(() => {
     const arr = fetchInventoryStock
-      .filter(item => item.totalQuantity <= item.lowStockThreshold)
+      .filter(item => {
+        if (item.totalQuantity === 0) return false;
+        const setting = getThresholdForStock(item);
+        return setting && item.totalQuantity <= setting.lowStockThreshold;
+      })
       .map(item => {
         const prod = products.find(p => p.ID === item.productId);
         return {
@@ -255,7 +279,7 @@ function Overview() {
 
     arr.sort((a, b) => a.stock - b.stock);
     return arr.slice(0, 6);
-  }, [fetchInventoryStock, products]);
+  }, [fetchInventoryStock, products, fetchInventorySettings]);
 
 
   // ---------------------------------
@@ -418,7 +442,7 @@ function Overview() {
       <main className="ov-container">
         {/* ===== First row: Orders & Inventory cards ===== */}
         <section className="ov-row ov-row-cards">
-          <div className="ov-card ov-card-large" onClick={() => navigate("/orders")}>
+          <div className="ov-card ov-card-large" onClick={() => window.location.href = "/orders"}>
             <div className="ov-card-top">
               <div className="ov-card-title">Orders</div>
               <div className="ov-card-sub">Overview</div>
@@ -439,7 +463,7 @@ function Overview() {
             </div>
           </div>
 
-          <div className="ov-card ov-card-large" onClick={() => navigate("/inventory")}>
+          <div className="ov-card ov-card-large" onClick={() => window.location.href = "/inventory"}>
             <div className="ov-card-top">
               <div className="ov-card-title">Inventory</div>
               <div className="ov-card-sub">Overview</div>
@@ -559,7 +583,7 @@ function Overview() {
           <div className="ov-section-head">
             <h3>Recent Order Transactions</h3>
             <div className="ov-actions">
-              <button className="ov-viewall-btn" onClick={() => navigate("/transactions/order")}>
+              <button className="ov-viewall-btn" onClick={() => window.location.href = "/transactions/order"}>
                 View All
               </button>
             </div>

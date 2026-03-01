@@ -19,6 +19,7 @@ import { io } from "../server.js";
 import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 import { orderSendMail } from "../utils/mailer.js";
+import ProductInventorySettings from "../models/productInventorySettings.js";
 import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate } from "../utils/emailTemplates.js";
 
 // 🔹 ID GENERATOR
@@ -178,7 +179,14 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
 
 
       // NEW SECTION: LOW STOCK ALERT
-      if (newTotalQuantity <= inventoryStock.lowStockThreshold) {
+      const inventorySettings = await ProductInventorySettings.findOne({
+        where: {
+          productId,
+          variantValueId: productVariantValueId || null,
+          variantCombinationId: productVariantCombinationId || null,
+        },
+      });
+      if (inventorySettings && newTotalQuantity <= inventorySettings.lowStockThreshold) {
         const lowStockMessage = newTotalQuantity === 0 ? `⚠️ The product "${productName}" is now OUT OF STOCK.` : `⚠️ The product "${productName}" is running low. Only ${newTotalQuantity} left in stock!`;
          // ⭐ FIXED — LOW STOCK NOTIFICATION ID
         const lowStockNotification = await Notifications.create({

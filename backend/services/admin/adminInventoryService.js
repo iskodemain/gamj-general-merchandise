@@ -2,6 +2,7 @@ import Admin from "../../models/admin.js";
 import InventoryStock from "../../models/inventoryStock.js";
 import InventoryBatch from "../../models/inventoryBatch.js"
 import InventoryHistory from "../../models/inventoryHistory.js"
+import ProductInventorySettings from "../../models/productInventorySettings.js";
 import { sequelize } from "../../config/sequelize.js";
 
 // ID GENERATOR
@@ -100,7 +101,7 @@ export const fetchInventoryHistoryService = async (adminId) => {
 }
 
 
-export const addStockService = async (adminId, productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, manufacturingDate, notes, lowStockThreshold) => {
+export const addStockService = async (adminId, productId, variantValueId, variantCombinationId, quantityReceived, expirationDate, supplier, batchNumber, manufacturingDate, notes) => {
     try {
         const t = await sequelize.transaction();
 
@@ -159,8 +160,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
         if (stock) {
             // Update existing stock
             await stock.update({
-                totalQuantity: stock.totalQuantity + quantityReceived,
-                lowStockThreshold: lowStockThreshold ?? stock.lowStockThreshold
+                totalQuantity: stock.totalQuantity + quantityReceived
             }, { transaction: t });
         } else {
             // AUTO-GENERATE INVENTORY STOCK ID
@@ -177,8 +177,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
                 productId,
                 variantValueId,
                 variantCombinationId,
-                totalQuantity: quantityReceived,
-                lowStockThreshold
+                totalQuantity: quantityReceived
             }, { transaction: t });
         }
 
@@ -212,3 +211,201 @@ export const addStockService = async (adminId, productId, variantValueId, varian
         throw new Error(error.message);
     }
 }
+
+export const fetchInventorySettingsService = async (adminId) => {
+  try {
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: 'User not found'
+      };
+    }
+
+    const inventorySettings = await ProductInventorySettings.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    if (inventorySettings.length === 0) {
+        return {
+            success: true,
+            inventorySettings: [],
+        };
+    }
+
+    return {
+      success: true,
+      inventorySettings,
+      message: 'Inventory settings fetched successfully'
+    };
+
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
+
+export const addInventorySettingsService = async (adminId, data) => {
+  try {
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: 'User not found'
+      };
+    }
+
+    const { productId, variantValueId, variantCombinationId, lowStockThreshold } = data;
+
+    // Validation
+    if (!productId) {
+      return {
+        success: false,
+        message: 'Product ID is required'
+      };
+    }
+
+    if (lowStockThreshold === undefined || lowStockThreshold === null || lowStockThreshold < 1) {
+      return {
+        success: false,
+        message: 'Valid low stock threshold is required'
+      };
+    }
+
+    // Check if settings already exist for this product/variant combination
+    const existingSettings = await ProductInventorySettings.findOne({
+      where: {
+        productId,
+        variantValueId: variantValueId || null,
+        variantCombinationId: variantCombinationId || null
+      }
+    });
+
+    if (existingSettings) {
+      return {
+        success: false,
+        message: 'This already exists.'
+      };
+    }
+
+    // AUTO-GENERATE INVENTORY HISTORY ID
+    const lastInventorySettings = await ProductInventorySettings.findOne({
+        order: [["ID", "DESC"]],
+    });
+
+    const nextInventorySettings = lastInventorySettings ? lastInventorySettings.ID + 1 : 1;
+    const productInventorySettingsId = withTimestamp("PIS", nextInventorySettings);
+
+    // Create new settings
+    const newSettings = await ProductInventorySettings.create({
+      productInventorySettingsId,
+      productId,
+      variantValueId: variantValueId || null,
+      variantCombinationId: variantCombinationId || null,
+      lowStockThreshold
+    });
+
+    return {
+      success: true,
+      message: 'Inventory settings added successfully',
+      data: newSettings
+    };
+
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
+
+export const updateInventorySettingsService = async (adminId, data) => {
+  try {
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: 'User not found'
+      };
+    }
+
+    const { productInventorySettingsID, lowStockThreshold } = data;
+
+    if (!productInventorySettingsID) {
+      return {
+        success: false,
+        message: 'Settings ID is required'
+      };
+    }
+
+    if (lowStockThreshold === undefined || lowStockThreshold === null || lowStockThreshold < 1) {
+      return {
+        success: false,
+        message: 'Valid low stock threshold is required'
+      };
+    }
+
+    // Find the settings
+    const settings = await ProductInventorySettings.findByPk(productInventorySettingsID);
+
+    if (!settings) {
+      return {
+        success: false,
+        message: 'Inventory settings not found'
+      };
+    }
+
+    // Update
+    settings.lowStockThreshold = lowStockThreshold;
+    settings.updatedAt = new Date();
+    await settings.save();
+
+    return {
+      success: true,
+      message: 'Inventory settings updated successfully',
+      data: settings
+    };
+
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
+
+export const deleteInventorySettingsService = async (adminId, productInventorySettingsID) => {
+  try {
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: 'User not found'
+      };
+    }
+
+    if (!productInventorySettingsID) {
+      return {
+        success: false,
+        message: 'Settings ID is required'
+      };
+    }
+
+    // Find the settings
+    const settings = await ProductInventorySettings.findByPk(productInventorySettingsID);
+
+    if (!settings) {
+      return {
+        success: false,
+        message: 'Inventory settings not found'
+      };
+    }
+
+    // Delete
+    await settings.destroy();
+
+    return {
+      success: true,
+      message: 'Inventory settings deleted successfully'
+    };
+
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};

@@ -26,7 +26,6 @@ export default function AddStock() {
   const [batchNumber, setBatchNumber] = useState("");
   const [manufacturingDate, setManufacturingDate] = useState("");
   const [notes, setNotes] = useState("");
-  const [lowStockThreshold, setLowStockThreshold] = useState("");
 
 
   // UI state
@@ -76,11 +75,6 @@ export default function AddStock() {
       return false;
     }
 
-    if (!lowStockThreshold || Number(lowStockThreshold) < 0) {
-        toast.error("Please enter a valid low-stock threshold", { ...toastError });
-        return false;
-    }
-
     if (!quantityReceived || Number(quantityReceived) <= 0) {
       toast.error("Please enter a valid quantity", { ...toastError });
       return false;
@@ -118,8 +112,7 @@ export default function AddStock() {
             supplier: supplier || null,
             batchNumber,
             manufacturingDate: manufacturingDate || null,
-            notes: notes || null,
-            lowStockThreshold: Number(lowStockThreshold)
+            notes: notes || null
             };
 
             const result = await addStock(payload);
@@ -272,39 +265,20 @@ export default function AddStock() {
             {/* Section 2: Batch Details */}
             <div className="addstock-section">
               <h3 className="addstock-section-title"> Batch Details</h3>
-
-              <div className="addstock-form-row">
-                <div className="addstock-form-group">
-                  <label className="addstock-label" htmlFor="quantity">
-                    Quantity Received 
-                  </label>
-                  <input
-                    id="quantity"
-                    type="number"
-                    className="addstock-input"
-                    value={quantityReceived}
-                    onChange={(e) => setQuantityReceived(e.target.value)}
-                    placeholder="Enter quantity"
-                    min="1"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="addstock-form-group">
-                    <label className="addstock-label" htmlFor="lowStockThreshold">
-                        Low Stock Threshold <span className="addstock-required">*</span>
-                    </label>
-                    <input
-                        id="lowStockThreshold"
-                        type="number"
-                        className="addstock-input"
-                        value={lowStockThreshold}
-                        onChange={(e) => setLowStockThreshold(e.target.value)}
-                        placeholder="e.g. 10"
-                        min="0"
-                        disabled={loading}
-                    />
-                </div>
+              <div className="addstock-form-group">
+                <label className="addstock-label" htmlFor="quantity">
+                  Quantity Received 
+                </label>
+                <input
+                  id="quantity"
+                  type="number"
+                  className="addstock-input"
+                  value={quantityReceived}
+                  onChange={(e) => setQuantityReceived(e.target.value)}
+                  placeholder="Enter quantity"
+                  min="1"
+                  disabled={loading}
+                />
               </div>
 
               <div className="addstock-form-row">

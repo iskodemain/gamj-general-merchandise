@@ -994,40 +994,6 @@ const ShopContextProvider = (props) => {
         }
         return totalCount;
     };
-
-
-
-    /*------------------------------------DEBUGGING--------------------------------------*/
-
-
-    // useEffect(() => {
-    //     console.log('Cart Items:', cartItems);
-    //     console.log('Wishlist Items:', wishlistItems);
-    //     console.log('Products:', products);
-
-    //     // typeof gives "object" for arrays too
-    //     console.log('Cart Items type:', typeof cartItems); 
-    //     console.log('Wishlist Items type:', typeof wishlistItems);
-    //     console.log('Products type:', typeof products);
-
-    //     // Array.isArray() tells if it is an array
-    //     console.log('Is Cart Items an array?', Array.isArray(cartItems)); // true if array
-    //     console.log('Is Wishlist Items an array?', Array.isArray(wishlistItems));
-    //     console.log('Is Products an array?', Array.isArray(products));
-
-    //     // Count items depending on whether it's array or object
-    //     const getItemCount = (data) => {
-    //         if (Array.isArray(data)) return data.length;
-    //         if (data && typeof data === 'object') return Object.keys(data).length;
-    //         return 0;
-    //     }
-
-    //     console.log('Cart count:', getItemCount(cartItems));
-    //     console.log('Wishlist count:', getItemCount(wishlistItems));
-    //     console.log('Products count:', getItemCount(products));
-    // }, [cartItems, wishlistItems, products]);
-
-    
     
     /*------------------------------------TOKEN--------------------------------------*/
 
@@ -1083,12 +1049,10 @@ const ShopContextProvider = (props) => {
 
         // For customer notifications only
         socket.on("newNotification_Customer", (notif) => {
-            console.log("🔔 Customer Notification:", notif);
             setFetchNotifications((prev) => [notif, ...prev]);
         });
 
         socket.on("lowStockAlert", (notif) => {
-            console.log("🔔 Customer Notification:", notif);
             setFetchNotifications((prev) => [notif, ...prev]);
         });
 
@@ -1168,7 +1132,6 @@ const ShopContextProvider = (props) => {
 
         // RESTORE STOCKS
         socket.on("stockRestoration", (notif) => {
-            console.log("🔔 Customer Notification:", notif);
             setFetchNotifications((prev) => [notif, ...prev]);
         });
 
@@ -1197,8 +1160,6 @@ const ShopContextProvider = (props) => {
     // (SOCKET IO) - CANCEL ORDER REQUEST
     useEffect(() => {
         socket.on("orderCancelledUpdate", (data) => {
-            console.log(data)
-
             // ✅ Remove the canceled order from state immediately
             setFetchCancelledOrders((prev) =>
                 prev.filter((cancel) => cancel.ID !== data.orderCancelId)
