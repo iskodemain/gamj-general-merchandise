@@ -75,8 +75,6 @@ const ShopContextProvider = (props) => {
         handleFetchReturnRefundPolicy();
     }, []);
 
-    console.log(fetchReturnRefundPolicy)
-
     /*----------------------DELETE ORDER PROOF PAYMENT-----------------------*/
     const deleteOrderProofPayment = async(paymentProofID) => {
         if (token) {
