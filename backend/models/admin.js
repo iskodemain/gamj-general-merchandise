@@ -37,7 +37,7 @@ const Admin = sequelize.define(
       allowNull: false,
     },
     userType: {
-      type: DataTypes.ENUM('Super Admin', 'Admin', 'Staff'),
+      type: DataTypes.ENUM('Super Admin', 'Admin', 'Staff', 'Delivery Staff'),
       allowNull: false,
     },
     createAt: {

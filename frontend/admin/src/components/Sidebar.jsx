@@ -26,36 +26,49 @@ function Sidebar({ currentView }) {
       </div>
 
       <nav className="sidebar-menu">
-        <MenuItem
-          icon={assets.overview_icon}
-          label="Overview"
-          active={currentView === "overview"}
-          onClick={() => {window.location.href = "/overview"; setIsSidebarOpen(false)}}
-        />
-        <MenuItem
-          icon={assets.products_icon}
-          label="Products"
-          active={currentView === "products"}
-          onClick={() => {window.location.href = "/products"; setIsSidebarOpen(false);}}
-        />
-        <MenuItem
-          icon={assets.inventory_icon}
-          label="Inventory"
-          active={currentView === "inventory"}
-          onClick={() => {window.location.href = "/inventory"; setIsSidebarOpen(false)}}
-        />
-        <MenuItem
-          icon={assets.orders_icon}
-          label="Orders"
-          active={currentView === "orders"}
-          onClick={() => {window.location.href = "/orders"; setIsSidebarOpen(false);}}
-        />
-        <MenuItem
-          icon={assets.transaction_icon}
-          label="Transactions"
-          active={currentView === "transactions"}
-          onClick={() => {window.location.href = "/transactions"; setIsSidebarOpen(false)}}
-        />
+        {
+          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) &&
+          <MenuItem
+            icon={assets.overview_icon}
+            label="Overview"
+            active={currentView === "overview"}
+            onClick={() => {window.location.href = "/overview"; setIsSidebarOpen(false)}}
+          />
+        }
+        {
+          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) &&
+          <MenuItem
+            icon={assets.products_icon}
+            label="Products"
+            active={currentView === "products"}
+            onClick={() => {window.location.href = "/products"; setIsSidebarOpen(false);}}
+          />
+        }
+        {['Super Admin', 'Admin', 'Staff'].includes(currentUser) &&
+          <MenuItem
+            icon={assets.inventory_icon}
+            label="Inventory"
+            active={currentView === "inventory"}
+            onClick={() => {window.location.href = "/inventory"; setIsSidebarOpen(false)}}
+          />
+        }
+        {
+          <MenuItem
+            icon={assets.orders_icon}
+            label="Orders"
+            active={currentView === "orders"}
+            onClick={() => {window.location.href = "/orders"; setIsSidebarOpen(false);}}
+          />
+        }
+        {
+          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) && 
+          <MenuItem 
+            icon={assets.transaction_icon}
+            label="Transactions"
+            active={currentView === "transactions"}
+            onClick={() => {window.location.href = "/transactions"; setIsSidebarOpen(false)}}
+          />
+        }
         {
           ['Super Admin'].includes(currentUser) && 
           <MenuItem
@@ -74,12 +87,15 @@ function Sidebar({ currentView }) {
             onClick={() => {window.location.href = "/delivery-locations"; setIsSidebarOpen(false)}}
           />
         }
-        <MenuItem
-          icon={assets.reports_icon}
-          label="Reports"
-          active={currentView === "reports"}
-          onClick={() => {window.location.href = "/reports"; setIsSidebarOpen(false)}}
-        />
+        {
+          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) && 
+          <MenuItem
+            icon={assets.reports_icon}
+            label="Reports"
+            active={currentView === "reports"}
+            onClick={() => {window.location.href = "/reports"; setIsSidebarOpen(false)}}
+          />
+        }
         {
           ['Super Admin'].includes(currentUser) && 
           <MenuItem

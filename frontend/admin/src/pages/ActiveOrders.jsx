@@ -8,7 +8,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 
 
 function ActiveOrders() {
-    const { navigate, fetchOrders, fetchOrderItems } = useContext(AdminContext);
+    const { navigate, fetchOrders, fetchOrderItems, currentUser } = useContext(AdminContext);
     
 
     const pendingOrders = fetchOrders?.filter((order) => {
@@ -47,43 +47,70 @@ function ActiveOrders() {
 
         {/* ===== ORDERS SECTION ===== */}
         <section className="active-orders-section">
-          <div className="active-orders-header">
-            <button className="active-orders-back-btn" onClick={() => navigate("/orders")}>
-                <FaArrowLeft />
-            </button>
-            <h3 className="active-orders-header-title">Back</h3>
-          </div>
+          {
+            ["Super Admin", "Admin", "Staff"].includes(currentUser) &&
+            <div className="active-orders-header">
+              <button className="active-orders-back-btn" onClick={() => navigate("/orders")}>
+                  <FaArrowLeft />
+              </button>
+              <h3 className="active-orders-header-title">Back</h3>
+            </div>
+          }
 
-          <div className="active-orders-grid">
-            <ActiveOrderCard
-              color="orange"
-              title="Pending Orders"
-              number={pendingOrders.length}
-              date="Updated: Sep 25, 2025"
-              onClick={() => navigate("/pending")}
-            />
-            <ActiveOrderCard
-              color="teal"
-              title="Processing Orders"
-              number={processingOrders.length}
-              date="Updated: Sep 25, 2025"
-              onClick={() => navigate("/processing")}
-            />
-            <ActiveOrderCard
-              color="blue"
-              title="Out for Delivery Orders"
-              number={outForDeliveryOrders.length}
-              date="Updated: Sep 25, 2025"
-              onClick={() => navigate("/outfordelivery")}
-            />
-            <ActiveOrderCard
-              color="green"
-              title="Delivered Orders"
-              number={deliiveredOrders.length}
-              date="Updated: Sep 25, 2025"
-              onClick={() => navigate("/delivered")}
-            />
-          </div>
+
+
+          {["Super Admin", "Admin", "Staff"].includes(currentUser) &&
+            <div className="active-orders-grid">
+              <ActiveOrderCard
+                color="orange"
+                title="Pending Orders"
+                number={pendingOrders.length}
+                date="Updated: Sep 25, 2025"
+                onClick={() => navigate("/pending")}
+              />
+              <ActiveOrderCard
+                color="teal"
+                title="Processing Orders"
+                number={processingOrders.length}
+                date="Updated: Sep 25, 2025"
+                onClick={() => navigate("/processing")}
+              />
+              <ActiveOrderCard
+                color="blue"
+                title="Out for Delivery Orders"
+                number={outForDeliveryOrders.length}
+                date="Updated: Sep 25, 2025"
+                onClick={() => navigate("/outfordelivery")}
+              />
+              <ActiveOrderCard
+                color="green"
+                title="Delivered Orders"
+                number={deliiveredOrders.length}
+                date="Updated: Sep 25, 2025"
+                onClick={() => navigate("/delivered")}
+              />
+            </div>
+          }
+
+          {currentUser === "Delivery Staff" && 
+            <div className="active-orders-grid">
+              <ActiveOrderCard
+                color="blue"
+                title="Out for Delivery Orders"
+                number={outForDeliveryOrders.length}
+                date="Updated: Sep 25, 2025"
+                onClick={() => navigate("/outfordelivery")}
+              />
+              <ActiveOrderCard
+                color="green"
+                title="Delivered Orders"
+                number={deliiveredOrders.length}
+                date="Updated: Sep 25, 2025"
+                onClick={() => navigate("/delivered")}
+              />
+            </div>
+          }
+          
         </section>
       </main>
     </>

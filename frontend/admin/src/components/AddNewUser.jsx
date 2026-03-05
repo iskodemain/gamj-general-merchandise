@@ -131,6 +131,21 @@ function AddNewUser() {
         password: form.password.trim()
       };
     }
+    else if (userType === "Delivery Staff") {
+      if (!form.userName.trim())
+        return toastErrorField("Username is required.");
+      if (!form.identifier.trim())
+        return toastErrorField("Account email/phone is required.");
+      if (!form.password.trim())
+        return toastErrorField("Account password is required.");
+
+      payload = {
+        ...payload,
+        userName: form.userName.trim(),
+        identifier: form.identifier.trim(),
+        password: form.password.trim()
+      };
+    }
     else if (userType === "Admin") {
       if (!form.userName.trim())
         return toastErrorField("Username is required.");
@@ -382,6 +397,61 @@ function AddNewUser() {
     </div>
   );
 
+  const renderDeliveryStaffFields = () => (
+    <div className="add-user-staff-view">
+      <div className="add-user-profile-card">
+        <div className="add-user-header-section">
+          <h2 className="add-user-profile-title">Delivery Staff Information</h2>
+        </div>
+
+        <section className="add-user-info-section">
+          <h3 className="add-user-section-title">Delivery Staff Details</h3>
+          <div className="add-user-form-group">
+            <label>User Name</label>
+            <input
+              type="text"
+              value={form.userName}
+              onChange={(e) =>
+                setForm({ ...form, userName: e.target.value })
+              }
+            />
+          </div>
+        </section>
+
+        <section className="add-user-info-section">
+          <h3 className="add-user-section-title">User Account</h3>
+
+          <div className="add-user-form-group">
+            <label>Email or Phone Number</label>
+            <input
+              type="text"
+              value={form.identifier}
+              onChange={(e) =>
+                setForm({ ...form, identifier: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="add-user-form-group">
+            <label>Create New Password</label>
+            <div className="add-user-password-input">
+              <input
+                type={passwordVisible ? "text" : "password"}
+                value={form.password}
+                onChange={(e) =>
+                  setForm({ ...form, password: e.target.value })
+                }
+              />
+              <button className="add-user-toggle-password" onClick={togglePasswordVisibility}>
+                {passwordVisible ? <FaRegEye /> : <FaRegEyeSlash />}
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+
   const renderAdminFields = () => (
     <div className="add-user-admin-view">
       <div className="add-user-profile-card">
@@ -465,6 +535,7 @@ function AddNewUser() {
                   <option value="">-- Select Role --</option>
                   <option value="Admin">Admin</option>
                   <option value="Staff">Staff</option>
+                  <option value="Delivery Staff">Delivery Staff</option>
                   <option value="Customer">Customer</option>
                 </select>
               </div>
@@ -473,6 +544,7 @@ function AddNewUser() {
 
           {userType === "Customer" && renderCustomerFields()}
           {userType === "Staff" && renderStaffFields()}
+          {userType === "Delivery Staff" && renderDeliveryStaffFields()}
           {userType === "Admin" && renderAdminFields()}
 
           {userType && (

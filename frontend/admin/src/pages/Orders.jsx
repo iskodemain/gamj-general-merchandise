@@ -7,7 +7,7 @@ import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
 
 function Orders() {
-  const { navigate, fetchOrders, fetchOrderItems, fetchCancelledOrders, fetchReturnRefundOrders, fetchOrderTransaction } = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, fetchCancelledOrders, fetchReturnRefundOrders, fetchOrderTransaction, currentUser } = useContext(AdminContext);
 
   const stats = useMemo(() => {
     const ACTIVE = ["Pending", "Processing", "Out for Delivery", "Delivered"];
@@ -41,33 +41,47 @@ function Orders() {
             </button>
             <h3 className="ordersView-header-title">Back</h3>
           </div>
+          
 
-          <div className="ordersView-grid">
-            <OverviewCard
-              icon={assets.all_orders_icon}
-              title="Active Orders"
-              number={stats.activeOrders}
-              onClick={() => navigate("/activeorders")}
-            />
-            <OverviewCard
-              icon={assets.order_cancellation_icon}
-              title="Order Cancellation"
-              number={stats.cancellations}
-              onClick={() => navigate("/cancelorder")}
-            />
-            <OverviewCard
-              icon={assets.returnandrefund_icon}
-              title="Return and Refund"
-              number={stats.returnsRefunds}
-              onClick={() => navigate("/returnandrefund")}
-            />
-            <OverviewCard
-              icon={assets.order_transaction}
-              title="Order Transactions"
-              number={stats.orderTransactions}
-              onClick={() => navigate("/transactions/order")}
-            />
-          </div>
+          {["Super Admin", "Admin", "Staff"].includes(currentUser) &&
+            <div className="ordersView-grid">
+              <OverviewCard
+                icon={assets.all_orders_icon}
+                title="Active Orders"
+                number={stats.activeOrders}
+                onClick={() => navigate("/activeorders")}
+              />
+              <OverviewCard
+                icon={assets.order_cancellation_icon}
+                title="Order Cancellation"
+                number={stats.cancellations}
+                onClick={() => navigate("/cancelorder")}
+              />
+              <OverviewCard
+                icon={assets.returnandrefund_icon}
+                title="Return and Refund"
+                number={stats.returnsRefunds}
+                onClick={() => navigate("/returnandrefund")}
+              />
+              <OverviewCard
+                icon={assets.order_transaction}
+                title="Order Transactions"
+                number={stats.orderTransactions}
+                onClick={() => navigate("/transactions/order")}
+              />
+            </div>
+          }
+
+          {currentUser === "Delivery Staff" &&
+            <div className="ordersView-grid">
+              <OverviewCard
+                icon={assets.all_orders_icon}
+                title="Active Orders"
+                number={stats.activeOrders}
+                onClick={() => navigate("/activeorders")}
+              />
+            </div>
+          }
         </section>
       </main>
     </>

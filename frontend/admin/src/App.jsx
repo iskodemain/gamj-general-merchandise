@@ -68,41 +68,41 @@ const App = () => {
       <Route path="/verify" element={token || !loginToken ? <Navigate to="/"/> : <Verification/>} />
 
       {/* ALL AUTHENTICATED USERS (Super Admin, Admin, Staff) */}
-      <Route path="/overview" element={<ProtectedRoute><Overview/></ProtectedRoute>} />
+      <Route path="/overview" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Overview/></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Notification /></ProtectedRoute>} />
 
       {/* ORDERS - ALL AUTHENTICATED USERS */}
-      <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+      <Route path="/orders" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Orders /></ProtectedRoute>} />
       <Route path="/activeorders" element={<ProtectedRoute><ActiveOrders /></ProtectedRoute>} /> 
-      <Route path="/pending" element={<ProtectedRoute><Pending /></ProtectedRoute>} />
-      <Route path="/view" element={<ProtectedRoute><ViewAll /></ProtectedRoute>} />
-      <Route path="/processing" element={<ProtectedRoute><Processing /></ProtectedRoute>} />
+      <Route path="/pending" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Pending /></ProtectedRoute>} />
+      {/* <Route path="/view" element={<ProtectedRoute><ViewAll allowedRoles={['Super Admin', 'Admin', 'Staff']}/></ProtectedRoute>} /> */}
+      <Route path="/processing" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Processing /></ProtectedRoute>} />
       <Route path="/outfordelivery" element={<ProtectedRoute><OutforDelivery /></ProtectedRoute>} />
       <Route path="/delivered" element={<ProtectedRoute><Delivered /></ProtectedRoute>} />
-      <Route path="/cancelorder" element={<ProtectedRoute><CancelOrder /></ProtectedRoute>} />
-      <Route path="/cancelreview" element={<ProtectedRoute><CancelReview /></ProtectedRoute>} /> {/* PENDING */}
-      <Route path="/admincancel" element={<ProtectedRoute><AdminCancel /></ProtectedRoute>} /> {/* PENDING */}
-      <Route path="/customercancel" element={<ProtectedRoute><CustomerCancel /></ProtectedRoute>} /> {/* PENDING */}
-      <Route path="/returnandrefund" element={<ProtectedRoute><ReturnAndRefund /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/cancelorder" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><CancelOrder /></ProtectedRoute>} />
+      <Route path="/cancelreview" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><CancelReview /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/admincancel" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><AdminCancel /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/customercancel" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><CustomerCancel /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/returnandrefund" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><ReturnAndRefund /></ProtectedRoute>} /> {/* PENDING */}
 
       {/* PRODUCTS - ALL AUTHENTICATED USERS */}
-      <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-      <Route path="/products/productcategory" element={<ProtectedRoute><ProductCategory /></ProtectedRoute>} />
-      <Route path="/products/totalproduct" element={<ProtectedRoute><TotalProduct /></ProtectedRoute>} />
+      <Route path="/products" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Products /></ProtectedRoute>} />
+      <Route path="/products/productcategory" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><ProductCategory /></ProtectedRoute>} />
+      <Route path="/products/totalproduct" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><TotalProduct /></ProtectedRoute>} />
 
       {/* INVENTORY - ALL AUTHENTICATED USERS */}
-      <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
-      <Route path="/inventory/list" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
-      <Route path="/inventory/batch" element={<ProtectedRoute><BatchList /></ProtectedRoute>} />
+      <Route path="/inventory" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Inventory /></ProtectedRoute>} />
+      <Route path="/inventory/list" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><InventoryDashboard /></ProtectedRoute>} />
+      <Route path="/inventory/batch" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><BatchList /></ProtectedRoute>} />
 
       {/* TRANSACTIONS - ALL AUTHENTICATED USERS */}
-      <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} /> 
-      <Route path="/transactions/order" element={<ProtectedRoute><OrderTransactions /></ProtectedRoute>} /> 
-      <Route path="/transactions/inventory" element={<ProtectedRoute><InventoryTransactions /></ProtectedRoute>} /> 
-      <Route path="/products/addproduct" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
-      <Route path="/products/updateproduct/:productId" element={<ProtectedRoute><UpdateProduct /></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute ><Reports /></ProtectedRoute>} />
+      <Route path="/transactions" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Transactions /></ProtectedRoute>} /> 
+      <Route path="/transactions/order" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><OrderTransactions /></ProtectedRoute>} /> 
+      <Route path="/transactions/inventory" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><InventoryTransactions /></ProtectedRoute>} /> 
+      <Route path="/products/addproduct" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><AddProduct /></ProtectedRoute>} />
+      <Route path="/products/updateproduct/:productId" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><UpdateProduct /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><Reports /></ProtectedRoute>} />
 
       {/* SUPER ADMIN & ADMIN ONLY - Staff CANNOT access */}
       <Route path="/inventory/add" element={

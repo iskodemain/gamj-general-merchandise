@@ -6,7 +6,7 @@ import { AdminContext } from "../context/AdminContextProvider.jsx";
 import { toast } from "react-toastify";
 
 function Navbar({TitleName}) {
-    const { isSidebarOpen, setIsSidebarOpen, setToken, toastSuccess, navigate } = useContext(AdminContext);
+    const { isSidebarOpen, setIsSidebarOpen, setToken, toastSuccess, navigate, currentUser } = useContext(AdminContext);
 
     const toggleSidebar = () => {
         setIsSidebarOpen((prev) => !prev);
@@ -42,8 +42,13 @@ function Navbar({TitleName}) {
           </div>
 
           <div className="navbar-icons">
-            <button onClick={() => window.location.href = "/settings"}><img src={assets.settings_icon} alt="Setings"className="navbar-icon"/></button>
-            <button onClick={() => window.location.href = "/notifications"}><img src={assets.notification_icon} alt="Notifications"className="navbar-icon"/></button>
+            {["Super Admin", "Admin", "Staff"].includes(currentUser) && 
+              <>
+                <button onClick={() => window.location.href = "/settings"}><img src={assets.settings_icon} alt="Setings"className="navbar-icon"/></button>
+                <button onClick={() => window.location.href = "/notifications"}><img src={assets.notification_icon} alt="Notifications"className="navbar-icon"/></button>
+              </>
+            }
+            
             <button onClick={() => logout()}><img src={assets.logout_icon} alt="Logout" className="navbar-icon"/></button>
           </div>
         </div>

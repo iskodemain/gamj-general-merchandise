@@ -49,7 +49,12 @@ function VerifiedUsers() {
       if (!isTrue(a.verifiedUser)) return;
 
       // Determine type based on userType field
-      const userType = a.userType === 'Staff' ? 'Staff' : 'Admin';
+      let userType = 'Admin'; // default
+      if (a.userType === 'Staff') {
+        userType = 'Staff';
+      } else if (a.userType === 'Delivery Staff') {
+        userType = 'Delivery Staff';
+      }
 
       const user = {
         ID: a.ID,
@@ -154,6 +159,7 @@ function VerifiedUsers() {
                   <option value="">All Types</option>
                   <option value="Admin">Admin</option>
                   <option value="Staff">Staff</option>
+                  <option value="Delivery Staff">Delivery Staff</option>
                   <option value="Customer">Customer</option>
                 </select>
               </label>
