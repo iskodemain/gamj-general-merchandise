@@ -14,6 +14,11 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
         return null; // or loading spinner
     }
 
+    if (currentUser === 'Delivery Staff' && allowedRoles.length > 0) {
+        // Delivery Staff is trying to access a restricted route
+        return <Navigate to="/activeorders" replace />;
+    }
+
     if (allowedRoles.length === 0) {
         return children;
     }
@@ -22,6 +27,9 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     const hasAccess = allowedRoles.includes(currentUser);
 
     if (!hasAccess) {
+        if (currentUser === 'Delivery Staff') {
+            return <Navigate to="/activeorders" replace />;
+        }
         return <Navigate to="/overview" replace />;
     }
 

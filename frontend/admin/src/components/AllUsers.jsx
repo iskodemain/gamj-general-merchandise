@@ -56,7 +56,7 @@ function AllUsers() {
     }
 
     // ✅ For Admin and Staff (both from adminList)
-    if (u.__type === 'Admin' || u.__type === 'Staff') {
+    if (u.__type === 'Admin' || u.__type === 'Staff' || u.__type === 'Delivery Staff') {
       // Exclude Super Admin (adminHead = true)
       if (isTrue(u.adminHead)) return 'Excluded';
       if (isTrue(u.verifiedUser)) return 'Verified';
@@ -97,7 +97,12 @@ function AllUsers() {
       if (isTrue(a.adminHead)) return;
 
       // Determine type based on userType field
-      const userType = a.userType === 'Staff' ? 'Staff' : 'Admin';
+      let userType = 'Admin'; // default
+      if (a.userType === 'Staff') {
+        userType = 'Staff';
+      } else if (a.userType === 'Delivery Staff') {
+        userType = 'Delivery Staff';
+      }
 
       const user = {
         ID: a.ID,
@@ -249,6 +254,7 @@ function AllUsers() {
                   <option value="">All Types</option>
                   <option value="Admin">Admin</option>
                   <option value="Staff">Staff</option>
+                  <option value="Delivery Staff">Delivery Staff</option>
                   <option value="Customer">Customer</option>
                 </select>
               </label>

@@ -306,6 +306,25 @@ export const deleteUserService = async (adminId, userID, userType) => {
       await userToDelete.destroy();
     }
 
+    // DELETE DELIVERY STAFF
+    else if (userType === "Delivery Staff") {
+      const userToDelete = await Admin.findOne({
+        where: { 
+          ID: userID,
+          userType: 'Delivery Staff'
+        }
+      });
+
+      if (!userToDelete) {
+        return {
+          success: false,
+          message: "Delivery Staff user not found"
+        };
+      }
+      await userToDelete.update({ forceLogout: true });
+      await userToDelete.destroy();
+    }
+
     // DELETE ADMIN
     else if (userType === "Admin") {
       const userToDelete = await Admin.findOne({
@@ -356,7 +375,7 @@ export const saveUserInfoService = async (adminId, data) => {
       };
     }
 
-    if (!["Customer", "Staff", "Admin"].includes(data.userType)) {
+    if (!["Customer", "Staff", "Delivery Staff", "Admin"].includes(data.userType)) {
       return { success: false, message: "Invalid user type." };
     }
 
@@ -439,6 +458,32 @@ export const saveUserInfoService = async (adminId, data) => {
       );
     }
 
+    if (data.userType === "Delivery Staff") {
+      const deliveryStaffUser = await Admin.findOne({
+        where: { 
+          ID: data.ID,
+          userType: 'Delivery Staff'
+        }
+      });
+
+      if (!deliveryStaffUser) {
+        return {
+          success: false,
+          message: "Delivery Staff user not found"
+        };
+      }
+      updated = await Admin.update(
+        {
+          userName: data.userName,
+          emailAddress: identifierType === "email" ? data.identifier : null,
+          phoneNumber: identifierType === "phone" ? data.identifier : null,
+          password: hashedPassword,
+          updateAt: new Date()
+        },
+        { where: { ID: data.ID, userType: 'Delivery Staff' } }
+      );
+    }
+
     if (data.userType === "Admin") {
       const adminToUpdate = await Admin.findOne({
         where: { 
@@ -489,7 +534,7 @@ export const addNewUserService = async (adminId, data) => {
       };
     }
 
-    if (!["Customer", "Staff", "Admin"].includes(data.userType)) {
+    if (!["Customer", "Staff", "Delivery Staff", "Admin"].includes(data.userType)) {
       return { success: false, message: "Invalid account role selected." };
     }
 
@@ -583,11 +628,11 @@ export const addNewUserService = async (adminId, data) => {
     }
 
     if (data.userType === "Staff") {
-      const lastAdmin = await Admin.findOne({
+      const lastStaff = await Admin.findOne({
         order: [["ID", "DESC"]],
       });
 
-      const nextAdminNo = lastAdmin ? Number(lastAdmin.ID) + 1 : 1;
+      const nextAdminNo = lastStaff ? Number(lastStaff.ID) + 1 : 1;
       const adminId = withTimestamp("ADMIN", nextAdminNo);
 
       addNewUser = await Admin.create({
@@ -597,6 +642,33 @@ export const addNewUserService = async (adminId, data) => {
         phoneNumber: identifierType === "phone" ? data.identifier : null,
         password: hashedPassword,
         userType: "Staff",
+        verifiedUser: true,
+      });
+      if (identifierType === "email") {
+        await accountSendMail({
+          to: addNewUser.emailAddress,
+          subject: 'Your GAMJ Account Has Been Created by Admin',
+          html: userAccountCreatedTemplate(addNewUser.userName),
+          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+        });
+      }
+    }
+
+    if (data.userType === "Delivery Staff") {
+      const lastDeliveryStaff = await Admin.findOne({
+        order: [["ID", "DESC"]],
+      });
+
+      const nextAdminNo = lastDeliveryStaff ? Number(lastDeliveryStaff.ID) + 1 : 1;
+      const adminId = withTimestamp("ADMIN", nextAdminNo);
+
+      addNewUser = await Admin.create({
+        adminId,
+        userName: data.userName,
+        emailAddress: identifierType === "email" ? data.identifier : null,
+        phoneNumber: identifierType === "phone" ? data.identifier : null,
+        password: hashedPassword,
+        userType: "Delivery Staff",
         verifiedUser: true,
       });
       if (identifierType === "email") {
