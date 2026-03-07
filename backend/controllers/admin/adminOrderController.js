@@ -1,4 +1,4 @@
-import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, adminDeleteOrderItemService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService } from "../../services/admin/adminOrderService.js";
+import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService } from "../../services/admin/adminOrderService.js";
 
 export const fetchOrders = async (req, res) => {
     try {
@@ -142,18 +142,6 @@ export const cancelSubmitAsCompleted = async (req, res) => {
         const { cancelID, newStatus } = req.body;
         const { ID } = req.admin;
         const result = await cancelSubmitAsCompletedService(ID, cancelID, newStatus);
-        res.json(result);
-    } catch (error) {
-        console.log(error);
-        res.json({success: false, message:error.message})
-    }
-}
-
-export const adminDeleteOrderItem = async (req, res) => {
-    try {
-        const { orderItemID } = req.body;
-        const { ID } = req.admin;
-        const result = await adminDeleteOrderItemService(ID, orderItemID);
         res.json(result);
     } catch (error) {
         console.log(error);

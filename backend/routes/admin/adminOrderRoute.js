@@ -1,6 +1,6 @@
 import express from 'express';
 import adminAuth from '../../middleware/adminAuth.js';
-import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, adminDeleteOrderItem, fetchOrderTransaction, fetchOrderPaymentProof, addOrderDeliveryProof, fetchOrderDeliveryProof } from '../../controllers/admin/adminOrderController.js';
+import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchOrderTransaction, fetchOrderPaymentProof, addOrderDeliveryProof, fetchOrderDeliveryProof } from '../../controllers/admin/adminOrderController.js';
 
 import upload from '../../middleware/multer.js';
 
@@ -24,9 +24,6 @@ adminOrderRouter.patch('/success-refund-process', adminAuth, sucessfullyProcesse
 adminOrderRouter.patch('/reject-refund-request', adminAuth, rejectedRefundRequest);
 
 adminOrderRouter.patch('/cancel/submit-as-completed', adminAuth, cancelSubmitAsCompleted);
-
-// DELETE
-adminOrderRouter.patch('/admin/delete-order-item', adminAuth, adminDeleteOrderItem);
 
 
 // CREATE FOR RETURN/REFUND

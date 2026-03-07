@@ -77,10 +77,6 @@ function Delivered() {
     return items.some((item) => item.orderStatus === "Delivered");
   }) || [];
 
-  const handleDeleteDeliveredOrder = async () => {
-    // PROCESS THIS
-  }
-
   return (
     <>
       <Navbar TitleName="Delivered Orders" />
@@ -259,8 +255,6 @@ function Delivered() {
                             }}>
                             View All
                           </button>
-
-                          <button type="button" onClick={handleDeleteDeliveredOrder} className="trash-viewall-btn"><FaTrashCan /></button>
                         </div>
                       </div>
                     </article>

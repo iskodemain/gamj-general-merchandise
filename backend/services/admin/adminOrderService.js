@@ -848,41 +848,6 @@ export const cancelSubmitAsCompletedService = async (adminId, cancelID, newStatu
   }
 };
 
-export const adminDeleteOrderItemService = async (adminId, orderItemID) => {
-  try {
-    // Verify admin exists
-    const adminUser = await Admin.findByPk(adminId);
-    if (!adminUser) {
-      return {
-        success: false,
-        message: "Admin user not found"
-      };
-    }
-
-    // Find refund order
-    const orderItem = await OrderItems.findByPk(orderItemID);
-    if (!orderItem) {
-      return {
-        success: false,
-        message: "Order item not found"
-      };
-    }
-
-    // Update status
-    orderItem.isDeletedByAdmin = 1;
-    await orderItem.save();
-
-    return {
-      success: true,
-      message: "Successfully deleted",
-    };
-
-  } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
-  }
-};
-
 
 export const fetchOrderTransactionService = async (adminId) => {
     try {
