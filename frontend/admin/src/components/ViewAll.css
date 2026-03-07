@@ -1,3 +1,71 @@
+.vap-confirm-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:9999;
+}
+
+.vap-confirm-modal{
+  width:100%;
+  max-width:380px;
+  min-width:200px;
+  background:#fff;
+  border-radius:10px;
+  padding:22px 18px;
+  text-align:center;
+}
+
+.vap-confirm-title{
+  font-size:18px;
+  font-weight:600;
+  margin-bottom:8px;
+}
+
+.vap-confirm-message{
+  font-size:14px;
+  color:#555;
+  margin-bottom:20px;
+}
+
+.vap-confirm-actions{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.vap-confirm-no{
+  padding:8px 16px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  background:#fff;
+  cursor:pointer;
+}
+
+.vap-confirm-yes{
+  padding:8px 16px;
+  border-radius:6px;
+  border:none;
+  background:#e54b4b;
+  color:#fff;
+  cursor:pointer;
+}
+
+@media (max-width:400px){
+  .vap-confirm-modal{
+    padding:18px 14px;
+  }
+  .vap-confirm-title{
+    font-size:16px;
+  }
+}
+
+
+
 .vap-image-preview-overlay {
   position: fixed;
   inset: 0;
@@ -1067,25 +1135,6 @@
   border-radius: 50%;
 }
 
-/* Trash Button */
-.vap-trash-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  width: 36px;
-  margin-right: 8px;
-  background: transparent;
-  color: #d32f2f;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.vap-trash-btn:hover {
-  background: rgba(211,47,47,0.06);
-}
 
 /* Bulk Status */
 .vap-bulk-status {
@@ -1457,12 +1506,6 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
-  }
-
-  /* Trash button compresses */
-  .vap-trash-btn {
-    width: 30px;
-    height: 30px;
   }
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef, useContext } from "react";
 import "./ViewAll.css";
-import { FaTrashCan, FaArrowLeft } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 import Loading from "../components/Loading.jsx"
@@ -23,7 +23,7 @@ const STATUS_OPTIONS = [
 ];
 
 function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
-  const { handleChangeOrderStatus, adminDeleteOrderItem, addOrderDeliveryProof, fetchOrderDeliveryProof, toastError } = useContext(AdminContext);
+  const { handleChangeOrderStatus, addOrderDeliveryProof, fetchOrderDeliveryProof, toastError } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   const [items, setItems] = useState([]);
@@ -220,14 +220,6 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
     return [...statuses][0];
   }, [selected, items]);
 
-  const deleteItem = (id) => {
-    if (!window.confirm(`Delete item #${id}?`)) return;
-    setItems((prev) => prev.filter((i) => i.id !== id));
-    const next = new Set(selected);
-    next.delete(id);
-    setSelected(next);
-  };
-
   const openCancelModalFor = (item) => {
   setCancelItem(item);
   setCancelModalOpen(true);
@@ -369,17 +361,19 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
         <div className="vap-card">
           <div className="vap-card-header">
             <div className="vap-header-left">
-              <label className="vap-all-checkbox">
-                <input
-                  type="checkbox"
-                  checked={
-                    visible.length > 0 &&
-                    visible.every((i) => selected.has(i.id))
-                  }
-                  onChange={toggleSelectAll}
-                />
-                <span className="vap-all-label">All ({selected.size})</span>
-              </label>
+              {orderStatus !== "Delivered" && (
+                <label className="vap-all-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={
+                      visible.length > 0 &&
+                      visible.every((i) => selected.has(i.id))
+                    }
+                    onChange={toggleSelectAll}
+                  />
+                  <span className="vap-all-label">All ({selected.size})</span>
+                </label>
+              )}
             </div>
 
             <div className="vap-header-right">
@@ -387,23 +381,9 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                 <input ref={searchRef} className="vap-search-input" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)}/>
                 <IoSearchOutline className="search-bar-item"/>
               </div>
-              {showBulkStatus && (
+              {showBulkStatus && orderStatus !== "Delivered" && (
                 <div className="vap-bulk-status">
-                  
-                  {/* If Delivered, show DELETE ALL instead of bulk dropdown */}
-                  {orderStatus === "Delivered" ? (
-                    <button
-                      className="vap-trash-btn"
-                      onClick={() => {
-                        if (window.confirm("Delete all selected delivered items?")) {
-                          [...selected].forEach(id => deleteItem(id));
-                        }
-                      }}
-                    >
-                      <FaTrashCan />
-                    </button>
-                  ) : (
-                    <div className="vap-bulk-dropdown">
+                  <div className="vap-bulk-dropdown">
                       <button
                         className="vap-bulk-pill"
                         onClick={() => setBulkDropdownOpen((v) => !v)}
@@ -441,8 +421,6 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                         </div>
                       )}
                     </div>
-                  )}
-
                 </div>
               )}
             </div>
@@ -459,7 +437,9 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 
                 <div className="vap-item-col">
                   <div className="vap-row-left">
-                    <input type="checkbox" checked={selected.has(item.id)} onChange={() => toggleSelect(item.id)} className="vap-row-checkbox"/>
+                    {orderStatus !== "Delivered" && (
+                      <input type="checkbox" checked={selected.has(item.id)} onChange={() => toggleSelect(item.id)} className="vap-row-checkbox"/>
+                    )}
 
                     <img className="vap-thumb" src={item.image} alt={item.name} />
 
@@ -513,13 +493,6 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                           onClick={() => openDeliveryProofReview(item.id)}
                         >
                           View Proof
-                        </button>
-
-                        <button
-                          className="vap-trash-btn"
-                          onClick={() => deleteItem(item.id)}
-                        >
-                          <FaTrashCan />
                         </button>
                       </div>
 
