@@ -1,3 +1,716 @@
+.vap-image-preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;        /* ← was missing; must beat pod-modal-overlay (1000) and vap-modal-overlay (1200) */
+  padding: 16px;
+  box-sizing: border-box;
+  cursor: zoom-out;
+}
+
+.vap-image-preview-modal {
+  position: relative;
+
+  width: 100%;
+  max-width: 900px;
+  min-width: 200px;
+
+  max-height: 90vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #111;
+  border-radius: 10px;
+
+  padding: 14px;
+  box-sizing: border-box;
+
+  cursor: default;    /* ← prevent zoom-out cursor leaking into the modal */
+}
+
+.vap-image-preview-container {
+  width: 100%;
+  height: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.vap-image-preview-img {
+  width: 100%;
+  height: auto;
+
+  max-height: 85vh;
+  object-fit: contain;
+
+  border-radius: 6px;
+  display: block;
+}
+
+.vap-image-preview-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #ffffff;
+  color: #111;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1;            /* ← above the image */
+
+  transition: all 0.15s ease;
+}
+
+.vap-image-preview-close:hover {
+  background: #f1f1f1;
+}
+
+.vap-delivered-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.vap-review-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 14px;
+  border-radius: 6px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  border: 1.5px solid #43A047;
+  cursor: pointer;
+
+  color: #43A047;
+  background: #fff;
+
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  height: 36px;
+}
+
+.vap-review-btn:hover {
+  background: #43A047;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.vap-review-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .vap-review-btn {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+
+  .vap-image-preview-modal {
+    padding: 10px;
+    max-width: 95%;
+  }
+
+  .vap-image-preview-close {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vap-delivered-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* DELIVERY ITEMS */
+
+.pod-items-container{
+  margin-bottom:20px;
+}
+
+.pod-items-header{
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.pod-items-list{
+  max-height:220px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.pod-item-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px;
+  border:1px solid #eee;
+  border-radius:8px;
+}
+
+.pod-item-img{
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:6px;
+}
+
+.pod-item-info{
+  flex:1;
+}
+
+.pod-item-name{
+  font-weight:500;
+  font-size:14px;
+}
+
+.pod-item-meta{
+  display:flex;
+  gap:10px;
+  font-size:12px;
+  color:#666;
+}
+
+.pod-item-price{
+  font-size:13px;
+  color:#444;
+}
+
+.pod-item-subtotal{
+  font-weight:600;
+  font-size:14px;
+}
+
+.pod-summary{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #eee;
+}
+
+.pod-summary-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+}
+
+.pod-total{
+  font-weight:700;
+  font-size:15px;
+}
+
+
+/* OVERLAY */
+.pod-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* MODAL CONTAINER */
+.pod-modal {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  min-width: 200px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px 24px 24px;
+  box-sizing: border-box;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
+  scrollbar-width: thin;
+  scrollbar-color: #e0e0e0 transparent;
+}
+
+.pod-modal::-webkit-scrollbar {
+  width: 5px;
+}
+.pod-modal::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 10px;
+}
+
+/* CLOSE BUTTON */
+.pod-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #f2f2f2;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.pod-close-btn:hover {
+  background: #e0e0e0;
+  color: #111;
+}
+
+/* HEADER */
+.pod-header {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 18px;
+  padding-right: 36px;
+  line-height: 1.3;
+}
+
+/* PRODUCT BOX */
+.pod-product-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #f8f9fb;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.pod-product-img {
+  width: 72px;
+  height: 72px;
+  min-width: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.pod-product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+}
+
+.pod-product-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pod-product-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.pod-product-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin-top: 2px;
+}
+
+/* DIVIDER */
+.pod-divider {
+  height: 1px;
+  background: #eee;
+  margin: 4px 0 20px;
+}
+
+/* FORM FIELDS */
+.pod-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pod-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pod-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.pod-field input[type="text"],
+.pod-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1a1a1a;
+  background: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.pod-field input[type="text"]:focus,
+.pod-field textarea:focus {
+  outline: none;
+  border-color: #43A047;
+  box-shadow: 0 0 0 3px rgba(101, 109, 255, 0.12);
+  background: #fff;
+}
+
+/* ============================================================
+   IMAGE UPLOAD — Styled drop zone with icon
+   ============================================================ */
+
+.pod-upload-zone {
+  position: relative;
+  border: 2px dashed #d0d0d0;
+  border-radius: 12px;
+  background: #f8f9fb;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  min-height: 110px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.pod-upload-zone:hover {
+  border-color: #43A047;
+  background: #f0f1ff;
+}
+
+/* Actual file input — invisible, covers full zone */
+.pod-upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Upload icon */
+.pod-upload-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ededff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #43A047;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.pod-upload-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+}
+
+.pod-upload-hint {
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+}
+
+/* When file is selected — show image preview */
+.pod-upload-zone.pod-has-preview {
+  border-style: solid;
+  border-color: #43A047;
+  padding: 10px;
+  min-height: 140px;
+}
+
+.pod-upload-preview-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pod-upload-preview {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: 8px;
+  object-fit: contain;
+  display: block;
+}
+
+.pod-upload-preview-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.pod-upload-change-label {
+  font-size: 12px;
+  color: #43A047;
+  font-weight: 600;
+  text-align: center;
+  z-index: 1;
+}
+
+/* ACTIONS */
+.pod-actions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pod-submit-btn {
+  background: #43A047;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.pod-submit-btn:hover {
+  background: #4b53e8;
+}
+
+.pod-submit-btn:active {
+  transform: scale(0.97);
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet
+   ============================================================ */
+@media (max-width: 480px) {
+  .pod-modal {
+    padding: 20px 16px 18px;
+    border-radius: 12px;
+  }
+
+  .pod-product-img {
+    width: 58px;
+    height: 58px;
+    min-width: 48px;
+  }
+
+  .pod-product-name {
+    font-size: 13px;
+  }
+
+  .pod-upload-zone {
+    padding: 18px 12px;
+    min-height: 100px;
+  }
+
+  .pod-upload-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
+
+  .pod-submit-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .pod-actions {
+    justify-content: stretch;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Small mobile
+   ============================================================ */
+@media (max-width: 360px) {
+  .pod-modal {
+    padding: 16px 12px 14px;
+  }
+
+  .pod-header {
+    font-size: 15px;
+  }
+
+  .pod-product-box {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .pod-product-img {
+    width: 48px;
+    height: 48px;
+    min-width: 40px;
+  }
+
+  .pod-field input[type="text"],
+  .pod-field textarea {
+    font-size: 13px;
+    padding: 9px 10px;
+  }
+
+  .pod-upload-text {
+    font-size: 12px;
+  }
+
+  .pod-upload-hint {
+    font-size: 10px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Minimum 200px (extreme small)
+   ============================================================ */
+@media (max-width: 260px) {
+  .pod-modal {
+    padding: 12px 8px 12px;
+    border-radius: 8px;
+  }
+
+  .pod-modal-overlay {
+    padding: 6px;
+  }
+
+  .pod-header {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .pod-product-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pod-product-img {
+    width: 100%;
+    max-width: 80px;
+    height: auto;
+  }
+
+  .pod-product-meta {
+    font-size: 11px;
+    gap: 4px 8px;
+  }
+
+  .pod-product-price {
+    font-size: 13px;
+  }
+
+  .pod-field label {
+    font-size: 11px;
+  }
+
+  .pod-field input[type="text"],
+  .pod-field textarea {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .pod-upload-zone {
+    min-height: 80px;
+    padding: 12px 8px;
+  }
+
+  .pod-upload-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .pod-upload-text {
+    font-size: 11px;
+  }
+
+  .pod-upload-hint {
+    display: none;
+  }
+
+  .pod-submit-btn {
+    font-size: 12px;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .pod-close-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+    top: 8px;
+    right: 8px;
+  }
+}
+
 /* Wrapper & Topbar */
 .vap-wrapper {
   min-height: calc(100vh - 64px);
@@ -626,12 +1339,6 @@
   }
 }
 
-@media (max-width: 900px) {
-  .vap-status-menu {
-    right: auto;
-    left: 0;
-  }
-}
 
 
 @media (max-width: 1040px) {
@@ -666,6 +1373,8 @@
     justify-content: space-between;
   }
 }
+
+
 
 @media (max-width: 480px) {
 

@@ -1,3 +1,351 @@
+/* ================================================================
+   ADD THESE TO Orders.css
+   Scoped under orders-* to avoid any conflict with existing styles
+   ================================================================ */
+
+/* ── Eye / View Proof button ── */
+.orders-eye-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border-radius: 6px;
+  border: 1.5px solid #43A047;
+  background: #fff;
+  color: #43A047;
+
+  font-size: 16px;
+  cursor: pointer;
+
+  transition: background 0.18s, color 0.18s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.orders-eye-btn:hover {
+  background: #43A047;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.orders-eye-btn:active {
+  transform: translateY(0);
+}
+
+/* ================================================================
+   DELIVERY PROOF MODAL OVERLAY
+   z-index must beat existing modals in Orders.jsx
+   ================================================================ */
+
+.orders-pod-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* MODAL BOX */
+.orders-pod-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+
+  width: 100%;
+  max-width: 480px;
+  min-width: 200px;
+
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 28px 24px 24px;
+  box-sizing: border-box;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  scrollbar-width: thin;
+  scrollbar-color: #e0e0e0 transparent;
+}
+
+.orders-pod-modal::-webkit-scrollbar { width: 5px; }
+.orders-pod-modal::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 10px;
+}
+
+/* CLOSE */
+.orders-pod-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+
+  border: none;
+  background: #f2f2f2;
+  color: #555;
+
+  font-size: 14px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.orders-pod-close:hover {
+  background: #e0e0e0;
+  color: #111;
+}
+
+/* HEADER */
+.orders-pod-header {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 16px;
+  padding-right: 36px;
+  line-height: 1.3;
+}
+
+/* DIVIDER */
+.orders-pod-divider {
+  height: 1px;
+  background: #eee;
+  margin: 0 0 18px;
+}
+
+/* FORM FIELDS */
+.orders-pod-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.orders-pod-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.orders-pod-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.orders-pod-field input[type="text"],
+.orders-pod-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: #333;
+  background: #f7f7f7;
+  resize: none;
+  font-family: inherit;
+  cursor: default;
+}
+
+/* ── Proof Image thumbnail (clickable) ── */
+.orders-pod-img-wrap {
+  position: relative;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: zoom-in;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  transition: border-color 0.2s;
+}
+
+.orders-pod-img-wrap:hover {
+  border-color: #43A047;
+}
+
+.orders-pod-img-thumb {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
+.orders-pod-img-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+/* ================================================================
+   FULL-SIZE IMAGE LIGHTBOX
+   z-index above the modal (1100) → use 1200
+   ================================================================ */
+
+.orders-img-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+  box-sizing: border-box;
+  cursor: zoom-out;
+}
+
+.orders-img-modal {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  min-width: 200px;
+  max-height: 90vh;
+  background: #111;
+  border-radius: 10px;
+  padding: 14px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.orders-img-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.orders-img-full {
+  width: 100%;
+  height: auto;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 6px;
+  display: block;
+}
+
+.orders-img-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.15s;
+}
+
+.orders-img-close:hover {
+  background: #ebebeb;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 480px) {
+  .orders-pod-modal {
+    padding: 20px 16px 18px;
+    border-radius: 12px;
+  }
+
+  .orders-pod-header {
+    font-size: 15px;
+  }
+
+  .orders-pod-field input[type="text"],
+  .orders-pod-field textarea {
+    font-size: 13px;
+  }
+
+  .orders-img-modal {
+    padding: 10px;
+  }
+
+  .orders-img-close {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .orders-eye-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 260px) {
+  .orders-pod-modal {
+    padding: 14px 10px;
+    border-radius: 8px;
+  }
+
+  .orders-pod-header {
+    font-size: 13px;
+  }
+
+  .orders-pod-field label {
+    font-size: 10px;
+  }
+
+  .orders-pod-field input[type="text"],
+  .orders-pod-field textarea {
+    font-size: 12px;
+    padding: 7px 8px;
+  }
+
+  .orders-pod-img-wrap {
+    min-height: 90px;
+  }
+}
+
+
 .upload-receipt-btn {
   border: 2px solid #43A047;
   color: #43A047;
@@ -319,7 +667,7 @@
 .valid-date-text {
     font-size: 0.6rem;
     color: #989898;
-    margin-left: 3.1rem;
+    margin-left: 5.8rem;
     margin-top: 0.2rem;
 }
 

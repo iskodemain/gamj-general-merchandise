@@ -10,12 +10,17 @@ import RefundReceiptModal from '../components/Orders/RefundReceiptModal';
 import RefundOrderModal from '../components/Orders/RefundOrderModal';
 import RejectedRefundModal from '../components/Orders/RejectedRefundModal';
 import OrderProofPayment from '../components/Orders/OrderProofPayment';
+import { FiEye } from "react-icons/fi";
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId, fetchReturnRefundPolicy } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof } = useContext(ShopContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [timeUpdated, setTimeUpdated] = useState(Date.now());
+
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewProof, setReviewProof] = useState(null);
+  const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
 
   const getCancelStatusForItem = (orderItemId) => {
     return fetchCancelledOrders.find(cancel => cancel.orderItemId === orderItemId);
@@ -192,6 +197,20 @@ function Orders() {
     return () => clearInterval(interval);
   }, []);
 
+  const openDeliveryProofReview = (orderItemId) => {
+    const proof = fetchOrderDeliveryProof.find(
+      (p) => p.orderItemId === orderItemId
+    );
+
+    if (!proof) {
+      alert("Delivery proof not found for this item.");
+      return;
+    }
+
+    setReviewProof(proof);
+    setReviewModalOpen(true);
+  };
+
 
 
   return (
@@ -344,6 +363,9 @@ function Orders() {
                             <div className="delivered-btn-group">
                               <div className='delivered-btn-duo'>
                                 <RiDeleteBinFill className="delete-btn" onClick={() => handleRemove(item.ID)} />
+                                <button className="orders-eye-btn" title="View Delivery Proof" onClick={() => openDeliveryProofReview(item.ID)}>
+                                  <FiEye />
+                                </button>
                                 <button className="order-button-container return-btn" onClick={() => handleOrderRefund(item.ID)}>Return / Refund</button>
                               </div>
                               <p className="valid-date-text">
@@ -354,9 +376,22 @@ function Orders() {
                         } else {
                           // 🔹 Expired: show only delete icon
                           return (
-                            <button className="delete-btn-ctn">
-                              <RiDeleteBinFill className="delete-btn" onClick={() => handleRemove(item.ID)} />
-                            </button>
+                            <div className="delivered-btn-group">
+                              <div className="delivered-btn-duo">
+                                <RiDeleteBinFill
+                                  className="delete-btn"
+                                  onClick={() => handleRemove(item.ID)}
+                                />
+                                <button
+                                  className="orders-eye-btn"
+                                  title="View Delivery Proof"
+                                  onClick={() => openDeliveryProofReview(item.ID)}
+                                >
+                                  <FiEye />
+                                </button>
+                              </div>
+                            </div>
+                            
                           );
                         }
                       }
@@ -481,6 +516,98 @@ function Orders() {
           </>
         )}
       </div>
+      {/* ── DELIVERY PROOF REVIEW MODAL ── */}
+      {reviewModalOpen && reviewProof && (
+        <div className="orders-pod-overlay">
+          <div className="orders-pod-modal">
+
+            <button
+              className="orders-pod-close"
+              onClick={() => {
+                setReviewModalOpen(false);
+                setReviewProof(null);
+              }}
+            >
+              ✕
+            </button>
+
+            <div className="orders-pod-header">Delivery Proof</div>
+
+            <div className="orders-pod-divider" />
+
+            <div className="orders-pod-fields">
+
+              {/* Rider Name */}
+              <div className="orders-pod-field">
+                <label>Rider Name</label>
+                <input type="text" value={reviewProof.riderName} disabled />
+              </div>
+
+              {/* Delivery Notes */}
+              <div className="orders-pod-field">
+                <label>Delivery Notes</label>
+                <textarea value={reviewProof.deliveryNotes || "—"} rows={3} disabled />
+              </div>
+
+              {/* Delivered At */}
+              <div className="orders-pod-field">
+                <label>Delivered At</label>
+                <input
+                  type="text"
+                  value={new Date(reviewProof.deliveredAt).toLocaleString()}
+                  disabled
+                />
+              </div>
+
+              {/* Proof Image */}
+              <div className="orders-pod-field">
+                <label>Proof Image</label>
+                <div
+                  className="orders-pod-img-wrap"
+                  onClick={() => setImagePreviewOpen(true)}
+                  title="Click to enlarge"
+                >
+                  <img
+                    className="orders-pod-img-thumb"
+                    src={reviewProof.proofImage}
+                    alt="Delivery proof"
+                  />
+                  <span className="orders-pod-img-badge">Click to view</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ── FULL IMAGE PREVIEW ── */}
+      {imagePreviewOpen && reviewProof && (
+        <div
+          className="orders-img-overlay"
+          onClick={() => setImagePreviewOpen(false)}
+        >
+          <div
+            className="orders-img-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="orders-img-close"
+              onClick={() => setImagePreviewOpen(false)}
+            >
+              ✕
+            </button>
+            <div className="orders-img-container">
+              <img
+                src={reviewProof.proofImage}
+                alt="Delivery Proof Full"
+                className="orders-img-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
