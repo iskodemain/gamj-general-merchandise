@@ -13,6 +13,8 @@ import RefundProof from "../../models/refundProof.js";
 import {v2 as cloudinary} from 'cloudinary';
 import OrderTransaction from "../../models/orderTransaction.js";
 import PaymentProof from "../../models/paymentProof.js";
+import OrderDeliveryProof from "../../models/orderDeliveryProof.js";
+import fs from 'fs/promises';
 
 
 // ID GENERATOR
@@ -882,7 +884,6 @@ export const adminDeleteOrderItemService = async (adminId, orderItemID) => {
 };
 
 
-
 export const fetchOrderTransactionService = async (adminId) => {
     try {
       const adminUser = await Admin.findByPk(adminId);
@@ -912,4 +913,124 @@ export const fetchOrderTransactionService = async (adminId) => {
     }
 }
 
+
+// FETCH DELIVERY PROOF
+export const fetchOrderDeliveryProofService = async (adminId) => {
+    try {
+      // Validate customer exists
+      const user = await Admin.findByPk(adminId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const orderDeliveryProof = await OrderDeliveryProof.findAll({});
+      if (orderDeliveryProof.length === 0) {
+        return {
+          success: false,
+          orderDeliveryProof: [],
+        };
+      }
+
+      return {
+        success: true,
+        orderDeliveryProof
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+// ADD DELIVERY PROOF
+export const addOrderDeliveryProofService = async (adminId, data, file) => {
+  try {
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) {
+      return {
+        success: false,
+        message: 'User not found'
+      };
+    }
+
+    const { orderItemId, riderName, deliveryNotes } = data;
+
+    if (!orderItemId || !riderName) {
+      return {
+        success: false,
+        message: "Missing required fields",
+      };
+    }
+
+    const orderItem = await OrderItems.findByPk(orderItemId);
+
+    if (!orderItem) {
+      return {
+        success: false,
+        message: "Order item not found",
+      };
+    }
+
+    // ----------------------------------
+    // Upload image to Cloudinary
+    // ----------------------------------
+    let imageUrl = null;
+
+    if (file?.proofImage?.[0]) {
+      try {
+        const cloudResult = await cloudinary.uploader.upload(
+          file.proofImage[0].path,
+          {
+            folder: "gamj/orderDeliveryProof",
+            resource_type: "image"
+          }
+        );
+
+        imageUrl = cloudResult.secure_url;
+
+      } catch (err) {
+        return {
+          success: false,
+          message: "Image upload failed",
+          error: err.message
+        };
+      }
+
+      // Delete local image after upload
+      try {
+        await fs.unlink(file.proofImage[0].path);
+      } catch (unlinkErr) {
+        console.error("Image unlink failed: ", unlinkErr.message);
+      }
+    }
+
+    // 6. AUTO-GENERATE refundProofId
+    const lastOrderDeliveryProof = await RefundProof.findOne({
+      order: [["ID", "DESC"]],
+    });
+
+    const nextOrderDeliveryProofNo = lastOrderDeliveryProof ? Number(lastOrderDeliveryProof.ID) + 1 : 1;
+    const orderDeliveryProofId = withTimestamp("ODP", nextOrderDeliveryProofNo);
+
+    await OrderDeliveryProof.create({
+      orderDeliveryProofId,
+      orderItemId: orderItemId,
+      riderName: riderName,
+      deliveryNotes: deliveryNotes || null,
+      proofImage: imageUrl,
+      createdBy: adminId,
+    });
+
+    return {
+      success: true,
+    };
+
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
 

@@ -5,6 +5,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 import Loading from "../components/Loading.jsx"
 import { AdminContext } from "../context/AdminContextProvider.jsx";
+import { toast } from "react-toastify";
 
 const SELECT_ALL_STATUS_OPTIONS = [
   { key: "Pending", color: "#FFA600" },
@@ -22,7 +23,7 @@ const STATUS_OPTIONS = [
 ];
 
 function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
-  const { handleChangeOrderStatus, adminDeleteOrderItem } = useContext(AdminContext);
+  const { handleChangeOrderStatus, adminDeleteOrderItem, addOrderDeliveryProof, fetchOrderDeliveryProof, toastError } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   const [items, setItems] = useState([]);
@@ -37,6 +38,29 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [cancelItem, setCancelItem] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
+
+  const [deliveryModalOpen, setDeliveryModalOpen] = useState(false);
+  const [deliveryItems, setDeliveryItems] = useState([]);
+
+  const [riderName, setRiderName] = useState("");
+  const [deliveryNotes, setDeliveryNotes] = useState("");
+  const [proofImage, setProofImage] = useState(null);
+  const [proofPreviewUrl, setProofPreviewUrl] = useState(null);
+
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewProof, setReviewProof] = useState(null);
+  const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
+
+  const deliverySummary = useMemo(() => {
+    const totalQty = deliveryItems.reduce((sum, i) => sum + Number(i.qty || 0), 0);
+
+    const totalAmount = deliveryItems.reduce(
+      (sum, i) => sum + Number(i.price || 0) * Number(i.qty || 0),
+      0
+    );
+
+    return { totalQty, totalAmount };
+  }, [deliveryItems]);
 
   // ✅ CLICK OUTSIDE — SIMPLEST & BUG-FREE SOLUTION
   useEffect(() => {
@@ -111,24 +135,35 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   };
 
   const changeStatus = async (id, status) => {
+    if (status === "Delivered") {
+      const item = items.find((i) => i.id === id);
+
+      setDeliveryItems([item]);
+      setDeliveryModalOpen(true);
+      setOpenDropdown(null);
+
+      return; // STOP status change until proof submitted
+    }
+
     if (status === "Cancelled") {
       const item = items.find((i) => i.id === id);
       openCancelModalFor(item);
       setOpenDropdown(null);
-      return; // STOP — do not update status
+      return;
     }
-  
+
     setLoading(true);
 
     const payload = [
       {
         customerID: order.customerId,
-        orderItemID: id, // priority to change
-        changeStatus: status, // priority to change
+        orderItemID: id,
+        changeStatus: status,
       },
     ];
 
     const created = await handleChangeOrderStatus(payload);
+
     setLoading(false);
     setOpenDropdown(null);
 
@@ -140,6 +175,20 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 
   const changeStatusForSelected = async (status) => {
     if (selected.size === 0) return;
+
+    if (status === "Delivered") {
+
+      const selectedItems = [...selected].map(id =>
+        items.find(i => i.id === id)
+      );
+
+      setDeliveryItems(selectedItems);
+      setDeliveryModalOpen(true);
+      setBulkDropdownOpen(false);
+
+      return;
+    }
+
     setLoading(true);
 
     const payload = [...selected].map((id) => ({
@@ -149,6 +198,7 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
     }));
 
     const created = await handleChangeOrderStatus(payload);
+
     setLoading(false);
     setBulkDropdownOpen(false);
 
@@ -210,6 +260,47 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
     setCancelItem(null);
   };
 
+  const submitDeliveryProof = async () => {
+    if (!deliveryItems.length) return;
+
+    if (!riderName.trim() || !proofImage) {
+      alert("Rider name and proof image are required.");
+      return;
+    }
+
+    setLoading(true);
+
+    // CREATE MULTIPLE DELIVERY PROOFS
+    for (const item of deliveryItems) {
+
+      const payload = {
+        orderItemId: item.id,
+        riderName: riderName,
+        deliveryNotes: deliveryNotes,
+        proofImage: proofImage
+      };
+
+      await addOrderDeliveryProof(payload);
+    }
+
+    // UPDATE ORDER STATUS FOR ALL
+    const statusPayload = deliveryItems.map(item => ({
+      customerID: order.customerId,
+      orderItemID: item.id,
+      changeStatus: "Delivered",
+    }));
+
+    await handleChangeOrderStatus(statusPayload);
+
+    setDeliveryModalOpen(false);
+    setDeliveryItems([]);
+    setProofPreviewUrl(null);
+
+    setTimeout(() => window.location.reload(), 500);
+
+    setLoading(false);
+  };
+
   // -------------------------------------------
   // INDIVIDUAL ITEM STATUS OPTIONS LOGIC
   // -------------------------------------------
@@ -244,6 +335,22 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
       default:
         return [];
     }
+  };
+
+  const openDeliveryProofReview = (itemId) => {
+
+    const proof = fetchOrderDeliveryProof.find(
+      (p) => p.orderItemId === itemId
+    );
+
+    if (!proof) {
+      toast.error("Delivery proof not found.", { ...toastError });
+      return;
+    }
+
+    setReviewProof(proof);
+    setReviewModalOpen(true);
+
   };
 
   return (
@@ -397,50 +504,59 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                     </div>
                   </div>
 
-                  <div className="vap-status-pick" >
-                    {item.status === "Delivered" && (
-                      <button
-                        className="vap-trash-btn"
-                        onClick={() => deleteItem(item.id)}
-                      >
-                        <FaTrashCan />
-                      </button>
-                    )}
+                  <div className="vap-status-pick">
+                    {item.status === "Delivered" ? (
+                      // ── DELIVERED STATE: ViewProof + Trash, NO pill ──
+                      <div className="vap-delivered-actions">
+                        <button
+                          className="vap-review-btn"
+                          onClick={() => openDeliveryProofReview(item.id)}
+                        >
+                          View Proof
+                        </button>
 
-                    <button 
-                      className="vap-status-pill" 
-                      disabled={item.status === "Delivered"}
-                      onClick={() =>
-                        item.status !== "Delivered" &&
-                        setOpenDropdown(openDropdown === item.id ? null : item.id)
-                      }
-                    >
-                      <span className="vap-pill-label">{item.status}</span>
-                      {
-                        item.status !== "Delivered" && <IoIosArrowDown />
-                      }
-                    </button>
-
-                    {openDropdown === item.id && (
-                      <div className="vap-status-menu">
-
-                        {getIndividualOptions(item.status).map((key) => {
-                          const opt = STATUS_OPTIONS.find(o => o.key === key);
-
-                          return (
-                            <button
-                              key={opt.key}
-                              className="vap-status-item"
-                              onClick={() => changeStatus(item.id, opt.key)}
-                            >
-                              <span className="vap-menu-dot" style={{ background: opt.color }} />
-                              {opt.key}
-                            </button>
-                          );
-                        })}
-
-
+                        <button
+                          className="vap-trash-btn"
+                          onClick={() => deleteItem(item.id)}
+                        >
+                          <FaTrashCan />
+                        </button>
                       </div>
+
+                    ) : (
+                      // ── ALL OTHER STATUSES: pill + dropdown ──
+                      <>
+                        <button
+                          className="vap-status-pill"
+                          onClick={() =>
+                            setOpenDropdown(openDropdown === item.id ? null : item.id)
+                          }
+                        >
+                          <span className="vap-pill-label">{item.status}</span>
+                          <IoIosArrowDown />
+                        </button>
+
+                        {openDropdown === item.id && (
+                          <div className="vap-status-menu">
+                            {getIndividualOptions(item.status).map((key) => {
+                              const opt = STATUS_OPTIONS.find((o) => o.key === key);
+                              return (
+                                <button
+                                  key={opt.key}
+                                  className="vap-status-item"
+                                  onClick={() => changeStatus(item.id, opt.key)}
+                                >
+                                  <span
+                                    className="vap-menu-dot"
+                                    style={{ background: opt.color }}
+                                  />
+                                  {opt.key}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
                     )}
 
                   </div>
@@ -508,6 +624,306 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
             <div className="vap-cancel-actions">
               <button className="vap-cancel-submit" onClick={submitCancel}>
                 Submit
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {reviewModalOpen && reviewProof && (
+        <div className="pod-modal-overlay">
+          <div className="pod-modal">
+
+            {/* Close */}
+            <button
+              className="pod-close-btn"
+              onClick={() => {
+                setReviewModalOpen(false);
+                setReviewProof(null);
+              }}
+            >
+              ✕
+            </button>
+
+            <div className="pod-header">Delivery Proof</div>
+
+            <div className="pod-divider" />
+
+            <div className="pod-fields">
+
+              {/* Rider Name */}
+              <div className="pod-field">
+                <label>Rider Name</label>
+                <input
+                  type="text"
+                  value={reviewProof.riderName}
+                  disabled
+                />
+              </div>
+
+              {/* Delivery Notes */}
+              <div className="pod-field">
+                <label>Delivery Notes</label>
+                <textarea
+                  value={reviewProof.deliveryNotes || ""}
+                  rows={3}
+                  disabled
+                />
+              </div>
+
+              {/* Delivered At */}
+              <div className="pod-field">
+                <label>Delivered At</label>
+                <input
+                  type="text"
+                  value={new Date(reviewProof.deliveredAt).toLocaleString()}
+                  disabled
+                />
+              </div>
+
+              {/* Proof Image */}
+              <div className="pod-field">
+                <label>Proof Image</label>
+
+                <div className="pod-upload-zone pod-has-preview">
+
+                  <div
+                    className="pod-upload-preview-wrap"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setImagePreviewOpen(true)}
+                  >
+
+                    <img
+                      className="pod-upload-preview"
+                      src={reviewProof.proofImage}
+                      alt="Proof"
+                    />
+
+                    <span className="pod-upload-preview-badge">
+                      Click to view
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      
+      {imagePreviewOpen && reviewProof && (
+        <div
+          className="vap-image-preview-overlay"
+          onClick={() => setImagePreviewOpen(false)}
+        >
+          <div
+            className="vap-image-preview-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="vap-image-preview-close"
+              onClick={() => setImagePreviewOpen(false)}
+            >
+              ✕
+            </button>
+
+            <div className="vap-image-preview-container">
+              <img
+                src={reviewProof.proofImage}
+                alt="Delivery Proof"
+                className="vap-image-preview-img"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      
+      {deliveryModalOpen && deliveryItems.length > 0 && (
+        <div className="pod-modal-overlay">
+          <div className="pod-modal">
+
+            {/* Close */}
+            <button
+              className="pod-close-btn"
+              onClick={() => {
+                setDeliveryModalOpen(false);
+                setDeliveryItems([]);
+                setProofPreviewUrl(null);
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div className="pod-header">Proof of Delivery</div>
+
+            {/* Product snapshot */}
+            {/* Selected Items */}
+            <div className="pod-items-container">
+
+              <div className="pod-items-header">
+                {deliveryItems.length} item{deliveryItems.length > 1 ? "s" : ""} selected
+              </div>
+
+              <div className="pod-items-list">
+
+                {deliveryItems.map((item) => {
+
+                  const subtotal = Number(item.price || 0) * Number(item.qty || 0);
+
+                  return (
+                    <div key={item.id} className="pod-item-row">
+
+                      <img
+                        className="pod-item-img"
+                        src={item.image}
+                        alt={item.name}
+                      />
+
+                      <div className="pod-item-info">
+
+                        <div className="pod-item-name">
+                          {item.name}
+                        </div>
+
+                        <div className="pod-item-meta">
+
+                          <span className="pod-meta">
+                            Qty: {item.qty}
+                          </span>
+
+                          {item.value && (
+                            <span className="pod-meta">
+                              Variant: {item.value}
+                            </span>
+                          )}
+
+                        </div>
+
+                        <div className="pod-item-price">
+                          ₱{Number(item.price).toFixed(2)}
+                        </div>
+
+                      </div>
+
+                      <div className="pod-item-subtotal">
+                        ₱{subtotal.toFixed(2)}
+                      </div>
+
+                    </div>
+                  );
+                })}
+
+              </div>
+
+              <div className="pod-summary">
+
+                <div className="pod-summary-row">
+                  <span>Total Quantity</span>
+                  <span>{deliverySummary.totalQty}</span>
+                </div>
+
+                <div className="pod-summary-row pod-total">
+                  <span>Total Amount</span>
+                  <span>₱{deliverySummary.totalAmount.toFixed(2)}</span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div className="pod-divider" />
+
+            {/* Form fields */}
+            <div className="pod-fields">
+
+              {/* Rider Name */}
+              <div className="pod-field">
+                <label>Rider Name *</label>
+                <input
+                  type="text"
+                  value={riderName}
+                  onChange={(e) => setRiderName(e.target.value)}
+                  placeholder="Enter rider name"
+                />
+              </div>
+
+              {/* Delivery Notes */}
+              <div className="pod-field">
+                <label>Delivery Notes</label>
+                <textarea
+                  value={deliveryNotes}
+                  onChange={(e) => setDeliveryNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Optional notes about the delivery"
+                />
+              </div>
+
+              {/* Proof Image Upload */}
+              <div className="pod-field">
+                <label>Proof Image *</label>
+
+                <div className={`pod-upload-zone ${proofPreviewUrl ? "pod-has-preview" : ""}`}>
+                  {/* Hidden real file input */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      setProofImage(file);
+                      if (file) setProofPreviewUrl(URL.createObjectURL(file));
+                      else setProofPreviewUrl(null);
+                    }}
+                  />
+
+                  {proofPreviewUrl ? (
+                    /* ── Preview state ── */
+                    <div className="pod-upload-preview-wrap">
+                      <img
+                        className="pod-upload-preview"
+                        src={proofPreviewUrl}
+                        alt="Proof preview"
+                      />
+                      <span className="pod-upload-preview-badge">
+                        {proofImage?.name?.length > 20
+                          ? proofImage.name.slice(0, 18) + "…"
+                          : proofImage?.name}
+                      </span>
+                    </div>
+                  ) : (
+                    /* ── Empty / prompt state ── */
+                    <>
+                      <div className="pod-upload-icon">
+                        {/* MdCloudUpload icon — swap for any react-icon you prefer */}
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                          <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                        </svg>
+                      </div>
+                      <span className="pod-upload-text">Click or tap to upload photo</span>
+                      <span className="pod-upload-hint">JPG, PNG, WEBP · Max 10MB</span>
+                    </>
+                  )}
+
+                  {/* Change photo label shown on top of preview */}
+                  {proofPreviewUrl && (
+                    <span className="pod-upload-change-label">Tap to change photo</span>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Submit */}
+            <div className="pod-actions">
+              <button className="pod-submit-btn" onClick={submitDeliveryProof}>
+                Submit Delivery Proof
               </button>
             </div>
 

@@ -21,6 +21,7 @@ import fs from 'fs/promises';
 import { orderSendMail } from "../utils/mailer.js";
 import ProductInventorySettings from "../models/productInventorySettings.js";
 import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate } from "../utils/emailTemplates.js";
+import OrderDeliveryProof from "../models/orderDeliveryProof.js";
 
 // 🔹 ID GENERATOR
 const withTimestamp = (prefix, number) => {
@@ -1371,5 +1372,36 @@ export const cancelOrderRefundRequestService = async (customerId, orderRefundId,
   }
 };
 
+
+// FETCH DELIVERY PROOF
+export const fetchOrderDeliveryProofService = async (customerId) => {
+    try {
+      // Validate customer exists
+      const user = await Customer.findByPk(customerId);
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const orderDeliveryProof = await OrderDeliveryProof.findAll({});
+      if (orderDeliveryProof.length === 0) {
+        return {
+          success: false,
+          orderDeliveryProof: [],
+        };
+      }
+
+      return {
+        success: true,
+        orderDeliveryProof
+      };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
 
 
