@@ -1,4 +1,4 @@
-.transactions-main-container {
+.terms-conditions-container {
   padding: 20px 32px;
   background: #EFFFF1;
   min-height: 100vh;
@@ -6,11 +6,11 @@
 }
 
 /* Section header */
-.transactions-main-section {
+.terms-conditions-section {
   margin-bottom: 32px;
 }
 
-.transactions-main-header {
+.terms-conditions-header {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -18,7 +18,7 @@
   width: 7rem;
 }
 
-.transactions-main-back-btn {
+.terms-conditions-back-btn {
   background: #fff;
   border: 1px solid #E6E9EE;
   padding: 8px 13px;
@@ -26,22 +26,22 @@
   cursor: pointer;
 }
 
-.transactions-main-header-title {
+.terms-conditions-header-title {
   font-size: 1.3rem;
   font-weight: 600;
   color: #222;
 }
 
-.transactions-main-chevron {
+.terms-conditions-chevron {
   transition: transform 0.25s ease;
 }
 
-.transactions-main-chevron.open {
+.terms-conditions-chevron.open {
   transform: rotate(180deg);
 }
 
 /* Grid layout */
-.transactions-main-grid {
+.terms-conditions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 12px;
@@ -49,7 +49,7 @@
 }
 
 /* Card styling */
-.transactions-main-card {
+.terms-conditions-card {
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -57,43 +57,43 @@
   transition: all 0.2s ease;
 }
 
-.transactions-main-card:hover {
+.terms-conditions-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-.transactions-main-card-top {
+.terms-conditions-card-top {
   padding: 18px 0 22px 22px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.transactions-main-card-icon {
+.terms-conditions-card-icon {
   width: 33px;
   height: 33px;
   object-fit: contain;
 }
 
-.transactions-main-dot {
+.terms-conditions-dot {
   width: 20px;
   height: 20px;
   border-radius: 50%;
 }
 
-.transactions-main-dot.orange { background: #ffa600; }
-.transactions-main-dot.teal { background: #00e3b6; }
-.transactions-main-dot.blue { background: #656dff; }
-.transactions-main-dot.green { background: #00dd31; }
+.terms-conditions-dot.orange { background: #ffa600; }
+.terms-conditions-dot.teal { background: #00e3b6; }
+.terms-conditions-dot.blue { background: #656dff; }
+.terms-conditions-dot.green { background: #00dd31; }
 
-.transactions-main-card-title {
+.terms-conditions-card-title {
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
   font-weight: 500;
   color: #3B3B3B;
 }
 
-.transactions-main-card-container {
+.terms-conditions-card-container {
   height: 9rem;
   padding: 15px 0 20px 20px;
   display: flex;
@@ -101,19 +101,20 @@
   justify-content: space-between;
 }
 
-.transactions-main-divider {
+.terms-conditions-divider {
   height: 1px;
   background: #ddd;
 }
 
-.transactions-main-card-number {
+.terms-conditions-card-description {
   font-family: "Roboto", sans-serif;
-  font-size: 2.5rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #3B3B3B;
+  color: #3b3b3bcb;
+  font-style: italic;
 }
 
-.transactions-main-card-date {
+.terms-conditions-card-date {
   font-size: 0.9rem;
   color: #737373;
   margin-top: 4px;
@@ -123,17 +124,18 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .transactions-main-container {
+  .terms-conditions-container {
     padding: 16px;
   }
 
-  .transactions-main-card {
+
+  .terms-conditions-card {
     padding: 12px;
   }
 }
 
 @media (max-width: 600px) {
-  .transactions-main-grid {
+  .terms-conditions-grid {
     grid-template-rows: 1fr;
   }
 }

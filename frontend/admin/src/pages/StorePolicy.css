@@ -1,0 +1,1016 @@
+/* ============================================================
+   StorePolicy.css
+   Color palette: #43A047 / #2FA14C / #34A853 (green primary)
+   Min width supported: 200px
+   ============================================================ */
+
+   /* ============================================================
+   CLEAR CONFIRMATION MODAL
+   ============================================================ */
+
+.sp-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.sp-confirm-modal {
+  background: var(--sp-white);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  min-width: 200px;
+  padding: 28px 24px 24px;
+  box-sizing: border-box;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+/* Warning icon circle */
+.sp-confirm-icon-wrap {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  border-radius: 50%;
+  background: #fff8e1;
+  border: 2px solid #ffe082;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.sp-confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-confirm-title {
+  font-size: 18px;
+  font-weight: 400;
+
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sp-confirm-desc {
+  font-size: 14px;
+  color: var(--sp-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sp-confirm-desc strong {
+  color: #d32f2f;
+}
+
+/* Action buttons */
+.sp-confirm-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.sp-confirm-cancel {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: 1.5px solid var(--sp-border);
+  background: var(--sp-white);
+  color: var(--sp-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--sp-font-body);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.sp-confirm-cancel:hover {
+  background: #f5f5f5;
+  border-color: #c0c8d2;
+}
+
+.sp-confirm-delete {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: none;
+  background: #e53935;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--sp-font-body);
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 3px 10px rgba(229, 57, 53, 0.28);
+}
+
+.sp-confirm-delete:hover {
+  background: #c62828;
+  transform: translateY(-1px);
+}
+
+.sp-confirm-delete:active {
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .sp-confirm-modal {
+    padding: 22px 18px 20px;
+    border-radius: 14px;
+  }
+
+  .sp-confirm-icon-wrap {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+  }
+
+  .sp-confirm-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 280px) {
+  .sp-confirm-modal {
+    padding: 16px 12px 14px;
+    border-radius: 10px;
+    gap: 12px;
+  }
+
+  .sp-confirm-icon-wrap {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+
+  .sp-confirm-actions {
+    flex-direction: column;
+  }
+
+  .sp-confirm-title {
+    font-size: 15px;
+  }
+
+  .sp-confirm-desc {
+    font-size: 13px;
+  }
+
+  .sp-confirm-cancel,
+  .sp-confirm-delete {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+}
+
+
+
+
+
+/* ── CSS Variables ───────────────────────────────────────── */
+:root {
+  --sp-green:       #34A853;
+  --sp-green-dark:  #2FA14C;
+  --sp-green-deep:  #1e7e34;
+  --sp-green-light: #e8f5e9;
+  --sp-green-mid:   #c8e6c9;
+  --sp-text-primary: #1a1a2e;
+  --sp-text-secondary: #555f6e;
+  --sp-text-muted:  #8a95a3;
+  --sp-border:      #e2e8f0;
+  --sp-border-focus:#34A853;
+  --sp-bg:          #f7f9fb;
+  --sp-white:       #ffffff;
+  --sp-shadow-sm:   0 1px 4px rgba(0,0,0,0.06);
+  --sp-shadow-md:   0 4px 16px rgba(0,0,0,0.08);
+  --sp-shadow-lg:   0 16px 48px rgba(0,0,0,0.14);
+  --sp-radius:      14px;
+  --sp-radius-sm:   8px;
+  --sp-font-body:   'DM Sans', system-ui, sans-serif;
+  --sp-font-display:'DM Serif Display', Georgia, serif;
+}
+
+/* ── Page Layout ─────────────────────────────────────────── */
+.sp-page {
+  min-height: calc(100vh - 64px);
+  background: var(--sp-bg);
+  padding: 28px 24px 48px;
+  box-sizing: border-box;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ── Page Header ─────────────────────────────────────────── */
+.sp-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.sp-page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sp-page-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 12px;
+  background: var(--sp-green-light);
+  border: 1.5px solid var(--sp-green-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sp-green);
+}
+
+.sp-page-title {
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 400;
+  color: var(--sp-text-primary);
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.sp-page-subtitle {
+  font-size: 13px;
+  color: var(--sp-text-muted);
+  margin: 3px 0 0;
+}
+
+.sp-last-saved {
+  font-size: 12px;
+  color: var(--sp-green-dark);
+  background: var(--sp-green-light);
+  border: 1px solid var(--sp-green-mid);
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ── Editor Card ─────────────────────────────────────────── */
+.sp-editor-card {
+  background: var(--sp-white);
+  border-radius: var(--sp-radius);
+  border: 1px solid var(--sp-border);
+  box-shadow: var(--sp-shadow-md);
+  overflow: hidden;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────── */
+.sp-toolbar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 6px 0;
+  padding: 12px 16px 10px;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--sp-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.sp-toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.sp-toolbar-group-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--sp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.sp-toolbar-btns {
+  display: flex;
+  gap: 2px;
+}
+
+.sp-toolbar-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--sp-border);
+  margin: 0 4px;
+  align-self: flex-end;
+}
+
+/* Tool Buttons */
+.sp-tool-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--sp-radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--sp-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  user-select: none;
+}
+
+.sp-tool-btn:hover {
+  background: var(--sp-green-light);
+  color: var(--sp-green-deep);
+  border-color: var(--sp-green-mid);
+}
+
+.sp-tool-btn--active {
+  background: var(--sp-green-light);
+  color: var(--sp-green-deep);
+  border-color: var(--sp-green);
+  font-weight: 700;
+}
+
+/* Font Size Select */
+.sp-font-size-group {
+  padding-left: 0;
+}
+
+.sp-select-wrap {
+  position: relative;
+}
+
+.sp-font-select {
+  height: 32px;
+  padding: 0 24px 0 10px;
+  border-radius: var(--sp-radius-sm);
+  border: 1px solid var(--sp-border);
+  background: var(--sp-white);
+  color: var(--sp-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 70px;
+}
+
+.sp-font-select:focus {
+  border-color: var(--sp-green);
+}
+
+.sp-select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--sp-text-muted);
+  pointer-events: none;
+}
+
+/* ── Editor Content Area ─────────────────────────────────── */
+.sp-editor {
+  min-height: 380px;
+  padding: 24px 28px;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--sp-text-primary);
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  transition: background 0.2s;
+}
+
+.sp-editor:focus {
+  background: #fffffe;
+}
+
+.sp-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--sp-text-muted);
+  pointer-events: none;
+  white-space: pre-line;
+  font-style: italic;
+}
+
+/* Rich text element defaults inside editor */
+.sp-editor h1, .sp-editor h2, .sp-editor h3 {
+  color: var(--sp-text-primary);
+  margin: 0.8em 0 0.4em;
+}
+
+.sp-editor p { margin: 0 0 0.7em; }
+.sp-editor ul, .sp-editor ol { padding-left: 1.6em; margin: 0.5em 0; }
+.sp-editor li { margin-bottom: 0.3em; }
+.sp-editor a { color: var(--sp-green); }
+.sp-editor strong { font-weight: 700; }
+.sp-editor em { font-style: italic; }
+.sp-editor u { text-decoration: underline; }
+.sp-editor s { text-decoration: line-through; }
+
+/* ── Fix list text color in editor ── */
+.sp-editor ul,
+.sp-editor ol,
+.sp-editor li {
+  color: #1a1a2e !important;
+}
+
+/* Force ::marker (the bullet/number symbol) to also be dark */
+.sp-editor ul li::marker,
+.sp-editor ol li::marker {
+  color: #1a1a2e !important;
+}
+
+
+/* ── Editor Footer ───────────────────────────────────────── */
+.sp-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 12px;
+  border-top: 1px solid var(--sp-border);
+  background: #fafbfc;
+}
+
+.sp-char-count {
+  font-size: 12px;
+  color: var(--sp-text-muted);
+}
+
+.sp-clear-btn {
+  font-size: 12px;
+  color: #e53935;
+  background: transparent;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sp-clear-btn:hover {
+  background: #ffebee;
+}
+
+/* ── Action Bar ──────────────────────────────────────────── */
+.sp-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.sp-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  border: 1.5px solid var(--sp-green);
+  background: var(--sp-white);
+  color: var(--sp-green-dark);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.sp-preview-btn:hover {
+  background: var(--sp-green-light);
+  transform: translateY(-1px);
+}
+
+.sp-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 26px;
+  border-radius: 10px;
+  border: none;
+  background: var(--sp-green);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.1s, box-shadow 0.18s;
+  box-shadow: 0 4px 12px rgba(52, 168, 83, 0.3);
+  white-space: nowrap;
+}
+
+.sp-save-btn:hover {
+  background: var(--sp-green-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(52, 168, 83, 0.38);
+}
+
+.sp-save-btn:active {
+  transform: translateY(0);
+}
+
+.sp-shortcut-hint {
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--sp-text-muted);
+  margin-top: 8px;
+}
+
+.sp-shortcut-hint kbd {
+  background: #f0f2f5;
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11px;
+  color: var(--sp-text-secondary);
+}
+
+/* ============================================================
+   PREVIEW MODAL
+   ============================================================ */
+
+.sp-preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.sp-preview-modal {
+  background: var(--sp-white);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 680px;
+  min-width: 200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--sp-shadow-lg);
+  overflow: hidden;
+}
+
+/* Fake browser topbar */
+.sp-preview-topbar {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background: #f0f2f5;
+  border-bottom: 1px solid var(--sp-border);
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sp-preview-topbar-left {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.sp-preview-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sp-preview-dot--red    { background: #ff5f57; }
+.sp-preview-dot--yellow { background: #ffbd2e; }
+.sp-preview-dot--green  { background: #28c840; }
+
+.sp-preview-topbar-title {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sp-text-muted);
+  letter-spacing: 0.03em;
+}
+
+.sp-preview-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--sp-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.sp-preview-close:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+/* Preview header (what customer sees at the top of T&C) */
+.sp-preview-header {
+  background: linear-gradient(135deg, var(--sp-green) 0%, var(--sp-green-deep) 100%);
+  padding: 20px 32px 24px;
+  flex-shrink: 0;
+}
+
+.sp-preview-store-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.9);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.sp-preview-heading {
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 400;
+  color: #fff;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.sp-preview-meta {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  margin: 0;
+}
+
+/* Preview body (scrollable content) */
+.sp-preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+  scrollbar-width: thin;
+  scrollbar-color: #d0d0d0 transparent;
+}
+
+.sp-preview-body::-webkit-scrollbar { width: 5px; }
+.sp-preview-body::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 10px;
+}
+
+.sp-preview-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--sp-text-primary);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.sp-preview-content h1,
+.sp-preview-content h2,
+.sp-preview-content h3 {
+  color: var(--sp-text-primary);
+  margin: 1em 0 0.4em;
+}
+
+.sp-preview-content p { margin: 0 0 0.8em; }
+.sp-preview-content ul,
+.sp-preview-content ol { padding-left: 1.6em; margin: 0.5em 0; }
+.sp-preview-content li { margin-bottom: 0.3em; }
+.sp-preview-content strong { font-weight: 700; }
+.sp-preview-content em { font-style: italic; }
+.sp-preview-content u { text-decoration: underline; }
+.sp-preview-content s { text-decoration: line-through; }
+
+/* Empty state */
+.sp-preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 20px;
+  color: var(--sp-text-muted);
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Preview footer */
+.sp-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--sp-border);
+  background: #fafbfc;
+  flex-shrink: 0;
+}
+
+.sp-preview-footer-note {
+  font-size: 12px;
+  color: var(--sp-text-muted);
+  font-style: italic;
+}
+
+.sp-preview-close-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1.5px solid var(--sp-border);
+  background: var(--sp-white);
+  color: var(--sp-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.sp-preview-close-btn:hover {
+  background: #f0f2f5;
+  border-color: #c0c8d2;
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet
+   ============================================================ */
+@media (max-width: 768px) {
+  .sp-page {
+    padding: 20px 16px 40px;
+  }
+
+  .sp-editor {
+    min-height: 300px;
+    padding: 18px 18px;
+  }
+
+  .sp-toolbar {
+    padding: 10px 12px 8px;
+    gap: 4px 0;
+  }
+
+  .sp-toolbar-group {
+    padding: 0 5px;
+  }
+
+  .sp-preview-header {
+    padding: 22px 22px 18px;
+  }
+
+  .sp-preview-body {
+    padding: 20px 22px;
+  }
+
+  .sp-action-bar {
+    justify-content: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .sp-preview-btn,
+  .sp-save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sp-shortcut-hint {
+    text-align: center;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Small mobile
+   ============================================================ */
+@media (max-width: 480px) {
+  .sp-page {
+    padding: 16px 12px 32px;
+  }
+
+  .sp-page-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 10px;
+  }
+
+  .sp-toolbar-divider {
+    display: none;
+  }
+
+  .sp-toolbar-group-label {
+    display: none;
+  }
+
+  .sp-toolbar {
+    gap: 4px;
+  }
+
+  .sp-toolbar-group {
+    padding: 0 2px;
+  }
+
+  .sp-tool-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .sp-font-select {
+    min-width: 62px;
+    font-size: 12px;
+  }
+
+  .sp-editor {
+    min-height: 260px;
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .sp-preview-modal {
+    border-radius: 14px;
+  }
+
+  .sp-preview-heading {
+    font-size: 20px;
+  }
+
+  .sp-preview-footer {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .sp-preview-close-btn {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Minimum 200px
+   ============================================================ */
+@media (max-width: 280px) {
+  .sp-page {
+    padding: 10px 8px 24px;
+  }
+
+  .sp-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sp-page-icon {
+    display: none;
+  }
+
+  .sp-page-title {
+    font-size: 17px;
+  }
+
+  .sp-tool-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .sp-font-select {
+    min-width: 54px;
+    font-size: 11px;
+    padding: 0 18px 0 6px;
+  }
+
+  .sp-editor {
+    padding: 10px;
+    font-size: 13px;
+    min-height: 200px;
+  }
+
+  .sp-preview-btn,
+  .sp-save-btn {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .sp-preview-header {
+    padding: 16px;
+  }
+
+  .sp-preview-body {
+    padding: 14px 16px;
+  }
+
+  .sp-preview-footer {
+    padding: 10px 14px;
+  }
+}
+
+
+
+/* ============================================================
+   PASTE THESE AT THE VERY END OF StorePolicy.css
+   ============================================================ */
+
+/* ── Force all editor content to dark text — beats any inherited white ── */
+.sp-editor,
+.sp-editor * {
+  color: #1a1a2e !important;
+}
+
+/* ── Restore muted color for placeholder only ── */
+.sp-editor:empty::before {
+  color: #8a95a3 !important;
+}
+
+/* ── List visibility — explicit dark color + markers ── */
+.sp-editor ul,
+.sp-editor ol {
+  padding-left: 1.8em;
+  margin: 0.5em 0;
+  list-style-position: outside;
+}
+
+.sp-editor ul {
+  list-style-type: disc;
+}
+
+.sp-editor ol {
+  list-style-type: decimal;
+}
+
+.sp-editor li {
+  display: list-item;
+  margin-bottom: 0.3em;
+  color: #1a1a2e !important;
+}
+
+.sp-editor ul li::marker,
+.sp-editor ol li::marker {
+  color: #1a1a2e !important;
+}
+
+/* ── Strikethrough via <del> tag ── */
+.sp-editor del {
+  text-decoration: line-through;
+  color: #1a1a2e !important;
+}
+
+/* ── Preview modal: same rules ── */
+.sp-preview-content,
+.sp-preview-content * {
+  color: #1a1a2e !important;
+}
+
+.sp-preview-content ul,
+.sp-preview-content ol {
+  padding-left: 1.8em;
+  margin: 0.5em 0;
+  list-style-position: outside;
+}
+
+.sp-preview-content ul  { list-style-type: disc; }
+.sp-preview-content ol  { list-style-type: decimal; }
+
+.sp-preview-content li {
+  display: list-item;
+  margin-bottom: 0.3em;
+}
+
+.sp-preview-content ul li::marker,
+.sp-preview-content ol li::marker {
+  color: #1a1a2e !important;
+}
+
+.sp-preview-content del {
+  text-decoration: line-through;
+}

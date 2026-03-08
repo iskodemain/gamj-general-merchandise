@@ -99,10 +99,10 @@ function Sidebar({ currentView }) {
         {
           ['Super Admin'].includes(currentUser) && 
           <MenuItem
-            icon={assets.return_policy_icon}
-            label="Return & refund policy"
-            active={currentView === "return refund policy"}
-            onClick={() => {window.location.href = "/return-refund-policy"; setIsSidebarOpen(false);}}
+            icon={assets.terms_and_conditions}
+            label="Terms & Conditions"
+            active={currentView === "terms & conditions"}
+            onClick={() => {window.location.href = "/terms-and-conditions"; setIsSidebarOpen(false);}}
           />
         }
         {

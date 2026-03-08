@@ -67,7 +67,7 @@ app.use('/api/settings', adminSettingsRouter);
 app.use('/api/inventory', adminInventoryRouter);
 app.use('/api/admin/notification', adminNotificationRouter);
 app.use('/api/location', adminLocationRouter);
-app.use('/api/return-refund-policy', adminPolicyRoute);
+app.use('/api/policies', adminPolicyRoute);
 
 
 // TEST
