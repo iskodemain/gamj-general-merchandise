@@ -22,6 +22,8 @@ function UpdateProduct() {
   const [productDetails, setProductDetails] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [displayPrice, setDisplayPrice] = useState('');
+  const [unitType, setUnitType] = useState('PIECE');
+  const [piecesPerBox, setPiecesPerBox] = useState(1);
 
   // --- IMAGE STATES
   const [image_1, setImage_1] = useState(false);
@@ -80,6 +82,8 @@ function UpdateProduct() {
     setIsOutOfStock(Boolean(found.isOutOfStock));
     setHasVariants(Boolean(found.hasVariant));
     setHasVariantCombination(Boolean(found.hasVariantCombination));
+    setUnitType(found.unitType || 'PIECE');
+    setPiecesPerBox(found.piecesPerBox !== undefined && found.piecesPerBox !== null ? Number(found.piecesPerBox) : 1);
 
     // Build variantNamesList (ordered)
     if (Array.isArray(variantName) && variantName.length) {
@@ -329,6 +333,10 @@ function UpdateProduct() {
       toast.error('Price is required', { ...toastError });
       return;
     }
+    if (unitType === 'BOX' && (!piecesPerBox || Number(piecesPerBox) < 1)) {
+      toast.error('Pieces per box must be at least 1.', { ...toastError });
+      return;
+    }
 
     let finalVariantNames;
     let finalVariantValues;
@@ -402,6 +410,8 @@ function UpdateProduct() {
     formData.append('productDescription', productDescription);
     formData.append('productDetails', productDetails || '');
     formData.append('price', displayPrice === '' ? null : Number(displayPrice));
+    formData.append('unitType', unitType);
+    formData.append('piecesPerBox', unitType === 'BOX' ? Number(piecesPerBox) : 1);
     
     // image_1
     if (image_1) {
@@ -458,8 +468,15 @@ function UpdateProduct() {
     setLoading(false);
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Delete this product? This action cannot be undone.")) return;
+  const handleDelete = async (ID) => {
+    setLoading(true);
+    const success = await deleteProduct(ID);
+    if (success) {
+      setTimeout(() => {
+        window.location.href = "/products/totalproduct";
+      }, 500);
+    }
+    setLoading(false);
   };
 
   const existingImage1 = productItemState?.image1 || productItemState?.images?.[0] || null;
@@ -471,131 +488,39 @@ function UpdateProduct() {
     <>
       {loading && <Loading />}
       <Navbar TitleName="Update Product" />
-      <div className="ap-page">
-        <div className="ap-container">
-          <div className="ap-header">
-            <button onClick={() => window.history.back()} className="ap-back">
+      <div className="upp-page">
+        <div className="upp-container">
+          <div className="upp-header">
+            <button onClick={() => window.history.back()} className="upp-back">
               <FaArrowLeft />
             </button>
-            <h1 className="ap-title">Back</h1>
+            <h1 className="upp-title">Back</h1>
           </div>
 
-          <form onSubmit={handleSubmit} className="ap-form">
-            <section className="ap-card">
-              <h2 className="ap-heading">Upload Image</h2>
-              <div className="ap-upload-grid">
-                {/* IMAGE 1 */}
-                <div className={`main-img-container ${(image_1 || existingImage1) ? 'uploaded' : ''}`}>
-                  <label htmlFor="image_1" className="img-label">
-                    <div className="img-container">
-                      <img
-                        className="image-con"
-                        src={image_1 ? URL.createObjectURL(image_1) : (existingImage1 || assets.image_upload_icon)}
-                        alt=""
-                      />
-                    </div>
-                    <input type="file" id="image_1" hidden onChange={(e) => setImage_1(e.target.files[0])}/>
-                  </label>
-                </div>
-
-                {/* IMAGE 2 */}
-                <div className={`main-img-container ${(image_2 || existingImage2) ? 'uploaded' : ''}`}>
-                  <p
-                    onClick={() => image_2 ? setImage_2(false) : handleImgCloseButton(2)}
-                    className={`img-remove-btn ${(image_2 || existingImage2) ? '' : 'hidden'}`}
-                  >
-                    <FaTrash />
-                  </p>
-
-                  <label htmlFor="image_2" className="img-label">
-                    <div className="img-container">
-                      <img
-                        className="image-con"
-                        src={
-                          image_2
-                            ? URL.createObjectURL(image_2)
-                            : (existingImage2 && !image_2Close ? existingImage2 : assets.image_upload_icon)
-                        }
-                        alt=""
-                      />
-                    </div>
-                    <input type="file" id="image_2" hidden onChange={(e) => setImage_2(e.target.files[0])}/>
-                  </label>
-                </div>
-
-                {/* IMAGE 3 */}
-                <div className={`main-img-container ${(image_3 || existingImage3) ? 'uploaded' : ''}`}>
-                  <p
-                    onClick={() => image_3 ? setImage_3(false) : handleImgCloseButton(3)}
-                    className={`img-remove-btn ${(image_3 || existingImage3) ? '' : 'hidden'}`}
-                  >
-                    <FaTrash />
-                  </p>
-
-                  <label htmlFor="image_3" className="img-label">
-                    <div className="img-container">
-                      <img
-                        className="image-con"
-                        src={
-                          image_3
-                            ? URL.createObjectURL(image_3)
-                            : (existingImage3 && !image_3Close ? existingImage3 : assets.image_upload_icon)
-                        }
-                        alt=""
-                      />
-                    </div>
-                    <input type="file" id="image_3" hidden onChange={(e) => setImage_3(e.target.files[0])}/>
-                  </label>
-                </div>
-
-                {/* IMAGE 4 */}
-                <div className={`main-img-container ${(image_4 || existingImage4) ? 'uploaded' : ''}`}>
-                  <p
-                    onClick={() => image_4 ? setImage_4(false) : handleImgCloseButton(4)}
-                    className={`img-remove-btn ${(image_4 || existingImage4) ? '' : 'hidden'}`}
-                  >
-                    <FaTrash />
-                  </p>
-
-                  <label htmlFor="image_4" className="img-label">
-                    <div className="img-container">
-                      <img
-                        className="image-con"
-                        src={
-                          image_4
-                            ? URL.createObjectURL(image_4)
-                            : (existingImage4 && !image_4Close ? existingImage4 : assets.image_upload_icon)
-                        }
-                        alt=""
-                      />
-                    </div>
-                    <input type="file" id="image_4" hidden onChange={(e) => setImage_4(e.target.files[0])}/>
-                  </label>
-                </div>
-              </div>
-
-              <div className="form-group">
+          <form onSubmit={handleSubmit} className="upp-form">
+            <section className="upp-card">
+              <div className="upp-form-group">
                 <label>Product Name</label>
-                <input className="input" type="text" value={productName}
+                <input className="upp-input" type="text" value={productName}
                   onChange={(e) => setProductName(e.target.value)} placeholder="Enter product name" required />
               </div>
 
-              <div className="form-group">
+              <div className="upp-form-group">
                 <label>Product Description</label>
-                <textarea className="input ap-pd" value={productDescription}
+                <textarea className="upp-input upp-pd" value={productDescription}
                   onChange={(e) => setProductDescription(e.target.value)} placeholder="Provide a brief product description" required />
               </div>
 
-              <div className="form-group">
+              <div className="upp-form-group">
                 <label>Product Details</label>
-                <textarea className="textarea" rows="4" value={productDetails}
+                <textarea className="upp-textarea" rows="4" value={productDetails}
                   onChange={(e) => setProductDetails(e.target.value)} placeholder="Enter detailed product information (optional)" />
               </div>
 
-              <div className="form-group">
+              <div className="upp-form-group">
                 <label>Product Category</label>
                 <select
-                  className="select"
+                  className="upp-select"
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                 >
@@ -610,10 +535,10 @@ function UpdateProduct() {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className="upp-form-group">
                 <label>Display Price</label>
                 <input
-                  className="input price-input"
+                  className="upp-input upp-price-input"
                   type="text"
                   inputMode="decimal"
                   value={displayPrice}
@@ -623,15 +548,45 @@ function UpdateProduct() {
                 />
               </div>
 
-              <div className="checkbox-row">
-                <label className="checkbox-inline">
+              <div className="upp-form-group">
+                <label>Unit Type</label>
+                <select
+                  className="upp-select"
+                  value={unitType}
+                  onChange={(e) => {
+                    setUnitType(e.target.value);
+                    if (e.target.value === 'PIECE') setPiecesPerBox(1);
+                  }}
+                >
+                  <option value="PIECE">Per Piece</option>
+                  <option value="BOX">Per Box</option>
+                </select>
+              </div>
+
+              {unitType === 'BOX' && (
+                <div className="upp-form-group">
+                  <label>Pieces Per Box</label>
+                  <input
+                    className="upp-input"
+                    type="number"
+                    min="1"
+                    value={piecesPerBox}
+                    onChange={(e) => setPiecesPerBox((e.target.value))}
+                    placeholder="e.g. 7"
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="upp-checkbox-row">
+                <label className="upp-checkbox-inline">
                   <input type="checkbox" checked={hasVariants} onChange={(e) => setHasVariants(e.target.checked)} />
                   This product has variants
                 </label>
               </div>
 
               {hasVariants && (
-                <label className="checkbox-inline">
+                <label className="upp-checkbox-inline">
                   <input type="checkbox" checked={hasVariantCombination} onChange={(e) => handleVariantCombinationToggle(e.target.checked)} />This product has variant combination
                 </label>
               )}
@@ -639,21 +594,21 @@ function UpdateProduct() {
 
             {/* Variants block */}
             {hasVariants && (
-              <section className="ap-card variant-card">
+              <section className="upp-card upp-variant-card">
                 {variantValuesSets.map((valueSet, setIndex) => (
-                  <div key={setIndex} className="variant-values-set">
-                    <div className="variant-set-header">
+                  <div key={setIndex} className="upp-variant-values-set">
+                    <div className="upp-variant-set-header">
                       {hasVariantCombination && variantValuesSets.length > 1 && (
-                        <button type="button" className="btn-remove" onClick={() => removeVariantValuesSet(setIndex)}>
-                          <FaTrash className='btn-remove-icon' />
+                        <button type="button" className="upp-btn-remove" onClick={() => removeVariantValuesSet(setIndex)}>
+                          <FaTrash className='upp-btn-remove-icon' />
                         </button>
                       )}
                     </div>
 
-                    <div className="variant-name-row">
-                      <p className="vn-title">Variant Name</p>
+                    <div className="upp-variant-name-row">
+                      <p className="upp-vn-title">Variant Name</p>
                       <input
-                        className="input"
+                        className="upp-input"
                         type="text"
                         value={variantNamesList[setIndex]?.name || ""}
                         onChange={(e) => updateVariantName(setIndex, e.target.value)}
@@ -663,14 +618,14 @@ function UpdateProduct() {
 
                     {/* Variant Values */}
                     {valueSet.map((value, valueIndex) => (
-                      <div key={valueIndex} className="variant-value-row">
-                        <div className="small-title">Variant Value {valueIndex + 1}</div>
+                      <div key={valueIndex} className="upp-variant-value-row">
+                        <div className="upp-small-title">Variant Value {valueIndex + 1}</div>
 
-                        <div className={hasVariantCombination ? "grid-1" : "grid-2"}>
-                          <div className="form-group">
+                        <div className={hasVariantCombination ? "upp-grid-1" : "upp-grid-2"}>
+                          <div className="upp-form-group">
                             <label>Name</label>
                             <input
-                              className="input"
+                              className="upp-input"
                               type="text"
                               value={value.name}
                               onChange={(e) => updateVariantValue(setIndex, valueIndex, "name", e.target.value)}
@@ -679,10 +634,10 @@ function UpdateProduct() {
                           </div>
 
                           {!hasVariantCombination && (
-                            <div className="form-group">
+                            <div className="upp-form-group">
                               <label>Price</label>
                               <input
-                                className="input price-input"
+                                className="upp-input upp-price-input"
                                 type="text"
                                 inputMode="decimal"
                                 value={value.price}
@@ -693,19 +648,19 @@ function UpdateProduct() {
                           )}
                         </div>
 
-                        <div className="value-actions">
+                        <div className="upp-value-actions">
                           {valueIndex === valueSet.length - 1 ? (
-                            <div className='vv-btn-ctn'>
-                              <button type="button" className="btn btn-primary btn-new" onClick={() => addVariantValue(setIndex)}>
+                            <div className='upp-vv-btn-ctn'>
+                              <button type="button" className="upp-btn upp-btn-primary upp-btn-new" onClick={() => addVariantValue(setIndex)}>
                                 <FaPlus /> New Value
                               </button>
 
-                              <button type="button" className="btn-remove-vv-double" onClick={() => removeVariantValue(setIndex, valueIndex)}>
+                              <button type="button" className="upp-btn-remove-vv-double" onClick={() => removeVariantValue(setIndex, valueIndex)}>
                                 <FaTrash />
                               </button>
                             </div>
                           ) : (
-                            <button type="button" className="btn btn-remove-vv-solo" onClick={() => removeVariantValue(setIndex, valueIndex)}>
+                            <button type="button" className="upp-btn upp-btn-remove-vv-solo" onClick={() => removeVariantValue(setIndex, valueIndex)}>
                               <FaTrash /> Delete
                             </button>
                           )}
@@ -716,19 +671,19 @@ function UpdateProduct() {
                 ))}
 
                 {hasVariantCombination && (
-                  <button type="button" className="avv-btn" onClick={addVariantValuesSet}>+ Add New Variant Value Set</button>
+                  <button type="button" className="upp-avv-btn" onClick={addVariantValuesSet}>+ Add New Variant Value Set</button>
                 )}
               </section>
             )}
 
             {/* Variant Combination */}
             {hasVariantCombination && variantValuesSets.length >= 2 && (
-              <section className='ap-card variant-combo-card'>
-                <div className="combo-card">
-                  <div className="combo-header">
-                    <p className='combo-title'>Variant Combination</p>
-                    <div className="combo-actions">
-                      <button type="button" className="combo-btn-deleteall"
+              <section className='upp-card upp-variant-combo-card'>
+                <div className="upp-combo-card">
+                  <div className="upp-combo-header">
+                    <p className='upp-combo-title'>Variant Combination</p>
+                    <div className="upp-combo-actions">
+                      <button type="button" className="upp-combo-btn-deleteall"
                         onClick={() => {
                           setVariantCombinations([{ combinations: '', price: '', availability: true }]);
                         }}>
@@ -737,26 +692,26 @@ function UpdateProduct() {
                     </div>
                   </div>
 
-                  <div className="combo-list">
+                  <div className="upp-combo-list">
                     {variantCombinations.map((combo, idx) => (
-                      <div key={idx} className={`combo-row ${!combo.availability ? "disabled" : ""}`}>
-                        <div className="combo-col combo-big">
-                          <input className="input" type="text" value={combo.combinations} disabled={!combo.availability}
+                      <div key={idx} className={`upp-combo-row ${!combo.availability ? "upp-disabled" : ""}`}>
+                        <div className="upp-combo-col upp-combo-big">
+                          <input className="upp-input" type="text" value={combo.combinations} disabled={!combo.availability}
                             onChange={(e) => updateVariantCombination(idx, 'combinations', e.target.value)} placeholder="Combined Variant Value (e.g., S, Blue)" />
                         </div>
 
-                        <div className="combo-col combo-small">
-                          <input className="input" type="text" inputMode="decimal" value={combo.price} disabled={!combo.availability} onChange={(e) => updateVariantCombination(idx, 'price', handleDecimalInput(e.target.value))} placeholder="Price" />
+                        <div className="upp-combo-col upp-combo-small">
+                          <input className="upp-input" type="text" inputMode="decimal" value={combo.price} disabled={!combo.availability} onChange={(e) => updateVariantCombination(idx, 'price', handleDecimalInput(e.target.value))} placeholder="Price" />
                         </div>
 
-                        <div className="combo-col toggle-col">
-                          <label className="switch">
+                        <div className="upp-combo-col upp-toggle-col">
+                          <label className="upp-switch">
                             <input type="checkbox" checked={combo.availability} onChange={() => toggleCombinationAvailability(idx)} />
-                            <span className="slider" />
+                            <span className="upp-slider" />
                           </label>
                         </div>
 
-                        <button type="button" className="combo-delete-single" onClick={() => removeVariantCombination(idx)}>
+                        <button type="button" className="upp-combo-delete-single" onClick={() => removeVariantCombination(idx)}>
                           <FaTrash />
                         </button>
                       </div>
@@ -764,31 +719,123 @@ function UpdateProduct() {
                   </div>
                 </div>
 
-                <button type="button" className="combo-avc-btn" onClick={addVariantCombination}>+ Add New Combination</button>
+                <button type="button" className="upp-combo-avc-btn" onClick={addVariantCombination}>+ Add New Combination</button>
               </section>
             )}
 
+            {/* Image Upload */}
+            <section className="upp-card">
+              <h2 className="upp-heading">Upload Image</h2>
+              <div className="upp-upload-grid">
+                {/* IMAGE 1 */}
+                <div className={`upp-main-img-container ${(image_1 || existingImage1) ? 'upp-uploaded' : ''}`}>
+                  <label htmlFor="image_1" className="upp-img-label">
+                    <div className="upp-img-container">
+                      <img
+                        className="upp-image-con"
+                        src={image_1 ? URL.createObjectURL(image_1) : (existingImage1 || assets.image_upload_icon)}
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_1" hidden onChange={(e) => setImage_1(e.target.files[0])}/>
+                  </label>
+                </div>
+
+                {/* IMAGE 2 */}
+                <div className={`upp-main-img-container ${(image_2 || existingImage2) && !image_2Close ? 'upp-uploaded' : ''}`}>
+                  <p
+                    onClick={() => image_2 ? setImage_2(false) : handleImgCloseButton(2)}
+                    className={`upp-img-remove-btn ${(image_2 || (existingImage2 && !image_2Close)) ? '' : 'upp-hidden'}`}
+                  >
+                    <FaTrash />
+                  </p>
+                  <label htmlFor="image_2" className="upp-img-label">
+                    <div className="upp-img-container">
+                      <img
+                        className="upp-image-con"
+                        src={
+                          image_2
+                            ? URL.createObjectURL(image_2)
+                            : (existingImage2 && !image_2Close ? existingImage2 : assets.image_upload_icon)
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_2" hidden onChange={(e) => setImage_2(e.target.files[0])}/>
+                  </label>
+                </div>
+
+                {/* IMAGE 3 */}
+                <div className={`upp-main-img-container ${(image_3 || existingImage3) && !image_3Close ? 'upp-uploaded' : ''}`}>
+                  <p
+                    onClick={() => image_3 ? setImage_3(false) : handleImgCloseButton(3)}
+                    className={`upp-img-remove-btn ${(image_3 || (existingImage3 && !image_3Close)) ? '' : 'upp-hidden'}`}
+                  >
+                    <FaTrash />
+                  </p>
+                  <label htmlFor="image_3" className="upp-img-label">
+                    <div className="upp-img-container">
+                      <img
+                        className="upp-image-con"
+                        src={
+                          image_3
+                            ? URL.createObjectURL(image_3)
+                            : (existingImage3 && !image_3Close ? existingImage3 : assets.image_upload_icon)
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_3" hidden onChange={(e) => setImage_3(e.target.files[0])}/>
+                  </label>
+                </div>
+
+                {/* IMAGE 4 */}
+                <div className={`upp-main-img-container ${(image_4 || existingImage4) && !image_4Close ? 'upp-uploaded' : ''}`}>
+                  <p
+                    onClick={() => image_4 ? setImage_4(false) : handleImgCloseButton(4)}
+                    className={`upp-img-remove-btn ${(image_4 || (existingImage4 && !image_4Close)) ? '' : 'upp-hidden'}`}
+                  >
+                    <FaTrash />
+                  </p>
+                  <label htmlFor="image_4" className="upp-img-label">
+                    <div className="upp-img-container">
+                      <img
+                        className="upp-image-con"
+                        src={
+                          image_4
+                            ? URL.createObjectURL(image_4)
+                            : (existingImage4 && !image_4Close ? existingImage4 : assets.image_upload_icon)
+                        }
+                        alt=""
+                      />
+                    </div>
+                    <input type="file" id="image_4" hidden onChange={(e) => setImage_4(e.target.files[0])}/>
+                  </label>
+                </div>
+              </div>
+            </section>
+
             {/* toggles & submit */}
-            <section className="ap-card">
-              <div className="toggle-list">
-                <label className="toggle-row">
+            <section className="upp-card">
+              <div className="upp-toggle-list">
+                <label className="upp-toggle-row">
                   <input type="checkbox" checked={isActive} onChange={() => setIsActive(!isActive)} />
                   Mark as Active
                 </label>
-                <label className="toggle-row">
+                <label className="upp-toggle-row">
                   <input type="checkbox" checked={isBestSeller} onChange={() => setIsBestSeller(!isBestSeller)} />
                   Mark as Best Seller
                 </label>
-                <label className="toggle-row">
+                <label className="upp-toggle-row">
                   <input type="checkbox" checked={isOutOfStock} onChange={() => setIsOutOfStock(!isOutOfStock)} />
                   Mark as Out of Stock
                 </label>
               </div>
 
-              <div className="ap-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
-                <button type="submit" className="btn-submit">Save Changes</button>
+              <div className="upp-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
+                <button type="submit" className="upp-btn-submit">Save Changes</button>
 
-                <button type="button" className="upp-delete-btn" onClick={handleDelete} style={{ marginRight: 'auto' }}>
+                <button type="button" className="upp-delete-btn" onClick={() => handleDelete(productID)} style={{ marginRight: 'auto' }}>
                   Delete
                 </button>
               </div>

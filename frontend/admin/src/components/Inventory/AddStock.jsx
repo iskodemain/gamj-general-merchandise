@@ -37,11 +37,15 @@ export default function AddStock() {
   const selectedProductData = products.find(p => p.ID === Number(selectedProduct));
   const hasVariants = selectedProductData?.hasVariant;
   const hasVariantCombination = selectedProductData?.hasVariantCombination;
+  const unitType = selectedProductData?.unitType || 'PIECE';
+  const piecesPerBox = selectedProductData?.piecesPerBox || 1;
+  const minQuantity = unitType === 'BOX' ? piecesPerBox : 1;
 
   // Reset variant inputs when product changes
   useEffect(() => {
     setSelectedVariantValue("");
     setSelectedVariantCombo("");
+    setQuantityReceived("");
   }, [selectedProduct]);
 
   // Auto-generate batch number
@@ -76,7 +80,22 @@ export default function AddStock() {
     }
 
     if (!quantityReceived || Number(quantityReceived) <= 0) {
-      toast.error("Please enter a valid quantity", { ...toastError });
+      toast.error("Please enter a valid quantity.", { ...toastError });
+      return false;
+    }
+
+    if (unitType === 'BOX' && Number(quantityReceived) < piecesPerBox) {
+      toast.error(`Quantity must be at least ${piecesPerBox} pieces (1 box) for this product.`, { ...toastError });
+      return false;
+    }
+
+    // if (unitType === 'BOX' && Number(quantityReceived) % piecesPerBox !== 0) {
+    //   toast.error(`Quantity must be a multiple of ${piecesPerBox} pieces per box (e.g. ${piecesPerBox}, ${piecesPerBox * 2}, ${piecesPerBox * 3}).`, { ...toastError });
+    //   return false;
+    // }
+
+    if (unitType === 'PIECE' && Number(quantityReceived) < 1) {
+      toast.error("Quantity must be at least 1 piece.", { ...toastError });
       return false;
     }
 
@@ -87,6 +106,21 @@ export default function AddStock() {
 
     if (hasVariants && !hasVariantCombination && !selectedVariantValue) {
       toast.error("This product requires a variant selection", { ...toastError });
+      return false;
+    }
+
+    if (!supplier || !supplier.trim()) {
+      toast.error("Supplier Name is required.", { ...toastError });
+      return false;
+    }
+
+    if (!batchNumber || !batchNumber.trim()) {
+      toast.error("Batch Number is required.", { ...toastError });
+      return false;
+    }
+
+    if (!manufacturingDate) {
+      toast.error("Manufacturing Date is required.", { ...toastError });
       return false;
     }
 
@@ -203,11 +237,15 @@ export default function AddStock() {
                   disabled={loading}
                 >
                   <option value="">-- Select Product --</option>
-                  {products.map((p) => (
-                    <option key={p.ID} value={p.ID}>
-                      {p.productName}
-                    </option>
-                  ))}
+                  {products.map((p) => {
+                    const unitLabel = p.unitType === 'BOX' ? `📦 Per Box (${p.piecesPerBox} pcs)` : '🔹 Per Piece';
+                    const stockLabel = p.isOutOfStock ? ' — ⚠️ No Stock' : '';
+                    return (
+                      <option key={p.ID} value={p.ID}>
+                        {p.productName} | {unitLabel}{stockLabel}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
@@ -267,7 +305,17 @@ export default function AddStock() {
               <h3 className="addstock-section-title"> Batch Details</h3>
               <div className="addstock-form-group">
                 <label className="addstock-label" htmlFor="quantity">
-                  Quantity Received 
+                  Quantity Received <span className="addstock-required">*</span>
+                  {selectedProduct && unitType === 'BOX' && (
+                    <span style={{ fontWeight: 400, fontSize: '0.8rem', color: '#888', marginLeft: '8px' }}>
+                      (Per Box — {piecesPerBox} pcs/box)
+                    </span>
+                  )}
+                  {selectedProduct && unitType === 'PIECE' && (
+                    <span style={{ fontWeight: 400, fontSize: '0.8rem', color: '#888', marginLeft: '8px' }}>
+                      (Per Piece — min. 1)
+                    </span>
+                  )}
                 </label>
                 <input
                   id="quantity"
@@ -275,9 +323,14 @@ export default function AddStock() {
                   className="addstock-input"
                   value={quantityReceived}
                   onChange={(e) => setQuantityReceived(e.target.value)}
-                  placeholder="Enter quantity"
-                  min="1"
-                  disabled={loading}
+                  placeholder={
+                    unitType === 'BOX'
+                      ? `Enter total pieces received (minimum of ${piecesPerBox} pcs)`
+                      : 'Enter total pieces received'
+                  }
+                  min={minQuantity}
+                  step={unitType === 'BOX' ? piecesPerBox : 1}
+                  disabled={loading || !selectedProduct}
                 />
               </div>
 
@@ -299,7 +352,7 @@ export default function AddStock() {
 
                 <div className="addstock-form-group">
                   <label className="addstock-label" htmlFor="supplier">
-                    Supplier Name
+                    Supplier Name <span className="addstock-required">*</span>
                   </label>
                   <input
                     id="supplier"
@@ -307,7 +360,7 @@ export default function AddStock() {
                     className="addstock-input"
                     value={supplier}
                     onChange={(e) => setSupplier(e.target.value)}
-                    placeholder="Optional"
+                    placeholder="Enter supplier name"
                     disabled={loading}
                   />
                 </div>
@@ -315,7 +368,7 @@ export default function AddStock() {
               <div className="addstock-form-row">
                 <div className="addstock-form-group">
                   <label className="addstock-label" htmlFor="batchNumber">
-                    Batch Number
+                    Batch Number <span className="addstock-required">*</span>
                   </label>
                   <input
                     id="batchNumber"
@@ -323,14 +376,14 @@ export default function AddStock() {
                     className="addstock-input"
                     value={batchNumber}
                     onChange={(e) => setBatchNumber(e.target.value)}
-                    placeholder="Enter the batch number (optional)"
+                    placeholder="Enter the batch number"
                     disabled={loading}
                   />
                 </div>
 
                 <div className="addstock-form-group">
                   <label className="addstock-label" htmlFor="manufacturingDate">
-                    Manufacturing Date
+                    Manufacturing Date <span className="addstock-required">*</span>
                   </label>
                   <input
                     id="manufacturingDate"
