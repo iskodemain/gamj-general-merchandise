@@ -45,6 +45,17 @@ const Products = sequelize.define(
         return parseFloat(value);
       },
     },
+    unitType: {
+      type: DataTypes.ENUM("PIECE", "BOX"),
+      allowNull: false,
+      defaultValue: "PIECE"
+    },
+
+    piecesPerBox: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 1
+    },
     image1: {
       type: DataTypes.TEXT,
       allowNull: false,

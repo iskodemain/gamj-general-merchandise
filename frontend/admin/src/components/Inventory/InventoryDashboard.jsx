@@ -75,6 +75,26 @@ export default function InventoryDashboard() {
     return p ? p.productName : 'Unknown';
   };
 
+  const resolveUnitDetails = (productId) => {
+    const product = products.find(p => p.ID === productId);
+
+    if (!product) {
+      return { unitType: '-', piecesPerBox: '-' };
+    }
+
+    const unitType = product.unitType || '-';
+
+    let piecesPerBox = '-';
+
+    if (unitType === 'PIECE') {
+      piecesPerBox = 'N/A';
+    } else {
+      piecesPerBox = product.piecesPerBox ?? '-';
+    }
+
+    return { unitType, piecesPerBox };
+  };
+
   const computeStatus = (qty, thresholdSettings) => {
     if (qty === 0) return 'OUT';
     if (!thresholdSettings) return 'OK'; // No threshold set
@@ -86,11 +106,33 @@ export default function InventoryDashboard() {
     let result = [...fetchInventoryStock];
 
     if (searchTerm) {
-      const search = searchTerm.toLowerCase();
+      const search = searchTerm.trim().toLowerCase();
+
       result = result.filter(stock => {
+        const product = products.find(p => p.ID === stock.productId);
+
         const productName = resolveProductName(stock.productId).toLowerCase();
-        const variant     = resolveVariant(stock).toLowerCase();
-        return productName.includes(search) || variant.includes(search);
+        const variant = resolveVariant(stock).toLowerCase();
+
+        const unitType = product?.unitType?.toLowerCase() || '';
+        const piecesPerBox = product?.piecesPerBox?.toString() || '';
+
+        const stockQty = stock.totalQuantity?.toString() || '';
+
+        const thresholdSettings = getThresholdForStock(stock);
+        const status = computeStatus(stock.totalQuantity, thresholdSettings).toLowerCase();
+
+        const productId = stock.productId?.toString() || '';
+
+        return (
+          productName.includes(search) ||
+          variant.includes(search) ||
+          unitType.includes(search) ||
+          piecesPerBox.includes(search) ||
+          stockQty.includes(search) ||
+          status.includes(search) ||
+          productId.includes(search)
+        );
       });
     }
 
@@ -346,6 +388,8 @@ export default function InventoryDashboard() {
                 <th>ID</th>
                 <th>Image</th>
                 <th>Product</th>
+                <th>Unit Type</th>
+                <th>Pieces per Box</th>
                 <th>Variant</th>
                 <th>Stock</th>
                 <th>
@@ -370,7 +414,7 @@ export default function InventoryDashboard() {
             <tbody>
               {filteredAndSortedData.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="no-results">
+                  <td colSpan="9" className="no-results">
                     {searchTerm || filterStatus !== 'all'
                       ? '🔍 No items match your filters'
                       : 'No inventory data available'}
@@ -393,6 +437,11 @@ export default function InventoryDashboard() {
                         <img src={image} alt="product" className="prod-img" />
                       </td>
                       <td><strong>{resolveProductName(stock.productId)}</strong></td>
+
+                      <td>{resolveUnitDetails(stock.productId).unitType}</td>
+
+                      <td>{resolveUnitDetails(stock.productId).piecesPerBox}</td>
+
                       <td>{resolveVariant(stock)}</td>
                       <td>
                         <span className="stock-badge">{stock.totalQuantity}</span>

@@ -11,7 +11,7 @@ const withTimestamp = (prefix, number) => {
   return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
 };
 
-export const addProductService = async ( adminId, categoryId, productName, productDescription, productDetails, price, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination) => {
+export const addProductService = async ( adminId, categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination) => {
   try {
       // Convert types
       const toBool = (v) => v === "true" || v === true || v === 1 || v === "1";
@@ -24,6 +24,8 @@ export const addProductService = async ( adminId, categoryId, productName, produ
       isOutOfStock = toBool(isOutOfStock);
       hasVariant = toBool(hasVariant);
       hasVariantCombination = toBool(hasVariantCombination);
+      unitType = unitType || "PIECE";
+      piecesPerBox = unitType === "BOX" ? Number(piecesPerBox) : 1;
 
       const adminUser = await Admin.findByPk(adminId);
       if (!adminUser) {
@@ -49,6 +51,9 @@ export const addProductService = async ( adminId, categoryId, productName, produ
       if (!productDescription) return { success: false, message: "Product description is required" };
       if (price === undefined || price === null || Number(price) < 0)
           return { success: false, message: "Price is required" };
+
+      if (unitType === "BOX" && (!piecesPerBox || piecesPerBox < 1))
+        return { success: false, message: "Pieces per box must be at least 1." };
 
       // Handle images
       const images = [image1, image2, image3, image4].filter(i => i && i.path);
@@ -97,6 +102,8 @@ export const addProductService = async ( adminId, categoryId, productName, produ
         productDescription,
         productDetails: productDetails || "",
         price: Number(price),
+        unitType,
+        piecesPerBox,
         image1: imagesUrl[0]?.secure_url,
         image2: imagesUrl[1]?.secure_url || null,
         image3: imagesUrl[2]?.secure_url || null,
@@ -320,7 +327,7 @@ export const addProductService = async ( adminId, categoryId, productName, produ
 };
 
 
-export const updateProductService = async (adminId, productID, categoryId, productName, productDescription, productDetails, price, image1File, image2File, image3File, image4File, image1Body, image2Body, image3Body, image4Body, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination) => {
+export const updateProductService = async (adminId, productID, categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, image1File, image2File, image3File, image4File, image1Body, image2Body, image3Body, image4Body, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination) => {
   try {
       // ---------- helpers ----------
       const toBool = (v) => v === "true" || v === true || v === 1 || v === "1";
@@ -334,6 +341,8 @@ export const updateProductService = async (adminId, productID, categoryId, produ
       isOutOfStock = toBool(isOutOfStock);
       hasVariant = toBool(hasVariant);
       hasVariantCombination = toBool(hasVariantCombination);
+      unitType = unitType || 'PIECE';
+      piecesPerBox = unitType === 'BOX' ? Number(piecesPerBox) : 1;
 
       // Parse JSON strings if provided
       if (typeof variantNames === 'string') {
@@ -372,6 +381,10 @@ export const updateProductService = async (adminId, productID, categoryId, produ
           if (price === null || Number.isNaN(price) || price < 0) {
               return { success: false, message: 'Price is required for non-variant product' };
           }
+      }
+
+      if (unitType === 'BOX' && (!piecesPerBox || piecesPerBox < 1)) {
+        return { success: false, message: 'Pieces per box must be at least 1.' };
       }
 
       // variants but no combination require variantNames & variantValues
@@ -485,6 +498,8 @@ export const updateProductService = async (adminId, productID, categoryId, produ
               productDescription,
               productDetails: productDetails || '',
               price: price === null ? null : Number(price),
+              unitType,
+              piecesPerBox,
               image1: imagesToUpdate.image1,
               image2: imagesToUpdate.image2,
               image3: imagesToUpdate.image3,

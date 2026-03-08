@@ -117,15 +117,38 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       const product = await Products.findByPk(productId);
       const productName = product.productName;
 
-      // ✅ UPDATE INVENTORY STOCK
-      const newTotalQuantity = Math.max((inventoryStock.totalQuantity || 0) - quantity, 0);
-      await inventoryStock.update({ 
+      // ✅ DETERMINE DEDUCTION AMOUNT BASED ON UNIT TYPE
+      const unitType = product.unitType || 'PIECE';
+      const piecesPerBox = Number(product.piecesPerBox) || 1;
+      const quantityToDeduct = unitType === 'BOX'
+        ? quantity * piecesPerBox   // BOX: ordered 2 boxes × 7 pcs = deduct 14
+        : quantity;                 // PIECE: deduct exactly as ordered
+
+      // ✅ VALIDATE SUFFICIENT STOCK (always compared in pieces)
+      if (inventoryStock.totalQuantity < quantityToDeduct) {
+        return {
+          success: false,
+          message: `Insufficient stock for "${productName}". Available: ${inventoryStock.totalQuantity} pcs, Required: ${quantityToDeduct} pcs.`,
+        };
+      }
+
+      // ✅ UPDATE INVENTORY STOCK (in pieces)
+      const newTotalQuantity = Math.max((inventoryStock.totalQuantity || 0) - quantityToDeduct, 0);
+      await inventoryStock.update({
         totalQuantity: newTotalQuantity,
         updatedAt: new Date()
       });
 
-      // ✅ UPDATE INVENTORY BATCH
-      let remainingToDeduct = quantity;
+      // ✅ MARK PRODUCT AS OUT OF STOCK IF ZERO
+      if (newTotalQuantity === 0) {
+        await Products.update(
+          { isOutOfStock: true },
+          { where: { ID: productId } }
+        );
+      }
+
+      // ✅ UPDATE INVENTORY BATCH (FIFO, deduct in pieces)
+      let remainingToDeduct = quantityToDeduct;
       const inventoryBatches = await InventoryBatch.findAll({
         where: {
           productId,
@@ -135,7 +158,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
         },
         order: [
           ['expirationDate', 'ASC'],  // FIFO: oldest expiration first
-          ['dateReceived', 'ASC'],     // Then by date received
+          ['dateReceived', 'ASC'],
         ],
       });
 
@@ -155,7 +178,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       if (remainingToDeduct > 0) {
         return {
           success: false,
-          message: "Inventory batch inconsistency detected",
+          message: "Inventory batch inconsistency detected. Please contact support.",
         };
       }
 
@@ -171,10 +194,10 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
         productId,
         variantValueId: productVariantValueId || null,
         variantCombinationId: productVariantCombinationId || null,
-        type: "OUT",                          // ✅ matches ENUM
-        quantity: Number(quantity),
-        referenceId: orderId,                 // OR fullOrder.orderId
-        remarks: `Order placed by ${user.medicalInstitutionName}`,
+        type: "OUT",
+        quantity: Number(quantityToDeduct), // ✅ always log actual pieces deducted
+        referenceId: orderId,
+        remarks: `Order placed by ${user.medicalInstitutionName}. ${unitType === 'BOX' ? `(${quantity} box/es × ${piecesPerBox} pcs)` : `(${quantity} piece/s)`}`,
         createdAt: new Date(),
       });
 
