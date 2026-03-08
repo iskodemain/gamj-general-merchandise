@@ -1,4 +1,58 @@
-import { addProvinceService, updateProvinceService, deleteProvinceService, fetchProvincesService, fetchCitiesService, fetchBarangaysService, addCitiesService, updateCitiesService, deleteCitiesService, addBarangaysService, updateBarangaysService, deleteBarangaysService } from "../../services/admin/adminLocationService.js";
+import { addProvinceService, updateProvinceService, deleteProvinceService, fetchProvincesService, fetchCitiesService, fetchBarangaysService, addCitiesService, updateCitiesService, deleteCitiesService, addBarangaysService, updateBarangaysService, deleteBarangaysService, fetchShippingRatesService, addShippingRatesService, updateShippingRatesService, deleteShippingRatesService } from "../../services/admin/adminLocationService.js";
+
+
+
+export const fetchShippingRates = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const result = await fetchShippingRatesService(ID);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const addShippingRates = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const result = await addShippingRatesService(ID, req.body);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const updateShippingRates = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const result = await updateShippingRatesService(ID, req.body);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const deleteShippingRates = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const result = await deleteShippingRatesService(ID, req.body);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+
+
+
+
+
+
+
 
 export const fetchProvinces = async (req, res) => {
     try {

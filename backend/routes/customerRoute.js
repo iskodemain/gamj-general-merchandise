@@ -1,8 +1,9 @@
 import express from 'express';
 import { loginCustomer, loginCodeVerify, registerCustomer, registerCodeVerify, requestPasswordResetCustomer, verifyPasswordResetCustomer, confirmPasswordResetCustomer,fetchVerifiedCustomer } from '../controllers/customerAuthController.js';
+
 import { fetchCustomerEditProfile, updateCustomerEditProfile, fetchCustomerDeliveryInfo, updateCustomerDeliveryInfo, fetchCustomerAccountSecurity, updateCustomerAccountSecurity, verifyCustomerAccountSecurity, deleteCustomerAccount } from '../controllers/customerProfileController.js'
 
-import { getLocationData } from '../controllers/customerLocationController.js'
+import { getLocationData, fetchShippingRates } from '../controllers/customerLocationController.js'
 
 import customerAuth from '../middleware/customerAuth.js'
 import upload from '../middleware/multer.js';
@@ -12,17 +13,23 @@ const customerRouter = express.Router();
 // LOGIN PROCESS
 customerRouter.post('/login', loginCustomer);
 customerRouter.post('/login/verify', loginCodeVerify);
+
 // REGISTRATION PROCESS
 customerRouter.post('/register', upload.single('imageProof'), registerCustomer);
 customerRouter.post('/register/verify', registerCodeVerify);
+
 // FORGOT PASSWORD PROCESS
 customerRouter.post('/forgot-password', requestPasswordResetCustomer);
 customerRouter.post('/forgot-password/verify', verifyPasswordResetCustomer);
 customerRouter.post('/forgot-password/confirm', confirmPasswordResetCustomer);
+
 // VERIFIED CUSTOMER
 customerRouter.get('/verified-customer', customerAuth, fetchVerifiedCustomer);
+
 // GET LOCATION DATA
 customerRouter.get('/location', customerAuth, getLocationData);
+customerRouter.get('/shipping-rates/fetch', customerAuth, fetchShippingRates);
+
 // CUSTOMER EDIT PROFILE PROCESS
 customerRouter.get('/profile/edit-profile', customerAuth, fetchCustomerEditProfile);
 customerRouter.put(

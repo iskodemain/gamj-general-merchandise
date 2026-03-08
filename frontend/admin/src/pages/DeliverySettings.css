@@ -1,0 +1,131 @@
+.delivery-settings-container {
+  padding: 20px 32px;
+  background: #EFFFF1;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Section header */
+.delivery-settings-section {
+  margin-bottom: 32px;
+}
+
+.delivery-settings-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 0;
+  width: 7rem;
+}
+
+.delivery-settings-back-btn {
+  background: #fff;
+  border: 1px solid #E6E9EE;
+  padding: 8px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.delivery-settings-header-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Grid layout */
+.delivery-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Card styling */
+.delivery-settings-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delivery-settings-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.delivery-settings-card-top {
+  padding: 18px 0 22px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.delivery-settings-card-icon {
+  width: 33px;
+  height: 33px;
+  object-fit: contain;
+}
+
+.delivery-settings-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.delivery-settings-dot.orange { background: #ffa600; }
+.delivery-settings-dot.teal { background: #00e3b6; }
+.delivery-settings-dot.blue { background: #656dff; }
+.delivery-settings-dot.green { background: #00dd31; }
+
+.delivery-settings-card-title {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #3B3B3B;
+}
+
+.delivery-settings-card-container {
+  height: 9rem;
+  padding: 15px 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.delivery-settings-divider {
+  height: 1px;
+  background: #ddd;
+}
+
+.delivery-settings-card-number {
+  font-family: "Roboto", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #3B3B3B;
+}
+
+.delivery-settings-card-date {
+  font-size: 0.9rem;
+  color: #737373;
+  margin-top: 4px;
+  display: block;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .delivery-settings-container {
+    padding: 16px;
+  }
+
+  .delivery-settings-card {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .delivery-settings-grid {
+    grid-template-rows: 1fr;
+  }
+}

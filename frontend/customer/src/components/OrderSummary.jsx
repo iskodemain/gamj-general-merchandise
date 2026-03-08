@@ -5,8 +5,6 @@ import './OrderSummary.css'
 
 function OrderSummary() {
     const {currency, shippingFee, orderSubTotal, totalPrice, getTotalPrice} = useContext(ShopContext);
-
-
     
     useEffect(() => {
       const finalTotal = orderSubTotal + shippingFee

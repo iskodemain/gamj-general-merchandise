@@ -82,9 +82,9 @@ function Sidebar({ currentView }) {
           ['Super Admin', 'Admin'].includes(currentUser) &&
           <MenuItem
             icon={assets.dl_icon}
-            label="Delivery Locations"
-            active={currentView === "delivery locations"}
-            onClick={() => {window.location.href = "/delivery-locations"; setIsSidebarOpen(false)}}
+            label="Delivery Settings"
+            active={currentView === "delivery settings"}
+            onClick={() => {window.location.href = "/delivery-settings"; setIsSidebarOpen(false)}}
           />
         }
         {

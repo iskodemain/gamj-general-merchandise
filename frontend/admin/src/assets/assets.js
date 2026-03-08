@@ -52,8 +52,12 @@ import inventory_dashboard_icon from "./inventory-dashboard-icon.png"
 import return_policy_icon from "./return_policy_icon.png"
 import terms_and_conditions from "./terms_and_conditions.png"
 import store_policy from "./store_policy.png"
+import delivery_location_2 from "./delivery_location_2.png"
+import shipping_rates from "./shipping_rates.png"
 
 export const assets = {
+    shipping_rates,
+    delivery_location_2,
     store_policy,
     terms_and_conditions,
     return_policy_icon,

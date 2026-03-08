@@ -53,6 +53,8 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ReturnRefundPolicy from "./pages/ReturnRefundPolicy.jsx";
 import TermsAndConditions from "./pages/TermsAndConditions.jsx";
 import StorePolicy from "./pages/StorePolicy.jsx";
+import ShippingRates from "./components/ShippingRates.jsx";
+import DeliverySettings from "./pages/DeliverySettings.jsx";
 
 //components
 // icon 
@@ -206,6 +208,18 @@ const App = () => {
       <Route path="/store-policy" element={
         <ProtectedRoute allowedRoles={['Super Admin']}>
           <StorePolicy />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/shipping-rates" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <ShippingRates />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/delivery-settings" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <DeliverySettings />
         </ProtectedRoute>
       } />
 
