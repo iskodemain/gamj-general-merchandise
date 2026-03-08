@@ -22,6 +22,28 @@ const ShopContextProvider = (props) => {
     const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID
     const socket = io(backendUrl);
 
+    /*---------------------------DATA LOCATIONS-----------------------------*/
+    const [provinces, setProvinces] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [barangays, setBarangays] = useState([]);
+
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedBarangay, setSelectedBarangay] = useState("");
+
+    const [filteredCities, setFilteredCities] = useState([]);
+    const [filteredBarangays, setFilteredBarangays] = useState([]);
+
+    /*-----------------------CHECKOUT PROCESS-------------------------*/
+
+    const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
+    const [orderItems, setOrderItems] = useState([]);
+
+    const [orderSubTotal, getOrderSubTotal] = useState(0);
+    
+    const [shippingFee, getShippingFee] = useState(0);
+    const [totalPrice, getTotalPrice] = useState(0);
+
     /*--------------------------USE STATE--------------------------*/
     const [token, setToken] = useState(() => localStorage.getItem('authToken') || '');
     const [loginToken, setLoginToken] = useState(() => localStorage.getItem('loginToken') || '');
@@ -59,6 +81,75 @@ const ShopContextProvider = (props) => {
     const [fetchReturnRefundPolicy, setFetchReturnRefundPolicy] = useState([]);
     const [fetchOrderDeliveryProof, setFetchOrderDeliveryProof] = useState([]); 
     const [fetchStorePolicy, setFetchStorePolicy] = useState(null);
+    const [fetchShippingRates, setFetchShippingRates] = useState([]);
+
+    useEffect(() => {
+        if (!fetchShippingRates || fetchShippingRates.length === 0) {
+            getShippingFee(0);
+            return;
+        }
+
+        if (!selectedProvince) {
+            getShippingFee(0);
+            return;
+        }
+
+        const rates = fetchShippingRates.filter((r) => r.isActive);
+
+        const provId  = Number(selectedProvince);
+        const cityId  = Number(selectedCity);
+        const brgyId  = Number(selectedBarangay);
+
+        // 1️⃣ Exact match — province + city + barangay
+        if (provId && cityId && brgyId) {
+            const match = rates.find(
+            (r) => r.provinceId === provId && r.cityId === cityId && r.barangayId === brgyId
+            );
+            if (match) { getShippingFee(Number(match.fee)); return; }
+        }
+
+        // 2️⃣ Province + city only
+        if (provId && cityId) {
+            const match = rates.find(
+            (r) => r.provinceId === provId && r.cityId === cityId && !r.barangayId
+            );
+            if (match) { getShippingFee(Number(match.fee)); return; }
+        }
+
+        // 3️⃣ Province only
+        const match = rates.find(
+            (r) => r.provinceId === provId && !r.cityId && !r.barangayId
+        );
+        if (match) { getShippingFee(Number(match.fee)); return; }
+
+        // 4️⃣ No match
+        getShippingFee(0);
+
+    }, [fetchShippingRates, selectedProvince, selectedCity, selectedBarangay]);
+
+    /*---------------------------FETCH SHIPPING RATES-----------------------------*/
+    const handleFetchShippingRates = async () => {
+        try {
+          const response = await axios.get(backendUrl + "/api/customer/shipping-rates/fetch", {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+          });
+          if (response.data.success) {
+            setFetchShippingRates(response.data.shippingRates)
+          } else {
+            toast.error(response.data.message, { ...toastError });
+          }
+        } catch (error) {
+          // ✅ SILENT - Form just shows empty
+        }
+      }
+      useEffect(() => {
+          if (token) {
+            handleFetchShippingRates();
+          }
+    }, [token]);
+
 
     /*---------------------------FETCH STORE POLICY-----------------------------*/
     const handleFetchStorePolicy = async () => {
@@ -516,16 +607,6 @@ const ShopContextProvider = (props) => {
         }
     };
 
-    /*-----------------------CHECKOUT PROCESS-------------------------*/
-
-    const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
-    const [orderItems, setOrderItems] = useState([]);
-
-    const [orderSubTotal, getOrderSubTotal] = useState(0);
-    
-    const [shippingFee, getShippingFee] = useState(0);
-    const [totalPrice, getTotalPrice] = useState(0);
-
     /*--------------------------FETCH ORDERS----------------------------*/
     const [fetchOrders, setFetchOrders] = useState([]);
     const [fetchOrderItems, setFetchOrderItems] = useState([]);
@@ -772,18 +853,6 @@ const ShopContextProvider = (props) => {
         fetchVariantName();
     }, []);
 
-    /*---------------------------DATA LOCATIONS-----------------------------*/
-    const [provinces, setProvinces] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [barangays, setBarangays] = useState([]);
-
-    const [selectedProvince, setSelectedProvince] = useState("");
-    const [selectedCity, setSelectedCity] = useState("");
-    const [selectedBarangay, setSelectedBarangay] = useState("");
-
-    const [filteredCities, setFilteredCities] = useState([]);
-    const [filteredBarangays, setFilteredBarangays] = useState([]);
-
     const handleFetchLocation = async () => {
         try {
             const response = await axios.get(`${backendUrl}/api/customer/location`, {
@@ -801,7 +870,6 @@ const ShopContextProvider = (props) => {
             // ✅ SILENT - Form just shows empty
         }
     };
-
     useEffect(() => {
         if (!selectedProvince) {
             setFilteredCities([]);
@@ -1447,7 +1515,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund, fetchNotifications, setFetchNotifications, cartItemsToDelete, setCartItemsToDelete, deleteNotification, readNotification, paypalClientId, showPaypalModal, setShowPaypalModal, rejectedCustomer, setRejectedCustomer, settingsData, fetchInventoryStock, showOrderProofPayment, setShowOrderProofPayment, orderId, setOrderId, addOrderProofPayment, fetchOrderProofPayment, deleteOrderProofPayment, customerId, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof, fetchStorePolicy
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail,cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund, fetchNotifications, setFetchNotifications, cartItemsToDelete, setCartItemsToDelete, deleteNotification, readNotification, paypalClientId, showPaypalModal, setShowPaypalModal, rejectedCustomer, setRejectedCustomer, settingsData, fetchInventoryStock, showOrderProofPayment, setShowOrderProofPayment, orderId, setOrderId, addOrderProofPayment, fetchOrderProofPayment, deleteOrderProofPayment, customerId, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof, fetchStorePolicy, fetchShippingRates
     }
 
     return (

@@ -56,7 +56,95 @@ const AdminContextProvider = (props) => {
   const [fetchInventorySettings, setFetchInventorySettings] = useState([]); 
   const [fetchOrderDeliveryProof, setFetchOrderDeliveryProof] = useState([]); 
   const [fetchStorePolicy, setFetchStorePolicy] = useState(null);
+  const [fetchShippingRates, setFetchShippingRates] = useState([]);
 
+  /*---------------------------DELETE SHIPPING RATES-----------------------------*/
+  const deleteShippingRates = async (shippingRateID) => {
+    if (!token) return;
+    try {
+      const response = await axios.delete(
+        backendUrl + "/api/location/shipping-rates/delete",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { shippingRateID }    // ✅ Correct way to send body in DELETE
+        }
+      );
+
+      if (response.data.success) {
+        return true;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------UPDATE SHIPPING RATES-----------------------------*/
+  const updateShippingRates = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.put(backendUrl + "/api/location/shipping-rates/update", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------ADD SHIPPING RATES-----------------------------*/
+  const addShippingRates = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.post(backendUrl + "/api/location/shipping-rates/add", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------FETCH SHIPPING RATES-----------------------------*/
+  const handleFetchShippingRates = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/api/location/shipping-rates/fetch", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+      });
+      if (response.data.success) {
+        setFetchShippingRates(response.data.shippingRates)
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      // ✅ SILENT - Form just shows empty
+    }
+  }
+  useEffect(() => {
+      if (token) {
+        handleFetchShippingRates();
+      }
+  }, [token]);
+
+
+  /*---------------------------UPDATE STORE POLICY-----------------------------*/
   const updateStorePolicy = async (payload) => {
     if (!token) return;
     try {
@@ -137,6 +225,7 @@ const AdminContextProvider = (props) => {
         handleFetchOrderDeliveryProof();
       }
   }, [token]);
+
 
   /*---------------------------ADD ORDER DELIVERY PROOF-----------------------------*/
   const addOrderDeliveryProof = async (payload) => {
@@ -1598,7 +1687,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser, fetchReturnRefundPolicy, addReturnRefundPolicy, updateReturnRefundPolicy, addInventorySettings, fetchInventorySettings, deleteInventorySettings, updateInventorySettings, addOrderDeliveryProof, addStorePolicy, fetchOrderDeliveryProof, fetchStorePolicy, updateStorePolicy
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser, fetchReturnRefundPolicy, addReturnRefundPolicy, updateReturnRefundPolicy, addInventorySettings, fetchInventorySettings, deleteInventorySettings, updateInventorySettings, addOrderDeliveryProof, addStorePolicy, fetchOrderDeliveryProof, fetchStorePolicy, updateStorePolicy, fetchShippingRates, addShippingRates, updateShippingRates, deleteShippingRates, handleFetchShippingRates
   }  
   return (
     <AdminContext.Provider value={value}>

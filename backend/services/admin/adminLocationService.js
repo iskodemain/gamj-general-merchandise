@@ -2,10 +2,131 @@ import Provinces from "../../models/provinces.js";
 import Cities from "../../models/cities.js";
 import Barangays from "../../models/barangays.js";
 import Admin from "../../models/admin.js";
+import ShippingRate from "../../models/shippingRate.js";
 
 const withTimestamp = (prefix, number) => {
   return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
 };
+
+export const fetchShippingRatesService = async (adminID) => {
+    try {
+        const adminUser = await Admin.findByPk(adminID);
+        if (!adminUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+
+        const shippingRates = await ShippingRate.findAll({});
+        if (!shippingRates.length) {
+            return {
+                success: true,
+                shippingRates: []
+            }
+        }
+
+        return {
+            success: true,
+            shippingRates
+        }
+        
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+
+export const addShippingRatesService = async (adminID, data) => {
+  try {
+    const adminUser = await Admin.findByPk(adminID);
+    if (!adminUser) return { success: false, message: "User not found" };
+
+    const { provinceId, cityId, barangayId, fee, isActive } = data;
+
+    // Validate required field
+    if (!provinceId) return { success: false, message: "Province is required." };
+    if (fee === undefined || fee === null || fee === "")
+      return { success: false, message: "Shipping fee is required." };
+
+    // Generate ID
+    const last = await ShippingRate.findOne({ order: [["ID", "DESC"]] });
+    const nextNumber = last ? Number(last.ID) + 1 : 1;
+    const shippingRateId = withTimestamp("SR", nextNumber);
+
+    const created = await ShippingRate.create({
+      shippingRateId,
+      provinceId,
+      cityId: cityId || null,
+      barangayId: barangayId || null,
+      fee: Number(fee),
+      isActive: isActive !== undefined ? isActive : true,
+    });
+
+    return { success: true, message: "Shipping rate added.", data: created };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+
+export const updateShippingRatesService = async (adminID, data) => {
+  try {
+    const adminUser = await Admin.findByPk(adminID);
+    if (!adminUser) return { success: false, message: "User not found" };
+
+    const { ID, provinceId, cityId, barangayId, fee, isActive } = data;
+
+    if (!ID) return { success: false, message: "ID is required for update." };
+    if (!provinceId) return { success: false, message: "Province is required." };
+    if (fee === undefined || fee === null || fee === "")
+      return { success: false, message: "Shipping fee is required." };
+
+    const existing = await ShippingRate.findByPk(ID);
+    if (!existing) return { success: false, message: "Shipping rate not found." };
+
+    await existing.update({
+      provinceId,
+      cityId: cityId || null,
+      barangayId: barangayId || null,
+      fee: Number(fee),
+      isActive: isActive !== undefined ? isActive : existing.isActive,
+    });
+
+    return { success: true, message: "Shipping rate updated.", data: existing };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+
+
+export const deleteShippingRatesService = async (adminID, data) => {
+  try {
+    const adminUser = await Admin.findByPk(adminID);
+    if (!adminUser) return { success: false, message: "Admin user not found" };
+
+    const { shippingRateID } = data;
+    if (!shippingRateID) return { success: false, message: "shippingRateID is required." };
+
+    const shippingRate = await ShippingRate.findByPk(shippingRateID);
+    if (!shippingRate) return { success: false, message: "Shipping rate not found" };
+
+    await shippingRate.destroy();
+
+    return { success: true, message: "Shipping rate deleted." };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+
+
+
 
 // PROVINCES SERVICES
 export const fetchProvincesService = async (adminID) => {

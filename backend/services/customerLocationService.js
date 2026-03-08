@@ -1,6 +1,38 @@
 import Provinces from '../models/provinces.js';
 import Cities from '../models/cities.js';
 import Barangays from '../models/barangays.js';
+import Customer from '../models/customer.js';
+import ShippingRate from '../models/shippingRate.js';
+
+export const fetchShippingRatesService = async (customerID) => {
+    try {
+        const customerUser = await Customer.findByPk(customerID);
+        if (!customerUser) {
+            return {
+                success: false,
+                message: 'User not found'
+            }
+        }
+
+        const shippingRates = await ShippingRate.findAll({});
+        if (!shippingRates.length) {
+            return {
+                success: true,
+                shippingRates: []
+            }
+        }
+
+        return {
+            success: true,
+            shippingRates
+        }
+        
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
 
 export const getLocationDataService = async () => {
     try {
