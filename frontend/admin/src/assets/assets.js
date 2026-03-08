@@ -50,8 +50,12 @@ import add_inventory_icon from "./add-inventory-icon.png"
 import inventory_batch_icon from "./inventory-batch-icon.png"
 import inventory_dashboard_icon from "./inventory-dashboard-icon.png"
 import return_policy_icon from "./return_policy_icon.png"
+import terms_and_conditions from "./terms_and_conditions.png"
+import store_policy from "./store_policy.png"
 
 export const assets = {
+    store_policy,
+    terms_and_conditions,
     return_policy_icon,
     inventory_dashboard_icon,
     inventory_batch_icon,

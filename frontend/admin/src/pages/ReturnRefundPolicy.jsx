@@ -94,12 +94,12 @@ const ReturnRefundPolicy = () => {
   return (
     <>
       {isLoading && <Loading />}
-      <Navbar TitleName="Return and Refund Policy"/>
+      <Navbar TitleName="Return & Refund Period"/>
       <div className="rrp-page-container">
         <div className="rrp-content-wrapper">
           <div className="rrp-card">
             
-            <h1 className="rrp-main-title">Return & Refund Policy</h1>
+            <h1 className="rrp-main-title">Return & Refund Period</h1>
 
             <form onSubmit={handleSubmit} className="rrp-form">
 

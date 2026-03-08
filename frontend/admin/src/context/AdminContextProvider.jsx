@@ -55,6 +55,65 @@ const AdminContextProvider = (props) => {
   const [fetchReturnRefundPolicy, setFetchReturnRefundPolicy] = useState([]);
   const [fetchInventorySettings, setFetchInventorySettings] = useState([]); 
   const [fetchOrderDeliveryProof, setFetchOrderDeliveryProof] = useState([]); 
+  const [fetchStorePolicy, setFetchStorePolicy] = useState(null);
+
+  const updateStorePolicy = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.put(backendUrl + "/api/policies/store/update", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------ADD STORE POLICY-----------------------------*/
+  const addStorePolicy = async (payload) => {
+    if (!token) return;
+    try {
+      const response = await axios.post(backendUrl + "/api/policies/store/add", payload, 
+        { headers: { Authorization: `Bearer ${token}` } });
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  /*---------------------------FETCH STORE POLICY-----------------------------*/
+  const handleFetchStorePolicy = async () => {
+    try {
+        const response = await axios.get(backendUrl + "/api/policies/store/fetch");
+        if (response.data.success) {
+            // "storePolicy" is what the service returns — null if not created yet
+            setFetchStorePolicy(response.data.storePolicy);
+        } else {
+            // Silent — page just shows an empty editor
+        }
+    } catch (error) {
+        // Silent — network error, editor starts empty
+    }
+  };
+
+  useEffect(() => {
+      handleFetchStorePolicy();
+  }, []);
+
+
 
   /*---------------------------FETCH ORDER DELIVERY PROOF-----------------------------*/
   const handleFetchOrderDeliveryProof = async () => {
@@ -206,7 +265,7 @@ const AdminContextProvider = (props) => {
   const updateReturnRefundPolicy = async (payload) => {
     if (!token) return;
     try {
-      const response = await axios.put(backendUrl + "/api/return-refund-policy/update", payload, 
+      const response = await axios.put(backendUrl + "/api/policies/return-and-refund/update", payload, 
         { headers: { Authorization: `Bearer ${token}` } });
 
       if (response.data.success) {
@@ -225,7 +284,7 @@ const AdminContextProvider = (props) => {
   const addReturnRefundPolicy = async (payload) => {
     if (!token) return;
     try {
-      const response = await axios.post(backendUrl + "/api/return-refund-policy/add", payload, 
+      const response = await axios.post(backendUrl + "/api/policies/return-and-refund/add", payload, 
         { headers: { Authorization: `Bearer ${token}` } });
 
       if (response.data.success) {
@@ -243,7 +302,7 @@ const AdminContextProvider = (props) => {
   /*---------------------------FETCH RETUNR AND REFUND POLICY-----------------------------*/
   const handleFetchReturnRefundPolicy = async () => {
       try {
-          const response = await axios.get(backendUrl + "/api/return-refund-policy/fetch");
+          const response = await axios.get(backendUrl + "/api/policies/return-and-refund/fetch");
           if (response.data.success) {
               setFetchReturnRefundPolicy(response.data.returnRefundPolicy)
           } else {
@@ -1539,7 +1598,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser, fetchReturnRefundPolicy, addReturnRefundPolicy, updateReturnRefundPolicy, addInventorySettings, fetchInventorySettings, deleteInventorySettings, updateInventorySettings, addOrderDeliveryProof, fetchOrderDeliveryProof
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser, fetchReturnRefundPolicy, addReturnRefundPolicy, updateReturnRefundPolicy, addInventorySettings, fetchInventorySettings, deleteInventorySettings, updateInventorySettings, addOrderDeliveryProof, addStorePolicy, fetchOrderDeliveryProof, fetchStorePolicy, updateStorePolicy
   }  
   return (
     <AdminContext.Provider value={value}>

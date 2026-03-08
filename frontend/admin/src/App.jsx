@@ -51,6 +51,8 @@ import OrderTransactions from "./components/Transactions/OrderTransactions.jsx";
 import InventoryTransactions from "./components/Transactions/InventoryTransactions.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ReturnRefundPolicy from "./pages/ReturnRefundPolicy.jsx";
+import TermsAndConditions from "./pages/TermsAndConditions.jsx";
+import StorePolicy from "./pages/StorePolicy.jsx";
 
 //components
 // icon 
@@ -192,6 +194,18 @@ const App = () => {
       <Route path="/return-refund-policy" element={
         <ProtectedRoute allowedRoles={['Super Admin']}>
           <ReturnRefundPolicy />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/terms-and-conditions" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <TermsAndConditions />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/store-policy" element={
+        <ProtectedRoute allowedRoles={['Super Admin']}>
+          <StorePolicy />
         </ProtectedRoute>
       } />
 

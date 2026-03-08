@@ -1,10 +1,119 @@
 import ReturnRefundPolicy from "../../models/returnRefundPolicy.js";
 import Admin from "../../models/admin.js";
+import StorePolicy from "../../models/storePolicy.js";
 
 // 🔹 ID GENERATOR
 const withTimestamp = (prefix, number) => {
   return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
 };
+
+export const fetchStorePolicyService = async () => {
+    try {
+        const storePolicy = await StorePolicy.findOne({
+            order: [['updatedAt', 'DESC']]
+        });
+
+        if (!storePolicy) {
+            return {
+                success: true,
+                message: 'No store policy found',
+                storePolicy: []
+            };
+        }
+
+        return {
+            success: true,
+            message: 'Store policy fetched successfully',
+            storePolicy: storePolicy
+        };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};
+
+// 🔹 ADD STORE POLICY (Create New Record)
+export const addStorePolicyService = async (adminId, data) => {
+    try {
+        // ✅ Validate Admin
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return { success: false, message: 'User not found' };
+        }
+
+        const { content } = data;
+
+        if (!content || !content.trim()) {
+            return { success: false, message: 'Content cannot be empty' };
+        }
+
+        const lastStorePolicy = await StorePolicy.findOne({
+            order: [["ID", "DESC"]],
+        });
+
+        const nextNumber = lastStorePolicy ? lastStorePolicy.ID + 1 : 1;
+        const storePolicyId = withTimestamp("SP", nextNumber);
+
+        // ✅ Create the single policy record
+        const newPolicy = await StorePolicy.create({
+            storePolicyId,
+            content,
+        });
+
+        return {
+            success: true,
+            message: 'Store policy created successfully',
+            data: newPolicy,
+        };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};
+
+export const updateStorePolicyService = async (adminId, data) => {
+    try {
+        // ✅ Validate Admin
+        const adminUser = await Admin.findByPk(adminId);
+        if (!adminUser) {
+            return { success: false, message: 'User not found' };
+        }
+
+        const { content } = data;
+
+        if (!content || !content.trim()) {
+            return { success: false, message: 'Content cannot be empty' };
+        }
+
+        // ✅ Find the single existing policy
+        const existingPolicy = await StorePolicy.findOne({
+            order: [['updatedAt', 'DESC']]
+        });
+
+        if (!existingPolicy) {
+            return {
+                success: false,
+                message: 'No store policy found to update'
+            };
+        }
+
+        // ✅ Update content
+        await existingPolicy.update({ content });
+
+        return {
+            success: true,
+            message: 'Store policy updated successfully',
+            data: existingPolicy,
+        };
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};
+
 
 // 🔹 FETCH RETURN REFUND POLICY (Single Record)
 export const fetchReturnRefundPolicyService = async () => {
