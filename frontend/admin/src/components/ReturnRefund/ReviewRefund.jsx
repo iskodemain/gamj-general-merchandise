@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState, useRef } from "react";
 import "./ReviewRefund.css";
 import { AdminContext } from "../../context/AdminContextProvider.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -58,6 +58,106 @@ function ConfirmModal({ open, title, message, onConfirm, onCancel }) {
   );
 }
 
+function RefundInfoBlock({ refundRec, isProcessing, isPickup, existingPickupDate }) {
+  const resolution = refundRec?.refundResolution || "";
+  const refundMethod = refundRec?.refundMethod || "";
+  const paypalEmail = refundRec?.refundPaypalEmail || "";
+  const returnQuantity = refundRec?.returnQuantity || null;
+  const returnMethod = refundRec?.returnMethod || null;
+
+  return (
+    <>
+      <label className="rr-label">Reason for Return Request</label>
+      <input className="rr-input" value={refundRec.reasonForRefund} readOnly />
+
+      <label className="rr-label">Comment</label>
+      <textarea className="rr-textarea" value={refundRec.refundComments || ""} readOnly />
+
+      <label className="rr-label">Submitted Image Proof</label>
+      <div className="rr-proof-row">
+        <img src={refundRec.imageProof1} className="rr-proof-img" draggable="false" />
+        <img src={refundRec.imageProof2} className="rr-proof-img" draggable="false" />
+      </div>
+
+      <label className="rr-label">Return Request Solution</label>
+      <input className="rr-input" value={refundRec.refundResolution} readOnly />
+
+      {returnQuantity && (
+        <>
+          <label className="rr-label">Return Quantity</label>
+          <input className="rr-input" value={`${returnQuantity} piece(s)`} readOnly />
+        </>
+      )}
+
+      {returnMethod && (
+        <>
+          <label className="rr-label">Return Method</label>
+          <input
+            className="rr-input"
+            value={returnMethod === 'PICKUP' ? 'Pickup' : 'Drop-off'}
+            readOnly
+          />
+        </>
+      )}
+
+      {/* Show scheduled pickup date if PICKUP + Processing + date exists */}
+      {isPickup && isProcessing && existingPickupDate && (
+        <>
+          <label className="rr-label">Scheduled Pickup Date</label>
+          <input className="rr-input" value={existingPickupDate} readOnly />
+        </>
+      )}
+
+      {resolution === "Return and Refund" && (
+        <>
+          <label className="rr-label">Refund Method</label>
+          <input className="rr-input" value={refundMethod || "—"} readOnly />
+
+          {refundMethod.includes("PayPal") && (
+            <>
+              <label className="rr-label">PayPal Email Address</label>
+              <input className="rr-input" value={paypalEmail || "—"} readOnly />
+            </>
+          )}
+        </>
+      )}
+
+      {resolution === "Other (please specify)" && (
+        <>
+          <label className="rr-label">Other Reason</label>
+          <input className="rr-input" value={refundRec.otherReason || ""} readOnly />
+
+          <label className="rr-label">Refund Method</label>
+          <input className="rr-input" value={refundMethod || "—"} readOnly />
+
+          {refundMethod.includes("PayPal") && (
+            <>
+              <label className="rr-label">PayPal Email Address</label>
+              <input className="rr-input" value={paypalEmail || "—"} readOnly />
+            </>
+          )}
+        </>
+      )}
+
+      {/* For resolutions with no refund method, still show it if present */}
+      {!["Return and Refund", "Other (please specify)"].includes(resolution) && refundMethod && (
+        <>
+          <label className="rr-label">Refund Method</label>
+          <input className="rr-input" value={refundMethod} readOnly />
+        </>
+      )}
+
+      {/* Rejected reason — only shown if exists */}
+      {refundRec.rejectedReason && (
+        <>
+          <label className="rr-label" style={{ color: '#e04242' }}>Rejected Reason</label>
+          <input className="rr-input" value={refundRec.rejectedReason} readOnly />
+        </>
+      )}
+    </>
+  );
+}
+
 function ReviewRefund({ item = null, onClose = () => {} }) {
   const { toastError, fetchOrders, fetchOrderItems, fetchReturnRefundOrders, customerList, processRefundRequest, fetchRefundProof, approveRefundRequest, rejectRefundRequest, submitRefundProof, deleteRefundRequest, successfullyProcessedRefund} = useContext(AdminContext);
 
@@ -80,6 +180,8 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
   const [localStatus, setLocalStatus] = useState("");
   const [processingStarted, setProcessingStarted] = useState(false);
 
+
+  const [pickupScheduledDate, setPickupScheduledDate] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmData, setConfirmData] = useState({
     title: "",
@@ -119,6 +221,11 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
     setLocalStatus(status);
     setProcessingStarted(status === "Processing");
 
+    setPickupScheduledDate(
+      refundRecord?.pickupScheduledDate
+        ? refundRecord.pickupScheduledDate.split('T')[0]
+        : ''
+    );
     setRefundAmount("");
     setReceiptFile(null);
     setReceiptPreview("");
@@ -179,7 +286,18 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
 
   const handleApproveRequest = async () => {
     if (!refundRec) return;
-    const success = await approveRefundRequest(refundRec.ID, "Processing");
+
+    // If returnMethod is PICKUP, pickupScheduledDate is required
+    if (isPickup && !pickupScheduledDate) {
+      return toast.error("Pickup scheduled date is required for PICKUP return method.", toastError);
+    }
+
+    setLoading(true);
+    const success = await approveRefundRequest(
+      refundRec.ID,
+      "Processing",
+      isPickup ? pickupScheduledDate : null
+    );
     setLocalStatus("Processing");
     setProcessingStarted(true);
     setLoading(false);
@@ -283,6 +401,24 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
   const resolution = refundRec?.refundResolution || "";
   const refundMethod = refundRec?.refundMethod || "";
   const paypalEmail = refundRec?.refundPaypalEmail || "";
+
+  const returnQuantity = refundRec?.returnQuantity || null;
+  const returnMethod = refundRec?.returnMethod || null;
+  const existingPickupDate = refundRec?.pickupScheduledDate
+    ? new Date(refundRec.pickupScheduledDate).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      })
+    : null;
+
+  // returnMethod requires pickup date input when admin approves
+  const isPickup = returnMethod === 'PICKUP';
+
+  const stepRef = useRef(0);
+  stepRef.current = 0; // reset on every render
+  const nextStep = () => {
+    stepRef.current += 1;
+    return stepRef.current;
+  };
 
   return (
     <>
@@ -391,51 +527,13 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                 ============================== */}
                 {isPending && (
                   <>
-                    <label className="rr-label">1. Reason for Return Request</label>
-                    <input className="rr-input" value={refundRec.reasonForRefund} readOnly />
-
-                    <label className="rr-label">2. Comment</label>
-                    <textarea className="rr-textarea" value={refundRec.refundComments || ""} readOnly />
-
-                    <label className="rr-label">3. Submitted Image Proof</label>
-                    <div className="rr-proof-row">
-                      <img src={refundRec.imageProof1} className="rr-proof-img" draggable="false" />
-                      <img src={refundRec.imageProof2} className="rr-proof-img" draggable="false" />
-                    </div>
-
-                    <label className="rr-label">4. Return Request Solution</label>
-                    <input className="rr-input" value={refundRec.refundResolution} readOnly />
-
-                    {resolution === "Return and Refund" && (
-                      <>
-                        <label className="rr-label">5. Refund Method</label>
-                        <input className="rr-input" value={refundMethod || "—"} readOnly />
-
-                        {refundMethod.includes("PayPal") && (
-                          <>
-                            <label className="rr-label">6. PayPal Email Address</label>
-                            <input className="rr-input" value={paypalEmail || "—"} readOnly />
-                          </>
-                        )}
-                      </>
-                    )}
-
-                    {resolution === "Other (please specify)" && (
-                      <>
-                        <label className="rr-label">5. Other Reason</label>
-                        <input className="rr-input" value={refundRec.otherReason || ""} readOnly />
-
-                        <label className="rr-label">6. Refund Method</label>
-                        <input className="rr-input" value={refundMethod || "—"} readOnly />
-
-                        {refundMethod.includes("PayPal") && (
-                          <>
-                            <label className="rr-label">7. PayPal Email Address</label>
-                            <input className="rr-input" value={paypalEmail || "—"} readOnly />
-                          </>
-                        )}
-                      </>
-                    )}
+                    <RefundInfoBlock
+                      refundRec={refundRec}
+                      nextStep={nextStep}
+                      isProcessing={isProcessing}
+                      isPickup={isPickup}
+                      existingPickupDate={existingPickupDate}
+                    />
 
                     <div className="rr-action-row">
                       {paypalEmail ? (
@@ -452,18 +550,35 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                           Proceed with Refund Process
                         </button>
                       ) : (
-                        <button
-                          className="rr-primary-btn"
-                          onClick={() =>
-                            openConfirm(
-                              "Approve Request?",
-                              "Are you sure you want to approve this refund request?",
-                              handleApproveRequest
-                            )
-                          }
-                        >
-                          Approved Request
-                        </button>
+                        <>
+                          {isPickup && (
+                            <div style={{ width: '100%', marginBottom: '12px' }}>
+                              <label className="rr-label">
+                                 Schedule Pickup Date <span style={{ color: 'red' }}>*</span>
+                              </label>
+                              <input
+                                className="rr-input"
+                                type="date"
+                                value={pickupScheduledDate}
+                                min={new Date().toISOString().split('T')[0]}
+                                onChange={(e) => setPickupScheduledDate(e.target.value)}
+                              />
+                            </div>
+                          )}
+                          <button
+                            className="rr-primary-btn"
+                            disabled={isPickup && !pickupScheduledDate}
+                            onClick={() =>
+                              openConfirm(
+                                "Approve Request?",
+                                "Are you sure you want to approve this refund request?",
+                                handleApproveRequest
+                              )
+                            }
+                          >
+                            Approved Request
+                          </button>
+                        </>
                       )}
 
                       <button
@@ -484,45 +599,34 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                 ============================== */}
                 {isProcessing && (
                   <>
-                    {/* CASE 1: refundStatus === "Processing" BUT NO PayPal email → 
-                        Show PENDING layout + "Successfully Processed" button */}
+                    <RefundInfoBlock
+                      refundRec={refundRec}
+                      nextStep={nextStep}
+                      isProcessing={isProcessing}
+                      isPickup={isPickup}
+                      existingPickupDate={existingPickupDate}
+                    />
+
                     {!paypalEmail ? (
-                      <>
-                        <label className="rr-label">1. Reason for Return Request</label>
-                        <input className="rr-input" value={refundRec.reasonForRefund} readOnly />
-
-                        <label className="rr-label">2. Comment</label>
-                        <textarea className="rr-textarea" value={refundRec.refundComments || ""} readOnly />
-
-                        <label className="rr-label">3. Submitted Image Proof</label>
-                        <div className="rr-proof-row">
-                          <img src={refundRec.imageProof1} className="rr-proof-img" draggable="false" />
-                          <img src={refundRec.imageProof2} className="rr-proof-img" draggable="false" />
-                        </div>
-
-                        <label className="rr-label">4. Return Request Solution</label>
-                        <input className="rr-input" value={refundRec.refundResolution} readOnly />
-
-                        <div className="rr-action-row">
-                          <button
-                            className="rr-primary-btn"
-                            onClick={() =>
-                              openConfirm(
-                                "Mark as Successfully Processed?",
-                                "Confirm that this refund has been completed.",
-                                handleSuccessfullyProcessed
-                              )
-                            }
-                          >
-                            Successfully Processed
-                          </button>
-                        </div>
-                      </>
+                      <div className="rr-action-row">
+                        <button
+                          className="rr-primary-btn"
+                          onClick={() =>
+                            openConfirm(
+                              "Mark as Successfully Processed?",
+                              "Confirm that this refund has been completed.",
+                              handleSuccessfullyProcessed
+                            )
+                          }
+                        >
+                          Successfully Processed
+                        </button>
+                      </div>
                     ) : (
                       <>
-                        {/* CASE 2: refundStatus === "Processing" WITH PayPal email → 
-                            Admin must fill refundAmount, proof & TxID */}
-                        <label className="rr-label">1. Total Refund Amount</label>
+                        <div className="rr-divider" />
+                        <p className="rr-title">Upload Refund Proof</p>
+                        <label className="rr-label"> Total Refund Amount</label>
                         <input
                           className="rr-input"
                           value={refundAmount}
@@ -530,8 +634,7 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                           placeholder="Enter refund amount"
                         />
 
-                        <label className="rr-label">2. Upload Refund Receipt</label>
-
+                        <label className="rr-label"> Upload Refund Receipt</label>
                         {!receiptPreview ? (
                           <label className="rr-upload-img">
                             <span className="rr-upload-text">Upload Proof of Refund Payment</span>
@@ -548,7 +651,7 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                           <img className="rr-proof-preview" src={receiptPreview} alt="proof" draggable="false" />
                         )}
 
-                        <label className="rr-label">3. PayPal Transaction ID</label>
+                        <label className="rr-label"> PayPal Transaction ID</label>
                         <input
                           className="rr-input"
                           value={paypalTxId}
@@ -581,48 +684,26 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                 ============================== */}
                 {isSuccessfullyProcessed && (
                   <>
-                    {!paypalEmail ? (
+                    <RefundInfoBlock
+                      refundRec={refundRec}
+                      nextStep={nextStep}
+                      isProcessing={isProcessing}
+                      isPickup={isPickup}
+                      existingPickupDate={existingPickupDate}
+                    />
+
+                    {paypalEmail && (
                       <>
-                        <label className="rr-label">1. Reason for Return Request</label>
-                        <input className="rr-input" value={refundRec.reasonForRefund} readOnly />
-
-                        <label className="rr-label">2. Comment</label>
-                        <textarea className="rr-textarea" value={refundRec.refundComments || ""} readOnly />
-
-                        <label className="rr-label">3. Submitted Image Proof</label>
-                        <div className="rr-proof-row">
-                          <img src={refundRec.imageProof1} className="rr-proof-img" draggable="false" />
-                          <img src={refundRec.imageProof2} className="rr-proof-img" draggable="false" />
-                        </div>
-
-                        <label className="rr-label">4. Return Request Solution</label>
-                        <input className="rr-input" value={refundRec.refundResolution} readOnly />
-
-                        <div className="rr-action-row">
-                          <button
-                            className="rr-danger-btn"
-                            onClick={() =>
-                              openConfirm(
-                                "Delete Refund Record?",
-                                "This cannot be undone.",
-                                handleDelete
-                              )
-                            }
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <label className="rr-label">1. Refund Amount</label>
+                        <div className="rr-divider" />
+                        <p className="rr-title">Uploaded Refund Proof</p>
+                        <label className="rr-label"> Refund Amount</label>
                         <input
                           className="rr-input"
                           value={refundProofRecord?.refundAmount || refundAmount || "—"}
                           readOnly
                         />
 
-                        <label className="rr-label">2. Proof of Payment</label>
+                        <label className="rr-label"> Proof of Payment</label>
                         {refundProofRecord?.receiptImage ? (
                           <img
                             className="rr-proof-preview"
@@ -631,32 +712,32 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                             draggable="false"
                           />
                         ) : (
-                          <div>No proof uploaded</div>
+                          <div className="rr-empty">No proof uploaded</div>
                         )}
 
-                        <label className="rr-label">3. PayPal Transaction ID</label>
+                        <label className="rr-label"> PayPal Transaction ID</label>
                         <input
                           className="rr-input"
                           value={refundProofRecord?.transactionID || paypalTxId || "—"}
                           readOnly
                         />
-
-                        <div className="rr-action-row">
-                          <button
-                            className="rr-danger-btn"
-                            onClick={() =>
-                              openConfirm(
-                                "Delete Refund Record?",
-                                "This cannot be undone.",
-                                handleDelete
-                              )
-                            }
-                          >
-                            Delete
-                          </button>
-                        </div>
                       </>
                     )}
+
+                    <div className="rr-action-row">
+                      <button
+                        className="rr-danger-btn"
+                        onClick={() =>
+                          openConfirm(
+                            "Delete Refund Record?",
+                            "This cannot be undone.",
+                            handleDelete
+                          )
+                        }
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </>
                 )}
 
@@ -665,17 +746,13 @@ function ReviewRefund({ item = null, onClose = () => {} }) {
                 ============================== */}
                 {isRejected && (
                   <>
-                    <label className="rr-label">1. Reason for Return Request</label>
-                    <input className="rr-input" value={refundRec.reasonForRefund} readOnly />
-
-                    <label className="rr-label">2. Comment</label>
-                    <textarea className="rr-textarea" value={refundRec.refundComments || ""} readOnly />
-
-                    <label className="rr-label">3. Submitted Image Proof</label>
-                    <div className="rr-proof-row">
-                      <img src={refundRec.imageProof1} className="rr-proof-img" draggable="false" />
-                      <img src={refundRec.imageProof2} className="rr-proof-img" draggable="false" />
-                    </div>
+                    <RefundInfoBlock
+                      refundRec={refundRec}
+                      nextStep={nextStep}
+                      isProcessing={isProcessing}
+                      isPickup={isPickup}
+                      existingPickupDate={existingPickupDate}
+                    />
 
                     <div className="rr-action-row">
                       <button

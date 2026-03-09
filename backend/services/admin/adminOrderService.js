@@ -486,7 +486,7 @@ export const processRefundRequestService = async (adminId, refundID, newStatus) 
   }
 };
 
-export const approveRefundRequestService = async (adminId, refundID, newStatus) => {
+export const approveRefundRequestService = async (adminId, refundID, newStatus, pickupScheduledDate = null) => {
   try {
     // Verify admin exists
     const adminUser = await Admin.findByPk(adminId);
@@ -508,6 +508,14 @@ export const approveRefundRequestService = async (adminId, refundID, newStatus) 
 
     // Update status
     approveRefund.refundStatus = newStatus;
+
+    // Only save pickupScheduledDate if returnMethod is PICKUP and date is provided
+    if (approveRefund.returnMethod === 'PICKUP' && pickupScheduledDate) {
+      approveRefund.pickupScheduledDate = new Date(pickupScheduledDate);
+    } else if (approveRefund.returnMethod !== 'PICKUP') {
+      approveRefund.pickupScheduledDate = null; // clear it if not pickup
+    }
+
     await approveRefund.save();
 
     return {

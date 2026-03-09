@@ -1,3 +1,30 @@
+/* ReviewRefund.css – Updated with rr- prefix (Review Return) */
+
+/* ---------- Variables ---------- */
+:root {
+  --bg: #fff;
+  --accent-green: #27AE60;
+  --accent-green-2: #43A047;
+  --muted: #6B7280;
+  --text: #0F172A;
+  --card-border: rgba(39, 174, 96, 0.12);
+}
+
+.rr-divider {
+  width: 100%;
+  border: none;
+  border-top: 1px dashed #e0e0e0;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.rr-title {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.5rem;
+
+}
+
 .rr-wide-modal {
   width: 450px;
   max-width: 95%;
@@ -74,24 +101,6 @@
 .rr-modal-confirm {
   background: #43A047;
   color: white;
-}
-
-
-
-
-
-
-
-/* ReviewRefund.css – Updated with rr- prefix (Review Return) */
-
-/* ---------- Variables ---------- */
-:root {
-  --bg: #fff;
-  --accent-green: #27AE60;
-  --accent-green-2: #43A047;
-  --muted: #6B7280;
-  --text: #0F172A;
-  --card-border: rgba(39, 174, 96, 0.12);
 }
 
 /* ---------- PAGE / WRAPPER ---------- */

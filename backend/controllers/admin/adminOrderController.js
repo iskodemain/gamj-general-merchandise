@@ -81,9 +81,9 @@ export const processRefundRequest = async (req, res) => {
 
 export const approveRefundRequest = async (req, res) => {
     try {
-        const { refundID, newStatus } = req.body;
+        const { refundID, newStatus, pickupScheduledDate } = req.body;
         const { ID } = req.admin;
-        const result = await approveRefundRequestService(ID, refundID, newStatus);
+        const result = await approveRefundRequestService(ID, refundID, newStatus, pickupScheduledDate );
         res.json(result);
     } catch (error) {
         console.log(error);
