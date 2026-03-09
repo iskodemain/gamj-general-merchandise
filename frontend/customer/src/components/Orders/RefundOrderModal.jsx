@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import Loading from '../Loading';
 
 const RefundOrderModal = () => {
-    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, cancelOrderRefundRequest } = useContext(ShopContext);
+    const { orderItemId, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution, refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, cancelOrderRefundRequest, returnQuantity, setReturnQuantity, returnMethod, setReturnMethod, pickupScheduledDate, setPickupScheduledDate, fetchOrderItems } = useContext(ShopContext);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCancelling, setIsCancelling] = useState(false);
@@ -15,6 +15,8 @@ const RefundOrderModal = () => {
     const [refundInfoComplete, setRefundInfoComplete] = useState(false);
     const [existingRefund, setExistingRefund] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
+    const matchedOrderItem = fetchOrderItems?.find(item => item.ID === orderItemId);
+    const maxReturnQuantity = matchedOrderItem ? Number(matchedOrderItem.quantity) : 1;
 
     const isDisabled = existingRefund && (existingRefund.refundStatus === 'Pending' || existingRefund.refundStatus === 'Processing');
 
@@ -40,6 +42,10 @@ const RefundOrderModal = () => {
             setRefundStatus(found.refundStatus || 'Pending');
             setOtherReason(found.otherReason || '');
             // proofs: backend urls (keep as null for now since files can't be refetched easily)
+            setReturnQuantity(found.returnQuantity || 1);
+            setReturnMethod(found.returnMethod || '');
+            setPickupScheduledDate(found.pickupScheduledDate ? found.pickupScheduledDate.split('T')[0] : '');
+
             setImageProof1(found.imageProof1 || null);
             setImageProof2(found.imageProof2 || null);
             
@@ -55,44 +61,59 @@ const RefundOrderModal = () => {
             setRefundPaypalEmail('');
             setRefundStatus('Pending');
             setOtherReason('');
+            setReturnQuantity(1);
+            setReturnMethod('');
+            setPickupScheduledDate('');
             setImageProof1(null);
             setImageProof2(null);
         }
         
     }, [orderItemId, fetchOrderRefund]);
 
-
-
-
     // FORM COMPLETION 
     useEffect(() => {
         let complete = false;
-        if (reasonForRefund && imageProof1 && imageProof2 && refundResolution) {
+
+        const needsReturnMethod = [
+            'Return and Refund',
+            'Return Only',
+            'Replace with a New Item',
+            'Other (please specify)'
+        ].includes(refundResolution);
+
+        if (reasonForRefund && imageProof1 && imageProof2 && refundResolution && Number(returnQuantity) >= 1) {
+
+            // returnMethod required for applicable resolutions
+            if (needsReturnMethod && !returnMethod) {
+                complete = false;
+            }
             // CASE 1: Return and Refund
-            if (refundResolution === 'Return and Refund' && refundMethod) {
+            else if (refundResolution === 'Return and Refund' && returnMethod && refundMethod) {
                 if (refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && refundPaypalEmail) {
                     complete = true;
                 } else if (refundMethod === 'Cash Refund — Receive your refund in cash.') {
                     complete = true;
                 }
             }
-
             // CASE 2: Other (please specify)
-            else if (refundResolution === 'Other (please specify)' && otherReason && refundMethod) {
+            else if (refundResolution === 'Other (please specify)' && otherReason && returnMethod && refundMethod) {
                 if (refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && refundPaypalEmail) {
                     complete = true;
                 } else if (refundMethod === 'Cash Refund — Receive your refund in cash.' || refundMethod === "No Refund Needed — I don't need a refund") {
                     complete = true;
                 }
             }
-
-            // CASE 3: No refund method required (auto-complete)
-            else if (refundResolution === 'Resend Missing Items' || refundResolution === 'Replace with a New Item' || refundResolution === 'Return Only') {
+            // CASE 3: Resend Missing Items — no return needed
+            else if (refundResolution === 'Resend Missing Items') {
+                complete = true;
+            }
+            // CASE 4: Replace or Return Only — needs returnMethod, no refundMethod
+            else if ((refundResolution === 'Replace with a New Item' || refundResolution === 'Return Only') && returnMethod) {
                 complete = true;
             }
         }
         setRefundInfoComplete(complete);
-    }, [reasonForRefund, imageProof1, imageProof2, refundResolution, refundMethod, otherReason, refundPaypalEmail]);
+    }, [reasonForRefund, imageProof1, imageProof2, refundResolution, refundMethod, otherReason, refundPaypalEmail, returnQuantity, returnMethod]);
 
 
     const handleCloseButton = () => {
@@ -105,6 +126,9 @@ const RefundOrderModal = () => {
         setRefundMethod('');
         setRefundPaypalEmail('');
         setOtherReason('');
+        setReturnQuantity(1);
+        setReturnMethod('');
+        setPickupScheduledDate('');
         setIsSubmitting(false);
         setIsCancelling(false);
     }
@@ -125,6 +149,24 @@ const RefundOrderModal = () => {
             return toast.error("Please select a return request solution.");
         }
 
+        if (!returnQuantity || Number(returnQuantity) < 1) {
+            return toast.error("Please enter a valid return quantity.");
+        }
+        if (Number(returnQuantity) > maxReturnQuantity) {
+            return toast.error(`Return quantity cannot exceed the ordered quantity of ${maxReturnQuantity}.`);
+        }
+
+        const needsReturnMethod = [
+            'Return and Refund',
+            'Return Only',
+            'Replace with a New Item',
+            'Other (please specify)'
+        ].includes(refundResolution);
+
+        if (needsReturnMethod && !returnMethod) {
+            return toast.error("Please select a return method (Pickup or Drop-off).");
+        }
+
         if (refundResolution === 'Return and Refund' || refundResolution === 'Other (please specify)') {
             if (!refundMethod) {
                 return toast.error("Please select your refund method.");
@@ -132,10 +174,9 @@ const RefundOrderModal = () => {
             if (refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && !refundPaypalEmail) {
                 return toast.error("Please provide your PayPal email address.");
             }
-            
         }
         setIsSubmitting(true); 
-        await addOrderRefund(orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus);
+        await addOrderRefund(orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus, Number(returnQuantity), returnMethod);
         setIsSubmitting(false); 
         handleCloseButton();
     }
@@ -172,12 +213,14 @@ const RefundOrderModal = () => {
         else if (existingRefund.refundStatus === 'Processing') {
             return (
             <button type="button" className="refund-request-btn waiting-btn" disabled>
-                Waiting for Approval...
+                Waiting for Processing...
             </button>
             );
         } 
     };
 
+    let step = 1;
+    const nextStep = () => step++;
 
 
 
@@ -190,7 +233,7 @@ const RefundOrderModal = () => {
                 <p className='refund-title'>Return/Refund Request</p>
                 {/* FIRST CONTENT */}
                 <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
-                    <label>1. Select the reason for your return</label>
+                    <label>{nextStep()}. Select the reason for your return</label>
                     <select value={reasonForRefund} onChange={(e) => setReasonForRefund(e.target.value)} className='cancel-input' disabled={isDisabled}>
                     <option value="" disabled hidden>Select Reason</option>
                     <option value="Order not received">Order not received</option>
@@ -205,7 +248,7 @@ const RefundOrderModal = () => {
 
                 {/* SECOND CONTENT */}
                 <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
-                    <label>2. Select at least two images as proof.</label>
+                    <label>{nextStep()}. Select at least two images as proof.</label>
 
                     <div className='refund-image-upload-ctn'>
                         <label htmlFor='imageProof1' className={`${imageProof1 ? 'has-image' : ''}`}>
@@ -223,7 +266,7 @@ const RefundOrderModal = () => {
 
                 {/* THIRD CONTENT */}
                 <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
-                    <label>3. Select a return request solutions</label>
+                    <label>{nextStep()}. Select a return request solutions</label>
                     <select 
                         value={refundResolution} 
                         onChange={(e) => {
@@ -253,7 +296,7 @@ const RefundOrderModal = () => {
                     {
                         (refundResolution === 'Other (please specify)' || refundResolution === 'Return and Refund') && (
                             <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
-                                <label>4. Select your preferred refund method</label>
+                                <label>{nextStep()}. Select your preferred refund method</label>
                                 <select value={refundMethod} onChange={(e) => setRefundMethod(e.target.value)} className='cancel-input' disabled={isDisabled}>
                                     <option value="" disabled hidden>Select Refund Method</option>
                                     <option value="PayPal Refund — Refund will be processed to your PayPal account.">PayPal Refund — Refund will be processed to your PayPal account.</option>
@@ -266,6 +309,72 @@ const RefundOrderModal = () => {
                             </div>
                         )
                     }
+
+                {/* RETURN QUANTITY */}
+                <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
+                    <label>
+                        {nextStep()}. How many pieces are you returning?
+                        {maxReturnQuantity > 0 && (
+                            <span style={{ fontWeight: 400, fontSize: '0.8rem', color: '#888', marginLeft: '8px' }}>
+                                (Max: {maxReturnQuantity} {maxReturnQuantity === 1 ? 'piece' : 'pieces'})
+                            </span>
+                        )}
+                    </label>
+                    <input
+                        type="number"
+                        className="cancel-input"
+                        min="1"
+                        max={maxReturnQuantity}
+                        value={returnQuantity ?? ""}
+                        onChange={(e) => {
+                            const value = e.target.value;
+
+                            // Allow empty input while typing
+                            if (value === "") {
+                                setReturnQuantity("");
+                                return;
+                            }
+
+                            const val = Number(value);
+
+                            if (isNaN(val)) return;
+
+                            if (val > maxReturnQuantity) {
+                                setReturnQuantity(maxReturnQuantity);
+                            } else if (val < 1) {
+                                setReturnQuantity(1);
+                            } else {
+                                setReturnQuantity(val);
+                            }
+                        }}
+                        placeholder={`Enter quantity (1 - ${maxReturnQuantity})`}
+                        disabled={isDisabled}
+                    />
+                </div>
+
+                {/* RETURN METHOD — only shown for resolutions that require physical return */}
+                {['Return and Refund', 'Return Only', 'Replace with a New Item', 'Other (please specify)'].includes(refundResolution) && (
+                    <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
+                        <label>{nextStep()}. How will you return the item?</label>
+                        <select
+                            value={returnMethod}
+                            onChange={(e) => setReturnMethod(e.target.value)}
+                            className="cancel-input"
+                            disabled={isDisabled}
+                        >
+                            <option value="" disabled hidden>Select Return Method</option>
+                            <option value="PICKUP">Pickup — We will arrange a rider to collect the item</option>
+                            <option value="DROP_OFF">Drop-off — I will bring the item to the store</option>
+                        </select>
+
+                        {/* Show scheduled pickup date only if Processing + PICKUP + date exists */}
+                        {existingRefund?.refundStatus === 'Processing' && returnMethod === 'PICKUP' && pickupScheduledDate && (
+                            <div className="pickup-schedule-info">
+                                <p>Scheduled Pickup Date: <strong>{new Date(pickupScheduledDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong></p>
+                            </div>
+                        )}
+                    </div>
+                )}
                
 
                 {/* FIFTH CONTENT */}
@@ -273,7 +382,7 @@ const RefundOrderModal = () => {
                     {
                         refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && (refundResolution === 'Return and Refund' || refundResolution === 'Other (please specify)') && (
                             <>
-                                <label>5. Give your PayPal email address.</label>
+                                <label>{nextStep()}. Give your PayPal email address.</label>
                                 <input type="email" placeholder='Enter your PayPal account email address.' value={refundPaypalEmail} onChange={(e) => setRefundPaypalEmail(e.target.value)} required disabled={isDisabled}/>
                             </>
                         )

@@ -1046,9 +1046,13 @@ const AdminContextProvider = (props) => {
   }
 
   /*---------------------------APPROVED REFUND REQUEST-----------------------------*/
-  const approveRefundRequest = async (refundID, newStatus) => {
+  const approveRefundRequest = async (refundID, newStatus, pickupScheduledDate = null) => {
     if (token) {
-      const payload = {refundID, newStatus};
+      const payload = {
+        refundID, 
+        newStatus,
+        ...(pickupScheduledDate && { pickupScheduledDate })
+      };
       try {
         const response = await axios.patch(backendUrl + "/api/order/approve-refund-request", payload, {
             headers: {

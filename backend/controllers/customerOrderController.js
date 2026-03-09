@@ -137,8 +137,8 @@ export const addOrderRefund = async (req, res) => {
         const { ID } = req.user;
         const imageProof1 = req.files?.imageProof1?.[0];
         const imageProof2 = req.files?.imageProof2?.[0];
-        const { orderItemId, reasonForRefund, refundComments, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus } = req.body;
-        const result = await addOrderRefundService(ID, orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus);
+        const { orderItemId, reasonForRefund, refundComments, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus, returnQuantity, returnMethod } = req.body;
+        const result = await addOrderRefundService(ID, orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus, returnQuantity, returnMethod);
         res.json(result);
     } catch (error) {
         console.log(error);

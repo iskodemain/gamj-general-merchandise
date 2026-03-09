@@ -1129,7 +1129,7 @@ export const fetchRefundProofService = async (customerId) => {
 }
 
 
-export const addOrderRefundService = async (customerId, orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus) => {
+export const addOrderRefundService = async (customerId, orderItemId, reasonForRefund, refundComments, imageProof1, imageProof2, refundResolution, otherReason, refundMethod, refundPaypalEmail, refundStatus, returnQuantity, returnMethod) => {
     try {
       const user = await Customer.findByPk(customerId);
       if (!user) {
@@ -1145,6 +1145,28 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         return {
           success: false,
           message: "Order item not found",
+        };
+      }
+      if (!returnQuantity || Number(returnQuantity) < 1) {
+        return {
+          success: false,
+          message: "Invalid return quantity."
+        };
+      }
+
+      if (Number(returnQuantity) > orderItem.quantity) {
+        return {
+          success: false,
+          message: `Return quantity cannot exceed ordered quantity (${orderItem.quantity}).`
+        };
+      }
+
+      const validReturnMethods = ["PICKUP", "DROP_OFF"];
+
+      if (returnMethod && !validReturnMethods.includes(returnMethod)) {
+        return {
+          success: false,
+          message: "Invalid return method."
         };
       }
 
@@ -1192,6 +1214,8 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         refundPaypalEmail: refundPaypalEmail || null,
         refundStatus: refundStatus || 'Pending',
         dateRequest: new Date(),
+        returnQuantity, 
+        returnMethod
       });
 
       // 5️⃣ Reset the order item status if needed
@@ -1211,6 +1235,8 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         refundPaypalEmail: newOrderRefund.refundPaypalEmail, 
         refundStatus: newOrderRefund.refundStatus,
         orderStatus: "Return/Refund",
+        returnQuantity: newOrderRefund.returnQuantity,
+        returnMethod: newOrderRefund.returnMethod,
         dateRequest: newOrderRefund.dateRequest,          
       });
 
