@@ -1,4 +1,4 @@
-import SystemSettings from "../models/SystemSettings.js";
+import SystemSettings from "../models/systemSettings.js";
 
 export const fetchBusinessInfoService = async () => {
     try {
