@@ -1,7 +1,7 @@
 /* ===========================
-   PROVINCE PAGE CONTAINER
+   CITY PAGE CONTAINER
    =========================== */
-.province-page-container {
+.city-page-container {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
@@ -12,7 +12,7 @@
 }
 
 /* Inner white card */
-.province-content-card {
+.city-content-card {
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -24,40 +24,90 @@
 /* ===========================
    HEADER
    =========================== */
-.province-page-title {
+.city-header {
+  margin-bottom: 24px;
+}
+
+.city-page-title {
   font-size: clamp(18px, 3vw, 24px);
   font-weight: 700;
-  margin: 0 0 24px 0;
+  margin: 0;
   color: #111827;
   line-height: 1.3;
 }
 
 /* ===========================
-   FORM SECTION
+   PROVINCE SELECTOR SECTION
    =========================== */
-.province-form-section {
-  margin-bottom: 28px;
+.city-province-section {
+  margin-bottom: 24px;
 }
 
-.province-section-label {
+.city-section-label {
   display: block;
   font-size: clamp(13px, 2vw, 15px);
   font-weight: 600;
   color: #374151;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+}
+
+.city-province-row {
+  margin-bottom: 10px;
+}
+
+.city-province-select {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 40px 12px 14px;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: clamp(13px, 2vw, 15px);
+  font-family: inherit;
+  color: #111827;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'><path d='M1 1l6 6 6-6' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px 9px;
+  transition: all 200ms ease;
+  box-sizing: border-box;
+}
+
+.city-province-select:hover:not(:disabled) {
+  border-color: #9CA3AF;
+}
+
+.city-province-select:focus {
+  outline: none;
+  border-color: #27AE60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+.city-province-select:disabled {
+  background-color: #F3F4F6;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* ===========================
-   INPUTS LIST
+   CITIES FORM SECTION
    =========================== */
-.province-inputs-list {
+.city-form-section {
+  margin-bottom: 28px;
+}
+
+/* Cities inputs list */
+.city-inputs-list {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  margin-top: 12px;
 }
 
-/* Single input row */
-.province-input-row {
+/* Single city input row */
+.city-input-row {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -65,8 +115,8 @@
   box-sizing: border-box;
 }
 
-/* Province text input */
-.province-text-input {
+/* City text input */
+.city-text-input {
   flex: 1 1 auto;
   min-width: 0;
   border: 1.5px solid #D1D5DB;
@@ -74,32 +124,32 @@
   padding: 12px 14px;
   font-size: clamp(13px, 2vw, 15px);
   font-family: inherit;
-  outline: none;
-  transition: all 200ms ease;
-  background: #ffffff;
   color: #111827;
+  outline: none;
+  background: #ffffff;
+  transition: all 200ms ease;
   box-sizing: border-box;
 }
 
-.province-text-input:focus {
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+.city-text-input:focus {
   border-color: #27AE60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
 }
 
-.province-text-input:disabled {
+.city-text-input:disabled {
   background: #F3F4F6;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.province-text-input::placeholder {
+.city-text-input::placeholder {
   color: #9CA3AF;
 }
 
 /* ===========================
    ROW ACTIONS (BUTTONS)
    =========================== */
-.province-row-actions {
+.city-row-actions {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -107,7 +157,7 @@
 }
 
 /* Base button styling */
-.province-btn {
+.city-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -127,48 +177,48 @@
   text-align: center;
 }
 
-.province-btn:disabled {
+.city-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
 /* Delete button (red) */
-.province-btn-delete {
+.city-btn-delete {
   background: #EF4444;
   box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15);
 }
 
-.province-btn-delete:hover:not(:disabled) {
+.city-btn-delete:hover:not(:disabled) {
   background: #DC2626;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
   transform: translateY(-1px);
 }
 
-.province-btn-delete:active:not(:disabled) {
+.city-btn-delete:active:not(:disabled) {
   transform: translateY(0);
 }
 
 /* Add More button (green) */
-.province-btn-add {
+.city-btn-add {
   background: #27AE60;
   box-shadow: 0 2px 6px rgba(39, 174, 96, 0.15);
 }
 
-.province-btn-add:hover:not(:disabled) {
+.city-btn-add:hover:not(:disabled) {
   background: #229954;
   box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
   transform: translateY(-1px);
 }
 
-.province-btn-add:active:not(:disabled) {
+.city-btn-add:active:not(:disabled) {
   transform: translateY(0);
 }
 
 /* ===========================
    FORM ACTIONS (BOTTOM BUTTONS)
    =========================== */
-.province-form-actions {
+.city-form-actions {
   display: flex;
   gap: 14px;
   justify-content: flex-start;
@@ -179,7 +229,7 @@
 }
 
 /* Save button (green, primary) */
-.province-btn-save {
+.city-btn-save {
   background: #27AE60;
   padding: 12px 20px;
   border-radius: 10px;
@@ -191,18 +241,18 @@
   height: 48px;
 }
 
-.province-btn-save:hover:not(:disabled) {
+.city-btn-save:hover:not(:disabled) {
   background: #229954;
   box-shadow: 0 6px 16px rgba(39, 174, 96, 0.3);
   transform: translateY(-2px);
 }
 
-.province-btn-save:active:not(:disabled) {
+.city-btn-save:active:not(:disabled) {
   transform: translateY(0);
 }
 
 /* Back button (neutral) */
-.province-btn-back {
+.city-btn-back {
   background: #ffffff;
   color: #6B7280;
   border: 1.5px solid #D1D5DB;
@@ -214,14 +264,14 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-.province-btn-back:hover:not(:disabled) {
+.city-btn-back:hover:not(:disabled) {
   background: #F9FAFB;
   border-color: #9CA3AF;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
 
-.province-btn-back:active:not(:disabled) {
+.city-btn-back:active:not(:disabled) {
   transform: translateY(0);
 }
 
@@ -231,72 +281,80 @@
 
 /* Large Tablets - 1024px */
 @media screen and (max-width: 1024px) {
-  .province-page-container {
+  .city-page-container {
     padding: 20px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 24px;
   }
 }
 
 /* Tablets - 768px */
 @media screen and (max-width: 768px) {
-  .province-page-container {
+  .city-page-container {
     padding: 18px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 22px;
     border-radius: 14px;
   }
 
-  .province-page-title {
+  .city-header {
     margin-bottom: 20px;
   }
 
-  .province-form-section {
+  .city-province-section {
+    margin-bottom: 20px;
+  }
+
+  .city-form-section {
     margin-bottom: 24px;
+  }
+
+  .city-province-select {
+    max-width: 100%;
   }
 }
 
 /* Mobile Landscape - 640px */
 @media screen and (max-width: 640px) {
-  .province-page-container {
+  .city-page-container {
     padding: 16px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 20px;
   }
 
-  .province-input-row {
+  .city-input-row {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
 
-  .province-row-actions {
+  .city-row-actions {
     width: 100%;
     justify-content: flex-end;
   }
 
-  .province-btn {
+  .city-btn {
     min-width: 140px;
   }
 
-  .province-form-actions {
+  .city-form-actions {
     flex-direction: column-reverse;
     align-items: stretch;
     gap: 12px;
   }
 
-  .province-btn-save {
+  .city-btn-save {
     width: 100%;
     flex: none;
   }
 
-  .province-btn-back {
+  .city-btn-back {
     width: 100%;
     min-width: 0;
   }
@@ -304,71 +362,85 @@
 
 /* Mobile Portrait - 480px */
 @media screen and (max-width: 480px) {
-  .province-page-container {
+  .city-page-container {
     padding: 14px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 18px;
     border-radius: 12px;
   }
 
-  .province-page-title {
+  .city-header {
     margin-bottom: 18px;
   }
 
-  .province-inputs-list {
+  .city-province-section {
+    margin-bottom: 18px;
+  }
+
+  .city-inputs-list {
     gap: 12px;
   }
 
-  .province-text-input {
+  .city-text-input,
+  .city-province-select {
     padding: 11px 12px;
   }
 
-  .province-btn {
+  .city-province-select {
+    padding-right: 36px;
+  }
+
+  .city-btn {
     height: 40px;
     padding: 0 14px;
   }
 
-  .province-btn-save,
-  .province-btn-back {
+  .city-btn-save,
+  .city-btn-back {
     height: 44px;
   }
 }
 
 /* Small Mobile - 375px */
 @media screen and (max-width: 375px) {
-  .province-page-container {
+  .city-page-container {
     padding: 12px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 16px;
   }
 
-  .province-page-title {
+  .city-page-title {
     font-size: 16px;
     margin-bottom: 16px;
   }
 
-  .province-section-label {
+  .city-section-label {
     font-size: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
-  .province-text-input {
+  .city-text-input,
+  .city-province-select {
     padding: 10px 11px;
     font-size: 13px;
   }
 
-  .province-btn {
+  .city-province-select {
+    padding-right: 34px;
+  }
+
+  .city-btn {
     height: 38px;
     font-size: 12px;
     min-width: 120px;
   }
 
-  .province-btn-save,
-  .province-btn-back {
+  .city-btn-save,
+  .city-btn-back {
     height: 42px;
     font-size: 13px;
   }
@@ -376,39 +448,45 @@
 
 /* Extra Small Mobile - 320px */
 @media screen and (max-width: 320px) {
-  .province-page-container {
+  .city-page-container {
     padding: 10px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 14px;
     border-radius: 10px;
   }
 
-  .province-page-title {
+  .city-page-title {
     font-size: 15px;
-    margin-bottom: 14px;
   }
 
-  .province-section-label {
+  .city-section-label {
     font-size: 11px;
   }
 
-  .province-inputs-list {
+  .city-inputs-list {
     gap: 10px;
   }
 
-  .province-input-row {
+  .city-input-row {
     gap: 8px;
   }
 
-  .province-text-input {
+  .city-text-input,
+  .city-province-select {
     padding: 9px 10px;
     font-size: 12px;
     border-radius: 6px;
   }
 
-  .province-btn {
+  .city-province-select {
+    padding-right: 32px;
+    background-size: 12px 7px;
+    background-position: right 10px center;
+  }
+
+  .city-btn {
     height: 36px;
     font-size: 11px;
     min-width: 110px;
@@ -416,13 +494,13 @@
     border-radius: 6px;
   }
 
-  .province-form-actions {
+  .city-form-actions {
     gap: 10px;
     margin-top: 20px;
   }
 
-  .province-btn-save,
-  .province-btn-back {
+  .city-btn-save,
+  .city-btn-back {
     height: 40px;
     font-size: 12px;
     border-radius: 8px;
@@ -431,43 +509,48 @@
 
 /* Minimum Support - 280px */
 @media screen and (max-width: 280px) {
-  .province-page-container {
+  .city-page-container {
     padding: 8px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 12px;
     border-radius: 8px;
   }
 
-  .province-page-title {
+  .city-page-title {
     font-size: 14px;
-    margin-bottom: 12px;
   }
 
-  .province-section-label {
+  .city-section-label {
     font-size: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
-  .province-inputs-list {
+  .city-inputs-list {
     gap: 8px;
   }
 
-  .province-text-input {
+  .city-text-input,
+  .city-province-select {
     padding: 8px 9px;
     font-size: 11px;
   }
 
-  .province-btn {
+  .city-province-select {
+    padding-right: 30px;
+    background-size: 10px 6px;
+  }
+
+  .city-btn {
     height: 34px;
     font-size: 10px;
     min-width: 100px;
     padding: 0 10px;
   }
 
-  .province-btn-save,
-  .province-btn-back {
+  .city-btn-save,
+  .city-btn-back {
     height: 38px;
     font-size: 11px;
   }
@@ -475,40 +558,55 @@
 
 /* Absolute Minimum - 200px */
 @media screen and (max-width: 200px) {
-  .province-page-container {
+  .city-page-container {
     padding: 6px;
   }
 
-  .province-content-card {
+  .city-content-card {
     padding: 10px;
     border-radius: 6px;
   }
 
-  .province-page-title {
+  .city-page-title {
     font-size: 12px;
-    margin-bottom: 10px;
   }
 
-  .province-section-label {
+  .city-section-label {
     font-size: 9px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
 
-  .province-inputs-list {
+  .city-province-section {
+    margin-bottom: 12px;
+  }
+
+  .city-form-section {
+    margin-bottom: 16px;
+  }
+
+  .city-inputs-list {
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .city-input-row {
     gap: 6px;
   }
 
-  .province-input-row {
-    gap: 6px;
-  }
-
-  .province-text-input {
+  .city-text-input,
+  .city-province-select {
     padding: 7px 8px;
     font-size: 10px;
     border-radius: 5px;
   }
 
-  .province-btn {
+  .city-province-select {
+    padding-right: 28px;
+    background-size: 9px 5px;
+    background-position: right 8px center;
+  }
+
+  .city-btn {
     height: 32px;
     font-size: 9px;
     min-width: 90px;
@@ -516,13 +614,13 @@
     border-radius: 5px;
   }
 
-  .province-form-actions {
+  .city-form-actions {
     gap: 8px;
     margin-top: 16px;
   }
 
-  .province-btn-save,
-  .province-btn-back {
+  .city-btn-save,
+  .city-btn-back {
     height: 36px;
     font-size: 10px;
     border-radius: 6px;
@@ -533,19 +631,21 @@
    ACCESSIBILITY
    =========================== */
 @media (prefers-reduced-motion: reduce) {
-  .province-btn,
-  .province-text-input {
+  .city-btn,
+  .city-text-input,
+  .city-province-select {
     transition: none;
   }
 }
 
 /* Focus visible styles */
-.province-text-input:focus-visible {
+.city-text-input:focus-visible,
+.city-province-select:focus-visible {
   outline: 2px solid #27AE60;
   outline-offset: 2px;
 }
 
-.province-btn:focus-visible {
+.city-btn:focus-visible {
   outline: 2px solid #27AE60;
   outline-offset: 2px;
 }

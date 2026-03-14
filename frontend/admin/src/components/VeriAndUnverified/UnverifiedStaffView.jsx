@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import './verifiedStaffView.css';
 import { FaUserLarge, FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
 function UnverifiedStaffView() {

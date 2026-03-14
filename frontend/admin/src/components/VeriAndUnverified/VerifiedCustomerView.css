@@ -1,13 +1,11 @@
 
-
-.review-card {
+.profile-card {
   width: min(800px, 95%);
   background: #ffffff;
   border-radius: 16px;
   padding: 32px;
   box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
   box-sizing: border-box;
-
 }
 
 /* Header section with status and avatar */
@@ -20,15 +18,8 @@
   border-bottom: 1px solid #eaeaea;
 }
 
-.pending-status {
-  color: #969494;
-  font-size: 30px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.rejected-status {
-  color: #E53935;
+.profile-title {
+  color: #000000;
   font-size: 30px;
   font-weight: 700;
   margin: 0;
@@ -65,6 +56,7 @@
 /* Form elements */
 .form-group {
   margin-bottom: 18px;
+  
 }
 
 .form-row {
@@ -108,8 +100,8 @@ input[type="password"] {
   background-color: #f3f4f6;
   padding: 12px 10px;
   border: 1px solid #d1d5db;
-  border-right: none;
-  border-radius: 8px 0 0 8px;
+  margin-right: 2px;
+  border-radius: 8px;
   color: #6b7280;
 }
 
@@ -119,18 +111,27 @@ input[type="password"] {
   flex: 1;
 }
 
+/* Document box and link styling */
+.document-box {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  margin-bottom: 12px;
+}
+
 /* Document link styling */
 .document-link {
   display: flex;
   align-items: center;
   padding: 12px 16px;
   border: 1px solid #d1d5db;
-  box-shadow: 0 0 1.5px 1px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   background-color: #FFFFFF;
   cursor: pointer;
+  margin-bottom: 10px;
 }
-.document-name {
+.document-label {
   color: #43A047;
 }
 .document-icon {
@@ -166,32 +167,33 @@ input[type="password"] {
   margin-top: 32px;
 }
 
-.btn-verify, .btn-reject, .btn-delete {
-  padding: 14px 28px;
+.btn-save1, .btn-delete {
+  padding: 12px 28px;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 16px;
   cursor: pointer;
   min-width: 160px;
   transition: background-color 0.2s;
 }
 
-.btn-verify {
+.btn-save1 {
   background-color: #43A047;
   color: white;
+  
 }
 
-.btn-verify:hover {
+.btn-save1:hover {
   background-color: #388e3c;
 }
 
-.btn-reject, .btn-delete {
+.btn-delete {
   background-color: #E53935;
   color: white;
 }
 
-.btn-reject:hover, .btn-delete:hover {
+.btn-delete:hover {
   background-color: #d32f2f;
 }
 
@@ -202,7 +204,7 @@ input[type="password"] {
     gap: 18px;
   }
   
-  .review-card {
+  .profile-card {
     padding: 24px;
   }
   
@@ -211,7 +213,7 @@ input[type="password"] {
     align-items: center;
   }
   
-  .btn-verify, .btn-reject, .btn-delete {
+  .btn-save, .btn-delete {
     width: 100%;
   }
 }

@@ -1,13 +1,16 @@
-.profile-card {
+
+
+.review-card {
   width: min(800px, 95%);
   background: #ffffff;
   border-radius: 16px;
   padding: 32px;
   box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
   box-sizing: border-box;
+
 }
 
-/* Header section with title and avatar */
+/* Header section with status and avatar */
 .header-section {
   display: flex;
   justify-content: space-between;
@@ -17,16 +20,23 @@
   border-bottom: 1px solid #eaeaea;
 }
 
-.profile-title {
-  color: #000000;
-  font-size: 24px;
+.pending-status {
+  color: #969494;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.rejected-status {
+  color: #E53935;
+  font-size: 30px;
   font-weight: 700;
   margin: 0;
 }
 
 .avatar-circle {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
   background: #ffe8d9;
   border-radius: 50%;
   display: flex;
@@ -47,7 +57,7 @@
 .section-title {
   font-size: 18px;
   font-weight: 700;
-  color: #128C3A;
+  color: #333333;
   margin-bottom: 20px;
   margin-top: 0;
 }
@@ -89,6 +99,46 @@ input[type="password"] {
   box-sizing: border-box;
 }
 
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+}
+
+.input-prefix {
+  background-color: #f3f4f6;
+  padding: 12px 10px;
+  border: 1px solid #d1d5db;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  color: #6b7280;
+}
+
+.input-with-prefix input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  flex: 1;
+}
+
+/* Document link styling */
+.document-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 0 1.5px 1px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  background-color: #FFFFFF;
+  cursor: pointer;
+}
+.document-name {
+  color: #43A047;
+}
+.document-icon {
+  color: #43A047;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
 /* Password field styling */
 .password-input {
   position: relative;
@@ -116,7 +166,7 @@ input[type="password"] {
   margin-top: 32px;
 }
 
-.btn-save1, .btn-delete, .btn-reject {
+.btn-verify, .btn-reject, .btn-delete {
   padding: 14px 28px;
   border: none;
   border-radius: 8px;
@@ -127,46 +177,22 @@ input[type="password"] {
   transition: background-color 0.2s;
 }
 
-.btn-save {
+.btn-verify {
   background-color: #43A047;
   color: white;
 }
 
-.btn-save:hover {
+.btn-verify:hover {
   background-color: #388e3c;
 }
 
-.btn-reject {
+.btn-reject, .btn-delete {
   background-color: #E53935;
   color: white;
 }
 
-.btn-reject:hover {
+.btn-reject:hover, .btn-delete:hover {
   background-color: #d32f2f;
-}
-
-.btn-delete {
-  background-color: #E53935;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #d32f2f;
-}
-
-/* Status titles */
-.pending-title {
-  color: #969494;
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.rejected-title {
-  color: #E53935;
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0;
 }
 
 /* Responsive adjustments */
@@ -176,7 +202,7 @@ input[type="password"] {
     gap: 18px;
   }
   
-  .profile-card {
+  .review-card {
     padding: 24px;
   }
   
@@ -185,7 +211,7 @@ input[type="password"] {
     align-items: center;
   }
   
-  .btn-save, .btn-delete {
+  .btn-verify, .btn-reject, .btn-delete {
     width: 100%;
   }
 }
