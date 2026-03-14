@@ -2,33 +2,33 @@ import React, { useContext } from "react";
 import {ToastContainer} from 'react-toastify'
 import {Routes, Route, Navigate} from 'react-router-dom'
 import './App.css'
-import LoginAdmin from './pages/LoginAdmin'
-import Verification from './components/Verification' // <-- Import Verification component
-import Pending from './components/Pending' // <-- Import Pending component
-import ViewAll from './components/ViewAll'
-import Processing from './components/Processing'
-import OutforDelivery from './components/OutforDelivery'
-import Delivered from './components/Delivered'
-import DeliveryLocations from "./components/DeliveryLocations";
-import Provinces from "./components/Locations/Provinces";
-import Cities from "./components/Locations/Cities";
-import Barangay from "./components/Locations/Barangay";
-import CancelOrder from "./components/CancelOrder";
-import CancelReview from "./components/Cancellation/CancelOrderReview";
-import AdminCancel from "./components/Cancellation/AdminCancel";
-import CustomerCancel from "./components/Cancellation/CustomerCancel";
-import ReturnAndRefund from "./components/ReturnAndRefund";
+import LoginAdmin from './pages/LoginAdmin.jsx'
+import Verification from './components/Verification.jsx' // <-- Import Verification component
+import Pending from './components/Pending.jsx' // <-- Import Pending component
+import ViewAll from './components/ViewAll.jsx'
+import Processing from './components/Processing.jsx'
+import OutforDelivery from './components/OutforDelivery.jsx'
+import Delivered from './components/Delivered.jsx'
+import DeliveryLocations from "./components/DeliveryLocations.jsx";
+import Provinces from "./components/Locations/Provinces.jsx";
+import Cities from "./components/Locations/Cities.jsx";
+import Barangay from "./components/Locations/Barangay.jsx";
+import CancelOrder from "./components/CancelOrder.jsx";
+import CancelReview from "./components/Cancellation/CancelOrderReview.jsx";
+import AdminCancel from "./components/Cancellation/AdminCancel.jsx";
+import CustomerCancel from "./components/Cancellation/CustomerCancel.jsx";
+import ReturnAndRefund from "./components/ReturnAndRefund.jsx";
 import UnverifiedUsers from "./components/VeriAndUnverified/UnverifiedUsers.jsx";
-import UnverifiedCustomerReview from "./components/VeriAndUnverified/UnverifiedCustomerReview";
+import UnverifiedCustomerReview from "./components/VeriAndUnverified/UnverifiedCustomerReview.jsx";
 import VerifiedUsers from "./components/VeriAndUnverified/VerifiedUsers.jsx";
-import VerifiedCustomerView from "./components/VeriAndUnverified/VerifiedCustomerView";
-import VerifiedStaffView from "./components/VeriAndUnverified/VerifiedStaffView";
-import UnverifiedStaffView from "./components/VeriAndUnverified/UnverifiedStaffView";
+import VerifiedCustomerView from "./components/VeriAndUnverified/VerifiedCustomerView.jsx";
+import VerifiedStaffView from "./components/VeriAndUnverified/VerifiedStaffView.jsx";
+import UnverifiedStaffView from "./components/VeriAndUnverified/UnverifiedStaffView.jsx";
 import Profile from "./pages/Profile.jsx";
 import Products from "./pages/Products.jsx";
-import AddProduct from "./components/ProductMenu/AddProduct";
+import AddProduct from "./components/ProductMenu/AddProduct.jsx";
 import ProductCategory from './components/ProductMenu/ProductCategory.jsx'
-import TotalProduct from "./components/ProductMenu/TotalProduct";
+import TotalProduct from "./components/ProductMenu/TotalProduct.jsx";
 
 import Notification from "./pages/Notification.jsx";
 import Overview from "./pages/Overview.jsx";
