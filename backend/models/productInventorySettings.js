@@ -59,7 +59,7 @@ const ProductInventorySettings = sequelize.define(
     },
   },
   {
-    tableName: "ProductInventorySettings",
+    tableName: "productInventorySettings",
     timestamps: false,
   }
 );

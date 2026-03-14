@@ -75,7 +75,7 @@ const InventoryHistory = sequelize.define(
     },
   },
   {
-    tableName: "InventoryHistory",
+    tableName: "inventoryHistory",
     timestamps: false,
   }
 );

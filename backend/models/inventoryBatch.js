@@ -88,7 +88,7 @@ const InventoryBatch = sequelize.define(
     }
   },
   {
-    tableName: "InventoryBatch",
+    tableName: "inventoryBatch",
     timestamps: false,
   }
 );

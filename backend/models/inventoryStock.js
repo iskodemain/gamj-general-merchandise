@@ -58,7 +58,7 @@ const InventoryStock = sequelize.define(
     },
   },
   {
-    tableName: "InventoryStock",
+    tableName: "inventoryStock",
     timestamps: false,
   }
 );
