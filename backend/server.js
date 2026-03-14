@@ -35,12 +35,7 @@ connectCloudinary();
 app.use(express.json());
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://gamj-general-merchandise-customer.vercel.app",
-    "https://gamj-general-merchandise-admin.vercel.app"
-  ],
+  origin: true,
   credentials: true
 }));
 
