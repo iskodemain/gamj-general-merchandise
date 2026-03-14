@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import './notification.css';
+import './Notification.css';
 import Navbar from '../components/Navbar';
 import { AdminContext } from '../context/AdminContextProvider';
 import { assets } from '../assets/assets';
