@@ -33,18 +33,29 @@ connectCloudinary();
 
 // MIDDLEWARES
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://gamj-general-merchandise-customer.vercel.app",
+    "https://gamj-general-merchandise-admin.vercel.app"
+  ],
+  credentials: true
+}));
 
 // SOCKET.IO SETUP
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
     origin: [
-      "http://localhost:5173", // customer
-      "http://localhost:5174", // admin
-      "http://localhost:5175", // staff
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://gamj-general-merchandise-customer.vercel.app",
+      "https://gamj-general-merchandise-admin.vercel.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
   },
 });
 
