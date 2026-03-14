@@ -23,6 +23,7 @@ import adminInventoryRouter from './routes/admin/adminInventoryRoute.js';
 import adminNotificationRouter from './routes/admin/adminNotificationRoute.js';
 import adminLocationRouter from './routes/admin/adminLocationRoute.js';
 import adminPolicyRoute from './routes/admin/adminPolicyRoute.js';
+import { createSuperAdminIfNotExists } from './scripts/createSuperAdmin.js';
 import { sequelize } from './config/sequelize.js';
 
 // APP CONFIG
@@ -135,7 +136,8 @@ const startServer = async () => {
     try {
         await connectToDatabase();
         // await sequelize.sync({ alter: true }); 
-        console.log("Database synchronized successfully.");
+        console.log("Database connected successfully.");
+        createSuperAdminIfNotExists()
         server.listen(port, () => {
             console.log("Server running on PORT: " + port);
         })
