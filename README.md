@@ -75,4 +75,10 @@ Developed as an academic and industry-aligned system, it follows modern **fullâ€
 | Authentication | JWT                                      |
 | File Storage   | Cloudinary                               |
 
+
+## ğŸŒ Live URLs
+
+- **Customer Site:** [https://gamj-general-merchandise-customer.vercel.app/](https://gamj-general-merchandise-customer.vercel.app/)  
+- **Admin Site:** [https://gamj-general-merchandise-admin.vercel.app/](https://gamj-general-merchandise-admin.vercel.app/)  
+
 ---
