@@ -312,19 +312,15 @@ function AddProduct() {
     formData.append('variantValues', JSON.stringify(finalVariantValues || []));
     formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
 
-    console.log("finalVariantNames:", finalVariantNames);
-    console.log("FormData:", Object.fromEntries(formData));
-
     setLoading(true);
-    await addProduct(formData);
-
-    setTimeout(() => {
-      window.location.href = "/products/totalproduct";  
-    }, 500);
-
+    const success = await addProduct(formData);
     setLoading(false);
 
-    // navigate('/products/totalproduct');
+    if (success) {
+      setTimeout(() => {
+        window.location.href = "/products/totalproduct";  
+      }, 500);
+    }
   };
 
   return (
