@@ -77,7 +77,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -96,7 +96,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -115,7 +115,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -130,11 +130,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setFetchShippingRates(response.data.shippingRates)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch shipping rates:", error);
     }
   }
   useEffect(() => {
@@ -158,7 +156,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -177,7 +175,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -213,11 +211,9 @@ const AdminContextProvider = (props) => {
         });
         if (response.data.success) {
             setFetchOrderDeliveryProof(response.data.orderDeliveryProof)
-        } else {
-            toast.error(response.data.message, { ...toastError });
         }
     } catch (error) {
-        // ✅ SILENT - Form just shows empty
+        console.error("Failed to fetch order delivery proof:", error);
     }
   }
   useEffect(() => {
@@ -259,7 +255,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -283,7 +279,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -302,7 +298,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -321,7 +317,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -336,11 +332,9 @@ const AdminContextProvider = (props) => {
         });
         if (response.data.success) {
             setFetchInventorySettings(response.data.inventorySettings)
-        } else {
-            toast.error(response.data.message, { ...toastError });
         }
     } catch (error) {
-        // ✅ SILENT - Form just shows empty
+        console.error("Failed to fetch inventory settings:", error);
     }
   }
   useEffect(() => {
@@ -364,7 +358,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -383,7 +377,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -394,11 +388,9 @@ const AdminContextProvider = (props) => {
           const response = await axios.get(backendUrl + "/api/policies/return-and-refund/fetch");
           if (response.data.success) {
               setFetchReturnRefundPolicy(response.data.returnRefundPolicy)
-          } else {
-              toast.error(response.data.message, { ...toastError });
           }
       } catch (error) {
-          // ✅ SILENT - Form just shows empty
+          console.error("Failed to fetch return refund policy:", error);
       }
   }
   useEffect(() => {
@@ -416,11 +408,9 @@ const AdminContextProvider = (props) => {
           });
           if (response.data.success) {
               setFetchOrderProofPayment(response.data.allPaymentProof)
-          } else {
-              toast.error(response.data.message, { ...toastError });
           }
       } catch (error) {
-          // ✅ SILENT - Form just shows empty
+          console.error("Failed to fetch order proof payment:", error);
       }
   }
   useEffect(() => {
@@ -448,7 +438,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -467,7 +457,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -486,7 +476,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -501,11 +491,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setBarangays(response.data.barangays)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch barangays:", error);
     }
   }
   useEffect(() => {
@@ -533,7 +521,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -552,7 +540,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -571,7 +559,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -586,11 +574,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setCities(response.data.cities)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch cities:", error);
     }
   }
   useEffect(() => {
@@ -618,7 +604,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -637,7 +623,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -656,7 +642,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -671,11 +657,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setProvinces(response.data.provinces)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch provinces:", error);
     }
   }
   useEffect(() => {
@@ -694,11 +678,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setFetchNotifications(response.data.notifications)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch notification:", error);
     }
   }
   useEffect(() => {
@@ -727,7 +709,7 @@ const AdminContextProvider = (props) => {
         return false;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return false;
     }
   };
@@ -742,11 +724,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setFetchOrderTransaction(response.data.orderTransaction)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch order transaction:", error);
     }
   };
   useEffect(() => {
@@ -771,7 +751,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -796,7 +776,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -815,7 +795,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -834,7 +814,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
@@ -859,7 +839,7 @@ const AdminContextProvider = (props) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Error processing stock-in.", { ...toastError });
       return null;
     }
@@ -879,7 +859,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch inventory history:", error);
     }
   }
   useEffect(() => {
@@ -898,11 +878,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setFetchInventoryBatch(response.data.inventoryBatch)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch inventory batch:", error);
     }
   }
   useEffect(() => {
@@ -926,7 +904,7 @@ const AdminContextProvider = (props) => {
         toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch inventory stock:", error);
     }
   }
   useEffect(() => {
@@ -952,7 +930,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -974,7 +952,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -996,7 +974,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1018,7 +996,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1040,7 +1018,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1066,7 +1044,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1088,7 +1066,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1103,11 +1081,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setFetchRefundProof(response.data.refundProof)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+        console.error("Failed to fetch settings data:", error);
     }
   }
   useEffect(() => {
@@ -1138,7 +1114,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   };
@@ -1150,11 +1126,9 @@ const AdminContextProvider = (props) => {
       const response = await axios.get(backendUrl + "/api/settings");
       if (response.data.success) {
         setSettingsData(response.data.settingData)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch settings data:", error);
     }
   }
   useEffect(() => {
@@ -1180,7 +1154,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1201,7 +1175,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1216,11 +1190,9 @@ const AdminContextProvider = (props) => {
       });
       if (response.data.success) {
         setAdminProfileInfo(response.data.adminUser)
-      } else {
-        toast.error(response.data.message, { ...toastError });
       }
     } catch (error) {
-      // ✅ SILENT - Form just shows empty
+      console.error("Failed to fetch admin profile:", error);
     }
   }
   useEffect(() => {
@@ -1245,7 +1217,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1266,7 +1238,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1288,7 +1260,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1310,7 +1282,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1332,7 +1304,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1349,7 +1321,7 @@ const AdminContextProvider = (props) => {
                 setFetchReturnRefundOrders(response.data.returnRefundOrders);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch return refund orders:", error);
         }
     }
     useEffect(() => {
@@ -1370,7 +1342,7 @@ const AdminContextProvider = (props) => {
               setFetchCancelledOrders(response.data.orderCancel);
           }
       } catch (error) {
-          // ✅ SILENT - Form just shows empty
+          console.error("Failed to fetch cancelled orders:", error);
       }
   }
   useEffect(() => {
@@ -1391,7 +1363,7 @@ const AdminContextProvider = (props) => {
               setDeliveryInfoList(response.data.deliveryInfoList);
           }
       } catch (error) {
-          // ✅ SILENT - Form just shows empty
+          console.error("Failed to fetch delivery info:", error);
       }
   }
   useEffect(() => {
@@ -1414,7 +1386,7 @@ const AdminContextProvider = (props) => {
             setCurrentUser(response.data.adminUserType); 
         }
     } catch (error) {
-        // ✅ SILENT - Form just shows empty
+        console.error("Failed to fetch all admin:", error);
     }
   }
   useEffect(() => {
@@ -1435,7 +1407,7 @@ const AdminContextProvider = (props) => {
                 setCustomerList(response.data.customerList);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch all customer:", error);
         }
     }
     useEffect(() => {
@@ -1457,7 +1429,7 @@ const AdminContextProvider = (props) => {
                 setFetchOrderItems(response.data.orderItems);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch orders:", error);
         }
     }
     useEffect(() => {
@@ -1474,7 +1446,7 @@ const AdminContextProvider = (props) => {
             setProductVariantCombination(response.data.productVariantCombination);
         } 
       } catch (error) {
-          // ✅ SILENT - Form just shows empty
+          console.error("Failed to fetch product variant combination:", error);
       }
 
     };
@@ -1492,7 +1464,7 @@ const AdminContextProvider = (props) => {
               setProductVariantValues(response.data.productVariantValues);
           }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch product variant values:", error);
         }
     };
     useEffect(() => {
@@ -1510,7 +1482,7 @@ const AdminContextProvider = (props) => {
             setVariantName(response.data.variantName);
         }
       } catch (error) {
-          // ✅ SILENT - Form just shows empty
+          console.error("Failed to fetch variant name:", error);
       }
     };
     useEffect(() => {
@@ -1537,7 +1509,7 @@ const AdminContextProvider = (props) => {
           return false;
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1558,7 +1530,7 @@ const AdminContextProvider = (props) => {
           toast.error(response.data.message, { ...toastError });
         }
       } catch (error) {
-          console.log(error);
+          console.error(error);
       }
     }
   }
@@ -1576,7 +1548,7 @@ const AdminContextProvider = (props) => {
           setProducts(response.data.products);
       } 
     } catch (error) {
-        // ✅ SILENT - Form just shows empty
+        console.error("Failed to fetch al products:", error);
     }
   }
   useEffect(() => {
@@ -1597,7 +1569,7 @@ const AdminContextProvider = (props) => {
           setProductCategory(response.data.productCategory);
       } 
     } catch (error) {
-        // ✅ SILENT - Form just shows empty
+        console.error("Failed to fetch product category:", error);
     }
   }
   useEffect(() => {
@@ -1626,7 +1598,7 @@ const AdminContextProvider = (props) => {
             toast.error(response.data.message, { ...toastError });
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         toast.error(error.message, { ...toastError });
     }
   };
@@ -1653,7 +1625,7 @@ const AdminContextProvider = (props) => {
             toast.error(response.data.message, { ...toastError });
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         toast.error(error.message, { ...toastError });
     }
   };
