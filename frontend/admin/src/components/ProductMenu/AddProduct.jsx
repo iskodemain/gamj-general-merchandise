@@ -294,14 +294,19 @@ function AddProduct() {
     formData.append('productName', productName);
     formData.append('productDescription', productDescription);
     formData.append('productDetails', productDetails || '');
-    formData.append('price', displayPrice === '' ? '' : Number(displayPrice));
+    formData.append('price', Number(displayPrice));
     formData.append('unitType', unitType);
     formData.append('piecesPerBox', unitType === 'BOX' ? Number(piecesPerBox) : 1);
     
-    if (image_1 instanceof File) formData.append('image1', image_1);
-    if (image_2 instanceof File) formData.append('image2', image_2);
-    if (image_3 instanceof File) formData.append('image3', image_3);
-    if (image_4 instanceof File) formData.append('image4', image_4);
+    // if (image_1 instanceof File) formData.append('image1', image_1);
+    // if (image_2 instanceof File) formData.append('image2', image_2);
+    // if (image_3 instanceof File) formData.append('image3', image_3);
+    // if (image_4 instanceof File) formData.append('image4', image_4);
+
+    if (image_1 && image_1 instanceof File) formData.append('image1', image_1);
+    if (image_2 && image_2 instanceof File) formData.append('image2', image_2);
+    if (image_3 && image_3 instanceof File) formData.append('image3', image_3);
+    if (image_4 && image_4 instanceof File) formData.append('image4', image_4);
 
     formData.append('isBestSeller', isBestSeller);
     formData.append('isActive', isActive);
@@ -312,17 +317,15 @@ function AddProduct() {
     formData.append('variantValues', JSON.stringify(finalVariantValues || []));
     formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
 
-    console.log("finalVariantNames:", finalVariantNames);
-    console.log("FormData:", Object.fromEntries(formData));
-
     setLoading(true);
-    await addProduct(formData);
-
-    setTimeout(() => {
-      window.location.href = "/products/totalproduct";  
-    }, 500);
-
+    const success = await addProduct(formData); // ✅ Get return value
     setLoading(false);
+
+    if (success) {
+      setTimeout(() => {
+          window.location.href = "/products/totalproduct";  
+      }, 500);
+    }
 
     // navigate('/products/totalproduct');
   };

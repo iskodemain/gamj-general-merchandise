@@ -6,12 +6,26 @@ export const addProduct = async (req, res) => {
     try {
         const { ID } = req.admin;
 
-        const image1 = req.files.image1?.[0];
-        const image2 = req.files.image2?.[0];
-        const image3 = req.files.image3?.[0];
-        const image4 = req.files.image4?.[0];
+        const image1 = req.files?.image1?.[0];
+        const image2 = req.files?.image2?.[0];
+        const image3 = req.files?.image3?.[0];
+        const image4 = req.files?.image4?.[0];
 
         const { categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination} = req.body;
+
+        // ✅ Add validation logging
+        console.log("📦 Add Product Request:", {
+            adminId: ID,
+            categoryId,
+            productName,
+            price,
+            hasImages: {
+                image1: !!image1,
+                image2: !!image2,
+                image3: !!image3,
+                image4: !!image4
+            }
+        });
 
         const result = await addProductService( ID, categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination);
 
