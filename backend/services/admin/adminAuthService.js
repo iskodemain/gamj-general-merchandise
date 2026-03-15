@@ -47,12 +47,12 @@ export const loginAdminService = async (identifier, password) => {
 
         // Send email (or SMS if phone)
         if (admin.emailAddress) {
-            await sendMail({
+            sendMail({
                 to: admin.emailAddress,
                 subject: 'Login Verification Code',
                 html: loginEmailTemplate(admin.userName, code),
                 attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
-            });
+            }).catch(err => console.error('Email sending failed:', err));;
         }
 
         return {
