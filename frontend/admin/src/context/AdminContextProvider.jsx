@@ -1526,11 +1526,14 @@ const AdminContextProvider = (props) => {
         });;
         if (response.data.success) {
             toast.success(response.data.message, { ...toastSuccess });
+            return true;
         } else {
           toast.error(response.data.message, { ...toastError });
+          return false;
         }
       } catch (error) {
           console.error(error);
+          return false;
       }
     }
   }
