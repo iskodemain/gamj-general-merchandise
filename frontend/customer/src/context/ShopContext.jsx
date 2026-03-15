@@ -22,6 +22,29 @@ const ShopContextProvider = (props) => {
     const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID
     const socket = io(backendUrl);
 
+    /*-----------------------FETCH DELIVERY INFO-------------------------*/
+    const [poMedicalInstitutionName, setPoMedicalInstitutionName] = useState('');
+    const [poEmailAddress, setPoEmailAddress] = useState('');
+    const [poDetailedAddress, setPoDetailedAddress] = useState('');
+    const [poZipCode, setPoZipCode] = useState('');
+    const [poContactNumber, setPoContactNumber] = useState('');
+
+    /*--------------------------FETCH CANCELLED ORDERS----------------------------*/
+    const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
+
+    /*-----------------------CANCEL ORDER PROCESS-------------------------*/
+    const [cancelOrder, setCancelOrder] = useState(false);
+    const [paymentUsed, setPaymentUsed] = useState('');
+    
+    const [reasonForCancellation, setReasonForCancellation] = useState('');
+    const [cancelComments, setCancelComments] = useState('');
+    const [cancelPaypalEmail, setCancelPaypalEmail] = useState(''); 
+    const [cancellationStatus, setCancellationStatus] = useState('Processing'); 
+    const [cancelledBy, setCancelledBy] = useState('Customer');
+
+    /*--------------------------FETCH REFUND PROOF----------------------------*/
+    const [fetchRefundProof, setFetchRefundProof] = useState([]);
+
     /*--------------------------FETCH ORDERS----------------------------*/
     const [fetchOrders, setFetchOrders] = useState([]);
     const [fetchOrderItems, setFetchOrderItems] = useState([]);
@@ -42,6 +65,12 @@ const ShopContextProvider = (props) => {
     const [refundPaypalEmail, setRefundPaypalEmail] = useState('');
     const [refundStatus, setRefundStatus] = useState('Pending');
     const [pickupScheduledDate, setPickupScheduledDate] = useState('');
+
+    /*----------------------FETCH NOTIFICATION PAGE-----------------------*/
+    const [fetchNotifications, setFetchNotifications] = useState([]);
+
+    /*--------------------------FETCH ORDER REFUND----------------------------*/
+    const [fetchOrderRefund, setFetchOrderRefund] = useState([]);
 
     /*---------------------------DATA LOCATIONS-----------------------------*/
     const [provinces, setProvinces] = useState([]);
@@ -158,11 +187,9 @@ const ShopContextProvider = (props) => {
           });
           if (response.data.success) {
             setFetchShippingRates(response.data.shippingRates)
-          } else {
-            toast.error(response.data.message, { ...toastError });
           }
         } catch (error) {
-          // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch shipping rates:", error);
         }
       }
       useEffect(() => {
@@ -179,20 +206,17 @@ const ShopContextProvider = (props) => {
             if (response.data.success) {
                 // "storePolicy" is what the service returns — null if not created yet
                 setFetchStorePolicy(response.data.storePolicy);
-            } else {
-                // Silent — page just shows an empty editor
             }
         } catch (error) {
-            // Silent — network error, editor starts empty
+            console.error("Failed to fetch store policy:", error);
         }
     };
-
     useEffect(() => {
         handleFetchStorePolicy();
     }, []);
     
-      /*---------------------------FETCH ORDER DELIVERY PROOF-----------------------------*/
-      const handleFetchOrderDeliveryProof = async () => {
+    /*---------------------------FETCH ORDER DELIVERY PROOF-----------------------------*/
+    const handleFetchOrderDeliveryProof = async () => {
         try {
             const response = await axios.get(backendUrl + "/api/order/order-delivery-proof", {
                 headers: {
@@ -201,11 +225,9 @@ const ShopContextProvider = (props) => {
             });
             if (response.data.success) {
                 setFetchOrderDeliveryProof(response.data.orderDeliveryProof)
-            } else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch order delivery proof:", error);
         }
     }
     useEffect(() => {
@@ -220,11 +242,9 @@ const ShopContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/policies/return-and-refund/fetch");
             if (response.data.success) {
                 setFetchReturnRefundPolicy(response.data.returnRefundPolicy)
-            } else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch retrun and refund policy:", error);
         }
     }
     useEffect(() => {
@@ -247,7 +267,7 @@ const ShopContextProvider = (props) => {
                     return false;
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
     }
@@ -266,10 +286,10 @@ const ShopContextProvider = (props) => {
                 }
 
                 const response = await axios.post(backendUrl + "/api/order/payment-proof/add", formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
                 });
                 if (response.data.success) {
                     toast.success(response.data.message, {...toastSuccess});
@@ -279,7 +299,7 @@ const ShopContextProvider = (props) => {
                     return false;
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
                 return false;
             }
@@ -296,11 +316,9 @@ const ShopContextProvider = (props) => {
             });
             if (response.data.success) {
                 setFetchOrderProofPayment(response.data.paymentProof)
-            } else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch order proof payment:", error);
         }
     }
     useEffect(() => {
@@ -313,13 +331,11 @@ const ShopContextProvider = (props) => {
     const handleFetchInventoryStock = async () => {
         try {
         const response = await axios.get(backendUrl + "/api/product/stock");
-        if (response.data.success) {
-            setFetchInventoryStock(response.data.inventoryStock)
-        } else {
-            toast.error(response.data.message, { ...toastError });
-        }
+            if (response.data.success) {
+                setFetchInventoryStock(response.data.inventoryStock)
+            }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch inventory stock:", error);
         }
     }
     useEffect(() => {
@@ -333,19 +349,16 @@ const ShopContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/business-info");
             if (response.data.success) {
                 setSettingsData(response.data.settingData)
-            } else {
-                toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch settings data:", error);
         }
     }
     useEffect(() => {
         fetchSettingsData();
     }, []);
 
-    /*----------------------FETCH NOTIFICATION PAGE-----------------------*/
-    const [fetchNotifications, setFetchNotifications] = useState([]);
+    
     const handleFetchNotification = async() => {
         try {
             const response = await axios.get(backendUrl + "/api/notification/", {
@@ -357,7 +370,7 @@ const ShopContextProvider = (props) => {
                 setFetchNotifications(response.data.notifications);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch notification:", error);
         }
     }
     useEffect(() => {
@@ -375,7 +388,7 @@ const ShopContextProvider = (props) => {
                     headers: { Authorization: `Bearer ${token}`},
                 });
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
     }
@@ -394,7 +407,7 @@ const ShopContextProvider = (props) => {
                 toast.error(response.data.message, { ...toastError });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
@@ -417,15 +430,14 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, { ...toastError });
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
             }
         }
     };
 
 
-    /*--------------------------FETCH ORDER REFUND----------------------------*/
-    const [fetchOrderRefund, setFetchOrderRefund] = useState([]);
+    
     const handleFetchOrderRefund = async() => {
         try {
             const response = await axios.get(backendUrl + "/api/order/order-refund", {
@@ -437,7 +449,7 @@ const ShopContextProvider = (props) => {
                 setFetchOrderRefund(response.data.orderRefund);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch order refund:", error);
         }
     }
     useEffect(() => {
@@ -480,24 +492,13 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, {...toastError});
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
             }
         }
     };
 
-    /*-----------------------CANCEL ORDER PROCESS-------------------------*/
-    const [cancelOrder, setCancelOrder] = useState(false);
-    const [paymentUsed, setPaymentUsed] = useState('');
     
-    const [reasonForCancellation, setReasonForCancellation] = useState('');
-    const [cancelComments, setCancelComments] = useState('');
-    const [cancelPaypalEmail, setCancelPaypalEmail] = useState(''); 
-    const [cancellationStatus, setCancellationStatus] = useState('Processing'); 
-    const [cancelledBy, setCancelledBy] = useState('Customer');
-
-    /*--------------------------FETCH REFUND PROOF----------------------------*/
-    const [fetchRefundProof, setFetchRefundProof] = useState([]);
     const handleFetchRefundProof = async() => {
         try {
             const response = await axios.get(backendUrl + "/api/order/refund-proof", {
@@ -509,7 +510,7 @@ const ShopContextProvider = (props) => {
                 setFetchRefundProof(response.data.refundProof);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch refund proof:", error);
         }
     }
     useEffect(() => {
@@ -535,7 +536,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, { ...toastError });
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
             }
         }
@@ -560,7 +561,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, { ...toastError });
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
             }
         }
@@ -581,7 +582,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, { ...toastError });
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
             }
         }
@@ -612,7 +613,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, { ...toastError });
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
             }
         }
@@ -631,7 +632,7 @@ const ShopContextProvider = (props) => {
                 setFetchOrderItems(response.data.orderItems);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch orders:", error);
         }
     }
     useEffect(() => {
@@ -640,8 +641,6 @@ const ShopContextProvider = (props) => {
         }
     }, [token]);
 
-    /*--------------------------FETCH CANCELLED ORDERS----------------------------*/
-    const [fetchCancelledOrders, setFetchCancelledOrders] = useState([]);
     const handleFetchCancelledOrders = async() => {
         try {
             const response = await axios.get(backendUrl + "/api/order/cancel-order", {
@@ -650,11 +649,10 @@ const ShopContextProvider = (props) => {
                 }
             });
             if (response.data.success) {
-                // SET MO NALANG DITO YUNG MGA NEED NA DATA
                 setFetchCancelledOrders(response.data.orderCancel);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch cancelled orders:", error);
         }
     }
     useEffect(() => {
@@ -687,19 +685,12 @@ const ShopContextProvider = (props) => {
                     return false;
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 toast.error(error.message, { ...toastError });
                 return false;
             }
         }
     };
-
-    /*-----------------------FETCH DELIVERY INFO-------------------------*/
-    const [poMedicalInstitutionName, setPoMedicalInstitutionName] = useState('');
-    const [poEmailAddress, setPoEmailAddress] = useState('');
-    const [poDetailedAddress, setPoDetailedAddress] = useState('');
-    const [poZipCode, setPoZipCode] = useState('');
-    const [poContactNumber, setPoContactNumber] = useState('');
 
     const handleFetchDeliveryInfo = async() => {
         try {
@@ -726,12 +717,12 @@ const ShopContextProvider = (props) => {
                 setHasDeliveryInfo(false);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch delivery info:", error);
         }
     }
     useEffect(() => {
         if (token) {
-        handleFetchDeliveryInfo();
+            handleFetchDeliveryInfo();
         }
     }, [token]);
 
@@ -750,7 +741,7 @@ const ShopContextProvider = (props) => {
                 setRejectedCustomer(response.data.user.rejectedCustomer)
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+           console.error("Failed to fetch verified customer:", error);
         }
     }
     useEffect(() => {
@@ -795,7 +786,7 @@ const ShopContextProvider = (props) => {
                 setProductCategory(response.data.productCategory);
             } 
         } catch (error) {
-            // ✅ SILENT - Form just shows empty;
+            console.error("Failed to fetch product category:", error);
         }
     }
     useEffect(() => {
@@ -810,7 +801,7 @@ const ShopContextProvider = (props) => {
                 setProducts(response.data.products);
             } 
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch all products:", error);
         }
     }
     useEffect(() => {
@@ -825,7 +816,7 @@ const ShopContextProvider = (props) => {
                 setProductVariantCombination(response.data.productVariantCombination);
             } 
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch product variant combination:", error);
         }
     };
     useEffect(() => {
@@ -840,7 +831,7 @@ const ShopContextProvider = (props) => {
                 setProductVariantValues(response.data.productVariantValues);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch product variant values:", error);
         }
     };
     useEffect(() => {
@@ -855,7 +846,7 @@ const ShopContextProvider = (props) => {
                 setVariantName(response.data.variantName);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch variant name:", error);
         }
     };
     useEffect(() => {
@@ -876,7 +867,7 @@ const ShopContextProvider = (props) => {
                 setBarangays(response.data.barangays || []);
             } 
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch location:", error);
         }
     };
     useEffect(() => {
@@ -941,7 +932,7 @@ const ShopContextProvider = (props) => {
                 setWishListItems(response.data.wishlistItems);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch wishlist:", error);
         } 
     }
     useEffect(() => {
@@ -967,7 +958,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, {...toastError});
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } 
         }
     }
@@ -987,7 +978,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, {...toastError});
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } 
         }
     };
@@ -1007,7 +998,7 @@ const ShopContextProvider = (props) => {
                 setCartItems(response.data.cartItems);
             }
         } catch (error) {
-            // ✅ SILENT - Form just shows empty
+            console.error("Failed to fetch user cart:", error);
         } 
     }
     useEffect(() => {
@@ -1035,7 +1026,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, {...toastError});
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } 
         }
 
@@ -1068,7 +1059,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, {...toastError});
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } 
         }
     }
@@ -1088,7 +1079,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, {...toastError});
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } 
         }
     }
@@ -1106,7 +1097,7 @@ const ShopContextProvider = (props) => {
                     toast.error(response.data.message, {...toastError});
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } 
         }
     }
