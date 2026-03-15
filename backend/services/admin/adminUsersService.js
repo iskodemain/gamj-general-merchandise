@@ -43,7 +43,7 @@ export const fetchAllCustomerService = async (adminId) => {
         console.log(error);
         throw new Error(error.message);
     }
-}; // PENDING
+};
 
 
 export const fetchAllAdminService = async (adminId) => {
@@ -74,8 +74,7 @@ export const fetchAllAdminService = async (adminId) => {
         console.log(error);
         throw new Error(error.message);
     }
-}; // GOODS NA
-
+};
 
 export const fetchDeliveryInfoService = async (adminId) => {
     try {
@@ -157,7 +156,7 @@ export const approvedUserService = async (adminId, userID, userType) => {
         createAt: new Date()
       });
 
-      await accountSendMail({
+      accountSendMail({
         to: customer.loginEmail || customer.repEmailAddress,
         subject: 'Your GAMJ Account Has Been Approved',
         html: userAccountApprovalTemplate(customer.medicalInstitutionName),
@@ -182,7 +181,7 @@ export const approvedUserService = async (adminId, userID, userType) => {
     console.error(error);
     throw new Error(error.message);
   }
-}; // GOODS NA
+};
 
 export const rejectUserService = async (adminId, userID, userType, rejectTitle, rejectMessage) => {
   try {
@@ -233,7 +232,7 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
         createAt: new Date()
       });
 
-      await accountSendMail({
+      accountSendMail({
         to: customer.loginEmail || customer.repEmailAddress || customer.emailAddress,
         subject: 'Your GAMJ Account Has Been Rejected',
         html: userAccountRejectedTemplate(customer.medicalInstitutionName, rejectTitle, rejectMessage),
@@ -258,7 +257,7 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
     console.error(error);
     throw new Error(error.message);
   }
-}; // GOODS NA
+};
 
 export const deleteUserService = async (adminId, userID, userType) => {
   try {
@@ -362,7 +361,7 @@ export const deleteUserService = async (adminId, userID, userType) => {
     console.error(error);
     throw new Error(error.message);
   }
-}; // GOODS NA
+};
 
 export const saveUserInfoService = async (adminId, data) => {
   try {
@@ -521,7 +520,7 @@ export const saveUserInfoService = async (adminId, data) => {
     console.error(error);
     throw new Error(error.message);
   }
-}; // GOODS NA
+};
 
 export const addNewUserService = async (adminId, data) => {
   try {
@@ -619,7 +618,7 @@ export const addNewUserService = async (adminId, data) => {
         verifiedCustomer: true
       });
 
-      await accountSendMail({
+      accountSendMail({
         to: addNewUser.loginEmail || addNewUser.repEmailAddress || addNewUser.emailAddress,
         subject: 'Your GAMJ Account Has Been Created by Admin',
         html: userAccountCreatedTemplate(addNewUser.medicalInstitutionName),
@@ -645,7 +644,7 @@ export const addNewUserService = async (adminId, data) => {
         verifiedUser: true,
       });
       if (identifierType === "email") {
-        await accountSendMail({
+        accountSendMail({
           to: addNewUser.emailAddress,
           subject: 'Your GAMJ Account Has Been Created by Admin',
           html: userAccountCreatedTemplate(addNewUser.userName),
@@ -672,7 +671,7 @@ export const addNewUserService = async (adminId, data) => {
         verifiedUser: true,
       });
       if (identifierType === "email") {
-        await accountSendMail({
+        accountSendMail({
           to: addNewUser.emailAddress,
           subject: 'Your GAMJ Account Has Been Created by Admin',
           html: userAccountCreatedTemplate(addNewUser.userName),
@@ -699,7 +698,7 @@ export const addNewUserService = async (adminId, data) => {
         verifiedUser: true
       });
       if (identifierType === "email") {
-        await accountSendMail({
+        accountSendMail({
           to: addNewUser.emailAddress,
           subject: 'Your GAMJ Account Has Been Created by Admin',
           html: userAccountCreatedTemplate(addNewUser.userName),
@@ -718,4 +717,4 @@ export const addNewUserService = async (adminId, data) => {
     console.error(error);
     throw new Error(error.message);
   }
-}; // GOODS NA
+};
