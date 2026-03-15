@@ -694,7 +694,7 @@ const AdminContextProvider = (props) => {
     if (!token) return;
     try {
       const response = await axios.delete(
-        backendUrl + "/api/product/delete",
+        backendUrl + "/api/admin/product/delete",
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { productID }
@@ -740,7 +740,7 @@ const AdminContextProvider = (props) => {
     if (!token) return;
     try {
       const response = await axios.delete(
-        backendUrl + "/api/product/category/delete-all",
+        backendUrl + "/api/admin/product/category/delete-all",
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -762,7 +762,7 @@ const AdminContextProvider = (props) => {
     if (!token) return;
     try {
       const response = await axios.delete(
-        backendUrl + "/api/product/category/delete",
+        backendUrl + "/api/admin/product/category/delete",
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { categoryID }    // ✅ Correct way to send body in DELETE
@@ -785,7 +785,7 @@ const AdminContextProvider = (props) => {
   const updateProductCategory = async (payload) => {
     if (!token) return;
     try {
-      const response = await axios.put(backendUrl + "/api/product/category/update", payload, 
+      const response = await axios.put(backendUrl + "/api/admin/product/category/update", payload, 
         { headers: { Authorization: `Bearer ${token}` } });
 
       if (response.data.success) {
@@ -804,7 +804,7 @@ const AdminContextProvider = (props) => {
   const addProductCategory = async (payload) => {
     if (!token) return;
     try {
-      const response = await axios.post(backendUrl + "/api/product/category/add", payload, 
+      const response = await axios.post(backendUrl + "/api/admin/product/category/add", payload, 
         { headers: { Authorization: `Bearer ${token}` } });
 
       if (response.data.success) {
@@ -1441,7 +1441,7 @@ const AdminContextProvider = (props) => {
   /*---------------------------FETCH ALL PRODUCT VARIANT COMBINATION-----------------------------*/
     const fetchProductVariantCombination = async () => {
       try {
-        const response = await axios.get(backendUrl + "/api/product/product-variant-combination");
+        const response = await axios.get(backendUrl + "/api/admin/product/product-variant-combination");
         if (response.data.success) {
             setProductVariantCombination(response.data.productVariantCombination);
         } 
@@ -1459,7 +1459,7 @@ const AdminContextProvider = (props) => {
   /*---------------------------FETCH ALL PRODUCT VARIANT VALUES-----------------------------*/
     const fetchProductVariantValues = async () => {
         try {
-          const response = await axios.get(backendUrl + "/api/product/product-variant-values");
+          const response = await axios.get(backendUrl + "/api/admin/product/product-variant-values");
           if (response.data.success) {
               setProductVariantValues(response.data.productVariantValues);
           }
@@ -1477,7 +1477,7 @@ const AdminContextProvider = (props) => {
   /*---------------------------FETCH ALL VARIANT NAME-----------------------------*/
     const fetchVariantName = async () => {
       try {
-        const response = await axios.get(backendUrl + "/api/product/variant-name");
+        const response = await axios.get(backendUrl + "/api/admin/product/variant-name");
         if (response.data.success) {
             setVariantName(response.data.variantName);
         }
@@ -1495,7 +1495,7 @@ const AdminContextProvider = (props) => {
   const updateProduct = async (formData) => {
     if (token) {
       try {
-        const response = await axios.put(backendUrl + "/api/product/update", formData, {
+        const response = await axios.put(backendUrl + "/api/admin/product/update", formData, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'multipart/form-data'
@@ -1518,7 +1518,7 @@ const AdminContextProvider = (props) => {
   const addProduct = async (formData) => {
     if (token) {
       try {
-        const response = await axios.post(backendUrl + "/api/product/add", formData, {
+        const response = await axios.post(backendUrl + "/api/admin/product/add", formData, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'multipart/form-data'
@@ -1539,7 +1539,7 @@ const AdminContextProvider = (props) => {
   /*---------------------------FETCH ALL PRODUCTS-----------------------------*/
   const fetchAllProducts = async () => {
     try {
-      const response = await axios.get(backendUrl + "/api/product/list", {
+      const response = await axios.get(backendUrl + "/api/admin/product/list", {
           headers: {
           Authorization: `Bearer ${token}`
           }
@@ -1560,7 +1560,7 @@ const AdminContextProvider = (props) => {
   /*---------------------------FETCH PRODUCT CATEGORY-----------------------------*/
   const fetchProductCategory = async () => {
     try {
-      const response = await axios.get(backendUrl + "/api/product/category", {
+      const response = await axios.get(backendUrl + "/api/admin/product/category", {
           headers: {
           Authorization: `Bearer ${token}`
           }

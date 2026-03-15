@@ -77,7 +77,7 @@ app.use('/api/business-info', cusomerSettingsRouter);
 
 // ADMIN ROUTES
 app.use('/api/admin', adminRouter);
-app.use('/api/product', adminProductRouter);
+app.use('/api/admin/product', adminProductRouter);
 app.use('/api/order', adminOrderRouter);
 app.use('/api/users', adminUsersRouter);
 app.use('/api/settings', adminSettingsRouter);

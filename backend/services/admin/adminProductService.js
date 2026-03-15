@@ -57,6 +57,11 @@ export const addProductService = async ( adminId, categoryId, productName, produ
 
       // Handle images
       const images = [image1, image2, image3, image4].filter(i => i && i.path);
+
+      if (images.length === 0) {
+        return { success: false, message: "Upload at least 1 image." };
+      }
+
       let imagesUrl = [];
 
       try {
@@ -69,6 +74,7 @@ export const addProductService = async ( adminId, categoryId, productName, produ
               )
           );
       } catch (cloudErr) {
+          console.error("Cloudinary upload error:", cloudErr);
           return {
               success: false,
               message: "Image upload to Cloudinary failed.",
@@ -82,8 +88,27 @@ export const addProductService = async ( adminId, categoryId, productName, produ
 
       // Delete local temp files
       for (const img of images) {
-        try { await fs.unlink(img.path); } catch {}
+        try { 
+            await fs.unlink(img.path); 
+        } catch (unlinkErr) {
+            console.error("Failed to delete temp file:", unlinkErr);
+        }
       }
+
+      // Assign images to product (handle any number of images)
+      const imageUrls = {
+        image1: null,
+        image2: null,
+        image3: null,
+        image4: null
+      };
+
+      // Map uploaded images back to their original positions
+      let urlIndex = 0;
+      if (image2 && image2.path) imageUrls.image2 = imagesUrl[urlIndex++]?.secure_url || null;
+      if (image3 && image3.path) imageUrls.image3 = imagesUrl[urlIndex++]?.secure_url || null;
+      if (image4 && image4.path) imageUrls.image4 = imagesUrl[urlIndex++]?.secure_url || null;
+      if (image1 && image1.path) imageUrls.image1 = imagesUrl[urlIndex++]?.secure_url || null;
 
 
       // AUTO-GENERATE PRODUCT ID ✅
@@ -104,10 +129,10 @@ export const addProductService = async ( adminId, categoryId, productName, produ
         price: Number(price),
         unitType,
         piecesPerBox,
-        image1: imagesUrl[0]?.secure_url,
-        image2: imagesUrl[1]?.secure_url || null,
-        image3: imagesUrl[2]?.secure_url || null,
-        image4: imagesUrl[3]?.secure_url || null,
+        image1: imageUrls.image1,
+        image2: imageUrls.image2,
+        image3: imageUrls.image3,
+        image4: imageUrls.image4,
         isBestSeller,
         isActive,
         isOutOfStock,
