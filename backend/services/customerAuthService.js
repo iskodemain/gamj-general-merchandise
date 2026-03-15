@@ -133,7 +133,7 @@ export const registerCustomerService = async (medicalInstitutionName, contactNum
 
         // Send email or phone verification code
         if (hasEmail) {
-            await sendMail({
+            sendMail({
                 to: loginEmail,
                 subject: 'Account Verification',
                 html: registrationEmailTemplate(verificationCode),
@@ -271,7 +271,7 @@ export const loginCustomerService = async (identifier, password) => {
 
         // Send email (or SMS if phone)
         if (user.loginEmail) {
-            await sendMail({
+            sendMail({
             to: user.loginEmail,
             subject: 'Login Verification Code',
             html: loginEmailTemplate(user.medicalInstitutionName, code),
@@ -395,7 +395,7 @@ export const requestPasswordResetService = async (identifier) => {
 
         // Send email verification code
         if (isEmail) {
-            await sendMail({
+            sendMail({
                 to: identifier,
                 subject: 'Reset Password Verification',
                 html: resetPasswordEmailTemplate(user.medicalInstitutionName, code),
