@@ -13,6 +13,15 @@ export const transporter = nodemailer.createTransport({
   }
 });
 
+// ADD THIS - will print exact error in Render Logs on startup
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log('❌ Mailer error:', error);
+  } else {
+    console.log('✅ Mailer is ready to send emails');
+  }
+});
+
 
 export const sendMail = async ({ to, subject, html, attachments }) => {
   return transporter.sendMail({
