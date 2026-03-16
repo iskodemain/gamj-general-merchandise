@@ -346,7 +346,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
     }
 
     // Send email
-    await orderSendMail({
+    orderSendMail({
         to: user.loginEmail ? user.loginEmail : user.emailAddress,
         subject: 'Your order has been placed.',
         html: placeOrderTemplate(user.medicalInstitutionName, 'Pending', fullOrder.paymentMethod, fullOrder.orderId),
@@ -863,7 +863,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
       io.emit("stockRestoration", stockRestoration);
 
       // Send email
-      await orderSendMail({
+      orderSendMail({
           to: user.loginEmail ? user.loginEmail : user.emailAddress,
           subject: 'Your order cancellation has been processed.',
           html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'Cancelled', fullOrder.paymentMethod, fullOrder.orderId, product.productName),
@@ -1315,7 +1315,7 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
       io.emit("newNotification_Staff", staffNotification);
 
       // Send email
-      await orderSendMail({
+      orderSendMail({
           to: user.loginEmail ? user.loginEmail : user.emailAddress,
           subject: 'Your requested order return/refund has been processed.',
           html: refundOrderTemplate(user.medicalInstitutionName, 'Return/Refund', refundMethod, fullOrder.orderId, product.productName),
