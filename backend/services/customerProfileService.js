@@ -446,7 +446,7 @@ export const verifyCustomerAccountSecurityService = async (customerId, currentPa
 
         // Send email verification code
         if (user.loginEmail) {
-            await sendMail({
+            sendMail({
                 to: user.loginEmail,
                 subject: 'Reset Password Verification',
                 html: resetPasswordEmailTemplate(user.medicalInstitutionName, code),

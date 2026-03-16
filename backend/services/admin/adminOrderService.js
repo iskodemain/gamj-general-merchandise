@@ -411,7 +411,7 @@ export const updateOrderStatusService = async (adminId, data) => {
       // ✅ AFTER (With bullet points):
       const completeProductList = group.productLines.map(line => `<li>${line}</li>`).join('');
       
-      await orderSendMail({
+      orderSendMail({
         to: group.customer.loginEmail || group.customer.emailAddress || group.customer.repEmailAddress,
         subject: group.emailSubject,
         html: orderStatusUpdateTemplate(
