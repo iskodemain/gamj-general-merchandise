@@ -350,7 +350,6 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
         to: user.loginEmail ? user.loginEmail : user.emailAddress,
         subject: 'Your order has been placed.',
         html: placeOrderTemplate(user.medicalInstitutionName, 'Pending', fullOrder.paymentMethod, fullOrder.orderId),
-        attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
     });
 
     return {
@@ -866,8 +865,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
       orderSendMail({
           to: user.loginEmail ? user.loginEmail : user.emailAddress,
           subject: 'Your order cancellation has been processed.',
-          html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'Cancelled', fullOrder.paymentMethod, fullOrder.orderId, product.productName),
-          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+          html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'Cancelled', fullOrder.paymentMethod, fullOrder.orderId, product.productName)
       });
 
       return {
@@ -1318,8 +1316,7 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
       orderSendMail({
           to: user.loginEmail ? user.loginEmail : user.emailAddress,
           subject: 'Your requested order return/refund has been processed.',
-          html: refundOrderTemplate(user.medicalInstitutionName, 'Return/Refund', refundMethod, fullOrder.orderId, product.productName),
-          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+          html: refundOrderTemplate(user.medicalInstitutionName, 'Return/Refund', refundMethod, fullOrder.orderId, product.productName)
       });
 
       return {

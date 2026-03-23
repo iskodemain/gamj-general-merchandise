@@ -420,8 +420,7 @@ export const updateOrderStatusService = async (adminId, data) => {
           group.order.paymentMethod, 
           completeProductList, // ✅ Complete list of products
           group.order.dateOrdered
-        ),
-        attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+        )
       });
     }
 

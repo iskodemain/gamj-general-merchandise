@@ -136,8 +136,7 @@ export const registerCustomerService = async (medicalInstitutionName, contactNum
             sendMail({
                 to: loginEmail,
                 subject: 'Account Verification',
-                html: registrationEmailTemplate(verificationCode),
-                attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+                html: registrationEmailTemplate(verificationCode)
             });
         } else {
             // Phone Number Verification Code Logic Here
@@ -272,10 +271,9 @@ export const loginCustomerService = async (identifier, password) => {
         // Send email (or SMS if phone)
         if (user.loginEmail) {
             sendMail({
-            to: user.loginEmail,
-            subject: 'Login Verification Code',
-            html: loginEmailTemplate(user.medicalInstitutionName, code),
-            attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+                to: user.loginEmail,
+                subject: 'Login Verification Code',
+                html: loginEmailTemplate(user.medicalInstitutionName, code)
             });
         }
 
@@ -398,8 +396,7 @@ export const requestPasswordResetService = async (identifier) => {
             sendMail({
                 to: identifier,
                 subject: 'Reset Password Verification',
-                html: resetPasswordEmailTemplate(user.medicalInstitutionName, code),
-                attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+                html: resetPasswordEmailTemplate(user.medicalInstitutionName, code)
             });
         } else {
             // Send phone verification Code

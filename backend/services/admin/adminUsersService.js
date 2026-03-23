@@ -159,8 +159,7 @@ export const approvedUserService = async (adminId, userID, userType) => {
       accountSendMail({
         to: customer.loginEmail || customer.repEmailAddress,
         subject: 'Your GAMJ Account Has Been Approved',
-        html: userAccountApprovalTemplate(customer.medicalInstitutionName),
-        attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+        html: userAccountApprovalTemplate(customer.medicalInstitutionName)
       });
     }
 
@@ -235,8 +234,7 @@ export const rejectUserService = async (adminId, userID, userType, rejectTitle, 
       accountSendMail({
         to: customer.loginEmail || customer.repEmailAddress || customer.emailAddress,
         subject: 'Your GAMJ Account Has Been Rejected',
-        html: userAccountRejectedTemplate(customer.medicalInstitutionName, rejectTitle, rejectMessage),
-        attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+        html: userAccountRejectedTemplate(customer.medicalInstitutionName, rejectTitle, rejectMessage)
       });
     }
 
@@ -621,8 +619,7 @@ export const addNewUserService = async (adminId, data) => {
       accountSendMail({
         to: addNewUser.loginEmail || addNewUser.repEmailAddress || addNewUser.emailAddress,
         subject: 'Your GAMJ Account Has Been Created by Admin',
-        html: userAccountCreatedTemplate(addNewUser.medicalInstitutionName),
-        attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+        html: userAccountCreatedTemplate(addNewUser.medicalInstitutionName)
       });
     }
 
@@ -647,8 +644,7 @@ export const addNewUserService = async (adminId, data) => {
         accountSendMail({
           to: addNewUser.emailAddress,
           subject: 'Your GAMJ Account Has Been Created by Admin',
-          html: userAccountCreatedTemplate(addNewUser.userName),
-          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+          html: userAccountCreatedTemplate(addNewUser.userName)
         });
       }
     }
@@ -674,8 +670,7 @@ export const addNewUserService = async (adminId, data) => {
         accountSendMail({
           to: addNewUser.emailAddress,
           subject: 'Your GAMJ Account Has Been Created by Admin',
-          html: userAccountCreatedTemplate(addNewUser.userName),
-          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+          html: userAccountCreatedTemplate(addNewUser.userName)
         });
       }
     }
@@ -701,8 +696,7 @@ export const addNewUserService = async (adminId, data) => {
         accountSendMail({
           to: addNewUser.emailAddress,
           subject: 'Your GAMJ Account Has Been Created by Admin',
-          html: userAccountCreatedTemplate(addNewUser.userName),
-          attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+          html: userAccountCreatedTemplate(addNewUser.userName)
         });
       }
     }
