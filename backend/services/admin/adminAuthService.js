@@ -50,8 +50,7 @@ export const loginAdminService = async (identifier, password) => {
             sendMail({
                 to: admin.emailAddress,
                 subject: 'Login Verification Code',
-                html: loginEmailTemplate(admin.userName, code),
-                attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+                html: loginEmailTemplate(admin.userName, code)
             }).catch(err => console.error('Email sending failed:', err));;
         }
 

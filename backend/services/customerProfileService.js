@@ -449,8 +449,7 @@ export const verifyCustomerAccountSecurityService = async (customerId, currentPa
             sendMail({
                 to: user.loginEmail,
                 subject: 'Reset Password Verification',
-                html: resetPasswordEmailTemplate(user.medicalInstitutionName, code),
-                attachments: [{ filename: 'GAMJ.png', path: './uploads/GAMJ.png', cid: 'gamj_logo' }],
+                html: resetPasswordEmailTemplate(user.medicalInstitutionName, code)
             });
         } 
         

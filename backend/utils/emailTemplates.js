@@ -94,7 +94,7 @@ export const placeOrderTemplate = (userName, orderStatus, paymentMethod, orderId
                 <div class="email-content">
                     <!-- Header -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                     </div>
 
                     <h2 class="email-title">Order Status Update</h2>
@@ -412,7 +412,7 @@ export const orderStatusUpdateTemplate = (userName, orderStatus, paymentMethod, 
                 <div class="email-content">
                     <!-- Header with Centered Logo -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                         <h2>Order Status Update</h2>
                     </div>
 
@@ -607,7 +607,7 @@ export const customerCancelledOrderTemplate = (userName, orderStatus, paymentMet
         <div class="email-content">
           <!-- Header -->
           <div class="email-header">
-            <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
           </div>
 
           <h2 class="email-title">Order Cancelled Successfully</h2>
@@ -680,7 +680,7 @@ export const adminCancelledOrderTemplate = (userName, orderStatus, paymentMethod
         <div class="email-content">
           <!-- Header -->
           <div class="email-header">
-            <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
             <h2>Order Cancelled by GAMJ General Merchandise</h2>
           </div>
 
@@ -802,7 +802,7 @@ export const refundOrderTemplate = (userName, orderStatus, refundMethod, orderId
       <td>
         <div class="email-content">
           <div class="email-header">
-            <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo" />
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo" />
             <h2>Refund Request Update</h2>
           </div>
           <div class="email-body">
@@ -927,7 +927,7 @@ export const loginEmailTemplate = (userName, verificationCode) => {
                 <div class="email-content">
                     <!-- Header Section with Logo -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                     </div>
 
                     <!-- Body Section -->
@@ -1043,7 +1043,7 @@ export const registrationEmailTemplate = (verificationCode) => {
                 <div class="email-content">
                     <!-- Header Section with Logo -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                     </div>
 
                     <!-- Body Section -->
@@ -1159,7 +1159,7 @@ export const resetPasswordEmailTemplate = (userName, verificationCode) => {
                 <div class="email-content">
                     <!-- Header Section with Logo -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                     </div>
 
                     <!-- Body Section -->
@@ -1281,7 +1281,7 @@ export const userAccountApprovalTemplate = (userName) => {
                     
                     <!-- Header Section with Logo -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                     </div>
 
                     <!-- Body Section -->
@@ -1420,7 +1420,7 @@ export const userAccountRejectedTemplate = (userName, rejectTitle, rejectMessage
 
                     <!-- Centered Logo -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                     </div>
 
                     <h2 class="rejected-title">Your Account Has Been Rejected</h2>
@@ -1547,7 +1547,7 @@ export const userAccountCreatedTemplate = (userName) => {
                     
                     <!-- Header Section with Logo -->
                     <div class="email-header">
-                        <img src="cid:gamj_logo" alt="GAMJ General Merchandise Logo">
+                        <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
                     </div>
                     
                     <!-- Body Section -->
