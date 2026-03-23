@@ -1,17 +1,13 @@
 import nodemailer from 'nodemailer';
 
 export const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,           // try 587 instead of letting 'service: gmail' decide
-  secure: false,       // false for port 587 (STARTTLS)
+  service: 'gmail',
   auth: {
     user: process.env.GAMJ_EMAIL,
     pass: process.env.GAMJ_PASSWORD,
   },
-  tls: {
-    rejectUnauthorized: false   // important for Render's environment
-  }
 });
+
 
 // ADD THIS - will print exact error in Render Logs on startup
 transporter.verify(function (error, success) {
