@@ -31,6 +31,9 @@ function ReturnAndRefund() {
           method: order.paymentMethod,
           date: order.dateOrdered,
           itemsCount: items.length,
+          subtotal: Number(order.subtotal),
+          shippingFee: Number(order.shippingFee || 0),
+          totalAmount: Number(order.totalAmount),
 
           items: items.map((item) => {
             const product = products.find(
@@ -109,10 +112,9 @@ function ReturnAndRefund() {
                     .filter((item) => item.orderId === order.ID)
                     .filter((item) => item.orderStatus === "Return/Refund");
 
-                  const orderTotal = items.reduce(
-                    (sum, item) => sum + parseFloat(item.subTotal || 0),
-                    0
-                  );
+                  const subtotal = Number(order.subtotal || 0);
+                  const shippingFee = Number(order.shippingFee || 0);
+                  const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
                     (d) => d.customerId === order.customerId
@@ -191,10 +193,6 @@ function ReturnAndRefund() {
                             <div className="return-refund-number">
                               Order ID: <strong>{order.orderId}</strong>
                             </div>
-
-                            <div className="return-refund-total">
-                              Total: ₱{orderTotal.toFixed(2)}
-                            </div>
                           </div>
 
                           <div className="return-refund-info">
@@ -245,6 +243,29 @@ function ReturnAndRefund() {
                                 </span>{" "}
                                 +63 {deliveryInfo?.contactNumber}
                               </div>
+                            </div>
+                          </div>
+
+                          <div className="return-refund-order-total-wrapper">
+                            <div className="return-refund-order-total-card">
+
+                              <div className="return-refund-order-total-row">
+                                <span className="return-refund-label">Subtotal</span>
+                                <span className="return-refund-value">₱{subtotal.toFixed(2)}</span>
+                              </div>
+
+                              <div className="return-refund-order-total-row">
+                                <span className="return-refund-label">Shipping Fee</span>
+                                <span className="return-refund-value">₱{shippingFee.toFixed(2)}</span>
+                              </div>
+
+                              <div className="return-refund-order-total-divider"></div>
+
+                              <div className="return-refund-order-total-row return-refund-total-highlight">
+                                <span>Total</span>
+                                <span>₱{totalAmount.toFixed(2)}</span>
+                              </div>
+
                             </div>
                           </div>
 

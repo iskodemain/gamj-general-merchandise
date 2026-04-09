@@ -1,3 +1,57 @@
+/* ===================== PROCESSING ORDER TOTAL ===================== */
+.processing-order-total-wrapper {
+  width: 100%;
+}
+
+.processing-order-total-card {
+  background: linear-gradient(145deg, #ffffff, #f3f6f9);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.processing-order-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: "Inter", sans-serif;
+  flex-wrap: wrap;
+}
+
+.processing-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.processing-value {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.processing-order-total-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 6px 0;
+}
+
+.processing-total-highlight {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+
+
+
 .processing-back-ctn {
   display: flex;
   flex-direction: row;
@@ -375,5 +429,177 @@
     font-size: 0.78rem;
     padding: 7px 10px;
     align-self: flex-start; 
+  }
+}
+
+/* ===================== RESPONSIVE - MINIMUM 200px ===================== */
+@media (max-width: 330px) {
+  .processing-order-total-card {
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .processing-order-total-row {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.7rem;
+    gap: 2px;
+  }
+
+  .processing-value {
+    width: 100%;
+    text-align: left;
+  }
+
+  .processing-total-highlight {
+    font-size: 0.85rem;
+  }
+
+  .processing-order-total-card {
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .processing-order-total-row {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.7rem;
+    gap: 2px;
+  }
+
+  .processing-value {
+    width: 100%;
+    text-align: left;
+  }
+
+  .processing-total-highlight {
+    font-size: 0.85rem;
+  }
+
+  .processing-orders-container {
+    padding: 0.5rem;
+  }
+
+  .processing-back-ctn {
+    gap: 4px;
+    width: 4.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .processing-order-back-btn {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    border-radius: 6px;
+  }
+
+  .processing-text-title {
+    font-size: 0.75rem;
+  }
+
+  .empty-proc {
+    padding: 12px;
+    font-size: 0.75rem;
+  }
+
+  .proc-order-card {
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+
+  .proc-order-inner {
+    gap: 10px;
+  }
+
+  .proc-order-left {
+    padding-right: 8px;
+  }
+
+  .proc-item-list {
+    gap: 8px;
+  }
+
+  .proc-item-row {
+    gap: 6px;
+    padding-bottom: 5px;
+  }
+
+  .proc-item-img {
+    width: 38px;
+    height: 38px;
+    border-radius: 5px;
+  }
+
+  .proc-item-name {
+    font-size: 0.68rem;
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+
+  .proc-item-details {
+    gap: 4px;
+  }
+
+  .proc-item-qtyblock {
+    font-size: 0.65rem;
+    gap: 0.2rem;
+    flex-wrap: wrap;
+  }
+
+  .proc-item-specs {
+    font-size: 0.65rem;
+  }
+
+  .proc-item-price {
+    font-size: 0.68rem;
+    margin-top: 2px;
+  }
+
+  .proc-order-right {
+    gap: 8px;
+    min-width: unset;
+  }
+
+  .proc-order-top {
+    gap: 0.2rem;
+  }
+
+  .proc-order-number {
+    font-size: 0.68rem;
+    line-height: 1.3;
+  }
+
+  .proc-order-total {
+    font-size: 0.8rem;
+  }
+
+  .proc-order-info {
+    gap: 3px;
+  }
+
+  .proc-info-row {
+    font-size: 0.65rem;
+  }
+
+  .proc-customer-block {
+    font-size: 0.65rem;
+    gap: 0.3rem;
+    padding-top: 6px;
+  }
+
+  .proc-cust-name {
+    margin-bottom: 3px;
+    font-size: 0.68rem;
+  }
+
+  .proc-cust-address {
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .proc-viewall-btn {
+    padding: 5px 8px;
+    font-size: 0.65rem;
+    border-radius: 5px;
   }
 }

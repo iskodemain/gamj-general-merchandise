@@ -34,6 +34,9 @@ function Pending() {
         method: order.paymentMethod,
         date: order.dateOrdered,
         itemsCount: items.length,
+        subtotal: Number(order.subtotal),
+        shippingFee: Number(order.shippingFee || 0),
+        totalAmount: Number(order.totalAmount),
 
         items: items.map((item) => {
           const product = products.find(
@@ -121,10 +124,9 @@ function Pending() {
                   pendingOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
                     const items = fetchOrderItems.filter((item) => item.orderId === order.ID).filter((item) => item.orderStatus === "Pending");
 
-                    const orderTotal = items.reduce(
-                      (sum, item) => sum + parseFloat(item.subTotal || 0),
-                      0
-                    );
+                    const subtotal = Number(order.subtotal || 0);
+                    const shippingFee = Number(order.shippingFee || 0);
+                    const totalAmount = Number(order.totalAmount || 0);
 
                     const deliveryInfo = deliveryInfoList.find(
                       (d) => d.customerId === order.customerId
@@ -200,10 +202,6 @@ function Pending() {
                               <div className="pending-product-order-number">
                                 Order ID: <strong>{order.orderId}</strong>
                               </div>
-
-                              <div className="pending-product-order-total">
-                                Total: ₱{orderTotal.toFixed(2)}
-                              </div>
                             </div>
 
                             <div className="pending-product-order-info">
@@ -249,6 +247,29 @@ function Pending() {
                                 <div className="pending-product-cust-phone">
                                   <span className="ppc-contact">Contact No.:</span> +63 {deliveryInfo?.contactNumber}
                                 </div>
+                              </div>
+                            </div>
+
+                            <div className="pending-order-total-wrapper">
+                              <div className="pending-order-total-card">
+
+                                <div className="pending-order-total-row">
+                                  <span className="pending-label">Subtotal</span>
+                                  <span className="pending-value">₱{subtotal.toFixed(2)}</span>
+                                </div>
+
+                                <div className="pending-order-total-row">
+                                  <span className="pending-label">Shipping Fee</span>
+                                  <span className="pending-value">₱{shippingFee.toFixed(2)}</span>
+                                </div>
+
+                                <div className="pending-order-total-divider"></div>
+
+                                <div className="pending-order-total-row pending-total-highlight">
+                                  <span>Total</span>
+                                  <span>₱{totalAmount.toFixed(2)}</span>
+                                </div>
+
                               </div>
                             </div>
 

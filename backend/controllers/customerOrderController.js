@@ -3,8 +3,8 @@ import { addOrderService, fetchOrdersService, cancelOrderService, fetchOrderCanc
 export const addOrder = async (req, res) => {
     try {
         const { ID } = req.user;
-        const { paymentMethod, orderItems, cartItemsToDelete } = req.body;
-        const result = await addOrderService(ID, paymentMethod, orderItems, cartItemsToDelete);
+        const { paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount } = req.body;
+        const result = await addOrderService(ID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount);
         res.json(result);
     } catch (error) {
         console.log(error);

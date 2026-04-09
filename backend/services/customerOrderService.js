@@ -29,7 +29,7 @@ const withTimestamp = (prefix, number) => {
 };
 
 // CUSTOMER SIDE
-export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete) => {
+export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount) => {
   try {
     const user = await Customer.findByPk(customerId);
     if (!user) {
@@ -79,6 +79,9 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       orderId,
       customerId,
       paymentMethod,
+      subtotal,
+      shippingFee,
+      totalAmount
     });
 
     // ORDER ITEM ID BASE
@@ -252,8 +255,6 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
     const fullOrder = await Orders.findByPk(order.ID);
 
     // CREATION OF ORDER TRANSATION RECORD
-    const totalAmount = orderItems.reduce((sum, item) => sum + Number(item.subTotal || 0), 0);
-
     const lastTransaction = await OrderTransaction.findOne({order: [['ID', 'DESC']]});
     const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
     const transactionId = withTimestamp('TRXN', nextTransactionNo);

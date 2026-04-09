@@ -75,6 +75,10 @@ function Orders() {
   // 🔹 Combine order + its orderItems
   const combinedOrders = fetchOrders.map(order => ({
     ...order,
+    subtotal: Number(order.subtotal || 0),
+    shippingFee: Number(order.shippingFee || 0),
+    totalAmount: Number(order.totalAmount || 0),
+
     items: fetchOrderItems.filter(item => item.orderId === order.ID && item.isDeletedByCustomer === false).map(item => {
         const product = products.find(p => p.ID === item.productId);
         return {
@@ -270,10 +274,9 @@ function Orders() {
                     Order ID: <span>{order.orderId || order.ID}</span>
                   </p>
                   <p className="order-group-date">
-                    {new Date(order.dateOrdered).toDateString()}
+                    Date Ordered: {new Date(order.dateOrdered).toDateString()}
                   </p>
                 </div>
-
                 {order.items.map(item => (
                   <div
                     key={item.ID}
@@ -300,8 +303,6 @@ function Orders() {
                             <p className="order-payment"> Payment: <span>{order.paymentMethod || "N/A"}</span></p>
                           </div>
                         </div>
-                        <p className="date-text-1">Date Ordered: <span className="date-text-2">{new Date(order.dateOrdered).toDateString()}</span>
-                        </p>
                       </div>
                     </div>
 
@@ -511,6 +512,31 @@ function Orders() {
 
                   </div>
                 ))}
+
+                {/* ORDER SUMMARY */}
+                <div className="orders-summary-card">
+                  <div className="orders-summary-row">
+                    <span className="orders-label">Subtotal</span>
+                    <span className="orders-value">
+                      {currency} {order.subtotal.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="orders-summary-row">
+                    <span className="orders-label">Shipping Fee</span>
+                    <span className="orders-value">
+                      {currency} {order.shippingFee.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="orders-summary-divider"></div>
+
+                  <div className="orders-summary-row total">
+                    <span>Total</span>
+                    <span className='orders-amount'>{currency} {order.totalAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+
               </div>
             ))}
           </>
