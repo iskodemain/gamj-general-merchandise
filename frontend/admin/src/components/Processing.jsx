@@ -33,6 +33,9 @@ function Processing() {
         method: order.paymentMethod,
         date: order.dateOrdered,
         itemsCount: items.length,
+        subtotal: Number(order.subtotal),
+        shippingFee: Number(order.shippingFee || 0),
+        totalAmount: Number(order.totalAmount),
 
         items: items.map((item) => {
           const product = products.find(
@@ -105,10 +108,9 @@ function Processing() {
                 processingOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
                   const items = fetchOrderItems.filter((item) => item.orderId === order.ID).filter((item) => item.orderStatus === "Processing");
 
-                  const orderTotal = items.reduce(
-                    (sum, item) => sum + parseFloat(item.subTotal || 0),
-                    0
-                  );
+                  const subtotal = Number(order.subtotal || 0);
+                  const shippingFee = Number(order.shippingFee || 0);
+                  const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
                     (d) => d.customerId === order.customerId
@@ -180,10 +182,6 @@ function Processing() {
                             <div className="proc-order-number">
                               Order ID: <strong>{order.orderId}</strong>
                             </div>
-
-                            <div className="proc-order-total">
-                              Total: ₱{orderTotal.toFixed(2)}
-                            </div>
                           </div>
 
                           <div className="proc-order-info">
@@ -225,6 +223,29 @@ function Processing() {
                               <div className="proc-cust-phone">
                                 <span className="ppc-contact">Contact No.:</span> +63 {deliveryInfo?.contactNumber}
                               </div>
+                            </div>
+                          </div>
+
+                          <div className="processing-order-total-wrapper">
+                            <div className="processing-order-total-card">
+
+                              <div className="processing-order-total-row">
+                                <span className="processing-label">Subtotal</span>
+                                <span className="processing-value">₱{subtotal.toFixed(2)}</span>
+                              </div>
+
+                              <div className="processing-order-total-row">
+                                <span className="processing-label">Shipping Fee</span>
+                                <span className="processing-value">₱{shippingFee.toFixed(2)}</span>
+                              </div>
+
+                              <div className="processing-order-total-divider"></div>
+
+                              <div className="processing-order-total-row processing-total-highlight">
+                                <span>Total</span>
+                                <span>₱{totalAmount.toFixed(2)}</span>
+                              </div>
+
                             </div>
                           </div>
 

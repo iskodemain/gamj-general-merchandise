@@ -253,10 +253,61 @@
 
 .pending-product-order-total { 
   font-family: "Inter", sans-serif;
-  font-weight: 600; 
-  font-size: 1.25rem; 
+  font-size: 0.8rem; 
   color: #111; 
 }
+
+/* ===================== PENDING ORDER TOTAL ===================== */
+.pending-order-total-wrapper {
+  width: 100%;
+}
+
+.pending-order-total-card {
+  background: linear-gradient(145deg, #ffffff, #f3f6f9);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.pending-order-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: "Inter", sans-serif;
+  flex-wrap: wrap;
+}
+
+.pending-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.pending-value {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.pending-order-total-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 6px 0;
+}
+
+.pending-total-highlight {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
 
 /* info rows */
 .pending-product-order-info {
@@ -656,6 +707,27 @@
 
 /* ===================== RESPONSIVE - MINIMUM 200px ===================== */
 @media (max-width: 330px) {
+  .pending-order-total-card {
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .pending-order-total-row {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.7rem;
+    gap: 2px;
+  }
+
+  .pending-value {
+    width: 100%;
+    text-align: left;
+  }
+
+  .pending-total-highlight {
+    font-size: 0.85rem;
+  }
+
   .pending-products-container {
     padding: 0.5rem;
   }

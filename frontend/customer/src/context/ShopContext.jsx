@@ -663,13 +663,16 @@ const ShopContextProvider = (props) => {
 
 
     /*--------------------------ADD ORDER----------------------------*/
-    const addOrder = async (paymentMethod, orderItems, cartItemsToDelete) => {
+    const addOrder = async (paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount) => {
         if (token) {
             try {
                 const response = await axios.post(backendUrl + "/api/order/add", {
                     paymentMethod,
                     orderItems,
-                    cartItemsToDelete
+                    cartItemsToDelete,
+                    subtotal,
+                    shippingFee,
+                    totalAmount
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });

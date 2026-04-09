@@ -1,3 +1,55 @@
+/* ===================== PENDING ORDER TOTAL ===================== */
+.return-refund-order-total-wrapper {
+  width: 100%;
+}
+
+.return-refund-order-total-card {
+  background: linear-gradient(145deg, #ffffff, #f3f6f9);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.return-refund-order-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: "Inter", sans-serif;
+  flex-wrap: wrap;
+}
+
+.return-refund-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.return-refund-value {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.return-refund-order-total-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 6px 0;
+}
+
+.return-refund-total-highlight {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+
 .return-refund-back-ctn {
   display: flex;
   flex-direction: row;
@@ -343,4 +395,32 @@
     padding: 7px 10px;
     align-self: flex-start; 
   }
+}
+
+
+.return-refund-container {
+  padding: 0.5rem;
+}
+
+.return-refund-right {
+  gap: 8px;
+  min-width: unset;
+}
+
+.return-refund-left {
+  padding-right: 8px;
+}
+
+.return-refund-item-list {
+  gap: 8px;
+}
+
+.return-refund-info {
+  gap: 3px;
+}
+
+.return-refund-cust-address {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }

@@ -20,7 +20,7 @@ export const createPayPalOrder = async (req, res) => {
 
 export const capturePayPalOrder = async (req, res) => {
   try {
-    const { orderID, paymentMethod, orderItems, cartItemsToDelete } = req.body;
+    const { orderID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount } = req.body;
     const { ID } = req.user;
 
     const capture = await capturePayPalOrderService(orderID);
@@ -29,7 +29,7 @@ export const capturePayPalOrder = async (req, res) => {
     const status = capture.status || capture?.purchase_units?.[0]?.payments?.captures?.[0]?.status;
 
     if (status === "COMPLETED") {
-      const result = await addOrderService(ID, paymentMethod, orderItems, cartItemsToDelete);
+      const result = await addOrderService(ID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount);
       res.json(result);
     }
 

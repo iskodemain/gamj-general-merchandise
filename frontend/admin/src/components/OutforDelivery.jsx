@@ -33,6 +33,9 @@ function OutforDelivery() {
         method: order.paymentMethod,
         date: order.dateOrdered,
         itemsCount: items.length,
+        subtotal: Number(order.subtotal),
+        shippingFee: Number(order.shippingFee || 0),
+        totalAmount: Number(order.totalAmount),
 
         items: items.map((item) => {
           const product = products.find(
@@ -107,10 +110,9 @@ function OutforDelivery() {
                     .filter((item) => item.orderId === order.ID)
                     .filter((item) => item.orderStatus === "Out for Delivery");
 
-                  const orderTotal = items.reduce(
-                    (sum, item) => sum + parseFloat(item.subTotal || 0),
-                    0
-                  );
+                  const subtotal = Number(order.subtotal || 0);
+                  const shippingFee = Number(order.shippingFee || 0);
+                  const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
                     (d) => d.customerId === order.customerId
@@ -181,10 +183,6 @@ function OutforDelivery() {
                             <div className="ofd-order-number">
                               Order ID: <strong>{order.orderId}</strong>
                             </div>
-
-                            <div className="ofd-order-total">
-                              Total: ₱{orderTotal.toFixed(2)}
-                            </div>
                           </div>
 
                           <div className="ofd-order-info">
@@ -225,6 +223,29 @@ function OutforDelivery() {
                               <div className="proc-cust-phone">
                                 <span className="ppc-contact">Contact No.:</span> +63 {deliveryInfo?.contactNumber}
                               </div>
+                            </div>
+                          </div>
+
+                          <div className="ofd-order-total-wrapper">
+                            <div className="ofd-order-total-card">
+
+                              <div className="ofd-order-total-row">
+                                <span className="ofd-label">Subtotal</span>
+                                <span className="ofd-value">₱{subtotal.toFixed(2)}</span>
+                              </div>
+
+                              <div className="ofd-order-total-row">
+                                <span className="ofd-label">Shipping Fee</span>
+                                <span className="ofd-value">₱{shippingFee.toFixed(2)}</span>
+                              </div>
+
+                              <div className="ofd-order-total-divider"></div>
+
+                              <div className="ofd-order-total-row ofd-total-highlight">
+                                <span>Total</span>
+                                <span>₱{totalAmount.toFixed(2)}</span>
+                              </div>
+
                             </div>
                           </div>
 

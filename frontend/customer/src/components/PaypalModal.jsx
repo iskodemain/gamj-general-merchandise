@@ -7,7 +7,7 @@ import Loading from "./Loading";
 import "./PaypalModal.css"; // ✅ Import CSS
 
 const PaypalModal = () => {
-    const { backendUrl, token, paypalClientId, totalPrice, orderItems, cartItemsToDelete, paymentMethod, navigate, setShowPaypalModal} = useContext(ShopContext);
+    const { backendUrl, token, paypalClientId, orderItems, cartItemsToDelete, paymentMethod, navigate, setShowPaypalModal, orderSubTotal, shippingFee, totalPrice} = useContext(ShopContext);
 
     const [visible, setVisible] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -85,6 +85,9 @@ const PaypalModal = () => {
                     paymentMethod,
                     orderItems,
                     cartItemsToDelete,
+                    subtotal: orderSubTotal,
+                    shippingFee: shippingFee,
+                    totalAmount: totalPrice
                   },
                   { headers: { Authorization: `Bearer ${token}` } }
                 );

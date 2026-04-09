@@ -29,6 +29,18 @@ const Orders = sequelize.define(
       type: DataTypes.ENUM('Cash On Delivery', 'Paypal'),
       allowNull: false,
     },
+    subtotal: {
+      type: DataTypes.DECIMAL(10,2),
+      allowNull: false
+    },
+    shippingFee: {
+      type: DataTypes.DECIMAL(10,2),
+      allowNull: true
+    },
+    totalAmount: {
+      type: DataTypes.DECIMAL(10,2),
+      allowNull: false
+    },
     dateOrdered: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

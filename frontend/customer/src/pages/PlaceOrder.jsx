@@ -14,7 +14,7 @@ import PaypalModal from '../components/PaypalModal'
 
 function PlaceOrder() {
   const location = useLocation();
-  const {navigate, backendUrl, token, cartItems, totalPrice, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder, cartItemsToDelete, paypalClientId, showPaypalModal, setShowPaypalModal, fetchStorePolicy, getShippingFee} = useContext(ShopContext);
+  const {navigate, backendUrl, token, cartItems, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder, cartItemsToDelete, paypalClientId, showPaypalModal, setShowPaypalModal, fetchStorePolicy, orderSubTotal, shippingFee, totalPrice } = useContext(ShopContext);
 
   const [loading, setLoading] = useState(false);
   
@@ -135,7 +135,6 @@ function PlaceOrder() {
     setIsEditingDelivery(!isEditingDelivery);
   };
 
-
   const handleSaveDeliveryChanges = async (e) => {
     e.preventDefault();
 
@@ -220,6 +219,14 @@ function PlaceOrder() {
     }
   };
 
+  const handleCancelEdit = () => {
+    setEditProvince('');
+    setEditCity('');
+    setEditBarangay('');
+
+    setIsEditingDelivery(false);
+  };
+
 
   
   // ORDER DATA
@@ -274,7 +281,7 @@ function PlaceOrder() {
 
     if (paymentMethod === "Cash On Delivery") {
       setLoading(true); 
-      const success = await addOrder(paymentMethod, orderItems, cartItemsToDelete);
+      const success = await addOrder(paymentMethod, orderItems, cartItemsToDelete, orderSubTotal, shippingFee, totalPrice);
       setLoading(false); 
       if (success) {
         window.location.href = "/orders";
@@ -283,6 +290,7 @@ function PlaceOrder() {
 
     if (paymentMethod === "Paypal") {
       setShowPaypalModal(true);
+      return;
     }
 
     setPendingOrderData(null);
@@ -437,13 +445,6 @@ function PlaceOrder() {
               <div className="DI-edit-buttons">
                 <button 
                   type="button" 
-                  className="DI-button-cancel" 
-                  onClick={() => setIsEditingDelivery(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="button" 
                   className="DI-button-save" 
                   onClick={handleSaveDeliveryChanges}
                 >
@@ -478,7 +479,7 @@ function PlaceOrder() {
                     </div>
                   </div>
                 </div>
-                <button type='submit' className='w-full text-center mt-8 submit-button'>PLACE ORDER</button>
+                <button type='submit' className='w-full text-center mt-8 submit-button' disabled={isEditingDelivery}>PLACE ORDER</button>
               </div> 
           </div>
         </form>
