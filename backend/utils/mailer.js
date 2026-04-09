@@ -19,33 +19,30 @@
 // });
 
 
-// export const sendMail = async ({ to, subject, html, attachments }) => {
+// export const sendMail = async ({ to, subject, html }) => {
 //   return transporter.sendMail({
 //     from: `Verification Code ${process.env.GAMJ_EMAIL}`,
 //     to,
 //     subject,
-//     html,
-//     attachments,
+//     html
 //   });
 // };
 
-// export const orderSendMail = async ({ to, subject, html, attachments }) => {
+// export const orderSendMail = async ({ to, subject, html }) => {
 //   return transporter.sendMail({
 //     from: `Order Status ${process.env.GAMJ_EMAIL}`,
 //     to,
 //     subject,
-//     html,
-//     attachments,
+//     html
 //   });
 // };
 
-// export const accountSendMail = async ({ to, subject, html, attachments }) => {
+// export const accountSendMail = async ({ to, subject, html }) => {
 //   return transporter.sendMail({
 //     from: `Account Update ${process.env.GAMJ_EMAIL}`,
 //     to,
 //     subject,
-//     html,
-//     attachments,
+//     html
 //   });
 // };
 
