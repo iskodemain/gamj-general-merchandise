@@ -13,7 +13,7 @@ import OrderProofPayment from '../components/Orders/OrderProofPayment';
 import { FiEye } from "react-icons/fi";
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof, setOrderTotalAmount } = useContext(ShopContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [timeUpdated, setTimeUpdated] = useState(Date.now());
@@ -256,7 +256,8 @@ function Orders() {
                             className={hasProof ? "review-receipt-btn" : "upload-receipt-btn"}
                             onClick={() => {
                               setOrderId(order.ID);
-                              setCustomerId(order.customerId)
+                              setCustomerId(order.customerId);
+                              setOrderTotalAmount(order.totalAmount);
                               setShowOrderProofPayment(true);
                             }}
                           >
