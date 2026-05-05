@@ -199,6 +199,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
         variantCombinationId: productVariantCombinationId || null,
         type: "OUT",
         quantity: Number(quantityToDeduct), // ✅ always log actual pieces deducted
+        stockAfter: newTotalQuantity,
         referenceId: orderId,
         remarks: `Order placed by ${user.medicalInstitutionName}. ${unitType === 'BOX' ? `(${quantity} box/es × ${piecesPerBox} pcs)` : `(${quantity} piece/s)`}`,
         createdAt: new Date(),
@@ -737,6 +738,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         variantCombinationId: orderItem.productVariantCombinationId || null,
         type: "IN",
         quantity: quantityToRestore,
+        stockAfter: newTotalQuantity,
         referenceId: `CANCEL-${orderItem.orderId}`,
         remarks: `Order cancelled by ${user.medicalInstitutionName}`,
         createdAt: new Date(),

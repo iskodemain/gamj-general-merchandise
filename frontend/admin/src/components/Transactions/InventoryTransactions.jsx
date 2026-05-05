@@ -242,6 +242,7 @@ const InventoryTransactions = () => {
                   <th>Variant</th>
                   <th>Type</th>
                   <th>Quantity</th>
+                  <th>Stock After</th>
                   <th>Reference</th>
                   <th>Remarks</th>
                 </tr>
@@ -269,8 +270,12 @@ const InventoryTransactions = () => {
                           {transaction.type === 'IN' ? '+' : '-'}{transaction.quantity}
                         </span>
                       </td>
-                      <td data-label="Reference">
-                        <span className="it-reference">{transaction.referenceId || 'N/A'}</span>
+                      <td data-label="Stock After">
+                        <span className="it-stock-after">
+                          {transaction.stockAfter !== null && transaction.stockAfter !== undefined
+                            ? transaction.stockAfter
+                            : '—'}
+                        </span>
                       </td>
                       <td data-label="Remarks">
                         <span className="it-remarks">{transaction.remarks || 'No remarks'}</span>
@@ -279,7 +284,7 @@ const InventoryTransactions = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="it-no-data">
+                    <td colSpan="8" className="it-no-data">
                       <div className="it-empty-state">
                         <span className="it-empty-icon">📦</span>
                         <p className="it-empty-text">No transactions found</p>

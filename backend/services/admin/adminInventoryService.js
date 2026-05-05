@@ -157,11 +157,15 @@ export const addStockService = async (adminId, productId, variantValueId, varian
             }
         });
 
+        let updatedStock;
+
         if (stock) {
             // Update existing stock
+            const newTotal = stock.totalQuantity + Number(quantityReceived);
             await stock.update({
-                totalQuantity: stock.totalQuantity + quantityReceived
+                totalQuantity: newTotal
             }, { transaction: t });
+            updatedStock = newTotal;
         } else {
             // AUTO-GENERATE INVENTORY STOCK ID
             const lastStock = await InventoryStock.findOne({
@@ -179,6 +183,8 @@ export const addStockService = async (adminId, productId, variantValueId, varian
                 variantCombinationId,
                 totalQuantity: quantityReceived
             }, { transaction: t });
+
+            updatedStock = Number(quantityReceived);
         }
 
         // AUTO-GENERATE INVENTORY HISTORY ID
@@ -195,6 +201,7 @@ export const addStockService = async (adminId, productId, variantValueId, varian
             variantCombinationId,
             type: "IN",
             quantity: quantityReceived,
+            stockAfter: updatedStock,
             referenceId: batch.ID,
             remarks: notes || `Stock-in for batch ${batchNumber}`
         }, { transaction: t });
