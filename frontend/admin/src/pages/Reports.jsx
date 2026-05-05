@@ -59,49 +59,6 @@ const Reports = () => {
   );
 
   /* ======================
-     📊 SUMMARY
-  ====================== */
-  const summary = useMemo(() => {
-    
-    const totalRevenue = filteredOrderTransactions
-      .filter(t => t.transactionType === "Order Placed")
-      .reduce((sum, t) => sum + Number(t.totalAmount || 0), 0);
-
-    const pendingCount = filteredOrderTransactions.filter(
-      t => t.transactionType === "Order Placed"
-    ).length;
-
-    const processingCount = filteredOrderTransactions.filter(
-      t => t.transactionType === "Order Processing"
-    ).length;
-
-    const outForDeliveryCount = filteredOrderTransactions.filter(
-      t => t.transactionType === "Out for Delivery"
-    ).length;
-
-    const deliveredCount = filteredOrderTransactions.filter(
-      t => t.transactionType === "Order Delivered"
-    ).length;
-
-    const refundCount = filteredOrderTransactions.filter(
-      t => t.transactionType === "Order Return/Refund"
-    ).length;
-
-    return {
-      pendingCount,
-      processingCount,
-      outForDeliveryCount,
-      deliveredCount,
-      refundCount,
-      totalOrders: filteredOrderTransactions.length,
-      totalRevenue,
-      cancelledCount: fetchCancelledOrders.filter(c =>
-        inRange(c.dateCancelled, orderFrom, orderTo)
-      ).length,
-    };
-  }, [filteredOrderTransactions, fetchCancelledOrders, orderFrom, orderTo]);
-
-  /* ======================
      🔧 HELPER FUNCTIONS
   ====================== */
   
@@ -303,43 +260,6 @@ const Reports = () => {
       <Navbar TitleName="Order & Inventory Reports" />
 
       <div className="reports-container">
-
-        {/* ===== SUMMARY ===== */}
-        <div className="summary-grid">
-          <div className="card">
-            <h4>Total Orders</h4>
-            <p>{summary.totalOrders}</p>
-          </div>
-          <div className="card">
-            <h4>Pending Orders</h4>
-            <p>{summary.pendingCount}</p>
-          </div>
-
-          <div className="card">
-            <h4>Processing Orders</h4>
-            <p>{summary.processingCount}</p>
-          </div>
-
-          <div className="card">
-            <h4>Out for Delivery</h4>
-            <p>{summary.outForDeliveryCount}</p>
-          </div>
-
-          <div className="card">
-            <h4>Delivered Orders</h4>
-            <p>{summary.deliveredCount}</p>
-          </div>
-
-          <div className="card danger">
-            <h4>Return/Refund Orders</h4>
-            <p>{summary.refundCount}</p>
-          </div>
-          <div className="card danger">
-            <h4>Cancelled Orders</h4>
-            <p>{summary.cancelledCount}</p>
-          </div>
-        </div>
-
         {/* ===== ORDER REPORTS ===== */}
         <section className="table-section">
           <div className="section-header">
