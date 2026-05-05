@@ -419,20 +419,14 @@ function Overview() {
 
   function getTypeColor(type) {
     const typeColors = {
-      'Order Placed': '#43A047',
-      'Order Processing': '#1976D2',
-      'Out for Delivery': '#FF9800',
-      'Order Delivered': '#4CAF50',
-      'Order Cancelled': '#F44336',
-      'Order Refund Requested': '#9C27B0',
-      'Order Refund Approved': '#00BCD4',
-      'Order Refund Completed': '#009688',
-      'Order Refund Rejected': '#E91E63',
-      'Order Cancellation Request': '#FF5722',
-      'Order Cancellation Processed': '#795548',
-      'Order Cancellation Request Cancelled': '#607D8B',
+      'Order Placed': '#FFA600',
+      'Order Processing': '#00E3B6',
+      'Out for Delivery': '#656DFF',
+      'Order Delivered': '#00DD31',
+      'Order Cancelled': '#D10000',
+      'Order Return/Refund': '#FF3333'
     };
-    return typeColors[type] || '#43A047';
+    return typeColors[type] || '#FFA600';
   }
 
   return (

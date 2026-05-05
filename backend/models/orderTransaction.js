@@ -57,13 +57,7 @@ const OrderTransaction = sequelize.define(
         'Out for Delivery',
         'Order Delivered',
         'Order Cancelled',
-        'Order Refund Requested',
-        'Order Refund Approved',
-        'Order Refund Completed',
-        'Order Refund Rejected',
-        'Order Cancellation Request',
-        'Order Cancellation Processed',
-        'Order Cancellation Request Cancelled'
+        'Order Return/Refund'
       ),
       allowNull: false,
     },

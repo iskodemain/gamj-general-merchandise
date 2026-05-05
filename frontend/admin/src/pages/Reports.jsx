@@ -59,23 +59,6 @@ const Reports = () => {
   );
 
   /* ======================
-     📊 SUMMARY
-  ====================== */
-  const summary = useMemo(() => {
-    const totalRevenue = filteredOrderTransactions
-      .filter(t => t.transactionType === "Order Placed")
-      .reduce((sum, t) => sum + Number(t.totalAmount || 0), 0);
-
-    return {
-      totalOrders: filteredOrderTransactions.length,
-      totalRevenue,
-      cancelledCount: fetchCancelledOrders.filter(c =>
-        inRange(c.dateCancelled, orderFrom, orderTo)
-      ).length,
-    };
-  }, [filteredOrderTransactions, fetchCancelledOrders, orderFrom, orderTo]);
-
-  /* ======================
      🔧 HELPER FUNCTIONS
   ====================== */
   
@@ -144,6 +127,11 @@ const Reports = () => {
     return productDetails.length > 0 ? productDetails.join(', ') : 'N/A';
   };
 
+  const getDisplayTransactionType = (type) => {
+    if (type === "Order Placed") return "Order Placed (Pending)";
+    return type;
+  };
+
   /* ======================
     🧱 TABLE ROW BUILDERS
   ====================== */
@@ -154,7 +142,7 @@ const Reports = () => {
       "Transaction ID": tx.transactionId,
       "Order ID": getOrderId(tx.orderId),
       "Product(s)": getOrderProductDetails(tx.orderId, tx.orderItemId),
-      "Type": tx.transactionType,
+      "Type": getDisplayTransactionType(tx.transactionType),
       "Amount": `₱ ${Number(tx.totalAmount).toFixed(2)}`,
       "Payment": tx.paymentMethod,
       "Date": new Date(tx.transactionDate).toLocaleDateString(),
@@ -272,23 +260,6 @@ const Reports = () => {
       <Navbar TitleName="Order & Inventory Reports" />
 
       <div className="reports-container">
-
-        {/* ===== SUMMARY ===== */}
-        <div className="summary-grid">
-          <div className="card">
-            <h4>Total Orders</h4>
-            <p>{summary.totalOrders}</p>
-          </div>
-          <div className="card">
-            <h4>Total Revenue</h4>
-            <p>₱ {summary.totalRevenue.toFixed(2)}</p>
-          </div>
-          <div className="card danger">
-            <h4>Cancelled Orders</h4>
-            <p>{summary.cancelledCount}</p>
-          </div>
-        </div>
-
         {/* ===== ORDER REPORTS ===== */}
         <section className="table-section">
           <div className="section-header">
@@ -301,10 +272,7 @@ const Reports = () => {
             </div>
 
             <div className="export-buttons">
-              <button onClick={() => exportCSV(orderReportRows, "orders.csv")}>CSV</button>
-              <button onClick={() => exportExcel(orderReportRows, "orders.xlsx")}>XLSX</button>
-              <button onClick={() => exportPDF(orderReportRows, "Order Reports", "orders.pdf")}>PDF</button>
-              <button onClick={() => exportDOCX(orderReportRows, "orders.docx")}>DOCX</button>
+              <button onClick={() => exportExcel(orderReportRows, "orders.xlsx")}>Export to Excel</button>
             </div>
           </div>
 
@@ -327,7 +295,7 @@ const Reports = () => {
                     <td>{tx.transactionId}</td>
                     <td>{getOrderId(tx.orderId)}</td>
                     <td>{getOrderProductDetails(tx.orderId, tx.orderItemId)}</td>
-                    <td>{tx.transactionType}</td>
+                    <td>{getDisplayTransactionType(tx.transactionType)}</td>
                     <td>₱ {tx.totalAmount}</td>
                     <td>{tx.paymentMethod}</td>
                     <td>{new Date(tx.transactionDate).toLocaleDateString()}</td>
@@ -350,10 +318,7 @@ const Reports = () => {
             </div>
 
             <div className="export-buttons">
-              <button onClick={() => exportCSV(inventoryReportRows, "inventory-history.csv")}>CSV</button>
-              <button onClick={() => exportExcel(inventoryReportRows, "inventory-history.xlsx")}>XLSX</button>
-              <button onClick={() => exportPDF(inventoryReportRows, "Inventory Reports", "inventory.pdf")}>PDF</button>
-              <button onClick={() => exportDOCX(inventoryReportRows, "inventory.docx")}>DOCX</button>
+              <button onClick={() => exportExcel(inventoryReportRows, "inventory-history.xlsx")}>Export to Excel</button>
             </div>
           </div>
 

@@ -249,6 +249,13 @@ export const updateOrderStatusService = async (adminId, data) => {
       // UPDATE ORDER ITEM STATUS
       // -------------------------
       const updateData = { orderStatus: changeStatus };
+
+      const transactionTypeMap = {
+        "Processing": "Order Processing",
+        "Out for Delivery": "Out for Delivery",
+        "Delivered": "Order Delivered",
+      };
+
       if (changeStatus === "Delivered") {
         updateData.dateDelivered = new Date();
       }
@@ -289,7 +296,22 @@ export const updateOrderStatusService = async (adminId, data) => {
         });
       }
 
-      
+      if (transactionTypeMap[changeStatus]) {
+        const lastTransaction = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+        const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
+        const transactionId = withTimestamp('TRXN', nextTransactionNo);
+
+        await OrderTransaction.create({
+          transactionId,
+          orderId: order.ID,
+          orderItemId: orderItem.ID,
+          customerId: customer.ID,
+          transactionType: transactionTypeMap[changeStatus],
+          totalAmount: order.totalAmount,
+          paymentMethod: order.paymentMethod,
+          transactionDate: new Date(),
+        });
+      }
 
       // -------------------------
       // BUILD NOTIFICATION MESSAGE
