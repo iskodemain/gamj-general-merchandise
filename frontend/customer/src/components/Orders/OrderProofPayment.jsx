@@ -7,16 +7,17 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from 'react-toastify';
 
 const OrderProofPayment = () => {
-  const { orderId, customerId, setShowOrderProofPayment, addOrderProofPayment, deleteOrderProofPayment, currency, toastError, fetchOrderProofPayment } = useContext(ShopContext);
+  const { orderId, customerId, setShowOrderProofPayment, addOrderProofPayment, deleteOrderProofPayment, currency, toastError, fetchOrderProofPayment, orderTotalAmount  } = useContext(ShopContext);
 
   const [referenceId, setReferenceId] = useState('');
-  const [amountPaid, setAmountPaid] = useState('');
+  const [amountPaid, setAmountPaid] = useState(orderTotalAmount || '');
   const [receiptImage, setReceiptImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  
   // Find existing payment proof for this order
   const existingProof = useMemo(() => {
     return fetchOrderProofPayment.find(
@@ -34,6 +35,12 @@ const OrderProofPayment = () => {
       setImagePreview(existingProof.receiptImage);
     }
   }, [existingProof]);
+
+  useEffect(() => {
+    if (!existingProof) {
+      setAmountPaid(orderTotalAmount);
+    }
+  }, [orderTotalAmount, existingProof]);
 
   const handleClose = () => {
     setShowOrderProofPayment(false);
@@ -160,11 +167,10 @@ const OrderProofPayment = () => {
                 type="number"
                 className="proof-input proof-amount-input"
                 value={amountPaid}
-                onChange={(e) => setAmountPaid(e.target.value)}
                 placeholder="0.00"
                 step="0.01"
                 min="0"
-                disabled={isViewMode}
+                disabled={true}
                 required={!isViewMode}
               />
             </div>
