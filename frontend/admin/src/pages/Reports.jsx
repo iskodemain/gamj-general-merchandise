@@ -18,6 +18,7 @@ const Reports = () => {
     fetchInventoryStock,
     fetchInventoryBatch,
     fetchInventoryHistory,
+    fetchInventorySettings,
     products,
     variantName,
     productVariantValues,
@@ -133,6 +134,44 @@ const Reports = () => {
   };
 
   /* ======================
+    📊 INVENTORY STATUS HELPERS
+  ====================== */
+
+  // Get threshold settings for a product/variant
+  const getThresholdForStock = (productId, variantValueId, variantCombinationId) => {
+    const setting = fetchInventorySettings?.find(s => 
+      s.productId === productId &&
+      s.variantValueId === variantValueId &&
+      s.variantCombinationId === variantCombinationId
+    );
+    return setting;
+  };
+
+  // Get current stock quantity
+  const getCurrentStock = (productId, variantValueId, variantCombinationId) => {
+    const stock = fetchInventoryStock?.find(s =>
+      s.productId === productId &&
+      s.variantValueId === variantValueId &&
+      s.variantCombinationId === variantCombinationId
+    );
+    return stock?.totalQuantity ?? 0;
+  };
+
+  // Compute stock status
+  const computeStockStatus = (qty, thresholdSettings) => {
+    if (qty === 0) return 'Out-of-Stock';
+    if (!thresholdSettings) return 'In-Stock'; // No threshold set
+    return qty <= thresholdSettings.lowStockThreshold ? 'Low Stock' : 'In-Stock';
+  };
+
+  // Get stock status for a product/variant
+  const getStockStatus = (productId, variantValueId, variantCombinationId) => {
+    const qty = getCurrentStock(productId, variantValueId, variantCombinationId);
+    const threshold = getThresholdForStock(productId, variantValueId, variantCombinationId);
+    return computeStockStatus(qty, threshold);
+  };
+
+  /* ======================
     🧱 TABLE ROW BUILDERS
   ====================== */
 
@@ -158,15 +197,20 @@ const Reports = () => {
         h.variantCombinationId
       );
 
+      const currentStock = getCurrentStock(h.productId, h.variantValueId, h.variantCombinationId);
+      const stockStatus = getStockStatus(h.productId, h.variantValueId, h.variantCombinationId);
+
       return {
         "Product": productDetails,
         "Type": h.type,
         "Quantity": h.quantity,
+        "Stock After": h.stockAfter !== null && h.stockAfter !== undefined ? h.stockAfter : '—',
+        "Stock Status": stockStatus,
         "Reference": h.referenceId || "-",
         "Date": new Date(h.createdAt).toLocaleDateString(),
       };
     });
-  }, [filteredInventoryHistory, products, variantName, productVariantValues, productVariantCombination]);
+  }, [filteredInventoryHistory, fetchInventoryStock, fetchInventorySettings, products, variantName, productVariantValues, productVariantCombination]);
 
   /* ======================
      ⬇️ EXPORT HELPERS
@@ -329,20 +373,37 @@ const Reports = () => {
                   <th>Product</th>
                   <th>Type</th>
                   <th>Quantity</th>
+                  <th>Stock After</th>
+                  <th>Stock Status</th> 
                   <th>Reference</th>
                   <th>Date</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredInventoryHistory.map(h => (
-                  <tr key={h.ID}>
-                    <td>{getProductDetails(h.productId, h.variantValueId, h.variantCombinationId)}</td>
-                    <td>{h.type}</td>
-                    <td>{h.quantity}</td>
-                    <td>{h.referenceId || '-'}</td>
-                    <td>{new Date(h.createdAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
+                {filteredInventoryHistory.map(h => {
+                  const currentStock = getCurrentStock(h.productId, h.variantValueId, h.variantCombinationId);
+                  const stockStatus = getStockStatus(h.productId, h.variantValueId, h.variantCombinationId);
+                  
+                  return (
+                    <tr key={h.ID}>
+                      <td>{getProductDetails(h.productId, h.variantValueId, h.variantCombinationId)}</td>
+                      <td>{h.type}</td>
+                      <td>{h.quantity}</td>
+                      <td>{h.stockAfter !== null && h.stockAfter !== undefined ? h.stockAfter : '—'}</td>
+                      <td>
+                        <span className={`status-badge status-${
+                          stockStatus === 'Out-of-Stock' ? 'out' : 
+                          stockStatus === 'Low Stock' ? 'low' : 'ok'
+                        }`}>
+                          {stockStatus === 'Out-of-Stock' ? '❌ OUT' : 
+                          stockStatus === 'Low Stock' ? '⚠️ LOW' : '✅ OK'}
+                        </span>
+                      </td> 
+                      <td>{h.referenceId || '-'}</td>
+                      <td>{new Date(h.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

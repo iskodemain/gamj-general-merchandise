@@ -58,6 +58,12 @@ const InventoryHistory = sequelize.define(
       allowNull: false,
     },
 
+    stockAfter: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0,
+    },
+
     referenceId: {
       type: DataTypes.STRING(100),
       allowNull: true,
