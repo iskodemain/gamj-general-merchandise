@@ -51,17 +51,6 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   const [reviewProof, setReviewProof] = useState(null);
   const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
 
-  const deliverySummary = useMemo(() => {
-    const totalQty = deliveryItems.reduce((sum, i) => sum + Number(i.qty || 0), 0);
-
-    const totalAmount = deliveryItems.reduce(
-      (sum, i) => sum + Number(i.price || 0) * Number(i.qty || 0),
-      0
-    );
-
-    return { totalQty, totalAmount };
-  }, [deliveryItems]);
-
   // ✅ CLICK OUTSIDE — SIMPLEST & BUG-FREE SOLUTION
   useEffect(() => {
     function handleClickOutside(e) {
@@ -748,9 +737,6 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
               <div className="pod-items-list">
 
                 {deliveryItems.map((item) => {
-
-                  const subtotal = Number(item.price || 0) * Number(item.qty || 0);
-
                   return (
                     <div key={item.id} className="pod-item-row">
 
@@ -786,30 +772,10 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 
                       </div>
 
-                      <div className="pod-item-subtotal">
-                        ₱{subtotal.toFixed(2)}
-                      </div>
-
                     </div>
                   );
                 })}
-
               </div>
-
-              <div className="pod-summary">
-
-                <div className="pod-summary-row">
-                  <span>Total Quantity</span>
-                  <span>{deliverySummary.totalQty}</span>
-                </div>
-
-                <div className="pod-summary-row pod-total">
-                  <span>Total Amount</span>
-                  <span>₱{deliverySummary.totalAmount.toFixed(2)}</span>
-                </div>
-
-              </div>
-
             </div>
 
             <div className="pod-divider" />
