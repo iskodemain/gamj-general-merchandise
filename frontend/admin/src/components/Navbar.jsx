@@ -42,7 +42,7 @@ function Navbar({TitleName}) {
           </div>
 
           <div className="navbar-icons">
-            {["Super Admin", "Admin", "Staff"].includes(currentUser) && 
+            {["Super Admin"].includes(currentUser) && 
               <>
                 <button onClick={() => window.location.href = "/settings"}><img src={assets.settings_icon} alt="Setings"className="navbar-icon"/></button>
                 <button onClick={() => window.location.href = "/notifications"}><img src={assets.notification_icon} alt="Notifications"className="navbar-icon"/></button>
