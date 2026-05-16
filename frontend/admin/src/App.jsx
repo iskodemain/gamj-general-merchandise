@@ -85,7 +85,8 @@ const App = () => {
       <Route path="/outfordelivery" element={<ProtectedRoute><OutforDelivery /></ProtectedRoute>} />
       <Route path="/delivered" element={<ProtectedRoute><Delivered /></ProtectedRoute>} />
       <Route path="/cancelorder" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><CancelOrder /></ProtectedRoute>} />
-      <Route path="/cancelreview" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><CancelReview /></ProtectedRoute>} /> {/* PENDING */}
+      <Route path="/cancelreview" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><CancelReview /></ProtectedRoute>} />
+
       <Route path="/admincancel" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><AdminCancel /></ProtectedRoute>} /> {/* PENDING */}
       <Route path="/customercancel" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><CustomerCancel /></ProtectedRoute>} /> {/* PENDING */}
       <Route path="/returnandrefund" element={<ProtectedRoute allowedRoles={['Super Admin', 'Admin', 'Staff']}><ReturnAndRefund /></ProtectedRoute>} /> {/* PENDING */}

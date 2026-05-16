@@ -7,7 +7,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from 'react-toastify';
 
 const OrderProofPayment = () => {
-  const { orderId, customerId, setShowOrderProofPayment, addOrderProofPayment, deleteOrderProofPayment, currency, toastError, fetchOrderProofPayment, orderTotalAmount  } = useContext(ShopContext);
+  const { orderId, customerId, setShowOrderProofPayment, addOrderProofPayment, deleteOrderProofPayment, currency, toastError, fetchOrderProofPayment, orderTotalAmount, fetchOrderItems  } = useContext(ShopContext);
 
   const [referenceId, setReferenceId] = useState('');
   const [amountPaid, setAmountPaid] = useState(orderTotalAmount || '');
@@ -26,6 +26,8 @@ const OrderProofPayment = () => {
   }, [fetchOrderProofPayment, orderId, customerId]);
 
   const isViewMode = !!existingProof;
+
+  const isOrderCancelled = fetchOrderItems.filter((item) => item.orderId === orderId).every((item) => item.orderStatus === 'Cancelled');
 
   // Populate fields if viewing existing proof
   useEffect(() => {
@@ -237,7 +239,7 @@ const OrderProofPayment = () => {
             )}
           </div>
 
-          {isViewMode ? (
+          {isViewMode && !isOrderCancelled ? (
             <button
               type="button"
               className="proof-delete-btn"

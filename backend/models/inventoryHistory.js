@@ -53,6 +53,11 @@ const InventoryHistory = sequelize.define(
       allowNull: false,
     },
 
+    adjustType: {
+      type: DataTypes.ENUM("ADD", "DEDUCT"),
+      allowNull: true, // only required when type = ADJUST, null for others
+    },
+
     quantity: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,

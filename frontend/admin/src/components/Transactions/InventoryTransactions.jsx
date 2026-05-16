@@ -7,7 +7,7 @@ const InventoryTransactions = () => {
   const { products, variantName, productVariantValues, productVariantCombination, fetchInventoryHistory } = useContext(AdminContext);
   
   // State for filters and sorting
-  const [filterType, setFilterType] = useState('ALL'); // ALL, IN, OUT
+  const [filterType, setFilterType] = useState('ALL'); // ALL, IN, OUT, RETURN, DAMAGED, ADJUSTMENT
   const [filterProduct, setFilterProduct] = useState('ALL');
   const [sortBy, setSortBy] = useState('DATE_DESC'); // DATE_DESC, DATE_ASC, QTY_DESC, QTY_ASC
   const [searchTerm, setSearchTerm] = useState('');
@@ -194,6 +194,9 @@ const InventoryTransactions = () => {
                   <option value="ALL">All Types</option>
                   <option value="IN">Stock In</option>
                   <option value="OUT">Stock Out</option>
+                  <option value="RETURN">Return</option>
+                  <option value="DAMAGED">Damaged</option>
+                  <option value="ADJUST">Adjustment</option>
                 </select>
               </div>
 
@@ -243,7 +246,6 @@ const InventoryTransactions = () => {
                   <th>Type</th>
                   <th>Quantity</th>
                   <th>Stock After</th>
-                  <th>Reference</th>
                   <th>Remarks</th>
                 </tr>
               </thead>
@@ -261,13 +263,43 @@ const InventoryTransactions = () => {
                         <span className="it-variant">{getVariantDetails(transaction.variantValueId, transaction.variantCombinationId)}</span>
                       </td>
                       <td data-label="Type">
-                        <span className={`it-type-badge ${transaction.type === 'IN' ? 'it-type-in' : 'it-type-out'}`}>
-                          {transaction.type === 'IN' ? '📥 Stock In' : '📤 Stock Out'}
+                        <span className={`it-type-badge ${
+                            transaction.type === 'IN'
+                              ? 'it-type-in'
+                              : transaction.type === 'RETURN'
+                              ? 'it-type-return'
+                              : transaction.type === 'DAMAGED'
+                              ? 'it-type-damaged'
+                              : transaction.type === 'ADJUST'
+                              ? 'it-type-adjust'
+                              : 'it-type-out'
+                          }`}>
+                          {
+                            transaction.type === 'IN'
+                              ? '📥 Stock In'
+                              : transaction.type === 'OUT'
+                              ? '📤 Stock Out'
+                              : transaction.type === 'RETURN'
+                              ? '↩️ Return'
+                              : transaction.type === 'DAMAGED'
+                              ? '⚠️ Damaged'
+                              : '🛠️ Adjustment'
+                          }
                         </span>
                       </td>
                       <td data-label="Quantity">
-                        <span className={`it-quantity ${transaction.type === 'IN' ? 'it-qty-in' : 'it-qty-out'}`}>
-                          {transaction.type === 'IN' ? '+' : '-'}{transaction.quantity}
+                        <span className={`it-quantity ${transaction.type === 'IN' ? 'it-qty-in' : transaction.type === 'RETURN' ? 'it-qty-in' : transaction.type === 'DAMAGED' ? 'it-qty-out' : transaction.type === 'OUT' ? 'it-qty-out' : transaction.adjustType === 'ADD' ? 'it-qty-in' : 'it-qty-out'}`}>
+                          {
+                            transaction.type === 'IN'
+                              ? '+'
+                              : transaction.type === 'RETURN'
+                              ? '+'
+                              : transaction.type === 'DAMAGED'
+                              ? '-'
+                              : transaction.type === 'OUT'
+                              ? '-'
+                              : transaction.adjustType === 'ADD' ? '+' : '-'
+                          }{transaction.quantity}
                         </span>
                       </td>
                       <td data-label="Stock After">

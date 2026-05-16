@@ -291,7 +291,7 @@ function CancelReason({ item = null, onClose = () => {} }) {
                       readOnly
                     />
 
-                    <div className="cr-action-row">
+                    <div className="cr-action-column">
                       <button
                         className="cr-primary-btn"
                         onClick={handleProceedRefund}
@@ -354,7 +354,7 @@ function CancelReason({ item = null, onClose = () => {} }) {
                     onChange={(e) => setPaypalTxId(e.target.value)}
                   />
 
-                  <div className="cr-action-row">
+                  <div className="cr-action-column">
 
                     {localCancellationStatus === "Processing" && (
                       <button
@@ -364,20 +364,6 @@ function CancelReason({ item = null, onClose = () => {} }) {
                         }
                       >
                         Submit as Refunded
-                      </button>
-                    )}
-
-                    {localCancellationStatus === "Refunded" && (
-                      <button
-                        className="cr-primary-btn"
-                        onClick={handleSubmitAsCompleted}
-                        disabled={
-                          !refundAmount ||
-                          !paypalTxId.trim() ||
-                          (!proofFile && !proofPreviewUrl)
-                        }
-                      >
-                        Submit as Completed
                       </button>
                     )}
                   </div>
@@ -402,7 +388,7 @@ function CancelReason({ item = null, onClose = () => {} }) {
                       readOnly
                     />
 
-                    <div className="cr-action-row">
+                    <div className="cr-action-column">
                       <button className="cr-danger-btn" onClick={handleDeleteCancel}>
                         Delete
                       </button>
@@ -433,7 +419,7 @@ function CancelReason({ item = null, onClose = () => {} }) {
                       readOnly
                     />
 
-                    <div className="cr-action-row">
+                    <div className="cr-action-column">
                       <button className="cr-danger-btn" onClick={handleDeleteCancel}>
                         Delete
                       </button>

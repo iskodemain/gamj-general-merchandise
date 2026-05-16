@@ -13,7 +13,7 @@ import OrderProofPayment from '../components/Orders/OrderProofPayment';
 import { FiEye } from "react-icons/fi";
 
 function Orders() {
-  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof, setOrderTotalAmount } = useContext(ShopContext);
+  const { currency, fetchOrders, fetchOrderItems, products, setOrderItemId, setPaymentUsed, cancelOrder, setCancelOrder, fetchCancelledOrders, removeOrder, viewRefundReceipt, setViewRefundReceipt, setRefundOrder, refundOrder, fetchOrderRefund, showRejectedRefund, setShowRejectedRefund, showOrderProofPayment, setShowOrderProofPayment, setOrderId, fetchOrderProofPayment, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof, setOrderTotalAmount, hasPaymentProof, setHasPaymentProof, setCancelledBy } = useContext(ShopContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [timeUpdated, setTimeUpdated] = useState(Date.now());
@@ -42,9 +42,11 @@ function Orders() {
     setViewRefundReceipt(true); // FOR CANCEL AND RETURN/REFUND ORDERS
   };
 
-  const handleReview = (orderItemId, paymentMethod) => {
+  const handleReview = (orderItemId, paymentMethod, order) => {
     setOrderItemId(orderItemId);
     setPaymentUsed(paymentMethod);
+    const paymentProof = getPaymentProofForOrder(order.ID, order.customerId);
+    setHasPaymentProof(!!paymentProof);
     setCancelOrder(true);
   };
 
@@ -159,10 +161,11 @@ function Orders() {
   );
 
   // 🔹 Cancel Button
-  const handleButtonClick = (item, order) => {
+  const handleButtonClick = (item, order, hasPaymentProof) => {
     if (item.orderStatus === 'Pending') {
       setOrderItemId(item.ID);
       setPaymentUsed(order.paymentMethod);
+      setHasPaymentProof(hasPaymentProof);
       setCancelOrder(true);
     }
   };
@@ -245,8 +248,7 @@ function Orders() {
               <div key={order.ID} className="order-group-card">
                 {/* ORDER HEADER */}
                 <div className="order-group-header">
-                  {order.paymentMethod === 'Paypal' &&
-                    order.items.some(item => item.orderStatus === 'Pending') && (
+                  {order.paymentMethod === 'Paypal' && (
                       (() => {
                         const paymentProof = getPaymentProofForOrder(order.ID, order.customerId);
                         const hasProof = !!paymentProof;
@@ -471,7 +473,10 @@ function Orders() {
                           return (
                             <button
                               className="order-button-container review-btn"
-                              onClick={() => handleReview(item.ID, order.paymentMethod)}
+                              onClick={() => {
+                                handleReview(item.ID, order.paymentMethod, order);
+                                setCancelledBy(cancelInfo.cancelledBy);
+                              }}
                             >
                               Review
                             </button>
@@ -494,7 +499,10 @@ function Orders() {
                       return (
                         <button
                           className={`order-button-container ${item.orderStatus === 'Pending' ? '' : 'disabled-button'}`}
-                          onClick={() => handleButtonClick(item, order)}
+                          onClick={() => {
+                            const paymentProof = getPaymentProofForOrder(order.ID, order.customerId);
+                            handleButtonClick(item, order, !!paymentProof);
+                          }}
                           disabled={item.orderStatus !== 'Pending'}
                         >
                           {item.orderStatus === 'Pending'

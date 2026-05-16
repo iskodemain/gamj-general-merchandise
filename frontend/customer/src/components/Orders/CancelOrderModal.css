@@ -1,3 +1,32 @@
+.refund-waiting-note {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 8px 12px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.paypal-refund-info {
+  text-align: center;
+  display:flex;
+  gap: 0.3rem;
+  flex-direction: column;
+}
+
+.paypal-refund-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.cr-text {
+  text-align: center;
+  font-weight: 600;
+}
+
 .disabled-cancel-section {
   opacity: 0.6;
   pointer-events: none;

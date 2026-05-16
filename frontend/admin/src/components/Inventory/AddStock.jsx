@@ -300,12 +300,12 @@ export default function AddStock() {
               )}
             </div>
 
-            {/* Section 2: Batch Details */}
+            {/* Section 2: Stock-In Details */}
             <div className="addstock-section">
-              <h3 className="addstock-section-title"> Batch Details</h3>
+              <h3 className="addstock-section-title"> Stock-In Details</h3>
               <div className="addstock-form-group">
                 <label className="addstock-label" htmlFor="quantity">
-                  Quantity Received <span className="addstock-required">*</span>
+                  Quantity <span className="addstock-required">*</span>
                   {selectedProduct && unitType === 'BOX' && (
                     <span style={{ fontWeight: 400, fontSize: '0.8rem', color: '#888', marginLeft: '8px' }}>
                       (Per Box — {piecesPerBox} pcs/box)

@@ -3,11 +3,13 @@ import "./CancelOrderReview.css";
 import { FaTrashCan, FaArrowLeft } from "react-icons/fa6";
 import { IoSearchOutline } from "react-icons/io5";
 import CancelReason from "./CancelReason.jsx";
+import CancelReview from "./CancelReview.jsx";
 
 function CancelOrderReview({ order = null, onClose = () => {}, orderStatus = "" }) {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [showReasonModal, setShowReasonModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
@@ -37,12 +39,20 @@ function CancelOrderReview({ order = null, onClose = () => {}, orderStatus = "" 
   return (
     <div className="cor-review-wrapper">
 
-      {/* If modal is open, show CancelReason */}
+      {/* If Reason modal is open, show CancelReason */}
       {showReasonModal && selectedItem ? (
         <CancelReason
           item={selectedItem}
           onClose={() => {
             setShowReasonModal(false);
+            setSelectedItem(null);
+          }}
+        />
+      ) : showReviewModal && selectedItem ? (
+        <CancelReview
+          item={selectedItem}
+          onClose={() => {
+            setShowReviewModal(false);
             setSelectedItem(null);
           }}
         />
@@ -166,7 +176,14 @@ function CancelOrderReview({ order = null, onClose = () => {}, orderStatus = "" 
                         )}
 
                         {item.cancelledBy === "Admin" && (
-                          <button type="button" className="cor-review-btn-admin">
+                          <button
+                            type="button"
+                            className="cor-review-btn-admin"
+                            onClick={() => {
+                              setSelectedItem(item);
+                              setShowReviewModal(true);
+                            }}
+                          >
                             Review
                           </button>
                         )}

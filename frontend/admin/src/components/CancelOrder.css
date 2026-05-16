@@ -1,3 +1,115 @@
+/* ===================== CANCEL ORDER TOTAL ===================== */
+.cancel-order-total-wrapper {
+  width: 100%;
+}
+
+.cancel-order-total-card {
+  background: linear-gradient(145deg, #ffffff, #f3f6f9);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.cancel-order-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: "Inter", sans-serif;
+  flex-wrap: wrap;
+}
+
+.cancel-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.cancel-value {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.cancel-order-total-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 6px 0;
+}
+
+.cancel-total-highlight {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+/* ===================== BUTTONS CONTAINER ===================== */
+.cancel-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* ===================== REVIEW RECEIPT BUTTON ===================== */
+.cancel-review-receipt-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.cancel-review-receipt-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+}
+
+.cancel-receipt-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ===================== NO RECEIPT INDICATOR ===================== */
+.cancel-no-receipt-indicator {
+  width: 100%;
+  background: #FFF3E0;
+  outline: 2px solid #FFB74D;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #E65100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.cancel-warning-icon {
+  width: 20px;
+  height: 20px;
+  color: #F57C00;
+  flex-shrink: 0;
+}
+
 .cancel-back-ctn {
   display: flex;
   flex-direction: row;
@@ -248,6 +360,18 @@
   }
 }
 
+@media (min-width: 768px) {
+  .cancel-buttons-container {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .cancel-review-receipt-btn,
+  .cancel-no-receipt-indicator {
+    flex: 1;
+  }
+}
+
 /* MOBILE LARGE */
 @media (max-width: 600px) {
   .cancel-orders-container {
@@ -286,6 +410,18 @@
   .cancel-viewall-btn {
     padding: 8px 12px;
     font-size: 0.85rem;
+  }
+
+  .cancel-review-receipt-btn,
+  .cancel-no-receipt-indicator {
+    padding: 0.55rem 0.85rem;
+    font-size: 0.82rem;
+  }
+
+  .cancel-receipt-icon,
+  .cancel-warning-icon {
+    width: 18px;
+    height: 18px;
   }
 }
 

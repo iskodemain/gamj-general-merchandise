@@ -12,6 +12,7 @@ const RefundReceiptModal = () => {
     const [record, setRecord] = useState(null); // can be cancel or refund record
     const [refundProofData, setRefundProofData] = useState(null);
     const [isCancel, setIsCancel] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // 🔹 Step 1: Identify whether the selected orderItem belongs to cancel or refund
     useEffect(() => {
@@ -56,14 +57,19 @@ const RefundReceiptModal = () => {
     }, [record, fetchRefundProof, isCancel]);
 
 
-    const handleMarkAsReceived = () => {
+    const handleMarkAsReceived = async () => {
         if (!record) return;
         
         const cancelId = isCancel ? record.ID : null;
         const refundId = !isCancel ? record.ID : null;
-
-        markRefundReceived(cancelId, refundId);
+        setLoading(true);
+        const success = await markRefundReceived(cancelId, refundId);
+        setLoading(false);
         setViewRefundReceipt(false);
+
+        if (success) {
+            setTimeout(() => window.location.reload(), 500);
+        }
     };
 
     /* 🔹 Step 4: View full receipt image overlay */
@@ -93,6 +99,7 @@ const RefundReceiptModal = () => {
 
   return (
     <div className="refund-receipt-bg">
+        {loading && <Loading />}
         {viewReceiptImage && <ViewReceiptImage />}
         <div className="refund-receipt-card">
             <IoCloseOutline className="close-receipt-btn" onClick={() => setViewRefundReceipt(false)}/>

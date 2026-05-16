@@ -1,4 +1,4 @@
-export const placeOrderTemplate = (userName, orderStatus, paymentMethod, orderId) => {
+export const placeOrderTemplate = (userName, orderStatus, paymentMethod, orderId, listOfProducts, subtotal, shippingFee, totalAmount) => {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,7 +114,36 @@ export const placeOrderTemplate = (userName, orderStatus, paymentMethod, orderId
 
                         <p>Your order is currently <b>pending</b> and awaiting confirmation from our team.</p>
                         <p class="payment-method">Payment Method: <b>${paymentMethod}</b></p>
-                        <p>We’ll notify you once your order has been processed and is ready for delivery.</p>
+
+                        <div style="background-color:#f9f9f9;padding:20px;border-radius:8px;margin:20px 0;text-align:left;">
+                            <h3 style="margin:0 0 15px 0;color:#333;text-align:center;">📦 Order Summary</h3>
+
+                            <div style="background-color:#fff;border-radius:6px;border:1px solid #e0e0e0;padding:15px;margin-bottom:15px;">
+                                <h4 style="margin:0 0 10px 0;font-size:15px;">Items Ordered:</h4>
+                                <ul style="margin:0;padding-left:20px;color:#333;">
+                                    ${listOfProducts}
+                                </ul>
+                            </div>
+
+                            <div style="background-color:#fff;border-radius:6px;border:1px solid #e0e0e0;padding:15px;">
+                                <table style="width:100%;font-size:14px;color:#333;">
+                                    <tr>
+                                        <td style="padding:6px 0;">Subtotal</td>
+                                        <td style="padding:6px 0;text-align:right;">₱${Number(subtotal).toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:6px 0;">Shipping Fee</td>
+                                        <td style="padding:6px 0;text-align:right;">₱${Number(shippingFee).toFixed(2)}</td>
+                                    </tr>
+                                    <tr style="font-weight:bold;border-top:1px solid #e0e0e0;">
+                                        <td style="padding:10px 0 0 0;">Total Amount</td>
+                                        <td style="padding:10px 0 0 0;text-align:right;color:#43A047;">₱${Number(totalAmount).toFixed(2)}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <p>We'll notify you once your order has been processed and is ready for delivery.</p>
                     </div>
 
                     <!-- Footer -->
@@ -130,7 +159,6 @@ export const placeOrderTemplate = (userName, orderStatus, paymentMethod, orderId
 </body>
 </html>`;
 };
-
 
 export const orderStatusUpdateTemplate = (userName, orderStatus, paymentMethod, listOfProducts, dateOrdered) => {
   // 🎨 Dynamic status configuration
@@ -500,11 +528,301 @@ export const orderStatusUpdateTemplate = (userName, orderStatus, paymentMethod, 
 };
 
 
+export const newCancelOrderRequestTemplate = (userName, orderStatus, paymentMethod, orderId, productName) => {
+  const refundMessage =
+    paymentMethod === "Paypal"
+      ? `<p>Your cancellation request is currently being <b>processed</b>.</p>
+         <p>Please wait for further updates.</p>
+         <p>We appreciate your patience and understanding during this process.</p>`
+      : `<p>Your cancellation request is currently being reviewed and processed.</p>
+         <p>Once confirmed, your order status and refund details will be updated accordingly.</p>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cancel Order Request Processing</title>
+<style>
+    body, table, td, a { 
+        margin: 0; 
+        padding: 0; 
+        font-family: Arial, sans-serif; 
+    }
+
+    img { 
+        border: 0; 
+        display: block; 
+        max-width: 100%; 
+    }
+
+    .email-container { 
+        width: 100%; 
+        background-color: #f4f6f9; 
+        padding: 20px 0; 
+    }
+
+    .email-content { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background-color: #ffffff; 
+        padding: 40px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    }
+
+    .email-header { 
+        text-align: center; 
+        margin-bottom: 30px; 
+    }
+
+    .email-header img { 
+        margin: 0 auto;
+        max-width: 120px;
+    }
+
+    .email-title {
+        text-align: center;
+    }
+
+    .email-body { 
+        text-align: center; 
+        font-size: 16px; 
+        line-height: 1.6; 
+        color: #333333; 
+    }
+
+    .status-badge { 
+        display: inline-block; 
+        padding: 10px 20px; 
+        background-color: #FB8C00;
+        color: #ffffff; 
+        font-weight: bold; 
+        border-radius: 10px; 
+        margin: 20px 0; 
+    }
+
+    .payment-method, .order-info { 
+        font-size: 15px; 
+        margin-top: 10px; 
+        color: #555555; 
+    }
+
+    .order-info strong {
+        color: #333333;
+    }
+
+    .email-footer { 
+        text-align: center; 
+        font-size: 12px; 
+        color: #777777; 
+        margin-top: 30px; 
+        border-top: 1px solid #e0e0e0; 
+        padding-top: 20px; 
+    }
+
+    .email-footer a { 
+        color: #FB8C00; 
+        text-decoration: none; 
+        font-weight: 600; 
+    }
+
+</style>
+</head>
+<body>
+  <table class="email-container" role="presentation">
+    <tr>
+      <td>
+        <div class="email-content">
+          <!-- Header -->
+          <div class="email-header">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
+          </div>
+
+          <h2 class="email-title">Cancel Order Request Received</h2>
+
+          <!-- Body -->
+          <div class="email-body">
+            <p>Hi <strong>${userName}</strong>,</p>
+            <p>We have successfully received your <b>order cancellation request</b>.</p>
+            <p>Your request is currently being reviewed and processed by our team.</p>
+
+            <div class="status-badge">
+              Order Status: ${orderStatus}
+            </div>
+
+            <div class="order-info">
+              <p><strong>Order ID:</strong> ${orderId}</p>
+              <p><strong>Product:</strong> ${productName}</p>
+            </div>
+
+            <p class="payment-method">Payment Method: <b>${paymentMethod}</b></p>
+            ${refundMessage}
+          </div>
+
+          <!-- Footer -->
+          <div class="email-footer">
+            <p>If you did not request this cancellation or have any concerns, please contact us immediately.</p>
+            <p>Email: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+            <p>Thank you for choosing GAMJ General Merchandise!</p>
+            <p style="margin-top: 15px;">
+                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
+
+export const customerPaypalEmailSubmittedTemplate = (userName, paymentMethod, orderId, productName) => {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayPal Email Received</title>
+<style>
+    body, table, td, a { 
+        margin: 0; 
+        padding: 0; 
+        font-family: Arial, sans-serif; 
+    }
+    img { 
+        border: 0; 
+        display: block; 
+        max-width: 100%; 
+    }
+    .email-container { 
+        width: 100%; 
+        background-color: #f4f6f9; 
+        padding: 20px 0; 
+    }
+    .email-content { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background-color: #ffffff; 
+        padding: 40px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    }
+    .email-header { 
+        text-align: center; 
+        margin-bottom: 30px; 
+    }
+    .email-header img { 
+        margin: 0 auto;
+        max-width: 120px;
+    }
+    .email-title {
+        text-align: center;
+    }
+    .email-body { 
+        text-align: center; 
+        font-size: 16px; 
+        line-height: 1.6; 
+        color: #333333; 
+    }
+    .status-badge { 
+        display: inline-block; 
+        padding: 10px 20px; 
+        background-color: #1976D2;
+        color: #ffffff; 
+        font-weight: bold; 
+        border-radius: 10px; 
+        margin: 20px 0; 
+    }
+    .payment-method, .order-info { 
+        font-size: 15px; 
+        margin-top: 10px; 
+        color: #555555; 
+    }
+    .order-info strong {
+        color: #333333;
+    }
+    .info-box {
+        background-color: #E3F2FD;
+        border-left: 4px solid #1976D2;
+        border-radius: 6px;
+        padding: 14px 18px;
+        margin: 20px 0;
+        text-align: left;
+        font-size: 14px;
+        color: #1a1a1a;
+    }
+    .email-footer { 
+        text-align: center; 
+        font-size: 12px; 
+        color: #777777; 
+        margin-top: 30px; 
+        border-top: 1px solid #e0e0e0; 
+        padding-top: 20px; 
+    }
+    .email-footer a { 
+        color: #43A047; 
+        text-decoration: none; 
+        font-weight: 600; 
+    }
+</style>
+</head>
+<body>
+  <table class="email-container" role="presentation">
+    <tr>
+      <td>
+        <div class="email-content">
+          <!-- Header -->
+          <div class="email-header">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
+          </div>
+
+          <h2 class="email-title">PayPal Email Received</h2>
+
+          <!-- Body -->
+          <div class="email-body">
+            <p>Hi <strong>${userName}</strong>,</p>
+            <p>We have successfully received your <b>PayPal email address</b> for your cancellation refund request.</p>
+
+            <div class="status-badge">
+              PayPal Email Submitted
+            </div>
+
+            <div class="order-info">
+              <p><strong>Order ID:</strong> ${orderId}</p>
+              <p><strong>Product:</strong> ${productName}</p>
+            </div>
+
+            <p class="payment-method">Payment Method: <b>${paymentMethod}</b></p>
+
+            <div class="info-box">
+              ℹ️ Our team will now process your refund. Please allow a few business days for the refund to reflect in your PayPal account. You will be notified once the refund has been sent.
+            </div>
+
+            <p>Thank you for your patience.</p>
+          </div>
+
+          <!-- Footer -->
+          <div class="email-footer">
+            <p>If you did not submit this request or have questions, contact us immediately.</p>
+            <p>Email: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+            <p>Thank you for choosing GAMJ General Merchandise!</p>
+            <p style="margin-top: 15px;">
+                © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
 
 export const customerCancelledOrderTemplate = (userName, orderStatus, paymentMethod, orderId, productName) => {
   const refundMessage =
     paymentMethod === "Paypal"
-      ? `<p>If you made a payment, please allow <b>3–5 business days</b> for the refund to be processed.</p>
+      ? `<p>If you made a payment, please wait for updates regarding your refund.</p>
          <p>We’re sorry to see you cancel, and we hope to serve you again soon.</p>`
       : `<p>Your order has been cancelled successfully. We hope to serve you again soon.</p>`;
 
@@ -647,11 +965,326 @@ export const customerCancelledOrderTemplate = (userName, orderStatus, paymentMet
 </html>`;
 };
 
+export const cancellationRequestRemovedTemplate = (userName, orderStatus, paymentMethod, orderId, productName) => {
+  const restoreMessage =
+    paymentMethod === "Paypal"
+      ? `<p>Your cancellation request has been removed successfully, and your order will continue to be processed as normal.</p>
+         <p>If any payment concerns arise, please contact our support team for assistance.</p>`
+      : `<p>Your cancellation request has been removed successfully.</p>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cancellation Request Removed</title>
+<style>
+    body, table, td, a { 
+        margin: 0; 
+        padding: 0; 
+        font-family: Arial, sans-serif; 
+    }
+
+    img { 
+        border: 0; 
+        display: block; 
+        max-width: 100%; 
+    }
+
+    .email-container { 
+        width: 100%; 
+        background-color: #f4f6f9; 
+        padding: 20px 0; 
+    }
+
+    .email-content { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background-color: #ffffff; 
+        padding: 40px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    }
+
+    .email-header { 
+        text-align: center; 
+        margin-bottom: 30px; 
+    }
+
+    .email-header img { 
+        margin: 0 auto;
+        max-width: 120px;
+    }
+
+    .email-title {
+        text-align: center;
+    }
+
+    .email-body { 
+        text-align: center; 
+        font-size: 16px; 
+        line-height: 1.6; 
+        color: #333333; 
+    }
+
+    .status-badge { 
+        display: inline-block; 
+        padding: 10px 20px; 
+        background-color: #FFA600;
+        color: #ffffff; 
+        font-weight: bold; 
+        border-radius: 10px; 
+        margin: 20px 0; 
+    }
+
+    .payment-method, .order-info { 
+        font-size: 15px; 
+        margin-top: 10px; 
+        color: #555555; 
+    }
+
+    .order-info strong {
+        color: #333333;
+    }
+
+    .email-footer { 
+        text-align: center; 
+        font-size: 12px; 
+        color: #777777; 
+        margin-top: 30px; 
+        border-top: 1px solid #e0e0e0; 
+        padding-top: 20px; 
+    }
+
+    .email-footer a { 
+        color: #1E88E5; 
+        text-decoration: none; 
+        font-weight: 600; 
+    }
+
+</style>
+</head>
+<body>
+  <table class="email-container" role="presentation">
+    <tr>
+      <td>
+        <div class="email-content">
+          <!-- Header -->
+          <div class="email-header">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
+          </div>
+
+          <h2 class="email-title">Cancellation Request Removed</h2>
+
+          <!-- Body -->
+          <div class="email-body">
+            <p>Hi <strong>${userName}</strong>,</p>
+
+            <p>Your request to cancel the order has been <b>removed successfully</b>.</p>
+
+            <div class="status-badge">
+              Order Status: ${orderStatus}
+            </div>
+
+            <div class="order-info">
+              <p><strong>Order ID:</strong> ${orderId}</p>
+              <p><strong>Product:</strong> ${productName}</p>
+            </div>
+
+            <p class="payment-method">
+              Payment Method: <b>${paymentMethod}</b>
+            </p>
+
+            ${restoreMessage}
+          </div>
+
+          <!-- Footer -->
+          <div class="email-footer">
+            <p>If you did not request this change or have any concerns, please contact us immediately.</p>
+
+            <p>
+              Email:
+              <a href="mailto:gamjmerchandisehelp@gmail.com">
+                gamjmerchandisehelp@gmail.com
+              </a>
+            </p>
+
+            <p>Thank you for choosing GAMJ General Merchandise!</p>
+
+            <p style="margin-top: 15px;">
+              © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
+
+export const adminCancellationRemovedTemplate = (userName, orderStatus, paymentMethod, orderId, productName) => {
+  const restoreMessage =
+    paymentMethod === "Paypal"
+      ? `<p>The admin has removed the cancellation for your order, and it will continue to be processed normally.</p>
+         <p>If you have any payment concerns, please contact our support team for assistance.</p>`
+      : `<p>The admin has removed the cancellation for your order successfully.</p>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Cancellation Removed</title>
+<style>
+    body, table, td, a { 
+        margin: 0; 
+        padding: 0; 
+        font-family: Arial, sans-serif; 
+    }
+
+    img { 
+        border: 0; 
+        display: block; 
+        max-width: 100%; 
+    }
+
+    .email-container { 
+        width: 100%; 
+        background-color: #f4f6f9; 
+        padding: 20px 0; 
+    }
+
+    .email-content { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background-color: #ffffff; 
+        padding: 40px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    }
+
+    .email-header { 
+        text-align: center; 
+        margin-bottom: 30px; 
+    }
+
+    .email-header img { 
+        margin: 0 auto;
+        max-width: 120px;
+    }
+
+    .email-title {
+        text-align: center;
+    }
+
+    .email-body { 
+        text-align: center; 
+        font-size: 16px; 
+        line-height: 1.6; 
+        color: #333333; 
+    }
+
+    .status-badge { 
+        display: inline-block; 
+        padding: 10px 20px; 
+        background-color: #FFA600;
+        color: #ffffff; 
+        font-weight: bold; 
+        border-radius: 10px; 
+        margin: 20px 0; 
+    }
+
+    .payment-method, .order-info { 
+        font-size: 15px; 
+        margin-top: 10px; 
+        color: #555555; 
+    }
+
+    .order-info strong {
+        color: #333333;
+    }
+
+    .email-footer { 
+        text-align: center; 
+        font-size: 12px; 
+        color: #777777; 
+        margin-top: 30px; 
+        border-top: 1px solid #e0e0e0; 
+        padding-top: 20px; 
+    }
+
+    .email-footer a { 
+        color: #1E88E5; 
+        text-decoration: none; 
+        font-weight: 600; 
+    }
+
+</style>
+</head>
+<body>
+  <table class="email-container" role="presentation">
+    <tr>
+      <td>
+        <div class="email-content">
+          <!-- Header -->
+          <div class="email-header">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
+          </div>
+
+          <h2 class="email-title">Admin Cancellation Removed</h2>
+
+          <!-- Body -->
+          <div class="email-body">
+            <p>Hi <strong>${userName}</strong>,</p>
+
+            <p>The admin has <b>removed the cancellation</b> for your order successfully.</p>
+
+            <div class="status-badge">
+              Order Status: ${orderStatus}
+            </div>
+
+            <div class="order-info">
+              <p><strong>Order ID:</strong> ${orderId}</p>
+              <p><strong>Product:</strong> ${productName}</p>
+            </div>
+
+            <p class="payment-method">
+              Payment Method: <b>${paymentMethod}</b>
+            </p>
+
+            ${restoreMessage}
+          </div>
+
+          <!-- Footer -->
+          <div class="email-footer">
+            <p>If you did not expect this change or have any concerns, please contact us immediately.</p>
+
+            <p>
+              Email:
+              <a href="mailto:gamjmerchandisehelp@gmail.com">
+                gamjmerchandisehelp@gmail.com
+              </a>
+            </p>
+
+            <p>Thank you for choosing GAMJ General Merchandise!</p>
+
+            <p style="margin-top: 15px;">
+              © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
 
 export const adminCancelledOrderTemplate = (userName, orderStatus, paymentMethod, cancelComments) => {
   // Determine refund or message logic based on payment method
   const paymentNote =
-    paymentMethod === "Paypal" && `<p>If payment has been made, please allow <b>3–5 business days</b> for the refund to reflect in your account.</p>`
+    paymentMethod === "Paypal" && `<p>If payment has been made, please wait for updates to reflect in your account.</p>`
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -705,6 +1338,164 @@ export const adminCancelledOrderTemplate = (userName, orderStatus, paymentMethod
             <p>Email: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
             <p style="margin-top: 15px;">
                 © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
+
+export const adminRefundSubmittedTemplate = (userName, orderStatus, paymentMethod, orderId, productName) => {
+  const refundMessage =
+    paymentMethod === "Paypal"
+      ? `<p>The admin has successfully submitted the refund for your canceled order.</p>
+         <p>If you have any questions regarding your refund, please contact us for assistance.</p>`
+      : `<p>The admin has successfully submitted the refund for your canceled order.</p>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refund Submitted</title>
+<style>
+    body, table, td, a { 
+        margin: 0; 
+        padding: 0; 
+        font-family: Arial, sans-serif; 
+    }
+
+    img { 
+        border: 0; 
+        display: block; 
+        max-width: 100%; 
+    }
+
+    .email-container { 
+        width: 100%; 
+        background-color: #f4f6f9; 
+        padding: 20px 0; 
+    }
+
+    .email-content { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background-color: #ffffff; 
+        padding: 40px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    }
+
+    .email-header { 
+        text-align: center; 
+        margin-bottom: 30px; 
+    }
+
+    .email-header img { 
+        margin: 0 auto;
+        max-width: 120px;
+    }
+
+    .email-title {
+        text-align: center;
+    }
+
+    .email-body { 
+        text-align: center; 
+        font-size: 16px; 
+        line-height: 1.6; 
+        color: #333333; 
+    }
+
+    .status-badge { 
+        display: inline-block; 
+        padding: 10px 20px; 
+        background-color: #28a745; /* Green for refund processed */
+        color: #ffffff; 
+        font-weight: bold; 
+        border-radius: 10px; 
+        margin: 20px 0; 
+    }
+
+    .payment-method, .order-info { 
+        font-size: 15px; 
+        margin-top: 10px; 
+        color: #555555; 
+    }
+
+    .order-info strong {
+        color: #333333;
+    }
+
+    .email-footer { 
+        text-align: center; 
+        font-size: 12px; 
+        color: #777777; 
+        margin-top: 30px; 
+        border-top: 1px solid #e0e0e0; 
+        padding-top: 20px; 
+    }
+
+    .email-footer a { 
+        color: #1E88E5; 
+        text-decoration: none; 
+        font-weight: 600; 
+    }
+
+</style>
+</head>
+<body>
+  <table class="email-container" role="presentation">
+    <tr>
+      <td>
+        <div class="email-content">
+          <!-- Header -->
+          <div class="email-header">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
+          </div>
+
+          <h2 class="email-title">Refund Submitted</h2>
+
+          <!-- Body -->
+          <div class="email-body">
+            <p>Hi <strong>${userName}</strong>,</p>
+
+            <p>The admin has <b>submitted your refund</b> for the canceled order successfully.</p>
+
+            <div class="status-badge">
+              Order Status: ${orderStatus}
+            </div>
+
+            <div class="order-info">
+              <p><strong>Order ID:</strong> ${orderId}</p>
+              <p><strong>Product:</strong> ${productName}</p>
+            </div>
+
+            <p class="payment-method">
+              Payment Method: <b>${paymentMethod}</b>
+            </p>
+
+            ${refundMessage}
+          </div>
+
+          <!-- Footer -->
+          <div class="email-footer">
+            <p>If you did not expect this change or have any concerns, please contact us immediately.</p>
+
+            <p>
+              Email:
+              <a href="mailto:gamjmerchandisehelp@gmail.com">
+                gamjmerchandisehelp@gmail.com
+              </a>
+            </p>
+
+            <p>Thank you for choosing GAMJ General Merchandise!</p>
+
+            <p style="margin-top: 15px;">
+              © ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.
             </p>
           </div>
         </div>
@@ -816,7 +1607,7 @@ export const refundOrderTemplate = (userName, orderStatus, refundMethod, orderId
             ${
               refundMethod.includes("No Refund Needed")
                 ? ""
-                : `<p>If applicable, please allow <strong>3–5 business days</strong> for your request to be processed.</p>`
+                : `<p>If applicable, please wait for updates regarding your request.</p>`
             }
           </div>
           <div class="email-footer">
@@ -1187,7 +1978,6 @@ export const resetPasswordEmailTemplate = (userName, verificationCode) => {
 </html>`
 }
 
-
 export const userAccountApprovalTemplate = (userName) => {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -1326,7 +2116,6 @@ export const userAccountApprovalTemplate = (userName) => {
 </html>`;
 };
 
-
 export const userAccountRejectedTemplate = (userName, rejectTitle, rejectMessage) => {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -1462,7 +2251,6 @@ export const userAccountRejectedTemplate = (userName, rejectTitle, rejectMessage
 </body>
 </html>`;
 };
-
 
 export const userAccountCreatedTemplate = (userName) => {
     return `<!DOCTYPE html>
