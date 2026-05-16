@@ -269,6 +269,21 @@
   color: #C62828;
 }
 
+.it-type-return {
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  color: #1565C0;
+}
+
+.it-type-damaged {
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+  color: #EF6C00;
+}
+
+.it-type-adjust {
+  background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+  color: #7B1FA2;
+}
+
 .it-quantity {
   font-weight: 700;
   font-size: 16px;

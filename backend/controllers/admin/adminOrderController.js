@@ -1,4 +1,4 @@
-import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService } from "../../services/admin/adminOrderService.js";
+import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService, adminRemoveCancellationService } from "../../services/admin/adminOrderService.js";
 
 export const fetchOrders = async (req, res) => {
     try {
@@ -37,6 +37,18 @@ export const fetchOrderReturnAndRefund = async (req, res) => {
     try {
         const { ID } = req.admin;
         const result = await fetchOrderReturnAndRefundService(ID);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message:error.message})
+    }
+}
+
+export const adminRemoveCancellation = async (req, res) => {
+    try {
+        const { customerID, orderItemID, orderCancelID } = req.body;
+        const { ID } = req.admin;
+        const result = await adminRemoveCancellationService(ID, customerID, orderItemID, orderCancelID);
         res.json(result);
     } catch (error) {
         console.log(error);

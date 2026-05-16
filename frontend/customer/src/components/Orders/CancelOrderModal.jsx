@@ -6,7 +6,7 @@ import './CancelOrderModal.css'
 import Loading from '../Loading';
 
 const CancelOrderModal = () => {
-    const { orderItemId, products, fetchOrderItems, paymentUsed, setCancelOrder, currency, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancellationStatus, setCancellationStatus, cancelledBy, addCancelOrder, fetchCancelledOrders, cancelOrderRequest, markRefundReceived} = useContext(ShopContext);
+    const { orderItemId, products, fetchOrderItems, paymentUsed, setCancelOrder, currency, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancellationStatus, setCancellationStatus, cancelledBy, addCancelOrder, fetchCancelledOrders, cancelOrderRequest, markRefundReceived, hasPaymentProof, markCanceledOrderComplete, toastError } = useContext(ShopContext);
 
     const [existingCancel, setExistingCancel] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -39,18 +39,24 @@ const CancelOrderModal = () => {
 
     if (!cancelItem || !relatedProduct) return null;
 
+    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
     const handleSubmitCancelOrder = async (e) => {
         e.preventDefault();
 
         let statusToUse = cancellationStatus;
 
-        if (!reasonForCancellation) {
+        if (!reasonForCancellation && cancelledBy !== 'Admin') {
             toast.error("Reason for cancellation is required", {...toastError});
             return;
         }
 
         if (paymentUsed === 'Paypal' && !cancelPaypalEmail) {
             toast.error("PayPal email address is required", {...toastError});
+            return;
+        }
+
+        if (paymentUsed === 'Paypal' && cancelPaypalEmail && !isValidEmail(cancelPaypalEmail)) {
+            toast.error("Please enter a valid PayPal email address", {...toastError});
             return;
         }
 
@@ -63,16 +69,22 @@ const CancelOrderModal = () => {
         }
         setCancellationStatus(statusToUse);
         setLoading(true); 
-        await addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, statusToUse, cancelledBy);
+        const success = await addCancelOrder(orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, statusToUse, cancelledBy);
         setLoading(false); 
         handleCloseButton();
+
+        if (success) {
+            setTimeout(() => window.location.reload(), 500);
+        }
     }
 
     // 🔹 Cancel Request (remove existing cancel)
     const handleCancelRequest = async () => {
         if (!existingCancel) return;
         const { ID, orderItemId } = existingCancel;
-        cancelOrderRequest(orderItemId, ID);
+        setLoading(true);
+        await cancelOrderRequest(orderItemId, ID);
+        setLoading(false);
         setExistingCancel(null);
         setCancelOrder(false);
         setReasonForCancellation('');
@@ -80,11 +92,28 @@ const CancelOrderModal = () => {
         setCancelPaypalEmail('');
     };
 
+    // 🔹 Mark as Completed (Admin cancelled + Cash On Delivery)
+    const handleMarkAsCompleted = async () => {
+        if (!existingCancel) return;
+        const { ID } = existingCancel;
+        setLoading(true);
+        const success = await markCanceledOrderComplete(ID);
+        setLoading(false);
+        setExistingCancel(null);
+        setCancelOrder(false);
+
+        if (success) {
+            setTimeout(() => window.location.reload(), 500);
+        }
+    };
+
     // 🔹 Mark refund as received
     const handleReceivedRefund = async () => {
         if (!existingCancel) return;
         const { ID } = existingCancel;
-        markRefundReceived(ID);
+        setLoading(true);
+        await markRefundReceived(ID);
+        setLoading(false);
         setExistingCancel(null);
         setCancelOrder(false);
         setReasonForCancellation('');
@@ -95,13 +124,17 @@ const CancelOrderModal = () => {
     // ✅ Disable inputs when existingCancel exists
     const isDisabled = Boolean(existingCancel);
 
+    const isAdminCancelled = existingCancel?.cancelledBy === 'Admin';
+
     return (
         <div className='cancel-order-bg'>
             {loading && <Loading />}
             <form onSubmit={handleSubmitCancelOrder}  className='cancel-modal-card'>
                 <IoCloseOutline className="close-cancel-btn" onClick={handleCloseButton}/>
                 <div className='cancel-content-ctn'>
-                <p className='cancel-title'>Order Cancellation Request</p>
+                <p className='cancel-title'>
+                    {isAdminCancelled ? 'Order Cancellation' : 'Order Cancellation Request'}
+                </p>
                 {/* FIRST CONTENT */}
                 <div className='cancel-order-item'>
                     <div className='cancel-item-details'>
@@ -131,44 +164,98 @@ const CancelOrderModal = () => {
                     </div>
                 </div>
                 {/* SECOND CONTENT */}
-                <div className={`cancel-form ${isDisabled ? 'disabled-cancel-section': ''}`}>
-                    <label>1. Select a Reason for Cancellation</label>
-                    <select value={reasonForCancellation} onChange={(e) => setReasonForCancellation(e.target.value)} className='cancel-input'>
-                    <option value="" disabled hidden>Select Reason</option>
-                    <option value="Change of mind">Change of mind</option>
-                    <option value="Ordered by mistake">Ordered by mistake</option>
-                    <option value="Found a better price">Found a better price</option>
-                    <option value="Other">Other</option>
-                    </select>
-                    <textarea value={cancelComments} onChange={(e) => setCancelComments(e.target.value)} className='cancel-textarea' placeholder="Additional Comments (optional)"/>
-
-                    <div className='paypal-form'>
-                    {paymentUsed === "Paypal" && (
+                <div className={`cancel-form ${isDisabled && !isAdminCancelled ? 'disabled-cancel-section': ''}`}>
+                    
+                    {/* Hide reason select when cancelled by Admin */}
+                    {!isAdminCancelled && (
                         <>
-                        <label>2. Give your PayPal email address for a refund</label>
-                        <input type="text" value={cancelPaypalEmail} onChange={(e) => setCancelPaypalEmail(e.target.value)} className='cancel-input' placeholder="Enter your PayPal account email address."/>
+                            <label>1. Select a Reason for Cancellation</label>
+                            <select value={reasonForCancellation} onChange={(e) => setReasonForCancellation(e.target.value)} className='cancel-input'>
+                                <option value="" disabled hidden>Select Reason</option>
+                                <option value="Change of mind">Change of mind</option>
+                                <option value="Ordered by mistake">Ordered by mistake</option>
+                                <option value="Found a better price">Found a better price</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </>
                     )}
-                    </div>
+
+                    {/* Always show comments textarea but disabled when Admin cancelled */}
+                    {isAdminCancelled && (
+                        <label className='cr-text'>Cancellation Reason</label>
+                    )}
+                    <textarea
+                        value={cancelComments}
+                        onChange={(e) => setCancelComments(e.target.value)}
+                        className='cancel-textarea'
+                        placeholder="Additional Comments (optional)"
+                        disabled={isAdminCancelled}
+                    />
+
+                    {hasPaymentProof && paymentUsed === "Paypal" && (
+                        <div className='paypal-form'>
+                            {isAdminCancelled && (
+                                <div className='paypal-refund-info'>
+                                    <h3>Refund Process</h3>
+                                    <label>Give your PayPal email address for a refund</label>
+                                </div>
+                            )}
+                            {!isAdminCancelled && <label>2. Give your PayPal email address for a refund</label>}
+                            <input
+                                type="text"
+                                value={cancelPaypalEmail}
+                                onChange={(e) => setCancelPaypalEmail(e.target.value)}
+                                className='cancel-input'
+                                placeholder="Enter your PayPal account email address."
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* BUTTON */}
                 {!existingCancel ? (
                     <button
-                    className='cancel-submit-btn'
-                    type='submit'
-                    disabled={!reasonForCancellation || (paymentUsed === 'Paypal' && !cancelPaypalEmail)}
+                        className='cancel-submit-btn'
+                        type='submit'
+                        disabled={!reasonForCancellation || (paymentUsed === 'Paypal' && !cancelPaypalEmail)}
                     >
-                    Submit
+                        Submit
                     </button>
+                ) : isAdminCancelled ? (
+                    // Admin cancelled — Cash On Delivery: show Mark as Completed
+                    paymentUsed === "Cash On Delivery" ? (
+                        <button
+                            type="button"
+                            className="cancel-submit-btn"
+                            onClick={handleMarkAsCompleted}
+                        >
+                            Mark as Completed
+                        </button>
+                    // Admin cancelled — Paypal with proof: show Submit for PayPal email
+                    ) : hasPaymentProof && paymentUsed === "Paypal" ? (
+                        <>
+                          <button
+                              className='cancel-submit-btn'
+                              type='submit'
+                              disabled={!cancelPaypalEmail}
+                          >
+                              {existingCancel?.cancelPaypalEmail ? 'Save Change' : 'Submit'}
+                          </button>
+                          {existingCancel?.cancelPaypalEmail && (
+                              <p className='refund-waiting-note'>
+                                  ⏳ Kindly wait while we process your refund.
+                              </p>
+                          )}
+                        </>
+                    ) : null // No button if Paypal but no proof yet
                 ) : (
                     <div className="existing-cancel-btns">
-                    <button type="button" className="cancel-request-btn" onClick={handleCancelRequest}>
-                        Cancel Request
-                    </button>
-                    <button type="button" className="refund-received-btn" onClick={handleReceivedRefund}>
-                        I’ve already received my refund
-                    </button>
+                        <button type="button" className="cancel-request-btn" onClick={handleCancelRequest}>
+                            Cancel Request
+                        </button>
+                        {/* <button type="button" className="refund-received-btn" onClick={handleReceivedRefund}>
+                            I've already received my refund
+                        </button> */}
                     </div>
                 )}
                 </div>

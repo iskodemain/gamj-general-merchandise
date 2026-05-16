@@ -20,7 +20,7 @@ import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 import { orderSendMail } from "../utils/mailer.js";
 import ProductInventorySettings from "../models/productInventorySettings.js";
-import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate } from "../utils/emailTemplates.js";
+import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate, cancellationRequestRemovedTemplate, newCancelOrderRequestTemplate, customerPaypalEmailSubmittedTemplate } from "../utils/emailTemplates.js";
 import OrderDeliveryProof from "../models/orderDeliveryProof.js";
 
 // 🔹 ID GENERATOR
@@ -347,12 +347,22 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       io.emit("cartUpdated", { customerId, deletedIds: cartItemsToDelete });
     }
 
+    const fullOrderItemsForEmail = await OrderItems.findAll({ where: { orderId: fullOrder.ID } });
+    const listOfProducts = (await Promise.all(
+        fullOrderItemsForEmail.map(async (oi) => {
+            const prod = await Products.findByPk(oi.productId);
+            const productName = prod ? prod.productName : 'Unknown Product';
+            const variant = oi.value ? ` (${oi.value})` : '';
+            return `<li>${productName}${variant} — Qty: ${oi.quantity} | ₱${Number(oi.subTotal).toFixed(2)}</li>`;
+        })
+    )).join('');
+
     // Send email
     orderSendMail({
-        to: user.loginEmail ? user.loginEmail : user.emailAddress,
-        subject: 'Your order has been placed.',
-        html: placeOrderTemplate(user.medicalInstitutionName, 'Pending', fullOrder.paymentMethod, fullOrder.orderId),
-    });
+      to: user.loginEmail ? user.loginEmail : user.emailAddress,
+      subject: 'Your order has been placed.',
+      html: placeOrderTemplate(user.medicalInstitutionName, 'Pending', fullOrder.paymentMethod, fullOrder.orderId, listOfProducts, subtotal, shippingFee, totalAmount),
+  });
 
     return {
       success: true,
@@ -364,7 +374,6 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
     throw error;
   }
 };
-
 
 export const fetchOrdersService = async (customerId) => {
     try {
@@ -630,7 +639,6 @@ export const addOrderPaymentProofService = async (customerId, orderId, reference
     }
 }
 
-
 export const cancelOrderService = async (customerId, orderItemId, reasonForCancellation, cancelComments, cancelPaypalEmail, cancellationStatus, cancelledBy) => {
     try {
       const user = await Customer.findByPk(customerId);
@@ -658,6 +666,91 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         };
       }
 
+      // Admin + PayPal email already provided = update only cancelPaypalEmail, skip everything else
+      if (cancelledBy === 'Admin' && cancelPaypalEmail) {
+        const existingCancel = await OrderCancel.findOne({ where: { orderItemId, customerId } });
+        if (existingCancel) {
+          await existingCancel.update({ cancelPaypalEmail });
+
+          const fullOrder = await Orders.findByPk(orderItem.orderId);
+          const userName = user.medicalInstitutionName;
+
+          // 🔔 NOTIFICATIONS
+          const lastNotification = await Notifications.findOne({ order: [["ID", "DESC"]] });
+          let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+
+          const customerNotification = await Notifications.create({
+            notificationId: withTimestamp("NTFY", nextNotificationNo++),
+            senderId: customerId,
+            receiverId: customerId,
+            receiverType: "Customer",
+            senderType: "System",
+            notificationType: "Order Cancellation",
+            title: "PayPal Email Submitted",
+            message: `You have successfully submitted your PayPal email for the cancellation refund of "${product.productName}" (Order #${fullOrder.orderId}). Our team will process your refund shortly.`,
+            isRead: false,
+            createAt: new Date(),
+          });
+
+          const adminNotification = await Notifications.create({
+            notificationId: withTimestamp("NTFY", nextNotificationNo++),
+            senderId: customerId,
+            receiverId: null,
+            receiverType: "Admin",
+            senderType: "System",
+            notificationType: "Order Cancellation",
+            title: `${userName} - PayPal Email Submitted`,
+            message: `${userName} has submitted their PayPal email for the cancellation refund of "${product.productName}" (Order #${fullOrder.orderId}).`,
+            isRead: false,
+            createAt: new Date(),
+          });
+
+          const staffNotification = await Notifications.create({
+            notificationId: withTimestamp("NTFY", nextNotificationNo++),
+            senderId: customerId,
+            receiverId: null,
+            receiverType: "Staff",
+            senderType: "System",
+            notificationType: "Order Cancellation",
+            title: `${userName} - PayPal Email Submitted`,
+            message: `${userName} has submitted their PayPal email for the cancellation refund of "${product.productName}" (Order #${fullOrder.orderId}).`,
+            isRead: false,
+            createAt: new Date(),
+          });
+
+          io.emit("addCancelOrder", {
+            orderCancelId: existingCancel.ID,
+            orderItemId: existingCancel.orderItemId,
+            customerId: existingCancel.customerId,
+            reasonForCancellation: existingCancel.reasonForCancellation,
+            cancelComments: existingCancel.cancelComments,
+            cancelPaypalEmail: existingCancel.cancelPaypalEmail,
+            cancellationStatus: existingCancel.cancellationStatus,
+            cancelledBy: existingCancel.cancelledBy,
+            newStatus: "Cancelled",
+          });
+
+          io.emit("newNotification_Customer", customerNotification);
+          io.emit("newNotification_Admin", adminNotification);
+          io.emit("newNotification_Staff", staffNotification);
+
+          orderSendMail({
+            to: user.loginEmail ? user.loginEmail : user.emailAddress,
+            subject: 'Your PayPal email has been received for your cancellation refund.',
+            html: customerPaypalEmailSubmittedTemplate(
+              user.medicalInstitutionName,
+              fullOrder.paymentMethod,
+              fullOrder.orderId,
+              product.productName
+            )
+          });
+
+          return {
+            success: true,
+            message: "PayPal email updated successfully.",
+          };
+        }
+      }
 
       // --- Important variables ---
       const quantityToRestore = Number(orderItem.quantity || 0);
@@ -736,7 +829,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         productId: orderItem.productId,
         variantValueId: orderItem.productVariantValueId || null,
         variantCombinationId: orderItem.productVariantCombinationId || null,
-        type: "IN",
+        type: "RETURN",
         quantity: quantityToRestore,
         stockAfter: newTotalQuantity,
         referenceId: `CANCEL-${orderItem.orderId}`,
@@ -753,18 +846,55 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
       const cancelId = withTimestamp("OCAN", nextCancelOrderNo);
 
       const cancelRecord = await OrderCancel.create({
-        cancelId,
-        orderItemId,
-        customerId,
-        reasonForCancellation,
-        cancelComments: cancelComments || null,
-        cancelPaypalEmail: cancelPaypalEmail || null,
-        cancellationStatus,
-        cancelledBy,
+          cancelId,
+          orderItemId,
+          customerId,
+          reasonForCancellation: reasonForCancellation || null,
+          cancelComments: cancelComments || null,
+          cancelPaypalEmail: cancelPaypalEmail || null,
+          cancellationStatus,
+          cancelledBy,
       });
 
       // Fetch the complete order record to include auto-generated orderId
       const fullOrder = await Orders.findByPk(orderItem.orderId);
+
+      /* ================================
+        4️⃣ DEDUCT CANCELLED ITEM PRICE FROM ORDER TOTAL
+           (only when cancellationStatus === 'Completed')
+      ================================= */
+      if (cancellationStatus === 'Completed') {
+        let itemUnitPrice = 0;
+
+        if (orderItem.productVariantCombinationId) {
+          // Priority 1: Variant Combination price
+          const variantCombination = await ProductVariantCombination.findByPk(
+            orderItem.productVariantCombinationId
+          );
+          itemUnitPrice = Number(variantCombination?.price || 0);
+
+        } else if (orderItem.productVariantValueId) {
+          // Priority 2: Variant Value price
+          const variantValue = await ProductVariantValues.findByPk(
+            orderItem.productVariantValueId
+          );
+          itemUnitPrice = Number(variantValue?.price || 0);
+
+        } else {
+          // Priority 3: Base product price
+          itemUnitPrice = Number(product?.price || 0);
+        }
+
+        const deductAmount = itemUnitPrice * Number(orderItem.quantity || 1);
+        const newTotalAmount = Math.max(0, Number(fullOrder.totalAmount || 0) - deductAmount);
+        const newSubtotal = Math.max(0, Number(fullOrder.subtotal || 0) - deductAmount);
+
+        await fullOrder.update({
+          totalAmount: newTotalAmount,
+          subtotal: newSubtotal,
+          updatedAt: new Date(),
+        });
+      }
 
       // 🔹 AUTO-GENERATE TRANSACTION ID & CREATE ORDER TRANSACTION
       const lastTransaction = await OrderTransaction.findOne({order: [['ID', 'DESC']]});
@@ -776,7 +906,7 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         orderId: fullOrder.ID,
         orderItemId: orderItem.ID,
         customerId,
-        transactionType: 'Order Cancelled',
+        transactionType: fullOrder.paymentMethod === 'Cash On Delivery' ? 'Order Cancelled' : 'Order Cancellation Request',
         totalAmount: orderItem.subTotal,
         paymentMethod: fullOrder.paymentMethod,
         transactionDate: new Date(),
@@ -812,7 +942,9 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         senderType: "System",
         notificationType: "Order Cancellation",
         title: "Order Cancellation",
-        message: `You cancelled your ${product.productName} order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
+        message: cancelledBy === 'Admin' && fullOrder.paymentMethod === 'Paypal'
+        ? `You have successfully submitted your PayPal email address for the cancellation refund of "${product.productName}" (Order #${fullOrder.orderId}). Our team will process your refund shortly.`
+        : `You cancelled your ${product.productName} order #${fullOrder.orderId} with ${fullOrder.paymentMethod}.`,
         isRead: false,
         createAt: new Date()
       });
@@ -826,7 +958,9 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         senderType: "System",
         notificationType: "Order Cancellation",
         title: `${userName} - Order Cancelled`,
-        message: `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
+        message: cancelledBy === 'Admin' && fullOrder.paymentMethod === 'Paypal'
+        ? `${userName} has submitted their PayPal email for the cancellation refund of order #${fullOrder.orderId}.`
+        : `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
         isRead: false,
         createAt: new Date()
       });
@@ -841,7 +975,9 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
         senderType: "System",
         notificationType: "Order Cancellation",
         title: `${userName} - Order Cancelled`,
-        message: `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
+        message: cancelledBy === 'Admin' && fullOrder.paymentMethod === 'Paypal'
+        ? `${userName} has submitted their PayPal email for the cancellation refund of order #${fullOrder.orderId}.`
+        : `${userName} cancelled order #${fullOrder.orderId} (${fullOrder.paymentMethod}).`,
         isRead: false,
         createAt: new Date(),
       });
@@ -865,11 +1001,19 @@ export const cancelOrderService = async (customerId, orderItemId, reasonForCance
       io.emit("stockRestoration", stockRestoration);
 
       // Send email
-      orderSendMail({
+      if (cancelledBy === 'Admin' && fullOrder.paymentMethod === 'Paypal') {
+        orderSendMail({
+            to: user.loginEmail ? user.loginEmail : user.emailAddress,
+            subject: 'Your PayPal email has been received for your cancellation refund.',
+            html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'PayPal Email Submitted', fullOrder.paymentMethod, fullOrder.orderId, product.productName)
+        });
+      } else {
+        orderSendMail({
           to: user.loginEmail ? user.loginEmail : user.emailAddress,
           subject: 'Your order cancellation has been processed.',
-          html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'Cancelled', fullOrder.paymentMethod, fullOrder.orderId, product.productName)
-      });
+          html: newCancelOrderRequestTemplate(user.medicalInstitutionName, 'Cancelled', fullOrder.paymentMethod, fullOrder.orderId, product.productName)
+        });
+      }
 
       return {
           success: true,
@@ -971,41 +1115,164 @@ export const cancelOrderRequestService = async (customerId, orderItemId, orderCa
     // 1️⃣ Validate customer
     const user = await Customer.findByPk(customerId);
     if (!user) {
-      return {
-        success: false,
-        message: "User not found",
-      };
+      return { success: false, message: "User not found" };
     }
 
+    // 2️⃣ Validate order item
     const orderItem = await OrderItems.findByPk(orderItemId);
     if (!orderItem) {
-      return {
-        success: false,
-        message: "Order item not found for this customer.",
-      };
+      return { success: false, message: "Order item not found for this customer." };
     }
 
+    // 3️⃣ Validate cancel request
     const cancelRequest = await OrderCancel.findOne({
       where: { ID: orderCancelId, orderItemId, customerId },
     });
     if (!cancelRequest) {
-      return {
-        success: false,
-        message: "Cancel request not found for this customer.",
-      };
+      return { success: false, message: "Cancel request not found for this customer." };
     }
 
-    // 4️⃣ Delete the cancel request
+    // 4️⃣ Fetch product
+    const product = await Products.findByPk(orderItem.productId);
+    if (!product) {
+      return { success: false, message: "Product not found." };
+    }
+
+    const quantityToDeduct = Number(orderItem.quantity || 0);
+
+    // 5️⃣ Deduct InventoryStock
+    const inventoryStock = await InventoryStock.findOne({
+      where: {
+        productId: orderItem.productId,
+        variantValueId: orderItem.productVariantValueId || null,
+        variantCombinationId: orderItem.productVariantCombinationId || null,
+      },
+    });
+    if (!inventoryStock) {
+      return { success: false, message: "Inventory stock record not found" };
+    }
+
+    const newTotalQuantity = Math.max(0, Number(inventoryStock.totalQuantity || 0) - quantityToDeduct);
+    await inventoryStock.update({ totalQuantity: newTotalQuantity, updatedAt: new Date() });
+
+    // 6️⃣ Deduct InventoryBatch (FIFO)
+    const deductBatch = await InventoryBatch.findOne({
+      where: {
+        productId: orderItem.productId,
+        variantValueId: orderItem.productVariantValueId || null,
+        variantCombinationId: orderItem.productVariantCombinationId || null,
+      },
+      order: [["expirationDate", "ASC"], ["dateReceived", "ASC"]],
+    });
+    if (deductBatch) {
+      const newRemaining = Math.max(0, Number(deductBatch.remainingQuantity || 0) - quantityToDeduct);
+      await deductBatch.update({ remainingQuantity: newRemaining });
+    } else {
+      return { success: false, message: "No inventory batch found for deduction" };
+    }
+
+    // 7️⃣ InventoryHistory (OUT)
+    const lastInventoryHistory = await InventoryHistory.findOne({ order: [["ID", "DESC"]] });
+    const nextInventoryHistoryNo = lastInventoryHistory ? Number(lastInventoryHistory.ID) + 1 : 1;
+
+    await InventoryHistory.create({
+      inventoryHistoryId: withTimestamp("IHST", nextInventoryHistoryNo),
+      productId: orderItem.productId,
+      variantValueId: orderItem.productVariantValueId || null,
+      variantCombinationId: orderItem.productVariantCombinationId || null,
+      type: "OUT",
+      adjustType: null,
+      quantity: quantityToDeduct,
+      stockAfter: newTotalQuantity,
+      referenceId: `CANCEL-REQUEST-REMOVED-${orderItem.orderId}`,
+      remarks: `Order cancellation request removed by customer ${user.medicalInstitutionName} - STOCK DEDUCTED AGAIN`,
+      createdAt: new Date(),
+    });
+
+    // 8️⃣ Delete the cancel request
     await cancelRequest.destroy();
 
-    // 5️⃣ Reset the order item status if needed
+    // 9️⃣ Reset order item status
     await orderItem.update({ orderStatus: 'Pending' });
 
-    io.emit("orderCancelledUpdate", {orderCancelId, orderItemId, customerId, newStatus: "Pending"});
+    const fullOrder = await Orders.findByPk(orderItem.orderId);
+    
+    // 🔹 AUTO-GENERATE TRANSACTION ID & CREATE ORDER TRANSACTION
+    const lastTransaction = await OrderTransaction.findOne({order: [['ID', 'DESC']]});
+    const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
+    const transactionId = withTimestamp('TRXN', nextTransactionNo);
+
+    await OrderTransaction.create({
+      transactionId,
+      orderId: fullOrder.ID,
+      orderItemId: orderItem.ID,
+      customerId,
+      transactionType: 'Order Cancellation Request Cancelled',
+      totalAmount: orderItem.subTotal,
+      paymentMethod: fullOrder.paymentMethod,
+      transactionDate: new Date(),
+    });
+
+    // 🔔 Notifications
+    const lastNotification = await Notifications.findOne({ order: [["ID", "DESC"]] });
+    let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+    const userName = user.medicalInstitutionName;
+
+    const customerNotification = await Notifications.create({
+      notificationId: withTimestamp("NTFY", nextNotificationNo++),
+      senderId: customerId,
+      receiverId: customerId,
+      receiverType: "Customer",
+      senderType: "System",
+      notificationType: "Order Cancellation",
+      title: "Cancellation Request Removed",
+      message: `You have successfully removed your cancellation request for "${product.productName}" (Order #${fullOrder.orderId}). ${quantityToDeduct} stock has been deducted again.`,
+      isRead: false,
+      createAt: new Date(),
+    });
+
+    const adminNotification = await Notifications.create({
+      notificationId: withTimestamp("NTFY", nextNotificationNo++),
+      senderId: customerId,
+      receiverId: null,
+      receiverType: "Admin",
+      senderType: "System",
+      notificationType: "Order Cancellation",
+      title: `${userName} - Cancellation Request Removed`,
+      message: `${userName} removed their cancellation request for "${product.productName}" (Order #${fullOrder.orderId}). ${quantityToDeduct} stock has been deducted again.`,
+      isRead: false,
+      createAt: new Date(),
+    });
+
+    const staffNotification = await Notifications.create({
+      notificationId: withTimestamp("NTFY", nextNotificationNo++),
+      senderId: customerId,
+      receiverId: null,
+      receiverType: "Staff",
+      senderType: "System",
+      notificationType: "Order Cancellation",
+      title: `${userName} - Cancellation Request Removed`,
+      message: `${userName} removed their cancellation request for "${product.productName}" (Order #${fullOrder.orderId}). ${quantityToDeduct} stock has been deducted again.`,
+      isRead: false,
+      createAt: new Date(),
+    });
+
+    // 📡 Socket emissions
+    io.emit("orderCancelledUpdate", { orderCancelId, orderItemId, customerId, newStatus: "Pending" });
+    io.emit("newNotification_Customer", customerNotification);
+    io.emit("newNotification_Admin", adminNotification);
+    io.emit("newNotification_Staff", staffNotification);
+
+    // Send email
+    orderSendMail({
+        to: user.loginEmail ? user.loginEmail : user.emailAddress,
+        subject: 'Your order cancellation has been removed.',
+        html: cancellationRequestRemovedTemplate(user.medicalInstitutionName, 'Pending', fullOrder.paymentMethod, fullOrder.orderId, product.productName)
+    });
 
     return {
       success: true,
-      message: "Cancellation request removed successfully.",
+      message: "Cancellation request removed successfully. Stock has been deducted again.",
     };
   } catch (error) {
     console.error(error);
@@ -1013,6 +1280,165 @@ export const cancelOrderRequestService = async (customerId, orderItemId, orderCa
   }
 };
 
+
+export const markCanceledOrderCompleteService = async (customerId, orderCancelId) => {
+  try {
+    // 1️⃣ Validate customer
+    const user = await Customer.findByPk(customerId);
+    if (!user) {
+      return {
+        success: false,
+        message: "Customer not found.",
+      };
+    }
+
+    // ORDER CANCEL ID
+    if (orderCancelId) {
+      const orderCancel = await OrderCancel.findOne({
+        where: { ID: orderCancelId, customerId },
+      });
+
+      if (!orderCancel) {
+        return {
+          success: false,
+          message: "No cancellation record found for this customer.",
+        };
+      }
+
+      await orderCancel.update({ cancellationStatus: "Completed" });
+
+      const orderItem = await OrderItems.findByPk(orderCancel.orderItemId);
+      if (!orderItem) {
+        return { success: false, message: "Order item not found." };
+      }
+
+      const product = await Products.findByPk(orderItem.productId);
+      if (!product) {
+        return { success: false, message: "Product not found." };
+      }
+
+      // Fetch the complete order record to include auto-generated orderId
+      const fullOrder = await Orders.findByPk(orderItem.orderId);
+
+      /*================================
+        DEDUCT CANCELLED ITEM PRICE FROM ORDER TOTAL
+      ================================= */
+      let itemUnitPrice = 0;
+
+      if (orderItem.productVariantCombinationId) {
+        // Priority 1: Variant Combination price
+        const variantCombination = await ProductVariantCombination.findByPk(
+          orderItem.productVariantCombinationId
+        );
+        itemUnitPrice = Number(variantCombination?.price || 0);
+
+      } else if (orderItem.productVariantValueId) {
+        // Priority 2: Variant Value price
+        const variantValue = await ProductVariantValues.findByPk(
+          orderItem.productVariantValueId
+        );
+        itemUnitPrice = Number(variantValue?.price || 0);
+
+      } else {
+        // Priority 3: Base product price
+        itemUnitPrice = Number(product?.price || 0);
+      }
+
+      const deductAmount = itemUnitPrice * Number(orderItem.quantity || 1);
+      const newTotalAmount = Math.max(0, Number(fullOrder.totalAmount || 0) - deductAmount);
+      const newSubtotal = Math.max(0, Number(fullOrder.subtotal || 0) - deductAmount);
+
+      await fullOrder.update({
+        totalAmount: newTotalAmount,
+        subtotal: newSubtotal,
+        updatedAt: new Date(),
+      });
+
+      // 🔹 AUTO-GENERATE TRANSACTION ID & CREATE ORDER TRANSACTION
+      const lastTransaction = await OrderTransaction.findOne({order: [['ID', 'DESC']]});
+      const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
+      const transactionId = withTimestamp('TRXN', nextTransactionNo);
+
+      await OrderTransaction.create({
+        transactionId,
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId,
+        transactionType: 'Order Cancelled',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      // 🔔 Notifications
+      const lastNotification = await Notifications.findOne({ order: [["ID", "DESC"]] });
+      let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+      const userName = user.medicalInstitutionName;
+
+      const customerNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: customerId,
+        receiverType: "Customer",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: "Order Cancellation Completed",
+        message: `Your cancellation for "${product.productName}" (Order #${fullOrder.orderId}) has been marked as completed.`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      const adminNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Admin",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: `${userName} - Cancellation Completed`,
+        message: `${userName} has marked their cancellation for "${product.productName}" (Order #${fullOrder.orderId}) as completed.`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      const staffNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Staff",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: `${userName} - Cancellation Completed`,
+        message: `${userName} has marked their cancellation for "${product.productName}" (Order #${fullOrder.orderId}) as completed.`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      io.emit("refundMarkedAsCompleted", {
+        orderCancelId,
+        cancellationStatus: "Completed",
+      });
+      io.emit("newNotification_Customer", customerNotification);
+      io.emit("newNotification_Admin", adminNotification);
+      io.emit("newNotification_Staff", staffNotification);
+
+      orderSendMail({
+        to: user.loginEmail ? user.loginEmail : user.emailAddress,
+        subject: 'Your order cancellation has been marked as completed.',
+        html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'Completed', fullOrder.paymentMethod, fullOrder.orderId, product.productName)
+      });
+
+      return {
+        success: true,
+        message: "Mark as completed successfully.",
+      };
+    }
+    
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
 export const markRefundReceivedService = async (customerId, orderCancelId, orderRefundId) => {
   try {
@@ -1046,9 +1472,124 @@ export const markRefundReceivedService = async (customerId, orderCancelId, order
         },
       });
 
+      const orderItem = await OrderItems.findByPk(orderCancel.orderItemId);
+      if (!orderItem) {
+        return { success: false, message: "Order item not found." };
+      }
+
+      const product = await Products.findByPk(orderItem.productId);
+      if (!product) {
+        return { success: false, message: "Product not found." };
+      }
+
+      const fullOrder = await Orders.findByPk(orderItem.orderId);
+
+      /* ================================
+        DEDUCT CANCELLED ITEM PRICE FROM ORDER TOTAL & SUBTOTAL
+      ================================= */
+      let itemUnitPrice = 0;
+
+      if (orderItem.productVariantCombinationId) {
+        // Priority 1: Variant Combination price
+        const variantCombination = await ProductVariantCombination.findByPk(
+          orderItem.productVariantCombinationId
+        );
+        itemUnitPrice = Number(variantCombination?.price || 0);
+
+      } else if (orderItem.productVariantValueId) {
+        // Priority 2: Variant Value price
+        const variantValue = await ProductVariantValues.findByPk(
+          orderItem.productVariantValueId
+        );
+        itemUnitPrice = Number(variantValue?.price || 0);
+
+      } else {
+        // Priority 3: Base product price
+        itemUnitPrice = Number(product?.price || 0);
+      }
+
+      const deductAmount = itemUnitPrice * Number(orderItem.quantity || 1);
+      const newTotalAmount = Math.max(0, Number(fullOrder.totalAmount || 0) - deductAmount);
+      const newSubtotal = Math.max(0, Number(fullOrder.subtotal || 0) - deductAmount);
+
+      await fullOrder.update({
+        totalAmount: newTotalAmount,
+        subtotal: newSubtotal,
+        updatedAt: new Date(),
+      });
+
+      // 🔹 AUTO-GENERATE TRANSACTION ID & CREATE ORDER TRANSACTION
+      const lastTransaction = await OrderTransaction.findOne({order: [['ID', 'DESC']]});
+      const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
+      const transactionId = withTimestamp('TRXN', nextTransactionNo);
+
+      await OrderTransaction.create({
+        transactionId,
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId,
+        transactionType: 'Order Cancelled',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      // 🔔 Notifications
+      const lastNotification = await Notifications.findOne({ order: [["ID", "DESC"]] });
+      let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+      const userName = user.medicalInstitutionName;
+
+      const customerNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: customerId,
+        receiverType: "Customer",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: "Order Cancellation Completed",
+        message: `Your cancellation for "${product.productName}" (Order #${fullOrder.orderId}) has been marked as completed.`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      const adminNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Admin",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: `${userName} - Cancellation Completed`,
+        message: `${userName} has marked their cancellation for "${product.productName}" (Order #${fullOrder.orderId}) as completed.`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      const staffNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: customerId,
+        receiverId: null,
+        receiverType: "Staff",
+        senderType: "System",
+        notificationType: "Order Cancellation",
+        title: `${userName} - Cancellation Completed`,
+        message: `${userName} has marked their cancellation for "${product.productName}" (Order #${fullOrder.orderId}) as completed.`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
       io.emit("refundMarkedAsCompleted", {
         orderCancelId,
         cancellationStatus: "Completed",
+      });
+      io.emit("newNotification_Customer", customerNotification);
+      io.emit("newNotification_Admin", adminNotification);
+      io.emit("newNotification_Staff", staffNotification);
+
+      orderSendMail({
+        to: user.loginEmail ? user.loginEmail : user.emailAddress,
+        subject: 'Your order cancellation has been marked as completed.',
+        html: customerCancelledOrderTemplate(user.medicalInstitutionName, 'Completed', fullOrder.paymentMethod, fullOrder.orderId, product.productName)
       });
 
       return {

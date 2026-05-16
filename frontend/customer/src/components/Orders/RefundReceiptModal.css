@@ -9,6 +9,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 2.5rem 1rem 1rem 1rem;
+    box-sizing: border-box;
 }
 
 .receipt-image-bg .receipt-image-btn {
@@ -22,13 +24,23 @@
 }
 
 .receipt-image-card {
-    width: 40rem;
-    height: auto;
+    width: min(40rem, 90vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .receipt-image-card img {
     width: 100%;
-    height: auto;
+    max-width: 100%;
+    max-height: 85vh;
+    min-width: 200px;
+    min-height: 200px;
+    object-fit: contain;
+    border-radius: 0.5rem;
 }
 
 .refund-receipt-bg {

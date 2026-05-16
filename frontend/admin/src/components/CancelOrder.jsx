@@ -6,10 +6,11 @@ import Navbar from "./Navbar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 import CancelOrderReview from "./Cancellation/CancelOrderReview.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
+import OrderPaymentProof from "./Modal/OrderPaymentProof.jsx";
 
 
 function CancelOrder() {
-  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders } = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchOrderProofPayment, setShowOrderPaymentProof, setSelectedPaymentProof, showOrderPaymentProof } = useContext(AdminContext);
 
   const [showViewAll, setShowViewAll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -76,6 +77,20 @@ function CancelOrder() {
     });
   };
 
+  const getPaymentProofForOrder = (orderId, customerId) => {
+    return fetchOrderProofPayment.find(
+      (proof) => proof.orderId === orderId && proof.customerId === customerId
+    );
+  };
+
+  const handleReviewReceipt = (orderId, customerId) => {
+    const proof = getPaymentProofForOrder(orderId, customerId);
+    if (proof) {
+      setSelectedPaymentProof(proof);
+      setShowOrderPaymentProof(true);
+    }
+  };
+
 
   const cancelledOrders = fetchOrders?.filter((order) => {
     const items = fetchOrderItems.filter(
@@ -87,6 +102,7 @@ function CancelOrder() {
 
   return (
     <>
+      {showOrderPaymentProof && <OrderPaymentProof />}
       <Navbar TitleName="Order Cancellation" />
       <div className="cancel-orders-container">
         {!showViewAll &&
@@ -119,10 +135,9 @@ function CancelOrder() {
                     .filter((item) => item.orderId === order.ID)
                     .filter((item) => item.orderStatus === "Cancelled");
 
-                  const orderTotal = items.reduce(
-                    (sum, item) => sum + parseFloat(item.subTotal || 0),
-                    0
-                  );
+                  const subtotal = Number(order.subtotal || 0);
+                  const shippingFee = Number(order.shippingFee || 0);
+                  const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
                     (d) => d.customerId === order.customerId
@@ -201,10 +216,6 @@ function CancelOrder() {
                             <div className="cancel-order-number">
                               Order ID: <strong>{order.orderId}</strong>
                             </div>
-
-                            <div className="cancel-order-total">
-                              Total: ₱{orderTotal.toFixed(2)}
-                            </div>
                           </div>
 
                           <div className="cancel-order-info">
@@ -258,19 +269,76 @@ function CancelOrder() {
                             </div>
                           </div>
 
-                          <button
-                            type="button"
-                            className="cancel-viewall-btn"
-                            onClick={() => {
-                              const clean = viewCancelledOrders.find(
-                                (o) => o.orderId === order.orderId
-                              );
-                              setSelectedOrder(clean);
-                              setShowViewAll(true);
-                            }}
-                          >
-                            View All
-                          </button>
+                          <div className="cancel-order-total-wrapper">
+                            <div className="cancel-order-total-card">
+
+                              <div className="cancel-order-total-row">
+                                <span className="cancel-label">Subtotal</span>
+                                <span className="cancel-value">₱{subtotal.toFixed(2)}</span>
+                              </div>
+
+                              <div className="cancel-order-total-row">
+                                <span className="cancel-label">Shipping Fee</span>
+                                <span className="cancel-value">₱{shippingFee.toFixed(2)}</span>
+                              </div>
+
+                              <div className="cancel-order-total-divider"></div>
+
+                              <div className="cancel-order-total-row cancel-total-highlight">
+                                <span>Total</span>
+                                <span>₱{totalAmount.toFixed(2)}</span>
+                              </div>
+
+                            </div>
+                          </div>
+
+                          <div className="cancel-buttons-container">
+                            {/* PAYMENT PROOF STATUS */}
+                            {order.paymentMethod === 'Paypal' && (
+                              (() => {
+                                const proof = getPaymentProofForOrder(order.ID, order.customerId);
+                                if (proof) {
+                                  return (
+                                    <button
+                                      type="button"
+                                      className="cancel-review-receipt-btn"
+                                      onClick={() => handleReviewReceipt(order.ID, order.customerId)}
+                                    >
+                                      <svg className="cancel-receipt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      </svg>
+                                      Review Receipt
+                                    </button>
+                                  );
+                                } else {
+                                  return (
+                                    <div className="cancel-no-receipt-indicator">
+                                      <svg className="cancel-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                      </svg>
+                                      <span>No Receipt Uploaded</span>
+                                    </div>
+                                  );
+                                }
+                              })()
+                            )}
+
+                            {/* VIEW ALL BUTTON */}
+                            <button
+                              type="button"
+                              className="cancel-viewall-btn"
+                              onClick={() => {
+                                const clean = viewCancelledOrders.find(
+                                  (o) => o.orderId === order.orderId
+                                );
+                                setSelectedOrder(clean);
+                                setShowViewAll(true);
+                              }}
+                            >
+                              View All
+                            </button>
+                          </div>
+
                         </div>
                       </div>
                     </article>

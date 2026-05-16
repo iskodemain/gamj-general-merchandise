@@ -309,9 +309,10 @@
 }
 
 /* ---------- ACTION BUTTONS ---------- */
-.cr-action-row {
+.cr-action-column {
   margin-top: 8px;
   display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 

@@ -1,206 +1,457 @@
-import React, { useState } from "react";
-import './CancelReview.css';
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import "./CancelReview.css";
+import { AdminContext } from "../../context/AdminContextProvider";
+import { FaArrowLeft } from "react-icons/fa6";
+import Loading from "../../../../customer/src/components/Loading";
+import { toast } from "react-toastify";
 
-function CancelReview({ item = null, order = null, onClose = () => {} }) {
-  const [notes, setNotes] = useState(
-`Marami pong kaming nakitang defect sa mask namin late na po namin na i-check.
-Wag niyo rin pong kalimutan ibigay sa amin ang PayPal email address niyo para po maibalik namin ang pera sainyo. Yun lamang po salamat.`
+function CancelReview({ item = null, onClose = () => {} }) {
+  const { fetchOrders, fetchOrderItems, fetchCancelledOrders, customerList, cancelSubmitAsRefund, toastError, fetchRefundProof, cancelSubmitAsCompleted, adminDeleteOrderItem, adminRemoveCancellation } = useContext(AdminContext);
+
+  const [loading, setLoading] = useState(false);
+  const [orderData, setOrderData] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [localCancelRecord, setLocalCancelRecord] = useState(null);
+
+  const [paypalEmailInput, setPaypalEmailInput] = useState("");
+  const [refundAmount, setRefundAmount] = useState("");
+  const [proofFile, setProofFile] = useState(null);
+  const [proofPreviewUrl, setProofPreviewUrl] = useState("");
+  const [paypalTxId, setPaypalTxId] = useState("");
+
+  const [refundStarted, setRefundStarted] = useState(false);
+
+  const [localCancellationStatus, setLocalCancellationStatus] = useState(
+    item?.cancellationStatus || item?.status || ""
   );
 
-  // new state: toggle between edit view and summary view
-  const [showSummary, setShowSummary] = useState(false);
-  const [refundEmail, setRefundEmail] = useState("");
+  useEffect(() => {
+    if (!item) return;
 
-  const handleSave = () => {
-    // instead of closing, show the summary view that replaces the previous one
-    setShowSummary(true);
+    // 1. Find ORDER ITEM
+    const orderItem = fetchOrderItems?.find(
+      (oi) => Number(oi.ID) === Number(item.id)
+    ) || null;
+
+    // 2. Find ORDER RECORD
+    const orderRec = orderItem
+      ? fetchOrders?.find((o) => Number(o.ID) === Number(orderItem.orderId)) || null
+      : null;
+
+    // 3. Find CUSTOMER
+    const cust = orderRec
+      ? customerList?.find((c) => Number(c.ID) === Number(orderRec.customerId)) || null
+      : null;
+
+    // 4. Find CANCEL RECORD
+    const cancelRec =
+      fetchCancelledOrders?.find(
+        (c) =>
+          Number(c.orderItemId) === Number(item.id) &&
+          (orderRec
+            ? Number(c.customerId) === Number(orderRec.customerId)
+            : true)
+      ) || null;
+
+    setOrderData(orderRec);
+    setCustomer(cust);
+    setLocalCancelRecord(cancelRec);
+
+    // Reset fields
+    setPaypalEmailInput(cancelRec?.cancelPaypalEmail || "");
+    setRefundAmount("");
+    setPaypalTxId("");
+    setProofFile(null);
+    setProofPreviewUrl("");
+
+    // 5. Find REFUND PROOF for CANCELLATION
+    if (cancelRec && fetchRefundProof?.length > 0) {
+      const foundProof = fetchRefundProof.find(
+        (p) => Number(p.cancelId) === Number(cancelRec.ID)
+      );
+
+      if (foundProof) {
+        setRefundAmount(foundProof.refundAmount || "");
+        setProofPreviewUrl(foundProof.receiptImage || "");
+        setPaypalTxId(foundProof.transactionID || "");
+      }
+    }
+
+    // 6. Local Status Handling
+    const status =
+      cancelRec?.cancellationStatus || item?.cancellationStatus || item?.status || "";
+
+    setLocalCancellationStatus(status);
+    setRefundStarted(status === "Refunded" || status === "Completed");
+
+  }, [
+    item,
+    fetchOrders,
+    fetchOrderItems,
+    fetchCancelledOrders,
+    fetchRefundProof,
+    customerList
+  ]);
+
+
+  const paymentMethod = useMemo(
+    () => orderData?.paymentMethod || "—",
+    [orderData]
+  );
+
+  const handleProofFile = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!f.type.startsWith("image/")) {
+      alert("Please upload an image only.");
+      return;
+    }
+    setProofFile(f);
+    setProofPreviewUrl(URL.createObjectURL(f));
   };
 
-  const handleProceed = () => {
-    console.log("Proceed refund with email:", refundEmail);
-    onClose();
+  const handleProceedRefund = () => {
+    setRefundStarted(true)
   };
 
-  if (showSummary) {
-    return (
-      <div className="cancel-reason-page">
-        <div className="cancel-reason-root" role="dialog" aria-modal="true" aria-label="Refund summary">
-          {/* Header Section (Top Left) */}
-          <div className="customer-row">
-            <div className="cust-left">
-              <div className="avatar" aria-hidden="true">
-                <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <rect width="64" height="64" rx="32" fill="#F6A34B"/>
-                  <path d="M32 36c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zM12 52c0-5 7-9 20-9s20 4 20 9v3H12v-3z" fill="#fff"/>
-                </svg>
-              </div>
+  const handleSubmitAsRefunded = async () => {
+    if (!localCancelRecord || !orderData) return;
 
-              <div className="user-texts">
-                <div className="org">Medical Hospital Cavite</div>
-                <div className="muted">Customer</div>
-                <div className="muted">Payment: Paid</div>
-              </div>
-            </div>
+    if (!refundAmount || isNaN(Number(refundAmount))) {
+      return toast.error("Invalid amount.", toastError);
+    }
 
-            <div className="cust-right">
-              <select className="status-select" aria-label="Order status">
-                <option>Processing</option>
-                <option>Pending</option>
-                <option>Completed</option>
-              </select>
-            </div>
-          </div>
+    if (!proofPreviewUrl) {
+      return toast.error("Upload proof.", toastError);
+    }
 
-          {/* Product Information Box (Centered, Mid Section) */}
-          <div className="product-box" role="group" aria-label="Product details">
-            <div className="product-thumb" aria-hidden="true">
-              <svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-                <rect x="6" y="10" width="52" height="36" rx="6" fill="#E8F5FF"/>
-                <rect x="12" y="6" width="40" height="8" rx="3" fill="#CFEFFF"/>
-                <g fill="#6BB0E6"><rect x="18" y="20" width="28" height="4" rx="2"/><rect x="18" y="28" width="28" height="4" rx="2"/></g>
-              </svg>
-            </div>
+    if (!paypalTxId.trim()) {
+      return toast.error("Enter PayPal TxID.", toastError);
+    }
 
-            <div className="product-details">
-              <div className="product-name">Disposable Face Mask (indoplas) – 50 pcs</div>
-              <div className="product-sub">Quantity: 2 &nbsp; Size: 500ml &nbsp; Color: Blue</div>
-              <div className="product-price">Price: ₱149.00</div>
-            </div>
+    const formData = new FormData();
+    formData.append("newStatus", "Refunded");
+    formData.append("customerID", localCancelRecord.customerId);
+    formData.append("cancelID", localCancelRecord.ID);
+    formData.append("refundAmount", refundAmount);
+    formData.append("transactionID", paypalTxId.trim());
 
-            <div className="product-payment" aria-hidden="true">
-              <span className="payment-label">Payment:</span>
-              <span className="paypal-badge">PayPal</span>
-            </div>
-          </div>
+    if (proofFile) {
+      formData.append("receiptImage", proofFile);
+    }
 
-          {/* Refund Section (Below Product Box) */}
-          <div className="refund-form" style={{ marginTop: 22 }}>
-            <div className="summary-title">MEDICAL HOSPITAL CAVITE REFUND PROCESS</div>
+    else if (proofPreviewUrl) {
+      formData.append("receiptImage", proofPreviewUrl);
+    }
 
-            <label className="q-label1" style={{ textAlign: 'center', width: '100%' }}>
-              Medical Hospital Cavite PayPal Email Address for Refund
-            </label>
+    setLoading(true);
+    const success = await cancelSubmitAsRefund(formData);
+    setLoading(false);
 
-            <input
-              className="summary-email-input"
-              placeholder="sample@example.com"
-              value={refundEmail}
-              onChange={(e) => setRefundEmail(e.target.value)}
-              aria-label="Medical Hospital Cavite PayPal Email Address"
-            />
+    if (success) {
+      setTimeout(() => window.location.reload(), 500);
+    }
+  };
 
-            <div className="proceed-row" style={{ width: '100%' }}>
-              <button
-                type="button"
-                className="proceed-btn"
-                onClick={handleProceed}
-                disabled={!refundEmail.trim()}
-                title={!refundEmail.trim() ? "Enter PayPal email address" : "Proceed with the Refund Process"}
-              >
-                Proceed with the Refund Process
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleSubmitAsCompleted = async() => {
+    if (!localCancelRecord) return;
 
-  // original edit view
+    setLoading(true);
+
+    const success = await cancelSubmitAsCompleted(localCancelRecord.ID, "Completed");
+    setLoading(false);
+
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+  };
+
+  const handleRemoveCancellation = async () => {
+    if (!localCancelRecord) return;
+
+    setLoading(true);
+
+    const success = await adminRemoveCancellation(localCancelRecord.ID, localCancelRecord.customerId, localCancelRecord.orderItemId);
+    setLoading(false);
+
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+  };
+
+  const handleDeleteCancel = async () => {
+    if (!localCancelRecord) return;
+
+    setLoading(true);
+
+    const success = await adminDeleteOrderItem(localCancelRecord.orderItemId);
+    setLoading(false);
+
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+  };
+
+  const cancelExists = Boolean(localCancelRecord);
+
   return (
-    <div className="cancel-reason-page">
-      <div className="cancel-reason-root" role="dialog" aria-modal="true" aria-label="Cancel review card">
-        {/* Top notice */}
-        <div className="top-notice" role="alert">
-          <span className="note-prefix">NOTE:</span>
-          <span className="note-body"> WAITING FOR MEDICAL HOSPITAL CAVITE TO 
-            <br />PROVIDE A PAYPAL EMAIL ADDRESS TO PROCESS 
-            <br />THE REFUND.</span>
-        </div>
+    <>
+    {loading && <Loading />}
+    <div className="return-viewall-topbar">
+        <button className="return-viewall-back-btn" onClick={onClose}>
+          <FaArrowLeft />
+        </button>
+        <div className="return-viewall-order-title">Back</div>
+      </div>
+    <div className="crw-page">
+      <div className="crw-root">
 
-        {/* Customer info + status */}
-        <div className="customer-row">
-          <div className="cust-left">
-            <div className="avatar avatar-striped" aria-hidden="true">
-              <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <defs>
-                  <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0" stopColor="#F6C6A6" />
-                    <stop offset="1" stopColor="#F2A57A" />
-                  </linearGradient>
-                </defs>
-                <rect width="44" height="44" rx="22" fill="url(#g)"/>
-                <g transform="translate(6,6)" fill="#2E2E2E" opacity="0.12">
-                  <rect x="0" y="0" width="32" height="4" rx="2"/>
-                  <rect x="0" y="8" width="32" height="4" rx="2"/>
-                </g>
-                <path d="M22 28c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z" fill="#fff" opacity="0.12"/>
-              </svg>
+        {/* TOP */}
+        <div className="crw-top">
+          <div className="crw-top-left">
+            <div className="crw-avatar">
+              {customer?.profileImage ? (
+                <img src={customer.profileImage} alt="Customer" />
+              ) : (
+                <div className="crw-avatar-fallback">
+                  {(customer?.medicalInstitutionName || "C").charAt(0)}
+                </div>
+              )}
             </div>
 
-            <div className="user-texts">
-              <div className="org">{item?.sellerName || "Medical Hospital Cavite"}</div>
-              <div className="muted">Customer</div>
-              <div className="muted">Payment: {order?.paid ? "Paid" : (order?.method || "Paid")}</div>
+            <div className="crw-user-text">
+              <div className="crw-user-org">
+                {customer?.medicalInstitutionName || "Unknown Customer"}
+              </div>
+              <div className="crw-user-muted">Customer</div>
             </div>
           </div>
 
-          <div className="cust-right">
-            <select className="status-select" aria-label="status">
-              <option>Processing</option>
-              <option>Pending</option>
-              <option>Completed</option>
-            </select>
+          <div className="crw-top-right">
+            <div
+              className={
+                localCancellationStatus === "Completed"
+                  ? "crw-status-pill crw-completed"
+                  : "crw-status-pill"
+              }
+            >
+              {localCancellationStatus || "Processing"}
+            </div>
           </div>
         </div>
 
-        {/* Product order box */}
-        <div className="product-box1">
-          <div className="product-thumb" aria-hidden="true">
-            <svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-              <rect x="6" y="10" width="52" height="36" rx="6" fill="#E8F5FF"/>
-              <rect x="12" y="6" width="40" height="8" rx="3" fill="#CFEFFF"/>
-              <g fill="#6BB0E6"><rect x="18" y="20" width="28" height="4" rx="2"/><rect x="18" y="28" width="28" height="4" rx="2"/></g>
-            </svg>
+        {/* ITEM CARD */}
+        <div className="crw-item-card">
+          <div className="crw-item-left">
+            <div className="crw-thumb">
+              <img className="crw-thumb-img" src={item?.image} alt={item?.name} />
+            </div>
+
+            <div className="crw-product-meta">
+              <div className="crw-product-name">{item?.name}</div>
+              <div className="crw-product-sub">
+                Qty: {item?.qty}
+                {item?.value ? ` • ${item.value}` : ""}
+              </div>
+              <div className="crw-product-price">
+                ₱{Number(item?.price || 0).toFixed(2)}
+              </div>
+            </div>
           </div>
 
-          <div className="product-details">
-            <div className="product-name">{item?.name || "Disposable Face Mask (Indoplas) – 50 pcs"}</div>
-            <div className="product-sub">{`Quantity: ${item?.qty ?? 2}  Size: ${item?.size || "500ml"}  Color: ${item?.color || "Blue"}`}</div>
-            <div className="product-price">{item?.price ? `₱${Number(item.price).toFixed(2)}` : "₱149.00"}</div>
-          </div>
-
-          <div className="product-payment">
-            <span className="payment-label">Payment:</span>
-            <span className="paypal-badge">PayPal</span>
+          <div className="crw-pay-badge">
+            <span className="crw-pay-label">Payment:</span>
+            <span className="crw-pay-method">{paymentMethod}</span>
           </div>
         </div>
 
-        {/* Refund reason */}
-        <div className="form-section">
-          <label className="q-label">1. Admin Reason for Cancellation</label>
-          <textarea
-            className="multi-input"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={6}
-            aria-label="Admin reason for cancellation"
-          />
-        </div>
+        {/* FORM */}
+        <div className="crw-form">
+          {!cancelExists ? (
+            <div className="crw-empty">No cancellation record found.</div>
+          ) : (
+            <>
 
-        {/* Action */}
-        <div className="action-row">
-          <button
-            className="primary-btn save-btn"
-            type="button"
-            onClick={handleSave}
-            disabled={!notes.trim()}
-          >
-            Save Changes
-          </button>
+            {/* PROCESSING – ENTER PAYPAL EMAIL */}
+            {localCancellationStatus === "Processing" &&
+              !refundStarted &&
+              /pay/i.test(paymentMethod) && (
+                <>
+                  <label className="crw-label">1. Admin Reason for Cancellation</label>
+                  <textarea
+                    className="crw-textarea"
+                    value={localCancelRecord?.cancelComments || ""}
+                    readOnly
+                  />
+
+                  <label className="crw-label">2. PayPal Email Address</label>
+                  <input
+                    className="crw-input"
+                    placeholder="customer-paypal@example.com"
+                    value={paypalEmailInput}
+                    readOnly
+                  />
+                  {!paypalEmailInput && (
+                    <p className="crw-paypal-note">
+                      ⚠️ Customer has not yet provided their PayPal email address. Please wait for the customer to submit it before proceeding.
+                    </p>
+                  )}
+
+                  <div className="crw-action-column">
+                    <button
+                      className="crw-primary-btn"
+                      onClick={handleProceedRefund}
+                      disabled={!paypalEmailInput}
+                    >
+                      Proceed with Refund Process
+                    </button>
+                    <button
+                      className="crw-danger-btn"
+                      onClick={handleRemoveCancellation}
+                    >
+                      Remove Cancellation
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* REFUND FORM WHILE STILL PROCESSING OR REFUNDED */}
+              {(localCancellationStatus === "Processing" && refundStarted && /pay/i.test(paymentMethod)) ||
+              (localCancellationStatus === "Refunded" && /pay/i.test(paymentMethod)) ? (
+                <>
+                  <label className="crw-label">1. Total Refund Amount</label>
+                  <input
+                    className="crw-input"
+                    placeholder="Enter the total refund amount"
+                    value={refundAmount}
+                    onChange={(e) => setRefundAmount(e.target.value)}
+                  />
+
+                  <label className="crw-label">2. Upload an image or screenshot of your refund payment receipt</label>
+
+                  {!proofPreviewUrl && (
+                    <label className="crw-upload-img">
+                      <span className="crw-upload-text">
+                        Upload Proof of Refund Payment
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProofFile}
+                      />
+                    </label>
+                  )}
+
+                  {proofPreviewUrl && localCancellationStatus === "Processing" &&
+                    <label className="crw-upload-img-active">
+                      <span className="crw-upload-text-active">
+                        Change Proof of Refund Payment
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProofFile}
+                      />
+                    </label>
+                  }
+
+                  {proofPreviewUrl && (
+                    <img className="crw-proof-preview" src={proofPreviewUrl} alt="proof" />
+                  )}
+
+                  <label className="crw-label">3. PayPal Transaction ID</label>
+                  <input
+                    className="crw-input"
+                    placeholder="Enter your PayPal transaction ID"
+                    value={paypalTxId}
+                    onChange={(e) => setPaypalTxId(e.target.value)}
+                  />
+
+                  <div className="crw-action-column">
+
+                    {localCancellationStatus === "Processing" && (
+                      <button
+                        className="crw-primary-btn"
+                        onClick={handleSubmitAsRefunded}
+                        disabled={ !refundAmount || !paypalTxId.trim() || (!proofFile && !proofPreviewUrl)
+                        }
+                      >
+                        Submit as Refunded
+                      </button>
+                    )}
+                  </div>
+                </>
+              ) : null}
+
+              {/* COMPLETED + CASH */}
+              {localCancellationStatus === "Completed" &&
+                /cash/i.test(paymentMethod) && (
+                  <>
+                    <label className="crw-label">1. Reason for Cancellation</label>
+                    <input
+                      className="crw-input"
+                      value={localCancelRecord?.reasonForCancellation || ""}
+                      readOnly
+                    />
+
+                    <label className="crw-label">2. Comments</label>
+                    <textarea
+                      className="crw-textarea"
+                      value={localCancelRecord?.cancelComments || ""}
+                      readOnly
+                    />
+
+                    <div className="crw-action-column">
+                      <button className="crw-danger-btn" onClick={handleDeleteCancel}>
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+
+              {/* COMPLETED + PAYPAL VIEW ONLY */}
+              {localCancellationStatus === "Completed" &&
+                /pay/i.test(paymentMethod) && (
+                  <>
+                    <label className="crw-label">1. Total Refund Amount</label>
+                    <input
+                      className="crw-input"
+                      value={refundAmount}
+                      readOnly
+                    />
+
+                    <label className="crw-label">2. Proof of Payment</label>
+                    {proofPreviewUrl && (
+                      <img className="crw-proof-preview" src={proofPreviewUrl} alt="proof" />
+                    )}
+
+                    <label className="crw-label">3. PayPal Transaction ID</label>
+                    <input
+                      className="crw-input"
+                      value={paypalTxId}
+                      readOnly
+                    />
+
+                    <div className="crw-action-column">
+                      <button className="crw-danger-btn" onClick={handleDeleteCancel}>
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+
+            </>
+          )}
         </div>
       </div>
     </div>
+    </>
   );
 }
 
