@@ -38,8 +38,8 @@ export const addOrderPaymentProof = async (req, res) => {
     try {
         const { ID } = req.user;
         const receiptImage = req.file;
-        const { orderId, referenceId, amountPaid } = req.body;
-        const result = await addOrderPaymentProofService(ID, orderId, referenceId, amountPaid, receiptImage);
+        const { orderId, paypalAccountName, referenceId, amountPaid } = req.body;
+        const result = await addOrderPaymentProofService(ID, orderId, paypalAccountName, referenceId, amountPaid, receiptImage);
         res.json(result);
     } catch (error) {
         console.log(error);
@@ -50,9 +50,9 @@ export const addOrderPaymentProof = async (req, res) => {
 export const editOrderPaymentProof = async (req, res) => {
     try {
         const { ID } = req.user;
-        const { paymentProofID, referenceId } = req.body;
+        const { paymentProofID, paypalAccountName, referenceId } = req.body;
         const receiptImageFile = req.file || null;
-        const result = await editOrderPaymentProofService(ID, paymentProofID, referenceId, receiptImageFile);
+        const result = await editOrderPaymentProofService(ID, paymentProofID, paypalAccountName, referenceId, receiptImageFile);
         res.json(result);
     } catch (error) {
         console.log(error);
@@ -170,7 +170,6 @@ export const fetchOrderRefund = async (req, res) => {
     }
 }
 
-
 export const cancelOrderRefundRequest = async (req, res) => {
     try {
         const { ID } = req.user;
@@ -182,7 +181,6 @@ export const cancelOrderRefundRequest = async (req, res) => {
         res.json({success: false, message:error.message})
     }
 }
-
 
 export const fetchOrderDeliveryProof = async (req, res) => {
     try {

@@ -305,6 +305,7 @@
     transform: none;
     align-self: flex-end;
     margin-top: 8px;
+    width: 100%;
   }
 }
 
