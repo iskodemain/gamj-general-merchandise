@@ -30,10 +30,10 @@ export const capturePayPalOrder = async (req, res) => {
 
     if (status === "COMPLETED") {
       const result = await addOrderService(ID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount);
-      res.json(result);
+      return res.json(result);
     }
-
-    res.status(400).json({ success: false, message: "Payment not completed" });
+    return res.status(400).json({ success: false, message: "Payment not completed" });
+    
   } catch (error) {
     console.error("PayPal Capture Error:", error.message);
     res.status(500).json({ success: false, message: "Failed to capture PayPal order" });
