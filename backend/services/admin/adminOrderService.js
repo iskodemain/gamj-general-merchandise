@@ -1444,3 +1444,36 @@ export const addOrderDeliveryProofService = async (adminId, data, file) => {
   }
 };
 
+
+export const adminDeleteOrderItemService = async (adminId, orderItemId) => {
+  try {
+    // 1. Validate admin
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) {
+      return { success: false, message: "Admin not found" };
+    }
+
+    // 2. Validate order item
+    const orderItem = await OrderItems.findByPk(orderItemId);
+    if (!orderItem) {
+      return { success: false, message: "Order item not found." };
+    }
+
+    // Soft-delete: set the correct flag based on who is deleting
+    // userType: 'Delivery Staff' → isDeletedByDeliveryStaff = true
+    // userType: 'Admin'          → isDeletedByAdmin = true
+    if (admin.userType === "Delivery Staff") {
+      await orderItem.update({ isDeletedByDeliveryStaff: true });
+    } else {
+      await orderItem.update({ isDeletedByAdmin: true });
+    }
+
+    return {
+      success: true,
+      message: "Order item deleted successfully.",
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};

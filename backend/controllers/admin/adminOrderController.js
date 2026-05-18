@@ -1,4 +1,4 @@
-import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService, adminRemoveCancellationService } from "../../services/admin/adminOrderService.js";
+import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService, adminRemoveCancellationService, adminDeleteOrderItemService } from "../../services/admin/adminOrderService.js";
 
 export const fetchOrders = async (req, res) => {
     try {
@@ -195,4 +195,17 @@ export const addOrderDeliveryProof = async (req, res) => {
       console.log(error);
       res.json({ success: false, message: error.message });
   }
+};
+
+// SOFT-DELETE ORDER ITEM (hide from the user who deleted it)
+export const adminDeleteOrderItem = async (req, res) => {
+    try {
+        const { orderItemId } = req.body;
+        const { ID } = req.admin;
+        const result = await adminDeleteOrderItemService(ID, orderItemId);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
 };

@@ -23,7 +23,7 @@ const STATUS_OPTIONS = [
 ];
 
 function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
-  const { handleChangeOrderStatus, addOrderDeliveryProof, fetchOrderDeliveryProof, toastError } = useContext(AdminContext);
+  const { handleChangeOrderStatus, addOrderDeliveryProof, fetchOrderDeliveryProof, toastError, currentUser } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
 
   const [items, setItems] = useState([]);
@@ -286,6 +286,16 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   // INDIVIDUAL ITEM STATUS OPTIONS LOGIC
   // -------------------------------------------
   const getIndividualOptions = (currentStatus) => {
+    // Delivery Staff can only update Out for Delivery → Delivered
+    if (currentUser === "Delivery Staff") {
+      switch (currentStatus) {
+        case "Out for Delivery":
+          return ["Delivered"];
+        default:
+          return []; // Pending and Processing are read-only for Delivery Staff
+      }
+    }
+
     switch (currentStatus) {
       case "Pending":
         return ["Processing", "Cancelled"];
@@ -304,6 +314,16 @@ function ViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
   // BULK STATUS OPTIONS LOGIC (based on orderStatus tab)
   // -------------------------------------------
   const getBulkOptions = () => {
+    // Delivery Staff can only bulk-update Out for Delivery → Delivered
+    if (currentUser === "Delivery Staff") {
+      switch (orderStatus) {
+        case "Out for Delivery":
+          return ["Delivered"];
+        default:
+          return []; // Pending and Processing are read-only for Delivery Staff
+      }
+    }
+
     switch (orderStatus) {
       case "Pending":
         return ["Processing"];
