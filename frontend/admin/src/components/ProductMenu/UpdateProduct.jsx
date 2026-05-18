@@ -824,12 +824,12 @@ function UpdateProduct() {
                 </label>
                 <label className="upp-toggle-row">
                   <input type="checkbox" checked={isBestSeller} onChange={() => setIsBestSeller(!isBestSeller)} />
-                  Mark as Best Seller
+                  Feature on Homepage
                 </label>
-                <label className="upp-toggle-row">
+                {/* <label className="upp-toggle-row">
                   <input type="checkbox" checked={isOutOfStock} onChange={() => setIsOutOfStock(!isOutOfStock)} />
                   Mark as Out of Stock
-                </label>
+                </label> */}
               </div>
 
               <div className="upp-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
