@@ -10,6 +10,7 @@ const OrderProofPayment = () => {
   const { orderId, customerId, setShowOrderProofPayment, addOrderProofPayment, editOrderProofPayment, currency, toastError, fetchOrderProofPayment, orderTotalAmount, fetchOrderItems  } = useContext(ShopContext);
 
   const [referenceId, setReferenceId] = useState('');
+  const [paypalAccountName, setPaypalAccountName] = useState('');
   const [amountPaid, setAmountPaid] = useState(orderTotalAmount || '');
   const [receiptImage, setReceiptImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,6 +34,7 @@ const OrderProofPayment = () => {
   // Populate fields if viewing existing proof
   useEffect(() => {
     if (existingProof) {
+      setPaypalAccountName(existingProof.paypalAccountName);
       setReferenceId(existingProof.referenceId);
       setAmountPaid(existingProof.amountPaid);
       setImagePreview(existingProof.receiptImage);
@@ -47,6 +49,7 @@ const OrderProofPayment = () => {
 
   const handleClose = () => {
     setShowOrderProofPayment(false);
+    setPaypalAccountName('');
     setReferenceId('');
     setAmountPaid('');
     setReceiptImage(null);
@@ -79,7 +82,7 @@ const OrderProofPayment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!referenceId || !amountPaid || !receiptImage) {
+    if (!paypalAccountName || !referenceId || !amountPaid || !receiptImage) {
       return toast.error("All fields are required.", { ...toastError });
     }
 
@@ -90,7 +93,7 @@ const OrderProofPayment = () => {
     setShowSubmitConfirmModal(false);
     setIsSubmitting(true);
 
-    const result = await addOrderProofPayment(orderId, referenceId, amountPaid, receiptImage);
+    const result = await addOrderProofPayment(orderId, paypalAccountName, referenceId, amountPaid, receiptImage);
 
     setIsSubmitting(false);
 
@@ -118,6 +121,7 @@ const OrderProofPayment = () => {
 
     const result = await editOrderProofPayment(
       existingProof.ID,
+      paypalAccountName,
       referenceId,
       receiptImage
     );
@@ -156,6 +160,20 @@ const OrderProofPayment = () => {
                 <p className="proof-subtitle">Upload your PayPal payment receipt to process your order.</p>
               </>
             )}
+          </div>
+
+          <div className="proof-form-group">
+            <label className="proof-label">
+              PayPal Account Name <span className="required-asterisk">*</span>
+            </label>
+            <input
+              type="text"
+              className="proof-input"
+              value={paypalAccountName}
+              onChange={(e) => setPaypalAccountName(e.target.value)}
+              placeholder="e.g., Juan Dela Cruz"
+              required
+            />
           </div>
 
           <div className="proof-form-group">
@@ -259,7 +277,7 @@ const OrderProofPayment = () => {
               type="button"
               className="proof-edit-btn"
               onClick={handleEditClick}
-              disabled={isEditing || !referenceId || !imagePreview}
+              disabled={isEditing || !paypalAccountName || !referenceId || !imagePreview}
             >
               {isEditing ? (
                 <>
@@ -278,7 +296,7 @@ const OrderProofPayment = () => {
               type="submit"
               className="proof-submit-btn"
               onClick={handleSubmit}
-              disabled={isSubmitting || !referenceId || !amountPaid || !receiptImage}
+              disabled={isSubmitting || !paypalAccountName || !referenceId || !amountPaid || !receiptImage}
             >
               {isSubmitting ? (
                 <>

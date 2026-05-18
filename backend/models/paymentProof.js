@@ -39,6 +39,11 @@ const PaymentProof = sequelize.define(
       onUpdate: 'CASCADE',
     },
 
+    paypalAccountName: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+
     referenceId: {
       type: DataTypes.TEXT,
       allowNull: false,

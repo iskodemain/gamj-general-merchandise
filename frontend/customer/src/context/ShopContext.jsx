@@ -254,11 +254,12 @@ const ShopContextProvider = (props) => {
     }, []);
 
     /*----------------------EDIT ORDER PROOF PAYMENT-----------------------*/
-    const editOrderProofPayment = async(paymentProofID, referenceId, receiptImage) => {
+    const editOrderProofPayment = async(paymentProofID, paypalAccountName, referenceId, receiptImage) => {
         if (token) {
             try {
                 const formData = new FormData();
                 formData.append('paymentProofID', paymentProofID);
+                formData.append('paypalAccountName', paypalAccountName);
                 formData.append('referenceId', referenceId);
                 if (receiptImage) {
                     formData.append('receiptImage', receiptImage);
@@ -283,11 +284,12 @@ const ShopContextProvider = (props) => {
     }
 
     /*--------------------------ADD ORDER PROOF PAYMENT----------------------------*/
-    const addOrderProofPayment = async (orderId, referenceId, amountPaid, receiptImage) => {
+    const addOrderProofPayment = async (orderId, paypalAccountName, referenceId, amountPaid, receiptImage) => {
         if (token) {
             try {
                 const formData = new FormData();
                 formData.append('orderId', orderId);
+                formData.append('paypalAccountName', paypalAccountName);
                 formData.append('referenceId', referenceId);
                 formData.append('amountPaid', amountPaid);
                 

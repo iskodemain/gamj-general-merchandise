@@ -5,9 +5,10 @@ import Navbar from "./Navbar.jsx";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 import ReturnViewAll from "./ReturnRefund/ReturnViewAll.jsx";
 import { FaArrowLeft } from "react-icons/fa6";
+import OrderPaymentProof from "./Modal/OrderPaymentProof.jsx";
 
 function ReturnAndRefund() {
-  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces, fetchReturnRefundOrders } = useContext(AdminContext);
+  const { navigate, fetchOrders, fetchOrderItems, products, deliveryInfoList, barangays, cities, provinces, fetchReturnRefundOrders, fetchOrderProofPayment, setShowOrderPaymentProof, setSelectedPaymentProof, showOrderPaymentProof } = useContext(AdminContext);
 
   const [showViewAll, setShowViewAll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -71,6 +72,20 @@ function ReturnAndRefund() {
     });
   };
 
+  const getPaymentProofForOrder = (orderId, customerId) => {
+      return fetchOrderProofPayment.find(
+          proof => proof.orderId === orderId && proof.customerId === customerId
+      );
+  };
+
+  const handleReviewReceipt = (orderId, customerId) => {
+      const proof = getPaymentProofForOrder(orderId, customerId);
+      if (proof) {
+          setSelectedPaymentProof(proof);
+          setShowOrderPaymentProof(true);
+      }
+  };
+
   const returnRefundOrders = fetchOrders?.filter((order) => {
     const items = fetchOrderItems.filter(
       (item) => item.orderId === order.ID
@@ -80,6 +95,7 @@ function ReturnAndRefund() {
 
   return (
     <>
+      {showOrderPaymentProof && <OrderPaymentProof />}
       <Navbar TitleName="Return and Refund" />
       <div className="return-refund-container">
         {!showViewAll &&
@@ -269,20 +285,51 @@ function ReturnAndRefund() {
                             </div>
                           </div>
 
-                          <button
-                            type="button"
-                            className="return-refund-viewall-btn"
-                            onClick={() => {
-                              const clean = viewReturnRefundOrders.find(
-                                (o) => o.orderId === order.orderId
-                              );
-                              console.log("Selected Order:", clean);
-                              setSelectedOrder(clean);
-                              setShowViewAll(true);
-                            }}
-                          >
-                            View All
-                          </button>
+                          <div className="rr-buttons-container">
+                            {order.paymentMethod === 'Paypal' && (
+                                (() => {
+                                    const proof = getPaymentProofForOrder(order.ID, order.customerId);
+                                    if (proof) {
+                                        return (
+                                            <button
+                                                type="button"
+                                                className="rr-review-receipt-btn"
+                                                onClick={() => handleReviewReceipt(order.ID, order.customerId)}
+                                            >
+                                                <svg className="rr-receipt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                Review Receipt
+                                            </button>
+                                        );
+                                    } else {
+                                        return (
+                                            <div className="rr-no-receipt-indicator">
+                                                <svg className="rr-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span>No Receipt Uploaded</span>
+                                            </div>
+                                        );
+                                    }
+                                })()
+                            )}
+
+                            <button
+                                type="button"
+                                className="return-refund-viewall-btn"
+                                onClick={() => {
+                                    const clean = viewReturnRefundOrders.find(
+                                        (o) => o.orderId === order.orderId
+                                    );
+                                    console.log("Selected Order:", clean);
+                                    setSelectedOrder(clean);
+                                    setShowViewAll(true);
+                                }}
+                            >
+                                View All
+                            </button>
+                        </div>
                         </div>
                       </div>
                     </article>

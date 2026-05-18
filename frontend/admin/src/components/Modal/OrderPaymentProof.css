@@ -131,12 +131,13 @@
 .opp-reference {
   font-weight: 700;
   letter-spacing: 0.5px;
+  min-height: 48px;
 }
 
 .opp-amount {
     display: flex;
     align-items: center;
-  font-weight: 700;
+    font-weight: 700;
 }
 
 .opp-date {

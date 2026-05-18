@@ -461,7 +461,7 @@ export const fetchOrderPaymentProofService = async (customerId) => {
     }
 }
 
-export const editOrderPaymentProofService = async (customerId, paymentProofID, referenceId, receiptImageFile) => {
+export const editOrderPaymentProofService = async (customerId, paymentProofID, paypalAccountName, referenceId, receiptImageFile) => {
     try {
       const user = await Customer.findByPk(customerId);
       if (!user) return { success: false, message: "User not found" };
@@ -486,6 +486,7 @@ export const editOrderPaymentProofService = async (customerId, paymentProofID, r
       }
 
       await paymentProof.update({
+        paypalAccountName,
         referenceId,
         receiptImage: receiptImageUrl,
         paymentProofDate: new Date()
@@ -533,7 +534,7 @@ export const editOrderPaymentProofService = async (customerId, paymentProofID, r
     }
 };
 
-export const addOrderPaymentProofService = async (customerId, orderId, referenceId, amountPaid, receiptImage) => {
+export const addOrderPaymentProofService = async (customerId, orderId, paypalAccountName, referenceId, amountPaid, receiptImage) => {
     try {
       const user = await Customer.findByPk(customerId);
       if (!user) {
@@ -579,6 +580,7 @@ export const addOrderPaymentProofService = async (customerId, orderId, reference
         paymentProofId,
         customerId,
         orderId, 
+        paypalAccountName,
         referenceId, 
         amountPaid, 
         receiptImage: upload1.secure_url
