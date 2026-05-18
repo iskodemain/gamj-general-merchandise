@@ -175,7 +175,7 @@ function VerifiedUsers() {
             </div>
 
             <div className="verified-users-controls-right">
-              <button onClick={() => navigate('/addnewuser')} className="verified-users-add-btn">Add User</button>
+              {/* <button onClick={() => navigate('/addnewuser')} className="verified-users-add-btn">Add User</button> */}
 
               <div className="verified-users-search">
                 <input
