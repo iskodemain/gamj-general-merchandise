@@ -29,7 +29,7 @@ const withTimestamp = (prefix, number) => {
 };
 
 // CUSTOMER SIDE
-export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount) => {
+export const addOrderService = async (customerId, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount, paypalFee = null) => {
   try {
     const user = await Customer.findByPk(customerId);
     if (!user) {
@@ -81,6 +81,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       paymentMethod,
       subtotal,
       shippingFee,
+      paypalFee: paypalFee || null,
       totalAmount
     });
 

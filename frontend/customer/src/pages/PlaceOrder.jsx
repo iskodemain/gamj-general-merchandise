@@ -14,7 +14,7 @@ import PaypalModal from '../components/PaypalModal'
 
 function PlaceOrder() {
   const location = useLocation();
-  const {navigate, backendUrl, token, cartItems, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder, cartItemsToDelete, paypalClientId, showPaypalModal, setShowPaypalModal, fetchStorePolicy, orderSubTotal, shippingFee, totalPrice } = useContext(ShopContext);
+  const {navigate, backendUrl, token, cartItems, products, toastError, toastSuccess, setCartItems, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, hasDeliveryInfo, poMedicalInstitutionName, poEmailAddress, poDetailedAddress, poZipCode, poContactNumber, setActiveStep, paymentMethod, setPaymentMethod, verifiedUser, setShowUnavailableNote, handleFetchDeliveryInfo, orderItems, addOrder, cartItemsToDelete, paypalClientId, showPaypalModal, setShowPaypalModal, fetchStorePolicy, orderSubTotal, shippingFee, totalPrice, paypalFee } = useContext(ShopContext);
 
   const [loading, setLoading] = useState(false);
   
@@ -281,7 +281,7 @@ function PlaceOrder() {
 
     if (paymentMethod === "Cash On Delivery") {
       setLoading(true); 
-      const success = await addOrder(paymentMethod, orderItems, cartItemsToDelete, orderSubTotal, shippingFee, totalPrice);
+      const success = await addOrder(paymentMethod, orderItems, cartItemsToDelete, orderSubTotal, shippingFee, totalPrice, null);
       setLoading(false); 
       if (success) {
         window.location.href = "/orders";
@@ -515,9 +515,15 @@ function PlaceOrder() {
                     <span className="confirm-label">Total Items:</span>
                     <span className="confirm-value">{orderItems?.length || 0}</span>
                   </div>
+                  {paymentMethod === 'Paypal' && paypalFee > 0 && (
+                    <div className="confirm-detail-row">
+                      <span className="confirm-label">PayPal Fee:</span>
+                      <span className="confirm-value">₱{Number(paypalFee).toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="confirm-detail-row">
                     <span className="confirm-label">Total Amount:</span>
-                    <span className="confirm-value">₱{totalPrice.toLocaleString()}</span>
+                    <span className="confirm-value">₱{Number(totalPrice).toLocaleString()}</span>
                   </div>
                 </div>
                 <p className="confirm-terms">

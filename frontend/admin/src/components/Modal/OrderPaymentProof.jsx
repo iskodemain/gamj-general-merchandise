@@ -78,9 +78,9 @@ const OrderPaymentProof = () => {
               {selectedPaymentProof.paypalAccountName}
             </div>
           </div>
-          {/* REFERENCE ID */}
+          {/* TRANSACTION ID */}
           <div className="opp-field">
-            <label className="opp-label">PayPal Reference ID</label>
+            <label className="opp-label">PayPal Transaction ID</label>
             <div className="opp-value opp-reference">
               {selectedPaymentProof.referenceId}
             </div>

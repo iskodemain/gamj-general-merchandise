@@ -37,6 +37,11 @@ const Orders = sequelize.define(
       type: DataTypes.DECIMAL(10,2),
       allowNull: true
     },
+    paypalFee: {
+      type: DataTypes.DECIMAL(10,2),
+      allowNull: true,
+      defaultValue: null
+    },
     totalAmount: {
       type: DataTypes.DECIMAL(10,2),
       allowNull: false

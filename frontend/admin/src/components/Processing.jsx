@@ -110,6 +110,7 @@ function Processing() {
 
                   const subtotal = Number(order.subtotal || 0);
                   const shippingFee = Number(order.shippingFee || 0);
+                  const paypalFee = Number(order.paypalFee || 0);
                   const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
@@ -238,6 +239,13 @@ function Processing() {
                                 <span className="processing-label">Shipping Fee</span>
                                 <span className="processing-value">₱{shippingFee.toFixed(2)}</span>
                               </div>
+
+                              {order.paymentMethod === 'Paypal' && paypalFee > 0 && (
+                                <div className="processing-order-total-row">
+                                  <span className="processing-label">PayPal Fee</span>
+                                  <span className="processing-value">₱{paypalFee.toFixed(2)}</span>
+                                </div>
+                              )}
 
                               <div className="processing-order-total-divider"></div>
 

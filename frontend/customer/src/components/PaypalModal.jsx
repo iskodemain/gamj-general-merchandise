@@ -7,11 +7,13 @@ import Loading from "./Loading";
 import "./PaypalModal.css"; // ✅ Import CSS
 
 const PaypalModal = () => {
-    const { toastSuccess, toastError, backendUrl, token, paypalClientId, orderItems, cartItemsToDelete, paymentMethod, navigate, setShowPaypalModal, orderSubTotal, shippingFee, totalPrice, setShowOrderProofPayment, setOrderId, setCustomerId, setOrderTotalAmount} = useContext(ShopContext);
+    const { toastSuccess, toastError, backendUrl, token, paypalClientId, orderItems, cartItemsToDelete, paymentMethod, navigate, setShowPaypalModal, orderSubTotal, shippingFee, totalPrice, setShowOrderProofPayment, setOrderId, setCustomerId, setOrderTotalAmount, paypalFee, setPaypalFee} = useContext(ShopContext);
 
     const [visible, setVisible] = useState(true);
     const [loading, setLoading] = useState(true);
     const [sdkLoaded, setSdkLoaded] = useState(false);
+    // Store the fee returned from backend create-order so capture can use it
+    const [resolvedPaypalFee, setResolvedPaypalFee] = useState(0);
 
     const handleClose = () => {
         setVisible(false);
@@ -53,9 +55,10 @@ const PaypalModal = () => {
       if (!sdkLoaded || !visible) return;
 
       try {
+        // Backend calculates the grossed-up amount and returns the fee
         const { data } = await axios.post(
           `${backendUrl}/api/paypal/create-order`,
-          { amount: totalPrice },
+          { amount: orderSubTotal + shippingFee },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -64,6 +67,11 @@ const PaypalModal = () => {
           setLoading(false);
           return;
         }
+
+        // Store the fee from backend for use in capture
+        const feeFromBackend = data.paypalFee || 0;
+        setResolvedPaypalFee(feeFromBackend);
+        setPaypalFee(feeFromBackend);
 
         // Render PayPal Buttons
         window.paypal
@@ -87,7 +95,8 @@ const PaypalModal = () => {
                     cartItemsToDelete,
                     subtotal: orderSubTotal,
                     shippingFee: shippingFee,
-                    totalAmount: totalPrice
+                    totalAmount: orderSubTotal + shippingFee, // original order total (without fee)
+                    paypalFee: feeFromBackend
                   },
                   { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -100,7 +109,6 @@ const PaypalModal = () => {
                   setOrderTotalAmount(order.totalAmount);
                   handleClose();
                   setShowOrderProofPayment(true);
-                  // window.location.href = "/orders";
                   navigate("/orders");
                 } else {
                   toast.error("Payment failed, please try again.", { ...toastError });
@@ -133,7 +141,7 @@ const PaypalModal = () => {
     };
 
     renderButtons();
-  }, [sdkLoaded, visible, totalPrice, token, backendUrl]);
+  }, [sdkLoaded, visible, token, backendUrl]);
 
 
   if (!visible) return null;
@@ -150,8 +158,18 @@ const PaypalModal = () => {
 
         <h2 className="paypal-title">Complete Your Payment</h2>
         <p className="paypal-subtext">
-          Total Amount: <strong>₱{totalPrice.toLocaleString()}</strong>
+          Order Total: <strong>₱{(orderSubTotal + shippingFee).toLocaleString()}</strong>
         </p>
+        {resolvedPaypalFee > 0 && (
+          <p className="paypal-subtext">
+            PayPal Fee: <strong>₱{Number(resolvedPaypalFee).toFixed(2)}</strong>
+          </p>
+        )}
+        {resolvedPaypalFee > 0 && (
+          <p className="paypal-subtext paypal-charged-total">
+            You will be charged: <strong>₱{(orderSubTotal + shippingFee + resolvedPaypalFee).toFixed(2)}</strong>
+          </p>
+        )}
 
         <div id="paypal-buttons-container"></div>
       </div>

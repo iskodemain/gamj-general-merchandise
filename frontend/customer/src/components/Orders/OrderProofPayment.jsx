@@ -178,7 +178,7 @@ const OrderProofPayment = () => {
 
           <div className="proof-form-group">
             <label className="proof-label">
-              PayPal Reference ID {!isViewMode && <span className="required-asterisk">*</span>}
+              PayPal Transaction ID {!isViewMode && <span className="required-asterisk">*</span>}
             </label>
             <input
               type="text"

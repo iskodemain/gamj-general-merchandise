@@ -126,6 +126,7 @@ function Pending() {
 
                     const subtotal = Number(order.subtotal || 0);
                     const shippingFee = Number(order.shippingFee || 0);
+                    const paypalFee = Number(order.paypalFee || 0);
                     const totalAmount = Number(order.totalAmount || 0);
 
                     const deliveryInfo = deliveryInfoList.find(
@@ -262,6 +263,13 @@ function Pending() {
                                   <span className="pending-label">Shipping Fee</span>
                                   <span className="pending-value">₱{shippingFee.toFixed(2)}</span>
                                 </div>
+
+                                {order.paymentMethod === 'Paypal' && paypalFee > 0 && (
+                                  <div className="pending-order-total-row">
+                                    <span className="pending-label">PayPal Fee</span>
+                                    <span className="pending-value">₱{paypalFee.toFixed(2)}</span>
+                                  </div>
+                                )}
 
                                 <div className="pending-order-total-divider"></div>
 
