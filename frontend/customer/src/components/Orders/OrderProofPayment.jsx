@@ -16,6 +16,7 @@ const OrderProofPayment = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSubmitConfirmModal, setShowSubmitConfirmModal] = useState(false);
 
   
   // Find existing payment proof for this order
@@ -86,6 +87,11 @@ const OrderProofPayment = () => {
       return toast.error("All fields are required.", { ...toastError });
     }
 
+    setShowSubmitConfirmModal(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setShowSubmitConfirmModal(false);
     setIsSubmitting(true);
 
     const result = await addOrderProofPayment(orderId, referenceId, amountPaid, receiptImage);
@@ -98,6 +104,10 @@ const OrderProofPayment = () => {
         window.location.reload();
       }, 300);
     }
+  };
+
+  const handleCancelSubmit = () => {
+    setShowSubmitConfirmModal(false);
   };
 
   const handleConfirmDelete = async () => {
@@ -139,7 +149,7 @@ const OrderProofPayment = () => {
               <>
                 <MdOutlineUploadFile className="proof-header-icon" />
                 <h2 className="proof-title">Payment Proof Submission</h2>
-                <p className="proof-subtitle">Upload your PayPal payment receipt</p>
+                <p className="proof-subtitle">Upload your PayPal payment receipt to process your order.</p>
               </>
             )}
           </div>
@@ -239,6 +249,10 @@ const OrderProofPayment = () => {
             )}
           </div>
 
+          <p className="proof-image-note">
+            ⚠️ Make sure to double check the information before submission.
+          </p>
+
           {isViewMode && !isOrderCancelled ? (
             <button
               type="button"
@@ -277,6 +291,37 @@ const OrderProofPayment = () => {
           )}
         </div>
       </div>
+
+      {/* SUBMIT CONFIRMATION MODAL */}
+      {showSubmitConfirmModal && (
+        <div className="confirm-modal-overlay">
+          <div className="confirm-modal-card">
+            <div className="confirm-modal-header">
+              <MdWarning className="confirm-modal-icon confirm-modal-icon-submit" />
+              <h3 className="confirm-modal-title">Confirm Submission</h3>
+            </div>
+
+            <p className="confirm-modal-message">
+              Are you sure the information is correct?
+            </p>
+
+            <div className="confirm-modal-buttons">
+              <button
+                className="confirm-modal-btn confirm-modal-btn-no"
+                onClick={handleCancelSubmit}
+              >
+                No, Go Back
+              </button>
+              <button
+                className="confirm-modal-btn submission-confirm-modal-btn-yes"
+                onClick={handleConfirmSubmit}
+              >
+                Yes, Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CONFIRMATION MODAL */}
       {showConfirmModal && (

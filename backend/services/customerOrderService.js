@@ -366,7 +366,13 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
 
     return {
       success: true,
-      message: "Order placed successfully"
+      message: "Order placed successfully",
+      order: {
+        ID: fullOrder.ID,
+        orderId: fullOrder.orderId,
+        customerId: fullOrder.customerId,
+        totalAmount: fullOrder.totalAmount
+      }
     };
 
   } catch (error) {

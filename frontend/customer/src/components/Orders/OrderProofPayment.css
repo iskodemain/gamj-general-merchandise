@@ -1,3 +1,21 @@
+.confirm-modal-icon-submit {
+  color: #43A047 !important;
+}
+
+.proof-image-note {
+  background-color: #fff8e1;
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
+  font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* ===================== CONFIRMATION MODAL ===================== */
 .confirm-modal-overlay {
   position: fixed;
@@ -106,6 +124,20 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
 }
+
+.submission-confirm-modal-btn-yes {
+  background: linear-gradient(135deg, #50d32f 0%, #42c628 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(61, 211, 47, 0.3);
+}
+
+.submission-confirm-modal-btn-yes:hover {
+  background: linear-gradient(135deg, #4ac628 0%, #50b71c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(47, 211, 47, 0.4);
+}
+
+
 
 /* ===================== SUCCESS HEADER ICON ===================== */
 .proof-header-icon-success {
@@ -278,7 +310,7 @@
 
 /* ===================== FORM GROUPS ===================== */
 .proof-form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .proof-label {
@@ -589,7 +621,7 @@
   }
 
   .proof-form-group {
-    margin-bottom: 1.2rem;
+    margin-bottom: 0.8rem;
   }
 
   .proof-label {
@@ -712,7 +744,7 @@
   }
 
   .proof-form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .proof-label {
@@ -812,6 +844,18 @@
     padding: 0.7rem 1rem;
     font-size: 0.85rem;
   }
+  .proof-image-note {
+    font-size: clamp(0.55rem, 3vw, 0.7rem);
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+@media (max-width: 240px) {
+  .proof-image-note {
+    font-size: 0.55rem;
+    padding: 0.3rem 0.5rem;
+    border-left-width: 3px;
+  }
 }
 
 /* ===================== RESPONSIVE - MINIMUM (200px) ===================== */
@@ -850,7 +894,7 @@
   }
 
   .proof-form-group {
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
   }
 
   .proof-label {

@@ -7,7 +7,7 @@ import Loading from "./Loading";
 import "./PaypalModal.css"; // ✅ Import CSS
 
 const PaypalModal = () => {
-    const { backendUrl, token, paypalClientId, orderItems, cartItemsToDelete, paymentMethod, navigate, setShowPaypalModal, orderSubTotal, shippingFee, totalPrice} = useContext(ShopContext);
+    const { toastSuccess, toastError, backendUrl, token, paypalClientId, orderItems, cartItemsToDelete, paymentMethod, navigate, setShowPaypalModal, orderSubTotal, shippingFee, totalPrice, setShowOrderProofPayment, setOrderId, setCustomerId, setOrderTotalAmount} = useContext(ShopContext);
 
     const [visible, setVisible] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ const PaypalModal = () => {
             setSdkLoaded(true);
         };
         script.onerror = () => {
-            toast.error("Failed to load PayPal SDK.");
+            toast.error("Failed to load PayPal SDK.", { ...toastError });
             setLoading(false);
         };
         document.body.appendChild(script);
@@ -60,7 +60,7 @@ const PaypalModal = () => {
         );
 
         if (!data?.id) {
-          toast.error("Unable to create PayPal order.");
+          toast.error("Unable to create PayPal order.", { ...toastError });
           setLoading(false);
           return;
         }
@@ -93,14 +93,20 @@ const PaypalModal = () => {
                 );
 
                 if (capture.data?.success) {
-                  toast.success("Payment successful!");
+                  toast.success("Payment successful!", { ...toastSuccess });
+                  const order = capture.data.order;
+                  setOrderId(order.ID);
+                  setCustomerId(order.customerId);
+                  setOrderTotalAmount(order.totalAmount);
                   handleClose();
-                  window.location.href = "/orders";
+                  setShowOrderProofPayment(true);
+                  // window.location.href = "/orders";
+                  navigate("/orders");
                 } else {
-                  toast.error("Payment failed, please try again.");
+                  toast.error("Payment failed, please try again.", { ...toastError });
                 }
               } catch {
-                toast.error("Error capturing PayPal payment.");
+                toast.error("Error capturing PayPal payment.", { ...toastError });
               } finally {
                 setLoading(false);
               }
@@ -121,7 +127,7 @@ const PaypalModal = () => {
           })
           .render("#paypal-buttons-container");
       } catch {
-        toast.error("PayPal initialization failed.");
+        toast.error("PayPal initialization failed.", { ...toastError });
         setLoading(false);
       }
     };
