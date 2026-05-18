@@ -6,7 +6,7 @@ import OrderCancel from '../../models/orderCancel.js'
 import Customer from "../../models/customer.js";
 import Products from "../../models/products.js";
 import ProductVariantValues from "../../models/productVariantValues.js";
-import ProductVariantCombination from "../../models/ProductVariantCombination.js";
+import ProductVariantCombination from "../../models/productVariantCombination.js";
 import Notifications from "../../models/notifications.js";
 import { orderSendMail } from '../../utils/mailer.js';
 import { orderStatusUpdateTemplate } from "../../utils/emailTemplates.js";
