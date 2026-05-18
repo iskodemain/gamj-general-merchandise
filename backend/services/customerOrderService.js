@@ -20,8 +20,9 @@ import {v2 as cloudinary} from 'cloudinary';
 import fs from 'fs/promises';
 import { orderSendMail } from "../utils/mailer.js";
 import ProductInventorySettings from "../models/productInventorySettings.js";
-import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate, cancellationRequestRemovedTemplate, newCancelOrderRequestTemplate, customerPaypalEmailSubmittedTemplate } from "../utils/emailTemplates.js";
+import { placeOrderTemplate, customerCancelledOrderTemplate, refundOrderTemplate, cancellationRequestRemovedTemplate, newCancelOrderRequestTemplate, customerPaypalEmailSubmittedTemplate, stockAdjustmentLowStockTemplate, outOfStockTemplate } from "../utils/emailTemplates.js";
 import OrderDeliveryProof from "../models/orderDeliveryProof.js";
+import Admin from "../models/admin.js";
 
 // 🔹 ID GENERATOR
 const withTimestamp = (prefix, number) => {
@@ -143,12 +144,52 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
         updatedAt: new Date()
       });
 
-      // ✅ MARK PRODUCT AS OUT OF STOCK IF ZERO
+      // ✅ MARK PRODUCT AS OUT OF STOCK IF ZERO + NOTIFY ALL USERS
       if (newTotalQuantity === 0) {
         await Products.update(
           { isOutOfStock: true },
           { where: { ID: productId } }
         );
+
+        // In-app out of stock notification broadcast to all user types
+        const lastOosNotif = await Notifications.findOne({ order: [["ID", "DESC"]] });
+        let oosNotifNo = lastOosNotif ? Number(lastOosNotif.ID) + 1 : 1;
+
+        const oosNotification = await Notifications.create({
+          notificationId: withTimestamp("NTFY", oosNotifNo++),
+          senderId: null,
+          receiverId: null,
+          receiverType: "All",
+          senderType: "System",
+          notificationType: "Product Update",
+          title: "Out of Stock Alert",
+          message: `❌ The product "${productName}" is now OUT OF STOCK.`,
+          isRead: false,
+          createAt: new Date(),
+        });
+
+        io.emit("lowStockAlert", oosNotification);
+
+        // Bulk email — all verified admins/delivery staff + all verified customers
+        const oosAdmins = await Admin.findAll({ where: { verifiedUser: true } });
+        const oosCustomers = await Customer.findAll({ where: { verifiedCustomer: true } });
+
+        const oosAdminEmails = oosAdmins.map(a => a.emailAddress).filter(Boolean);
+        const oosCustomerEmails = oosCustomers.map(c => c.loginEmail || c.emailAddress).filter(Boolean);
+        const oosAllEmails = [...new Set([...oosAdminEmails, ...oosCustomerEmails])];
+
+        if (oosAllEmails.length > 0) {
+          orderSendMail({
+            to: oosAllEmails.join(","),
+            subject: `OUT OF STOCK: ${productName}`,
+            html: outOfStockTemplate(
+              productName,
+              "Customer Order",
+              quantityToDeduct,
+              `Order placed by ${user.medicalInstitutionName}`
+            ),
+          });
+        }
       }
 
       // ✅ UPDATE INVENTORY BATCH (FIFO, deduct in pieces)
@@ -207,7 +248,7 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
       });
 
 
-      // NEW SECTION: LOW STOCK ALERT
+      // NEW SECTION: LOW STOCK ALERT (only when stock > 0 but at or below threshold)
       const inventorySettings = await ProductInventorySettings.findOne({
         where: {
           productId,
@@ -215,14 +256,15 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
           variantCombinationId: productVariantCombinationId || null,
         },
       });
-      if (inventorySettings && newTotalQuantity <= inventorySettings.lowStockThreshold) {
-        const lowStockMessage = newTotalQuantity === 0 ? `⚠️ The product "${productName}" is now OUT OF STOCK.` : `⚠️ The product "${productName}" is running low. Only ${newTotalQuantity} left in stock!`;
-         // ⭐ FIXED — LOW STOCK NOTIFICATION ID
+      if (inventorySettings && newTotalQuantity > 0 && newTotalQuantity <= inventorySettings.lowStockThreshold) {
+        const lowStockMessage = `⚠️ The product "${productName}" is running low. Only ${newTotalQuantity} left in stock!`;
+
+        // In-app notification broadcast to all user types
         const lowStockNotification = await Notifications.create({
             notificationId: withTimestamp("NTFY", nextNotificationNo++),
             senderId: null,
-            receiverId: null,               // ✅ null = broadcast to all users
-            receiverType: "All",            // ✅ notify all types
+            receiverId: null,
+            receiverType: "All",
             senderType: "System",
             notificationType: "Product Update",
             title: "Low Stock Alert",
@@ -233,6 +275,29 @@ export const addOrderService = async (customerId, paymentMethod, orderItems, car
         );
 
         io.emit("lowStockAlert", lowStockNotification);
+
+        // Bulk email — all verified admins/delivery staff + all verified customers
+        const allAdmins = await Admin.findAll({ where: { verifiedUser: true } });
+        const allCustomers = await Customer.findAll({ where: { verifiedCustomer: true } });
+
+        const adminEmails = allAdmins.map(a => a.emailAddress).filter(Boolean);
+        const customerEmails = allCustomers.map(c => c.loginEmail || c.emailAddress).filter(Boolean);
+        const allEmails = [...new Set([...adminEmails, ...customerEmails])];
+
+        if (allEmails.length > 0) {
+          orderSendMail({
+            to: allEmails.join(","),
+            subject: `Low Stock Alert: ${productName}`,
+            html: stockAdjustmentLowStockTemplate(
+              productName,
+              "ORDER",
+              quantityToDeduct,
+              newTotalQuantity,
+              `Order placed by ${user.medicalInstitutionName}`,
+              inventorySettings.lowStockThreshold
+            ),
+          });
+        }
       }
 
       const orderItemId = withTimestamp("OITM", nextOrderItemNo);

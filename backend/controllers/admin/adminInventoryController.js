@@ -1,4 +1,4 @@
-import { fetchInventoryStockService, addStockService, fetchInventoryBatchService, fetchInventoryHistoryService, addInventorySettingsService, fetchInventorySettingsService, updateInventorySettingsService, deleteInventorySettingsService } from "../../services/admin/adminInventoryService.js";
+import { fetchInventoryStockService, addStockService, fetchInventoryBatchService, fetchInventoryHistoryService, addInventorySettingsService, fetchInventorySettingsService, updateInventorySettingsService, deleteInventorySettingsService, adjustStockService } from "../../services/admin/adminInventoryService.js";
 
 
 export const fetchInventoryStock = async (req, res) => {
@@ -98,4 +98,16 @@ export const deleteInventorySettings = async (req, res) => {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
+};
+
+export const adjustStock = async (req, res) => {
+    try {
+        const { ID } = req.admin;
+        const { productId, variantValueId, variantCombinationId, quantity, adjustType, reason } = req.body;
+        const result = await adjustStockService(ID, productId, variantValueId, variantCombinationId, quantity, adjustType, reason);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
 };

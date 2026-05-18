@@ -53,6 +53,16 @@ function Inventory() {
                 onClick={() => navigate("/inventory/add")}
               />
             }
+
+            {
+              ['Admin', 'Delivery Staff'].includes(currentUser) &&
+              <OverviewCard
+                icon={assets.inventory_icon}
+                title="Stock Adjustment"
+                number={"+/-"}
+                onClick={() => navigate("/inventory/adjust")}
+              />
+            }
           </div>
         </section>
       </main>

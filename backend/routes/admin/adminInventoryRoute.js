@@ -1,7 +1,7 @@
 import express from 'express';
 import adminAuth from '../../middleware/adminAuth.js';
 
-import { fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, fetchInventorySettings, addInventorySettings, updateInventorySettings, deleteInventorySettings } from '../../controllers/admin/adminInventoryController.js';
+import { fetchInventoryStock, addStock, fetchInventoryBatch, fetchInventoryHistory, fetchInventorySettings, addInventorySettings, updateInventorySettings, deleteInventorySettings, adjustStock } from '../../controllers/admin/adminInventoryController.js';
 
 const adminInventoryRouter = express.Router();
 
@@ -13,6 +13,7 @@ adminInventoryRouter.get('/settings/fetch', adminAuth, fetchInventorySettings);
 
 // ADD
 adminInventoryRouter.post('/add-stock', adminAuth, addStock);
+adminInventoryRouter.post('/adjust-stock', adminAuth, adjustStock);
 adminInventoryRouter.post('/settings/add', adminAuth, addInventorySettings);
 
 // UPDATE

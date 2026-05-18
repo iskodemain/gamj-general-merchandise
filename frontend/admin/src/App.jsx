@@ -46,6 +46,7 @@ import AddNewUser from "./components/AddNewUser.jsx";
 import Inventory from "./pages/Inventory.jsx";
 import InventoryDashboard from "./components/Inventory/InventoryDashboard.jsx";
 import AddStock from "./components/Inventory/AddStock.jsx";
+import StockAdjustment from "./components/Inventory/StockAdjustment.jsx";
 import BatchList from "./components/Inventory/BatchList.jsx";
 import OrderTransactions from "./components/Transactions/OrderTransactions.jsx";
 import InventoryTransactions from "./components/Transactions/InventoryTransactions.jsx";
@@ -114,6 +115,11 @@ const App = () => {
       <Route path="/inventory/add" element={
         <ProtectedRoute allowedRoles={['Admin', 'Delivery Staff']}>
           <AddStock />
+        </ProtectedRoute>
+      } />
+      <Route path="/inventory/adjust" element={
+        <ProtectedRoute allowedRoles={['Admin', 'Delivery Staff']}>
+          <StockAdjustment />
         </ProtectedRoute>
       } />
       <Route path="/delivery-locations" element={

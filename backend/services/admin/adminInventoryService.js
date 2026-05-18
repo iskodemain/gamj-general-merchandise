@@ -3,7 +3,13 @@ import InventoryStock from "../../models/inventoryStock.js";
 import InventoryBatch from "../../models/inventoryBatch.js"
 import InventoryHistory from "../../models/inventoryHistory.js"
 import ProductInventorySettings from "../../models/productInventorySettings.js";
+import Notifications from "../../models/notifications.js";
+import Customer from "../../models/customer.js";
+import Products from "../../models/products.js";
 import { sequelize } from "../../config/sequelize.js";
+import { io } from "../../server.js";
+import { orderSendMail } from "../../utils/mailer.js";
+import { stockAdjustmentLowStockTemplate, outOfStockTemplate } from "../../utils/emailTemplates.js";
 
 // ID GENERATOR
 const withTimestamp = (prefix, number) => {
@@ -413,6 +419,244 @@ export const deleteInventorySettingsService = async (adminId, productInventorySe
 
   } catch (error) {
     console.log(error);
+    throw new Error(error.message);
+  }
+};
+
+export const adjustStockService = async (adminId, productId, variantValueId, variantCombinationId, quantity, adjustType, reason) => {
+  try {
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) return { success: false, message: "User not found" };
+
+    if (!productId || !quantity || !adjustType || !reason) {
+      return { success: false, message: "Missing required fields" };
+    }
+
+    if (Number(quantity) <= 0) {
+      return { success: false, message: "Quantity must be greater than 0" };
+    }
+
+    if (!["ADD", "DEDUCT"].includes(adjustType)) {
+      return { success: false, message: "Invalid adjust type. Must be ADD or DEDUCT." };
+    }
+
+    const product = await Products.findByPk(productId);
+    if (!product) return { success: false, message: "Product not found" };
+
+    // Find inventory stock record
+    const stock = await InventoryStock.findOne({
+      where: {
+        productId,
+        variantValueId: variantValueId || null,
+        variantCombinationId: variantCombinationId || null,
+      },
+    });
+
+    if (!stock) return { success: false, message: "Inventory stock record not found for this product/variant." };
+
+    const currentQty = Number(stock.totalQuantity || 0);
+    const adjustQty = Number(quantity);
+
+    if (adjustType === "DEDUCT" && adjustQty > currentQty) {
+      return { success: false, message: `Cannot deduct ${adjustQty} — only ${currentQty} in stock.` };
+    }
+
+    // Calculate new total
+    const newTotalQuantity = adjustType === "ADD"
+      ? currentQty + adjustQty
+      : Math.max(0, currentQty - adjustQty);
+
+    // Update InventoryStock
+    await stock.update({ totalQuantity: newTotalQuantity, updatedAt: new Date() });
+
+    // Update isOutOfStock flag on product + notify all users when stock hits zero
+    if (newTotalQuantity === 0) {
+      await Products.update({ isOutOfStock: true }, { where: { ID: productId } });
+
+      // In-app out of stock notification broadcast to all user types
+      const lastOosNotif = await Notifications.findOne({ order: [["ID", "DESC"]] });
+      let oosNotifNo = lastOosNotif ? Number(lastOosNotif.ID) + 1 : 1;
+
+      const oosNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", oosNotifNo++),
+        senderId: null,
+        receiverId: null,
+        receiverType: "All",
+        senderType: "System",
+        notificationType: "Product Update",
+        title: "Out of Stock Alert",
+        message: `❌ The product "${product.productName}" is now OUT OF STOCK after a stock adjustment.`,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      io.emit("lowStockAlert", oosNotification);
+
+      // Bulk email — all verified admins/delivery staff + all verified customers
+      const oosAdmins = await Admin.findAll({ where: { verifiedUser: true } });
+      const oosCustomers = await Customer.findAll({ where: { verifiedCustomer: true } });
+
+      const oosAdminEmails = oosAdmins.map(a => a.emailAddress).filter(Boolean);
+      const oosCustomerEmails = oosCustomers.map(c => c.loginEmail || c.emailAddress).filter(Boolean);
+      const oosAllEmails = [...new Set([...oosAdminEmails, ...oosCustomerEmails])];
+
+      if (oosAllEmails.length > 0) {
+        orderSendMail({
+          to: oosAllEmails.join(","),
+          subject: `OUT OF STOCK: ${product.productName}`,
+          html: outOfStockTemplate(
+            product.productName,
+            `Stock Adjustment (${adjustType})`,
+            adjustQty,
+            reason
+          ),
+        });
+      }
+    } else {
+      await Products.update({ isOutOfStock: false }, { where: { ID: productId } });
+    }
+
+    // Update InventoryBatch — find the most recent batch for this product/variant
+    // For ADD: increase quantityReceived and remainingQuantity of the latest batch
+    // For DEDUCT: decrease remainingQuantity using FIFO (oldest expiry first)
+    if (adjustType === "ADD") {
+      // Find the latest batch (most recently received)
+      const latestBatch = await InventoryBatch.findOne({
+        where: {
+          productId,
+          variantValueId: variantValueId || null,
+          variantCombinationId: variantCombinationId || null,
+        },
+        order: [["dateReceived", "DESC"]],
+      });
+
+      if (latestBatch) {
+        await latestBatch.update({
+          quantityReceived: Number(latestBatch.quantityReceived) + adjustQty,
+          remainingQuantity: Number(latestBatch.remainingQuantity) + adjustQty,
+          updatedAt: new Date(),
+        });
+      }
+    } else {
+      // DEDUCT: FIFO — oldest expiry first
+      let remainingToDeduct = adjustQty;
+      const batches = await InventoryBatch.findAll({
+        where: {
+          productId,
+          variantValueId: variantValueId || null,
+          variantCombinationId: variantCombinationId || null,
+        },
+        order: [
+          ["expirationDate", "ASC"],
+          ["dateReceived", "ASC"],
+        ],
+      });
+
+      for (const batch of batches) {
+        if (remainingToDeduct <= 0) break;
+        const batchRemaining = Number(batch.remainingQuantity || 0);
+        const deductFromBatch = Math.min(batchRemaining, remainingToDeduct);
+        await batch.update({ remainingQuantity: batchRemaining - deductFromBatch, updatedAt: new Date() });
+        remainingToDeduct -= deductFromBatch;
+      }
+    }
+
+    // Create InventoryHistory record
+    const lastHistory = await InventoryHistory.findOne({ order: [["ID", "DESC"]] });
+    const nextHistoryNo = lastHistory ? lastHistory.ID + 1 : 1;
+    const inventoryHistoryId = withTimestamp("IHT", nextHistoryNo);
+
+    await InventoryHistory.create({
+      inventoryHistoryId,
+      productId,
+      variantValueId: variantValueId || null,
+      variantCombinationId: variantCombinationId || null,
+      type: "ADJUST",
+      adjustType,
+      quantity: adjustQty,
+      stockAfter: newTotalQuantity,
+      referenceId: `ADJ-${adminUser.adminId || adminId}`,
+      remarks: reason,
+      createdAt: new Date(),
+    });
+
+    // Check low stock threshold and notify if needed
+    const inventorySettings = await ProductInventorySettings.findOne({
+      where: {
+        productId,
+        variantValueId: variantValueId || null,
+        variantCombinationId: variantCombinationId || null,
+      },
+    });
+
+    const shouldNotify = adjustType === "DEDUCT" && inventorySettings && newTotalQuantity > 0 && newTotalQuantity <= inventorySettings.lowStockThreshold;
+
+    if (shouldNotify) {
+      const productName = product.productName;
+      const lowStockThreshold = inventorySettings.lowStockThreshold;
+      const lowStockMessage = newTotalQuantity === 0
+        ? `⚠️ The product "${productName}" is now OUT OF STOCK after a stock adjustment.`
+        : `⚠️ The product "${productName}" is running low after a stock adjustment. Only ${newTotalQuantity} left in stock!`;
+
+      // Notification counter
+      const lastNotification = await Notifications.findOne({ order: [["ID", "DESC"]] });
+      let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
+
+      // Broadcast low stock notification to all
+      const lowStockNotification = await Notifications.create({
+        notificationId: withTimestamp("NTFY", nextNotificationNo++),
+        senderId: null,
+        receiverId: null,
+        receiverType: "All",
+        senderType: "System",
+        notificationType: "Product Update",
+        title: "Low Stock Alert",
+        message: lowStockMessage,
+        isRead: false,
+        createAt: new Date(),
+      });
+
+      io.emit("lowStockAlert", lowStockNotification);
+
+      // Collect all email recipients: all admins + all customers
+      const allAdmins = await Admin.findAll({ where: { verifiedUser: true } });
+      const allCustomers = await Customer.findAll({ where: { verifiedCustomer: true } });
+
+      const adminEmails = allAdmins
+        .map(a => a.emailAddress)
+        .filter(Boolean);
+
+      const customerEmails = allCustomers
+        .map(c => c.loginEmail || c.emailAddress)
+        .filter(Boolean);
+
+      const allEmails = [...new Set([...adminEmails, ...customerEmails])];
+
+      if (allEmails.length > 0) {
+        orderSendMail({
+          to: allEmails.join(","),
+          subject: newTotalQuantity === 0
+            ? `OUT OF STOCK: ${productName}`
+            : `Low Stock Alert: ${productName}`,
+          html: stockAdjustmentLowStockTemplate(
+            productName,
+            adjustType,
+            adjustQty,
+            newTotalQuantity,
+            reason,
+            lowStockThreshold
+          ),
+        });
+      }
+    }
+
+    return {
+      success: true,
+      message: `Stock ${adjustType === "ADD" ? "increased" : "decreased"} by ${adjustQty} units successfully.`,
+    };
+
+  } catch (error) {
+    console.error(error);
     throw new Error(error.message);
   }
 };

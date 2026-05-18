@@ -2379,3 +2379,122 @@ export const userAccountCreatedTemplate = (userName) => {
 </body>
 </html>`;
 };
+
+export const stockAdjustmentLowStockTemplate = (productName, adjustType, quantity, stockAfter, reason, lowStockThreshold) => {
+  const isOut = stockAfter === 0;
+  const badgeColor = isOut ? '#c62828' : '#FB8C00';
+  const statusText = isOut ? '❌ OUT OF STOCK' : '⚠️ LOW STOCK ALERT';
+  const statusMessage = isOut
+    ? `The product <b>${productName}</b> is now <b>OUT OF STOCK</b> after a stock adjustment.`
+    : `The product <b>${productName}</b> has fallen to or below the low stock threshold of <b>${lowStockThreshold}</b> units after a stock adjustment.`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Adjustment Alert</title>
+<style>
+  body, table, td, a { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+  img { border: 0; display: block; max-width: 100%; }
+  .email-container { width: 100%; background-color: #f4f6f9; padding: 20px 0; }
+  .email-content { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  .email-header { text-align: center; margin-bottom: 30px; }
+  .email-header img { margin: 0 auto; max-width: 120px; }
+  .email-body { text-align: center; font-size: 16px; line-height: 1.6; color: #333333; }
+  .status-badge { display: inline-block; padding: 10px 20px; background-color: ${badgeColor}; color: #ffffff; font-weight: bold; border-radius: 10px; margin: 20px 0; }
+  .info-box { background-color: #fff8e1; border-left: 4px solid ${badgeColor}; border-radius: 6px; padding: 14px 18px; margin: 20px 0; text-align: left; font-size: 14px; color: #1a1a1a; }
+  .email-footer { text-align: center; font-size: 12px; color: #777777; margin-top: 30px; border-top: 1px solid #e0e0e0; padding-top: 20px; }
+  .email-footer a { color: #43A047; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+  <table class="email-container" role="presentation">
+    <tr>
+      <td>
+        <div class="email-content">
+          <div class="email-header">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
+          </div>
+          <h2 style="text-align:center;">Stock Adjustment Alert</h2>
+          <div class="email-body">
+            <div class="status-badge">${statusText}</div>
+            <p>${statusMessage}</p>
+            <div class="info-box">
+              <p><strong>Product:</strong> ${productName}</p>
+              <p><strong>Adjustment Type:</strong> ${adjustType}</p>
+              <p><strong>Quantity Adjusted:</strong> ${quantity}</p>
+              <p><strong>Stock After Adjustment:</strong> ${stockAfter} units</p>
+              <p><strong>Low Stock Threshold:</strong> ${lowStockThreshold} units</p>
+              <p><strong>Reason:</strong> ${reason}</p>
+            </div>
+            <p>Please review the inventory and take necessary action.</p>
+          </div>
+          <div class="email-footer">
+            <p>This is an automated alert from GAMJ General Merchandise Inventory System.</p>
+            <p>Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+            <p style="margin-top: 15px;">© ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.</p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
+
+export const outOfStockTemplate = (productName, triggeredBy, quantity, reason) => {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Out of Stock Alert</title>
+<style>
+  body, table, td, a { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+  img { border: 0; display: block; max-width: 100%; }
+  .email-container { width: 100%; background-color: #f4f6f9; padding: 20px 0; }
+  .email-content { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  .email-header { text-align: center; margin-bottom: 30px; }
+  .email-header img { margin: 0 auto; max-width: 120px; }
+  .email-body { text-align: center; font-size: 16px; line-height: 1.6; color: #333333; }
+  .status-badge { display: inline-block; padding: 12px 24px; background-color: #c62828; color: #ffffff; font-weight: bold; border-radius: 10px; margin: 20px 0; font-size: 18px; letter-spacing: 1px; }
+  .info-box { background-color: #ffebee; border-left: 4px solid #c62828; border-radius: 6px; padding: 14px 18px; margin: 20px 0; text-align: left; font-size: 14px; color: #1a1a1a; }
+  .info-box p { margin: 6px 0; }
+  .email-footer { text-align: center; font-size: 12px; color: #777777; margin-top: 30px; border-top: 1px solid #e0e0e0; padding-top: 20px; }
+  .email-footer a { color: #43A047; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+  <table class="email-container" role="presentation">
+    <tr>
+      <td>
+        <div class="email-content">
+          <div class="email-header">
+            <img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ General Merchandise Logo">
+          </div>
+          <h2 style="text-align:center; color:#c62828;">❌ Out of Stock Alert</h2>
+          <div class="email-body">
+            <p>The following product has just reached <b>zero stock</b> and is now <b>OUT OF STOCK</b>.</p>
+            <div class="status-badge">❌ OUT OF STOCK</div>
+            <div class="info-box">
+              <p><strong>Product:</strong> ${productName}</p>
+              <p><strong>Triggered By:</strong> ${triggeredBy}</p>
+              <p><strong>Quantity Deducted:</strong> ${quantity}</p>
+              <p><strong>Remaining Stock:</strong> 0 units</p>
+              <p><strong>Reason / Reference:</strong> ${reason}</p>
+            </div>
+            <p>Please restock this product as soon as possible to avoid disruption to orders.</p>
+          </div>
+          <div class="email-footer">
+            <p>This is an automated alert from GAMJ General Merchandise Inventory System.</p>
+            <p>Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+            <p style="margin-top: 15px;">© ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.</p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
