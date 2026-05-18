@@ -162,3 +162,243 @@ select option {
     font-size: 1.5rem;           
   }
 }
+
+
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .shop-main {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+
+    .dropdown-container ul,
+    .dropdown-container li {
+        font-size: 0.8rem;
+    }
+
+    .shop-semi {
+        gap: 1rem;
+        padding-top: 2rem;
+    }
+
+    .shop-settings {
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .filter-btn {
+        font-size: 0.8rem;
+    }
+
+    .filter-button {
+        font-size: 1rem;
+        margin-right: 0.6rem;
+    }
+
+    .product-filter {
+        width: 10rem;
+    }
+
+    .sort-container {
+        font-size: 0.8rem;
+    }
+
+    .dropdown-container {
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .shop-main {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+
+    .dropdown-container ul,
+    .dropdown-container li {
+        font-size: 0.72rem;
+    }
+
+    .shop-semi {
+        gap: 0.8rem;
+        padding-top: 1.5rem;
+    }
+
+    .shop-settings {
+        font-size: 0.78rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .filter-btn {
+        font-size: 0.72rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .filter-button {
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+    }
+
+    .product-filter {
+        width: 9rem;
+    }
+
+    .sort-container {
+        font-size: 0.72rem;
+    }
+
+    .dropdown-container {
+        font-size: 0.72rem;
+    }
+
+    .dropdown-container .dropdown-choices,
+    .dropdown-container .dropdown-choices-top,
+    .dropdown-choices-buttom {
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .shop-main {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .dropdown-container ul,
+    .dropdown-container li {
+        font-size: 0.65rem;
+    }
+
+    .shop-semi {
+        gap: 0.7rem;
+        padding-top: 1.2rem;
+    }
+
+    .shop-settings {
+        font-size: 0.7rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-btn {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.3rem;
+    }
+
+    .filter-button {
+        font-size: 0.8rem;
+        margin-right: 0.4rem;
+    }
+
+    .product-filter {
+        width: 8rem;
+    }
+
+    .sort-container {
+        font-size: 0.65rem;
+    }
+
+    .dropdown-container {
+        font-size: 0.65rem;
+    }
+
+    .dropdown-container .dropdown-choices,
+    .dropdown-container .dropdown-choices-top,
+    .dropdown-choices-buttom {
+        padding: 0.35rem 0.6rem;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .shop-main {
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
+
+    .dropdown-container ul,
+    .dropdown-container li {
+        font-size: 0.55rem;
+    }
+
+    .shop-semi {
+        gap: 0.6rem;
+        padding-top: 1rem;
+    }
+
+    .shop-settings {
+        font-size: 0.6rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .filter-btn {
+        font-size: 0.55rem;
+        padding: 0.12rem 0.25rem;
+    }
+
+    .filter-button {
+        font-size: 0.7rem;
+        margin-right: 0.3rem;
+    }
+
+    .product-filter {
+        width: 7rem;
+    }
+
+    .sort-container {
+        font-size: 0.55rem;
+    }
+
+    .dropdown-container {
+        font-size: 0.55rem;
+    }
+
+    .dropdown-container .dropdown-choices,
+    .dropdown-container .dropdown-choices-top,
+    .dropdown-choices-buttom {
+        padding: 0.3rem 0.5rem;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .shop-main {
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+    }
+
+    .shop-semi {
+        gap: 0.5rem;
+        padding-top: 0.8rem;
+    }
+
+    .shop-settings {
+        font-size: 0.5rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .filter-btn {
+        font-size: 0.45rem;
+        padding: 0.1rem 0.2rem;
+    }
+
+    .filter-button {
+        font-size: 0.6rem;
+        margin-right: 0.2rem;
+    }
+
+    .product-filter {
+        width: 6rem;
+    }
+
+    .sort-container {
+        font-size: 0.45rem;
+    }
+
+    .dropdown-container {
+        font-size: 0.45rem;
+    }
+
+    .dropdown-container .dropdown-choices,
+    .dropdown-container .dropdown-choices-top,
+    .dropdown-choices-buttom {
+        padding: 0.25rem 0.4rem;
+    }
+}

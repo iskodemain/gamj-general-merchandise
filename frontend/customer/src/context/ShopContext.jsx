@@ -1144,22 +1144,33 @@ const ShopContextProvider = (props) => {
         for (const item of cartItems) {   
             totalCount += 1;
         }
-        if (totalCount === 0) {
-            setShowCartContent(false);    
-        }
+        // if (totalCount === 0) {
+        //     setShowCartContent(false);    
+        // }
         return totalCount;
     };
+    useEffect(() => {
+        if (cartItems.length === 0) {
+            setShowCartContent(false);
+        }
+    }, [cartItems]);
 
     const getWishlistCount = () => {
         let totalCount = 0;
         for (const items in wishlistItems) {
             totalCount += 1;
         }
-        if (totalCount === 0) {
-            setShowWishlistContent(false);
-        }
+        // if (totalCount === 0) {
+        //     setShowWishlistContent(false);
+        // }
         return totalCount;
     };
+    // ✅ NEW: Handle showWishlistContent based on wishlist count
+    useEffect(() => {
+        if (wishlistItems.length === 0) {
+            setShowWishlistContent(false);
+        }
+    }, [wishlistItems]);
     
     /*------------------------------------TOKEN--------------------------------------*/
 

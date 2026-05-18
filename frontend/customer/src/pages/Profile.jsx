@@ -864,10 +864,10 @@ const Profile = () => {
         {loading && <Loading />}
           <div className="security-header">
             <h2 className="profile-title" style={{ marginBottom: 0 }}>Account Security</h2>
-            <button type="button" className="delete-account-btn" onClick={handleDeleteAccount}>
+            {/* <button type="button" className="delete-account-btn" onClick={handleDeleteAccount}>
               <HiMiniTrash size={20} style={{ marginRight: 2 }} />
               Delete Account
-            </button>
+            </button> */}
           </div>
           {!accountUpdate ? 
             // FIRST STEP

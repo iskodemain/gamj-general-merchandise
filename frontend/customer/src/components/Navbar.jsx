@@ -80,6 +80,20 @@ function Navbar() {
     }
   }, [])
 
+  // ✅ NEW: Disable body scroll when sidebar is open
+useEffect(() => {
+  if (sidebar) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = 'unset';
+  }
+  
+  // Cleanup on unmount
+  return () => {
+    document.body.style.overflow = 'unset';
+  };
+}, [sidebar]);
+
   // Add this useEffect to close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -266,6 +280,7 @@ function Navbar() {
           <li><NavLink to="/" onClick={showSidebar}>Home</NavLink></li>
           <li><NavLink to="/shop" onClick={showSidebar}>Shop</NavLink></li>
           <li><NavLink to="/about" onClick={showSidebar}>About</NavLink></li>
+          <li><NavLink to="/contact" onClick={showSidebar}>Contacts</NavLink></li>
           {token && (
             <li><NavLink to="/orders" onClick={showSidebar}>Orders</NavLink></li>
           )}

@@ -15,3 +15,34 @@
     font-size: 14px;
     color: #565656;
 }
+
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .footer-container .copyright {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .footer-container .copyright {
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .footer-container .copyright {
+        font-size: 10px;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .footer-container .copyright {
+        font-size: 8px;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .footer-container .copyright {
+        font-size: 6px;
+    }
+}

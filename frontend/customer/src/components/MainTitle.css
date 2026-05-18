@@ -22,3 +22,39 @@
     gap: 0.75rem; 
     align-items: center; 
 }
+
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .firstMainText,
+    .secondMainText {
+        font-size: 1.3rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .firstMainText,
+    .secondMainText {
+        font-size: 1.1rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .firstMainText,
+    .secondMainText {
+        font-size: 0.95rem;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .firstMainText,
+    .secondMainText {
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .firstMainText,
+    .secondMainText {
+        font-size: 0.65rem;
+    }
+}

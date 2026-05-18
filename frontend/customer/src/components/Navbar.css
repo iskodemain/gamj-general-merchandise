@@ -10,9 +10,6 @@
   pointer-events: none;
 }
 
-
-
-
 /* ================================
    Navbar Notification Dropdown
    (Isolated from Notification.jsx)
@@ -372,6 +369,7 @@ img {
     height: 100vh;
     border-left: 1px solid rgb(232, 232, 232);
     border-top-left-radius: 1rem;
+    overflow-y: auto;
 }
 
 .nav-menu.active {
@@ -413,6 +411,7 @@ img {
 
 .nav-menu-items {
     width: 100%;
+    min-height: min-content;
 }
 
 .nav-menu ul li .menu-bars {
