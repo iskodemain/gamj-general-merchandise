@@ -45,7 +45,7 @@ function Inventory() {
             />
             
             {
-              ['Super Admin', 'Admin'].includes(currentUser) &&
+              ['Admin', 'Delivery Staff'].includes(currentUser) &&
               <OverviewCard
                 icon={assets.add_inventory_icon}
                 title="Add Stock"

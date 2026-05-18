@@ -42,7 +42,7 @@ function Navbar({TitleName}) {
           </div>
 
           <div className="navbar-icons">
-            {["Super Admin"].includes(currentUser) && 
+            {["Admin"].includes(currentUser) && 
               <>
                 <button onClick={() => window.location.href = "/settings"}><img src={assets.settings_icon} alt="Setings"className="navbar-icon"/></button>
               </>

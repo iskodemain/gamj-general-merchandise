@@ -54,7 +54,7 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
     }
 
     // 🔥 STAFF & ADMIN now both come from adminList
-    if (userType === "Staff" || userType === "Admin" || userType === "Delivery Staff") {
+    if (userType === "Admin" || userType === "Delivery Staff") {
       return adminList.find(
         (a) => a.ID === ID && a.userType === userType
       ) || null;
@@ -89,12 +89,6 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
         identifier: user.loginEmail || user.loginPhoneNum,
         password: ""
       };
-    } else if (userType === "Staff") {
-      return {
-        userName: user?.userName || "",
-        identifier: user?.emailAddress || user?.phoneNumber || "",
-        password: ""
-      };
     } else if (userType === "Delivery Staff") {
       return {
         userName: user?.userName || "",
@@ -121,14 +115,6 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
       return 'Unverified Customer';
     } else if (userType === 'Customer' && userStatus === 'Rejected') {
       return 'Rejected Customer';
-    }
-
-    if (userType === 'Staff' && userStatus === 'Verified') {
-      return 'Verified Staff';
-    } else if (userType === 'Staff' && userStatus === 'Unverified') {
-      return 'Unverified Staff';
-    } else if (userType === 'Staff' && userStatus === 'Rejected') {
-      return 'Rejected Staff';
     }
 
     if (userType === 'Delivery Staff' && userStatus === 'Verified') {
@@ -287,26 +273,6 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
         repContactNumber: form.repContact.trim(),
         repEmailAddress: form.repEmail.trim(),
         repJobPosition: form.repJob.trim(),
-        identifier: form.identifier.trim(),
-        password: form.password.trim()
-      };
-    }
-
-    else if (userType === "Staff") {
-      if (!form.userName.trim()) {
-        toast.error("Username is required.", toastError);
-        setLoading(false);
-        return;
-      }
-      if (!form.identifier.trim()) {
-        toast.error("The user account email or phone number is required.", toastError);
-        setLoading(false);
-        return;
-      }
-
-      payload = {
-        ...payload,
-        userName: form.userName.trim(),
         identifier: form.identifier.trim(),
         password: form.password.trim()
       };
@@ -737,99 +703,6 @@ function ViewUserInfo({ ID, userType, userStatus, onBack = () => {} }) {
                       <button className="btn-delete" onClick={() => openModal(handleDelete, "Are you sure you want to delete this account permanently?")}>Delete Account</button>
                     </>
                   )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STAFF */}
-          {userType === "Staff" && (
-            <div className="verified-staff-view">
-              <div className="profile-card">
-                <div className="header-section">
-                  <h2 className="profile-title">
-                    Profile Information -{" "}
-                    {user?.verifiedUser ? (
-                      <span className="verified-color">(Verified)</span>
-                    ) : (
-                      <span className="unverified-color">(Unverified)</span>
-                    )}
-                  </h2>
-                  <div className="avatar-circle">
-                    <FaUserLarge className="avatar-icon" />
-                  </div>
-                </div>
-
-                <section className="info-section">
-                  <h3 className="section-title">Staff Information</h3>
-
-                  <div className="form-group">
-                    <label>Username</label>
-                    <input
-                      type="text"
-                      value={form.userName}
-                      onChange={(e) =>
-                        setForm((s) => ({ ...s, userName: e.target.value }))
-                      }
-                    />
-                  </div>
-                </section>
-
-                <section className="info-section">
-                  <h3 className="section-title">User Account</h3>
-
-                  <div className="form-group">
-                    <label>Email or Phone Number</label>
-                    <input
-                      type="text"
-                      value={form.identifier}
-                      onChange={(e) =>
-                        setForm((s) => ({ ...s, identifier: e.target.value }))
-                      }
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Change Password</label>
-                    <div className="password-input">
-                      <input
-                        type={passwordVisible ? "text" : "password"}
-                        value={form.password}
-                        onChange={(e) =>
-                          setForm((s) => ({ ...s, password: e.target.value }))
-                        }
-                      />
-                      <button
-                        className="toggle-password"
-                        onClick={togglePasswordVisibility}
-                      >
-                        {passwordVisible ? <FaRegEyeSlash /> : <FaRegEye />}
-                      </button>
-                    </div>
-                  </div>
-                </section>
-
-                <div className="vui-action-buttons">
-                  <button
-                    className="btn-save1"
-                    onClick={() =>
-                      openModal(handleSave, "Are you sure you want to save all changes?")
-                    }
-                  >
-                    Save Changes
-                  </button>
-
-                  <button
-                    className="btn-delete"
-                    onClick={() =>
-                      openModal(
-                        handleDelete,
-                        "Are you sure you want to delete this account permanently?"
-                      )
-                    }
-                  >
-                    Delete Account
-                  </button>
                 </div>
               </div>
             </div>

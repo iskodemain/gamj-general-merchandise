@@ -284,25 +284,6 @@ export const deleteUserService = async (adminId, userID, userType) => {
       await userToDelete.destroy();
     }
 
-    // DELETE STAFF
-    else if (userType === "Staff") {
-      const userToDelete = await Admin.findOne({
-        where: { 
-          ID: userID,
-          userType: 'Staff'
-        }
-      });
-
-      if (!userToDelete) {
-        return {
-          success: false,
-          message: "Staff user not found"
-        };
-      }
-      await userToDelete.update({ forceLogout: true });
-      await userToDelete.destroy();
-    }
-
     // DELETE DELIVERY STAFF
     else if (userType === "Delivery Staff") {
       const userToDelete = await Admin.findOne({
@@ -372,7 +353,7 @@ export const saveUserInfoService = async (adminId, data) => {
       };
     }
 
-    if (!["Customer", "Staff", "Delivery Staff", "Admin"].includes(data.userType)) {
+    if (!["Customer", "Delivery Staff", "Admin"].includes(data.userType)) {
       return { success: false, message: "Invalid user type." };
     }
 
@@ -426,32 +407,6 @@ export const saveUserInfoService = async (adminId, data) => {
           updateAt: new Date()
         },
         { where: { ID: data.ID } }
-      );
-    }
-
-    if (data.userType === "Staff") {
-      const staffUser = await Admin.findOne({
-        where: { 
-          ID: data.ID,
-          userType: 'Staff'
-        }
-      });
-
-      if (!staffUser) {
-        return {
-          success: false,
-          message: "Staff user not found"
-        };
-      }
-      updated = await Admin.update(
-        {
-          userName: data.userName,
-          emailAddress: identifierType === "email" ? data.identifier : null,
-          phoneNumber: identifierType === "phone" ? data.identifier : null,
-          password: hashedPassword,
-          updateAt: new Date()
-        },
-        { where: { ID: data.ID, userType: 'Staff' } }
       );
     }
 
@@ -531,7 +486,7 @@ export const addNewUserService = async (adminId, data) => {
       };
     }
 
-    if (!["Customer", "Staff", "Delivery Staff", "Admin"].includes(data.userType)) {
+    if (!["Customer", "Delivery Staff", "Admin"].includes(data.userType)) {
       return { success: false, message: "Invalid account role selected." };
     }
 
@@ -621,32 +576,6 @@ export const addNewUserService = async (adminId, data) => {
         subject: 'Your GAMJ Account Has Been Created by Admin',
         html: userAccountCreatedTemplate(addNewUser.medicalInstitutionName)
       });
-    }
-
-    if (data.userType === "Staff") {
-      const lastStaff = await Admin.findOne({
-        order: [["ID", "DESC"]],
-      });
-
-      const nextAdminNo = lastStaff ? Number(lastStaff.ID) + 1 : 1;
-      const adminId = withTimestamp("ADMIN", nextAdminNo);
-
-      addNewUser = await Admin.create({
-        adminId,
-        userName: data.userName,
-        emailAddress: identifierType === "email" ? data.identifier : null,
-        phoneNumber: identifierType === "phone" ? data.identifier : null,
-        password: hashedPassword,
-        userType: "Staff",
-        verifiedUser: true,
-      });
-      if (identifierType === "email") {
-        accountSendMail({
-          to: addNewUser.emailAddress,
-          subject: 'Your GAMJ Account Has Been Created by Admin',
-          html: userAccountCreatedTemplate(addNewUser.userName)
-        });
-      }
     }
 
     if (data.userType === "Delivery Staff") {
