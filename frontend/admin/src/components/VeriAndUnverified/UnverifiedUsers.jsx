@@ -41,16 +41,14 @@ function UnverifiedUsers() {
 
     // ✅ Admins and Staff from adminList - Only unverified
     (adminList || []).forEach((a) => {
-      // Skip Super Admin (adminHead = true)
+      // Skip Admin Head (adminHead = true)
       if (Number(a.adminHead) === 1) return;
       // Only unverified users
       if (Number(a.verifiedUser) !== 0) return;
 
       // Determine type based on userType field
       let userType = 'Admin'; // default
-      if (a.userType === 'Staff') {
-        userType = 'Staff';
-      } else if (a.userType === 'Delivery Staff') {
+      if (a.userType === 'Delivery Staff') {
         userType = 'Delivery Staff';
       }
 
@@ -150,7 +148,6 @@ function UnverifiedUsers() {
                 >
                   <option value="">All Types</option>
                   <option value="Admin">Admin</option>
-                  <option value="Staff">Staff</option>
                   <option value="Delivery Staff">Delivery Staff</option>
                   <option value="Customer">Customer</option>
                 </select>

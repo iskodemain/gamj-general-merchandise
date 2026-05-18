@@ -43,7 +43,7 @@ function Orders() {
           </div>
           
 
-          {["Super Admin", "Admin", "Staff"].includes(currentUser) &&
+          {["Admin"].includes(currentUser) &&
             <div className="ordersView-grid">
               <OverviewCard
                 icon={assets.all_orders_icon}

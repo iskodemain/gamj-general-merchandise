@@ -48,7 +48,7 @@ function ActiveOrders() {
         {/* ===== ORDERS SECTION ===== */}
         <section className="active-orders-section">
           {
-            ["Super Admin", "Admin", "Staff"].includes(currentUser) &&
+            ["Admin", "Delivery Staff"].includes(currentUser) &&
             <div className="active-orders-header">
               <button className="active-orders-back-btn" onClick={() => navigate("/orders")}>
                   <FaArrowLeft />
@@ -59,34 +59,30 @@ function ActiveOrders() {
 
 
 
-          {["Super Admin", "Admin", "Staff"].includes(currentUser) &&
+          {["Admin"].includes(currentUser) &&
             <div className="active-orders-grid">
               <ActiveOrderCard
                 color="orange"
                 title="Pending Orders"
                 number={pendingOrders.length}
-                date="Updated: Sep 25, 2025"
                 onClick={() => navigate("/pending")}
               />
               <ActiveOrderCard
                 color="teal"
                 title="Processing Orders"
                 number={processingOrders.length}
-                date="Updated: Sep 25, 2025"
                 onClick={() => navigate("/processing")}
               />
               <ActiveOrderCard
                 color="blue"
                 title="Out for Delivery Orders"
                 number={outForDeliveryOrders.length}
-                date="Updated: Sep 25, 2025"
                 onClick={() => navigate("/outfordelivery")}
               />
               <ActiveOrderCard
                 color="green"
                 title="Delivered Orders"
                 number={deliiveredOrders.length}
-                date="Updated: Sep 25, 2025"
                 onClick={() => navigate("/delivered")}
               />
             </div>
@@ -98,14 +94,12 @@ function ActiveOrders() {
                 color="blue"
                 title="Out for Delivery Orders"
                 number={outForDeliveryOrders.length}
-                date="Updated: Sep 25, 2025"
                 onClick={() => navigate("/outfordelivery")}
               />
               <ActiveOrderCard
                 color="green"
                 title="Delivered Orders"
                 number={deliiveredOrders.length}
-                date="Updated: Sep 25, 2025"
                 onClick={() => navigate("/delivered")}
               />
             </div>

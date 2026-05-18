@@ -44,7 +44,7 @@ function Orders() {
        (EXCLUDE adminHead === true)
     ----------------------------*/
     adminList.forEach((admin) => {
-      // Skip Super Admin
+      // Skip Admin Head
       if (admin.adminHead === 1 || admin.adminHead === true) return;
 
       totalUsers += 1;

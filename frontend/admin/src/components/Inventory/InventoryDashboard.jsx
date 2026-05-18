@@ -304,7 +304,7 @@ export default function InventoryDashboard() {
     setLoading(false);
   };
 
-  const isAdminUser = ['Super Admin', 'Admin'].includes(currentUser);
+  const isAdminUser = ['Admin'].includes(currentUser);
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -367,11 +367,9 @@ export default function InventoryDashboard() {
               <option value="status">Sort: Status (Critical First)</option>
             </select>
 
-            {isAdminUser && (
-              <button onClick={() => navigate('inventory/add')} className="add-stock-btn">
-                + Add Stock
-              </button>
-            )}
+            <button onClick={() => navigate('inventory/add')} className="add-stock-btn">
+              + Add Stock
+            </button>
           </div>
         </div>
 

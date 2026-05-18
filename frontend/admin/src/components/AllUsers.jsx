@@ -55,9 +55,9 @@ function AllUsers() {
       return 'Unverified';
     }
 
-    // ✅ For Admin and Staff (both from adminList)
-    if (u.__type === 'Admin' || u.__type === 'Staff' || u.__type === 'Delivery Staff') {
-      // Exclude Super Admin (adminHead = true)
+    // ✅ For Admin and Delivery Staff (both from adminList)
+    if (u.__type === 'Admin' || u.__type === 'Delivery Staff') {
+      // Exclude Admin Head (adminHead = true)
       if (isTrue(u.adminHead)) return 'Excluded';
       if (isTrue(u.verifiedUser)) return 'Verified';
       if (isFalse(u.verifiedUser)) return 'Unverified';
@@ -68,7 +68,7 @@ function AllUsers() {
   };
 
   // Build unified user list with consistent fields:
-  // { ID, __type: 'Admin'|'Staff'|'Customer', displayName, status, createAt, original }
+  // { ID, __type: 'Admin'|'Delivery Staff'|'Customer', displayName, status, createAt, original }
   const unifiedUsers = useMemo(() => {
     const list = [];
 
@@ -91,22 +91,20 @@ function AllUsers() {
       list.push(user);
     });
 
-    // ✅ Admins and Staff (from adminList)
+    // ✅ Admins and Delivery Staff (from adminList)
     (adminList || []).forEach((a) => {
-      // Skip Super Admin (adminHead = true)
+      // Skip Admin Head (adminHead = true)
       if (isTrue(a.adminHead)) return;
 
       // Determine type based on userType field
       let userType = 'Admin'; // default
-      if (a.userType === 'Staff') {
-        userType = 'Staff';
-      } else if (a.userType === 'Delivery Staff') {
+      if (a.userType === 'Delivery Staff') {
         userType = 'Delivery Staff';
       }
 
       const user = {
         ID: a.ID,
-        __type: userType,  // ✅ 'Admin' or 'Staff' based on userType
+        __type: userType,  // ✅ 'Admin' or 'Delivery Staff' based on userType
         original: a,
         displayName: a.userName || a.emailAddress || `${userType}-${a.ID}`,
         createAt: a.createAt || a.updateAt || null,
@@ -253,7 +251,6 @@ function AllUsers() {
                 >
                   <option value="">All Types</option>
                   <option value="Admin">Admin</option>
-                  <option value="Staff">Staff</option>
                   <option value="Delivery Staff">Delivery Staff</option>
                   <option value="Customer">Customer</option>
                 </select>

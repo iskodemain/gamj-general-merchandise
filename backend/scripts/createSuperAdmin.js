@@ -7,13 +7,13 @@ export const createSuperAdminIfNotExists = async () => {
       throw new Error("Missing SA_EMAIL or SA_PASSWORD in environment variables");
     }
 
-    const existingSuperAdmin = await Admin.findOne({
-      where: { userType: "Super Admin" },
+    const existingAdminHead = await Admin.findOne({
+      where: { userType: "Admin", adminHead: true },
     });
 
-    if (existingSuperAdmin) {
+    if (existingAdminHead) {
       if (process.env.NODE_ENV !== "production") {
-        console.log("Super Admin already exists:", existingSuperAdmin.adminId);
+        console.log("Admin Head already exists:", existingAdminHead.adminId);
       }
       return;
     }
@@ -24,24 +24,24 @@ export const createSuperAdminIfNotExists = async () => {
 
     const hashedPassword = await bcrypt.hash(process.env.SA_PASSWORD, 10);
 
-    const superAdmin = await Admin.create({
+    const adminHead = await Admin.create({
       adminId,
-      userName: "Super Admin",
+      userName: "Admin Head",
       emailAddress: process.env.SA_EMAIL,
       password: hashedPassword,
-      userType: "Super Admin",
+      userType: "Admin",
       verifiedUser: true,
       adminHead: true,
     });
 
     if (process.env.NODE_ENV !== "production") {
-      console.log("Super Admin created:", superAdmin.adminId);
+      console.log("Admin Head created:", adminHead.adminId);
     }
   } catch (error) {
     if (process.env.NODE_ENV === "production") {
-      console.error("Error creating Super Admin");
+      console.error("Error creating Admin Head");
     } else {
-      console.error("[DEV ERROR] Super Admin creation failed:", error);
+      console.error("[DEV ERROR] Admin Head creation failed:", error);
     }
   }
 };

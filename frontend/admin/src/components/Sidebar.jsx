@@ -27,7 +27,7 @@ function Sidebar({ currentView }) {
 
       <nav className="sidebar-menu">
         {
-          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) &&
+          ['Admin', 'Delivery Staff'].includes(currentUser) &&
           <MenuItem
             icon={assets.overview_icon}
             label="Overview"
@@ -36,7 +36,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
-          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) &&
+          ['Admin', 'Delivery Staff'].includes(currentUser) &&
           <MenuItem
             icon={assets.products_icon}
             label="Products"
@@ -44,7 +44,7 @@ function Sidebar({ currentView }) {
             onClick={() => {window.location.href = "/products"; setIsSidebarOpen(false);}}
           />
         }
-        {['Super Admin', 'Admin', 'Staff'].includes(currentUser) &&
+        {['Admin', 'Delivery Staff'].includes(currentUser) &&
           <MenuItem
             icon={assets.inventory_icon}
             label="Inventory"
@@ -53,6 +53,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
+          ['Admin', 'Delivery Staff'].includes(currentUser) &&
           <MenuItem
             icon={assets.orders_icon}
             label="Orders"
@@ -61,7 +62,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
-          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) && 
+          ['Admin', 'Delivery Staff'].includes(currentUser) && 
           <MenuItem 
             icon={assets.transaction_icon}
             label="Transactions"
@@ -70,7 +71,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
-          ['Super Admin'].includes(currentUser) && 
+          ['Admin'].includes(currentUser) && 
           <MenuItem
             icon={assets.staff_icon}
             label="User Management"
@@ -79,7 +80,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
-          ['Super Admin', 'Admin'].includes(currentUser) &&
+          ['Admin'].includes(currentUser) &&
           <MenuItem
             icon={assets.dl_icon}
             label="Delivery Settings"
@@ -88,7 +89,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
-          ['Super Admin', 'Admin', 'Staff'].includes(currentUser) && 
+          ['Admin', 'Delivery Staff'].includes(currentUser) && 
           <MenuItem
             icon={assets.reports_icon}
             label="Reports"
@@ -97,7 +98,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
-          ['Super Admin'].includes(currentUser) && 
+          ['Admin'].includes(currentUser) && 
           <MenuItem
             icon={assets.terms_and_conditions}
             label="Terms & Conditions"
@@ -106,7 +107,7 @@ function Sidebar({ currentView }) {
           />
         }
         {
-          ['Super Admin'].includes(currentUser) && 
+          ['Admin'].includes(currentUser) && 
           <MenuItem
             icon={assets.settings_icon}
             label="Settings"

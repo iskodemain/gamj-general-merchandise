@@ -116,21 +116,6 @@ function AddNewUser() {
         password: form.password.trim()
       };
     }
-    else if (userType === "Staff") {
-      if (!form.userName.trim())
-        return toastErrorField("Username is required.");
-      if (!form.identifier.trim())
-        return toastErrorField("Account email/phone is required.");
-      if (!form.password.trim())
-        return toastErrorField("Account password is required.");
-
-      payload = {
-        ...payload,
-        userName: form.userName.trim(),
-        identifier: form.identifier.trim(),
-        password: form.password.trim()
-      };
-    }
     else if (userType === "Delivery Staff") {
       if (!form.userName.trim())
         return toastErrorField("Username is required.");
@@ -534,7 +519,6 @@ function AddNewUser() {
                 >
                   <option value="">-- Select Role --</option>
                   <option value="Admin">Admin</option>
-                  <option value="Staff">Staff</option>
                   <option value="Delivery Staff">Delivery Staff</option>
                   <option value="Customer">Customer</option>
                 </select>
@@ -543,7 +527,6 @@ function AddNewUser() {
           </div>
 
           {userType === "Customer" && renderCustomerFields()}
-          {userType === "Staff" && renderStaffFields()}
           {userType === "Delivery Staff" && renderDeliveryStaffFields()}
           {userType === "Admin" && renderAdminFields()}
 
