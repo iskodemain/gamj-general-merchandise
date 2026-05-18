@@ -648,12 +648,12 @@ function AddProduct() {
                 </label>
                 <label className="toggle-row">
                   <input type="checkbox" checked={isBestSeller} onChange={() => setIsBestSeller(!isBestSeller)} />
-                  Mark as Best Seller
+                  Feature on Homepage
                 </label>
-                <label className="toggle-row">
+                {/* <label className="toggle-row">
                   <input type="checkbox" checked={isOutOfStock} onChange={() => setIsOutOfStock(!isOutOfStock)} />
                   Mark as Out of Stock
-                </label>
+                </label> */}
               </div>
 
               <div className="ap-actions">
