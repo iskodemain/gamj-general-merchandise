@@ -1,4 +1,4 @@
-import { addOrderService, fetchOrdersService, cancelOrderService, fetchOrderCancelService, removeCancelOrderService, cancelOrderRequestService, markRefundReceivedService, fetchRefundProofService, addOrderRefundService, fetchOrderRefundService, cancelOrderRefundRequestService, fetchOrderPaymentProofService, addOrderPaymentProofService, deleteOrderPaymentProofService, fetchOrderDeliveryProofService, markCanceledOrderCompleteService } from '../services/customerOrderService.js';
+import { addOrderService, fetchOrdersService, cancelOrderService, fetchOrderCancelService, removeCancelOrderService, cancelOrderRequestService, markRefundReceivedService, fetchRefundProofService, addOrderRefundService, fetchOrderRefundService, cancelOrderRefundRequestService, fetchOrderPaymentProofService, addOrderPaymentProofService, editOrderPaymentProofService, fetchOrderDeliveryProofService, markCanceledOrderCompleteService } from '../services/customerOrderService.js';
 
 export const addOrder = async (req, res) => {
     try {
@@ -47,17 +47,18 @@ export const addOrderPaymentProof = async (req, res) => {
     }
 }
 
-export const deleteOrderPaymentProof = async (req, res) => {
+export const editOrderPaymentProof = async (req, res) => {
     try {
         const { ID } = req.user;
-        const { paymentProofID } = req.body;
-        const result = await deleteOrderPaymentProofService(ID, paymentProofID);
+        const { paymentProofID, referenceId } = req.body;
+        const receiptImageFile = req.file || null;
+        const result = await editOrderPaymentProofService(ID, paymentProofID, referenceId, receiptImageFile);
         res.json(result);
     } catch (error) {
         console.log(error);
-        res.json({success: false, message:error.message})
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 
 export const cancelOrder = async (req, res) => {
