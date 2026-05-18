@@ -40,7 +40,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   // "https://www.gamjgeneralmerchandise.store",
-  // "https://gamj-general-merchandise-customer.vercel.app",
+  "https://gamj-general-merchandise-customer.vercel.app",
   "https://gamj-general-merchandise-admin.vercel.app"
 ];
 
