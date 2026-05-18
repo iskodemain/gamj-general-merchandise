@@ -9,7 +9,7 @@ import Footer from '../components/Footer.jsx'
 import './Contact.css'
 import { assets } from '../assets/assets.js'
 
-const About = () => {
+const Contact = () => {
   return (
     <>
         <div className='ctc-container'>
@@ -30,11 +30,11 @@ const About = () => {
                     </div>
                     <div className='call ctc-container'>
                         <FiPhoneCall className="ctc-icon"/>
-                        <p className="ctc-text">+63 987654321</p>
+                        <p className="ctc-text">+63 9228430548</p>
                     </div>
                     <div className='gmail ctc-container'>
                         <GoMail className="ctc-icon"/>
-                        <p className="ctc-text">gamjshop@gmail.com</p>
+                        <a href="mailto:gamjmerchandisehelp@gmail.com" target="_blank" rel="noopener noreferrer" className="ctc-text">gamjmerchandisehelp@gmail.com</a>
                     </div>
                     <div className='viber ctc-container'>
                         <FaViber className="ctc-icon"/>
@@ -43,7 +43,6 @@ const About = () => {
                     <div className='messeger ctc-container'>
                         <FaFacebookMessenger className="ctc-icon"/>
                         <a href="https://m.me/gamj.general.merchandise.2006" target="blank" className="ctc-text msgr">https://m.me/gamj.general.<br/>merchandise.2006</a>
-                        
                     </div>
                 </div>
                 </div>
@@ -62,4 +61,4 @@ const About = () => {
   )
 }
 
-export default About
+export default Contact

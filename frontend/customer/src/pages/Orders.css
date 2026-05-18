@@ -1036,3 +1036,554 @@
   }
 
 }
+
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .main-ctn-orders {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+
+    .upload-btn-text {
+        font-size: 0.78rem;
+    }
+
+    .spc-above {
+        padding-top: 3rem;
+    }
+
+    .orders-title-ctn {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .order-type-status {
+        font-size: 0.95rem;
+    }
+
+    .tracker-circle {
+        width: 50px;
+        height: 50px;
+    }
+
+    .tracker-img-ctn {
+        width: 22px;
+    }
+
+    .tracker-label {
+        font-size: 0.72rem;
+    }
+
+    .product-name {
+        font-size: 0.78rem;
+    }
+
+    .order-price-ctn {
+        font-size: 0.85rem;
+    }
+
+    .order-qty, .order-value, .order-payment {
+        font-size: 0.75rem;
+    }
+
+    .pending-text {
+        font-size: 0.75rem;
+    }
+
+    .order-button-container {
+        width: 6rem;
+        height: 1.7rem;
+        font-size: 0.75rem;
+    }
+
+    .order-group-id {
+        font-size: 0.78rem;
+    }
+
+    .order-group-date {
+        font-size: 0.68rem;
+    }
+
+    .orders-summary-row {
+        font-size: 0.78rem;
+    }
+
+    .orders-summary-row.total {
+        font-size: 0.9rem;
+    }
+
+    .upload-receipt-btn,
+    .review-receipt-btn {
+        min-width: 130px;
+        font-size: 0.78rem;
+        height: 2rem;
+    }
+
+    .valid-date-text {
+        font-size: 0.58rem;
+    }
+
+    .delete-btn {
+        font-size: 1rem;
+    }
+
+    .orders-eye-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .main-ctn-orders {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+
+    .upload-btn-text {
+        font-size: 0.7rem;
+    }
+
+    .spc-above {
+        padding-top: 2.5rem;
+    }
+
+    .orders-title-ctn {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .order-type-status {
+        font-size: 0.85rem;
+    }
+
+    .tracker-circle {
+        width: 44px;
+        height: 44px;
+    }
+
+    .tracker-img-ctn {
+        width: 18px;
+    }
+
+    .tracker-label {
+        font-size: 0.65rem;
+    }
+
+    .product-name {
+        font-size: 0.72rem;
+    }
+
+    .order-price-ctn {
+        font-size: 0.78rem;
+    }
+
+    .order-qty, .order-value, .order-payment {
+        font-size: 0.68rem;
+    }
+
+    .pending-text {
+        font-size: 0.68rem;
+    }
+
+    .order-button-container {
+        width: 5.5rem;
+        height: 1.6rem;
+        font-size: 0.68rem;
+    }
+
+    .order-group-id {
+        font-size: 0.72rem;
+    }
+
+    .order-group-date {
+        font-size: 0.62rem;
+    }
+
+    .orders-summary-row {
+        font-size: 0.72rem;
+    }
+
+    .orders-summary-row.total {
+        font-size: 0.82rem;
+    }
+
+    .upload-receipt-btn,
+    .review-receipt-btn {
+        min-width: 110px;
+        font-size: 0.7rem;
+        height: 1.9rem;
+    }
+
+    .valid-date-text {
+        font-size: 0.55rem;
+    }
+
+    .delete-btn {
+        font-size: 0.95rem;
+    }
+
+    .orders-eye-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .tracker-flex::before,
+    .tracker-flex::after {
+        left: 25px;
+        right: 25px;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .main-ctn-orders {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .upload-btn-text {
+        font-size: 0.62rem;
+    }
+
+    .spc-above {
+        padding-top: 2rem;
+    }
+
+    .orders-title-ctn {
+        font-size: 0.8rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .order-type-status {
+        font-size: 0.75rem;
+    }
+
+    .tracker-circle {
+        width: 38px;
+        height: 38px;
+    }
+
+    .tracker-img-ctn {
+        width: 16px;
+    }
+
+    .tracker-label {
+        font-size: 0.58rem;
+    }
+
+    .product-name {
+        font-size: 0.65rem;
+    }
+
+    .order-price-ctn {
+        font-size: 0.7rem;
+    }
+
+    .order-qty, .order-value, .order-payment {
+        font-size: 0.62rem;
+    }
+
+    .pending-text {
+        font-size: 0.62rem;
+    }
+
+    .order-button-container {
+        width: 5rem;
+        height: 1.5rem;
+        font-size: 0.62rem;
+    }
+
+    .order-group-id {
+        font-size: 0.65rem;
+    }
+
+    .order-group-date {
+        font-size: 0.58rem;
+    }
+
+    .orders-summary-row {
+        font-size: 0.65rem;
+    }
+
+    .orders-summary-row.total {
+        font-size: 0.75rem;
+    }
+
+    .upload-receipt-btn,
+    .review-receipt-btn {
+        min-width: 95px;
+        font-size: 0.62rem;
+        height: 1.8rem;
+    }
+
+    .valid-date-text {
+        font-size: 0.5rem;
+    }
+
+    .delete-btn {
+        font-size: 0.9rem;
+    }
+
+    .orders-eye-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    .tracker-flex::before,
+    .tracker-flex::after {
+        left: 20px;
+        right: 20px;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .main-ctn-orders {
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
+
+    .upload-btn-text {
+        font-size: 0.55rem;
+    }
+
+    .spc-above {
+        padding-top: 1.5rem;
+    }
+
+    .orders-title-ctn {
+        font-size: 0.7rem;
+        margin-bottom: 1rem;
+    }
+
+    .order-type-status {
+        font-size: 0.65rem;
+    }
+
+    .tracker-circle {
+        width: 32px;
+        height: 32px;
+    }
+
+    .tracker-img-ctn {
+        width: 13px;
+    }
+
+    .tracker-label {
+        font-size: 0.5rem;
+    }
+
+    .product-name {
+        font-size: 0.58rem;
+    }
+
+    .order-price-ctn {
+        font-size: 0.62rem;
+    }
+
+    .order-qty, .order-value, .order-payment {
+        font-size: 0.55rem;
+    }
+
+    .pending-text {
+        font-size: 0.55rem;
+    }
+
+    .order-button-container {
+        width: 4.5rem;
+        height: 1.4rem;
+        font-size: 0.55rem;
+    }
+
+    .order-group-id {
+        font-size: 0.58rem;
+    }
+
+    .order-group-date {
+        font-size: 0.52rem;
+    }
+
+    .orders-summary-row {
+        font-size: 0.58rem;
+    }
+
+    .orders-summary-row.total {
+        font-size: 0.65rem;
+    }
+
+    .upload-receipt-btn,
+    .review-receipt-btn {
+        min-width: 80px;
+        font-size: 0.55rem;
+        height: 1.6rem;
+    }
+
+    .valid-date-text {
+        font-size: 0.45rem;
+    }
+
+    .delete-btn {
+        font-size: 0.85rem;
+    }
+
+    .orders-eye-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
+
+    .tracker-flex::before,
+    .tracker-flex::after {
+        left: 16px;
+        right: 16px;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .main-ctn-orders {
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+    }
+
+    .upload-btn-text {
+        font-size: 0.45rem;
+    }
+
+    .spc-above {
+        padding-top: 1rem;
+    }
+
+    .orders-title-ctn {
+        font-size: 0.55rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .order-type-status {
+        font-size: 0.55rem;
+    }
+
+    .tracker-circle {
+        width: 26px;
+        height: 26px;
+        border-width: 2px;
+    }
+
+    .tracker-img-ctn {
+        width: 11px;
+    }
+
+    .tracker-label {
+        font-size: 0.42rem;
+    }
+
+    .product-name {
+        font-size: 0.5rem;
+    }
+
+    .order-price-ctn {
+        font-size: 0.52rem;
+    }
+
+    .order-qty, .order-value, .order-payment {
+        font-size: 0.48rem;
+    }
+
+    .pending-text {
+        font-size: 0.48rem;
+    }
+
+    .order-button-container {
+        width: 4rem;
+        height: 1.2rem;
+        font-size: 0.48rem;
+    }
+
+    .order-group-id {
+        font-size: 0.5rem;
+    }
+
+    .order-group-date {
+        font-size: 0.45rem;
+    }
+
+    .orders-summary-row {
+        font-size: 0.5rem;
+    }
+
+    .orders-summary-row.total {
+        font-size: 0.55rem;
+    }
+
+    .upload-receipt-btn,
+    .review-receipt-btn {
+        min-width: 65px;
+        font-size: 0.45rem;
+        height: 1.4rem;
+    }
+
+    .valid-date-text {
+        font-size: 0.38rem;
+    }
+
+    .delete-btn {
+        font-size: 0.75rem;
+    }
+
+    .orders-eye-btn {
+        width: 17px;
+        height: 17px;
+        font-size: 9px;
+    }
+
+    .tracker-flex::before,
+    .tracker-flex::after {
+        left: 13px;
+        right: 13px;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .tracker-flex[data-active="0"]::after {
+        width: 0%;
+    }
+    .tracker-flex[data-active="1"]::after {
+        width: calc(33.33% - 20px);
+    }
+    .tracker-flex[data-active="2"]::after {
+        width: calc(66.66% - 20px);
+    }
+    .tracker-flex[data-active="3"]::after {
+        width: calc(100% - 40px);
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .tracker-flex[data-active="0"]::after {
+        width: 0%;
+    }
+    .tracker-flex[data-active="1"]::after {
+        width: calc(33.33% - 16px);
+    }
+    .tracker-flex[data-active="2"]::after {
+        width: calc(66.66% - 16px);
+    }
+    .tracker-flex[data-active="3"]::after {
+        width: calc(100% - 32px);
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .tracker-flex[data-active="0"]::after {
+        width: 0%;
+    }
+    .tracker-flex[data-active="1"]::after {
+        width: calc(33.33% - 13px);
+    }
+    .tracker-flex[data-active="2"]::after {
+        width: calc(66.66% - 13px);
+    }
+    .tracker-flex[data-active="3"]::after {
+        width: calc(100% - 26px);
+    }
+}

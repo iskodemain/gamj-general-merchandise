@@ -29,12 +29,12 @@ const Shop = () => {
   const filteringProducts = () => {
     let updatedProducts = products.filter(item => item.isActive === true);
 
-    if (selectedFilter.name !== 'All' && selectedFilter.name !== 'Best Sellers' && selectedFilter.name !== 'Filter') {
+    if (selectedFilter.name !== 'All' && selectedFilter.name !== 'Featured Products' && selectedFilter.name !== 'Filter') {
       // Filter by categoryId (from DB)
       updatedProducts = updatedProducts.filter(
         (item) => item.categoryId === selectedFilter.id
       );
-    } else if (selectedFilter.name === 'Best Sellers') {
+    } else if (selectedFilter.name === 'Featured Products') {
       updatedProducts = updatedProducts.filter((item) => item.isBestSeller === true);
     }
 
@@ -108,7 +108,7 @@ const Shop = () => {
               <div className='dropdown-container'>
                 <ul className='text-sm'>
                   <li onClick={() => handleFilterSelect(null, 'All')} className='px-4 py-2 cursor-pointer dropdown-choices-top'>All</li>
-                  <li onClick={() => handleFilterSelect(null, 'Best Sellers')} className='px-4 py-2 cursor-pointer dropdown-choices'>Best Sellers</li>
+                  <li onClick={() => handleFilterSelect(null, 'Featured Products')} className='px-4 py-2 cursor-pointer dropdown-choices'>Featured Products</li>
                   {productCategory.map((cat, index) => (
                     <li
                       key={cat.ID}

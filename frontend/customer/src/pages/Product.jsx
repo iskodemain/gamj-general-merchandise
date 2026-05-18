@@ -396,9 +396,9 @@ const Product = () => {
               </div>
               <hr className='line-hr'/>
               <div className='product-info'>
-                <p>100% Original product.</p>
-                <p>Cash on delivery is available on this product.</p>
-                <p>Easy return and exchange policy within 7 days.</p>
+                {/* <p>100% Original product.</p> */}
+                {/* <p>Cash on delivery is available on this product.</p> */}
+                {/* <p>Easy return and exchange policy within 7 days.</p> */}
               </div>
             </div>
           </div>

@@ -81,3 +81,177 @@
     padding-right: 9vw;
   }
 }
+
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .bs-container {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+
+    .shop-button {
+        padding-inline: 1.5rem !important;
+        padding-block: 0.4rem !important;
+    }
+
+    .bs-margin {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .bs-subtitle {
+        font-size: 0.85rem;
+        width: 90%;
+        margin-bottom: 1.5rem;
+    }
+
+    .shop-button {
+        font-size: 0.85rem;
+        padding-block: 0.4rem;
+    }
+
+    .seemore-container {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .bs-container {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+
+    .shop-button {
+        padding-inline: 1.2rem !important;
+        padding-block: 0.35rem !important;
+    }
+
+    .bs-margin {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .bs-subtitle {
+        font-size: 0.78rem;
+        width: 95%;
+        margin-bottom: 1.2rem;
+        margin-top: 0.8rem;
+    }
+
+    .shop-button {
+        font-size: 0.78rem;
+        padding-block: 0.35rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .seemore-container {
+        margin-top: 1.5rem;
+        font-size: 0.78rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .bs-container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .shop-button {
+        padding-inline: 1rem !important;
+        padding-block: 0.3rem !important;
+    }
+
+    .bs-margin {
+        margin-top: 1.2rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .bs-subtitle {
+        font-size: 0.7rem;
+        width: 98%;
+        margin-bottom: 1rem;
+        margin-top: 0.6rem;
+    }
+
+    .shop-button {
+        font-size: 0.7rem;
+        padding-block: 0.3rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .seemore-container {
+        margin-top: 1.2rem;
+        font-size: 0.7rem;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .bs-container {
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
+
+    .shop-button {
+        padding-inline: 0.7rem !important;
+        padding-block: 0.25rem !important;
+    }
+
+    .bs-margin {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .bs-subtitle {
+        font-size: 0.6rem;
+        width: 100%;
+        margin-bottom: 0.8rem;
+        margin-top: 0.5rem;
+    }
+
+    .shop-button {
+        font-size: 0.6rem;
+        padding-block: 0.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .seemore-container {
+        margin-top: 1rem;
+        font-size: 0.6rem;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .bs-container {
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+    }
+
+    .shop-button {
+        padding-inline: 0.5rem !important;
+        padding-block: 0.2rem !important;
+    }
+
+    .bs-margin {
+        margin-top: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .bs-subtitle {
+        font-size: 0.5rem;
+        width: 100%;
+        margin-bottom: 0.6rem;
+        margin-top: 0.4rem;
+    }
+
+    .shop-button {
+        font-size: 0.5rem;
+        padding-block: 0.2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .seemore-container {
+        margin-top: 0.8rem;
+        font-size: 0.5rem;
+    }
+}

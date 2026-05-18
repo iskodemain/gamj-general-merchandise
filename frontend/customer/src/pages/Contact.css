@@ -120,10 +120,6 @@
     text-decoration: underline;
 }
 
-.vbr {
-    text-decoration: underline;
-}
-
 
 /* || MEDIUM */
 @media screen and (min-width: 1115px) {
@@ -168,4 +164,215 @@
     padding-left: 9vw;
     padding-right: 9vw;
   }
+}
+
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .contact-us {
+        font-size: 1.5rem;
+        margin-inline: 2rem;
+    }
+
+    .contact-container {
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .contact-text {
+        font-size: 1.8rem;
+    }
+
+    .contact-description {
+        font-size: 0.85rem;
+    }
+
+    .ct-cont {
+        gap: 1rem;
+        font-size: 0.85rem;
+    }
+
+    .img-contact {
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .ctc-text {
+        font-size: 0.95rem;
+    }
+
+    .ctc-icon {
+        font-size: 1.2rem;
+    }
+
+    .list-info {
+        gap: 1.2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .contact-us {
+        font-size: 1.2rem;
+        margin-inline: 1.2rem;
+    }
+
+    .contact-container {
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .contact-text {
+        font-size: 1.5rem;
+    }
+
+    .contact-description {
+        font-size: 0.8rem;
+    }
+
+    .ct-cont {
+        gap: 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .ctc-text {
+        font-size: 0.85rem;
+        line-height: 1.2rem;
+    }
+
+    .ctc-icon {
+        font-size: 1.1rem;
+    }
+
+    .list-info {
+        gap: 1rem;
+    }
+
+    .ctc-container {
+        gap: 1rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .contact-us {
+        font-size: 1rem;
+        margin-inline: 0.8rem;
+    }
+
+    .contact-container {
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .contact-text {
+        font-size: 1.2rem;
+    }
+
+    .contact-description {
+        font-size: 0.75rem;
+    }
+
+    .ct-cont {
+        gap: 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .ctc-text {
+        font-size: 0.75rem;
+        line-height: 1.1rem;
+    }
+
+    .ctc-icon {
+        font-size: 1rem;
+    }
+
+    .list-info {
+        gap: 0.8rem;
+    }
+
+    .ctc-container {
+        gap: 0.8rem;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .contact-us {
+        font-size: 0.85rem;
+        margin-inline: 0.5rem;
+    }
+
+    .contact-container {
+        gap: 0.8rem;
+        margin-top: 0.8rem;
+    }
+
+    .contact-text {
+        font-size: 1rem;
+    }
+
+    .contact-description {
+        font-size: 0.65rem;
+    }
+
+    .ct-cont {
+        gap: 0.5rem;
+        font-size: 0.65rem;
+    }
+
+    .ctc-text {
+        font-size: 0.65rem;
+        line-height: 1rem;
+    }
+
+    .ctc-icon {
+        font-size: 0.9rem;
+    }
+
+    .list-info {
+        gap: 0.6rem;
+    }
+
+    .ctc-container {
+        gap: 0.6rem;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .contact-us {
+        font-size: 0.7rem;
+        margin-inline: 0.3rem;
+    }
+
+    .contact-container {
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .contact-text {
+        font-size: 0.8rem;
+    }
+
+    .contact-description {
+        font-size: 0.55rem;
+    }
+
+    .ct-cont {
+        gap: 0.4rem;
+        font-size: 0.55rem;
+    }
+
+    .ctc-text {
+        font-size: 0.55rem;
+        line-height: 0.9rem;
+    }
+
+    .ctc-icon {
+        font-size: 0.75rem;
+    }
+
+    .list-info {
+        gap: 0.4rem;
+    }
+
+    .ctc-container {
+        gap: 0.4rem;
+    }
 }

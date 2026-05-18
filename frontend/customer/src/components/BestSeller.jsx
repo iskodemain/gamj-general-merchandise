@@ -23,8 +23,8 @@ function BestSeller() {
         <div id="best-seller" className='bs-container'>
             <div className='bs-margin'>
                 <div className='bs-maintext'>
-                    <Title text1={'BEST'} text2={'SELLERS'}/>
-                    <p className='bs-subtitle'>These top-rated products are designed to support patient care and enhance medical efficiency.</p>
+                    <Title text1={'FEATURED'} text2={'PRODUCTS'}/>
+                    <p className='bs-subtitle'>Medical supplies and healthcare essentials for your patient care and daily medical needs.</p>
                     <NavLink to="/shop"><p className='shop-button'>SHOP</p></NavLink>
                 </div>
                 {/* RENDERING PRODUCTS */}

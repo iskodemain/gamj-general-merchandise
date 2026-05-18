@@ -354,5 +354,369 @@ input[type="checkbox"] {
     
 }
 
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .cart-container {
+        grid-template-columns: 3fr 0.1fr;
+        gap: 0.5rem;
+    }
 
+    .cc-size {
+        font-size: 0.7rem;
+    }
+
+    .cc-2 {
+        gap: 1rem;
+    }
+
+    .cart-product-img {
+        width: 4rem;
+    }
+
+    .cart-name {
+        font-size: 0.7rem;
+    }
+
+    .cart-price {
+        font-size: 0.75rem;
+    }
+
+    .cart-select-all {
+        font-size: 0.85rem;
+    }
+
+    .checkout-total-price {
+        font-size: 0.9rem;
+    }
+
+    .cart-button-delete,
+    .cart-button-checkout {
+        width: 9rem;
+        height: 2.4rem;
+        font-size: 0.7rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .quantity-btn-cart {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+
+    .quantity-input-cart {
+        width: 40px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    .qd-container {
+        gap: 0.6rem;
+        margin-top: 1rem;
+    }
+
+    .cart-right-functions {
+        width: 20vw;
+        padding-right: 0.5rem;
+    }
+
+    .cart-item-checkbox {
+        padding-bottom: 2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .cart-container {
+        grid-template-columns: 3fr 0.1fr;
+        gap: 0.4rem;
+    }
+
+    .cc-size {
+        font-size: 0.65rem;
+    }
+
+    .cc-2 {
+        gap: 0.8rem;
+    }
+
+    .cart-product-img {
+        width: 3.5rem;
+    }
+
+    .cart-name {
+        font-size: 0.65rem;
+    }
+
+    .cart-price {
+        font-size: 0.7rem;
+    }
+
+    .cart-select-all {
+        font-size: 0.75rem;
+    }
+
+    .checkout-total-price {
+        font-size: 0.8rem;
+    }
+
+    .cart-button-delete,
+    .cart-button-checkout {
+        width: 8rem;
+        height: 2.2rem;
+        font-size: 0.65rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .quantity-btn-cart {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+
+    .quantity-input-cart {
+        width: 35px;
+        height: 20px;
+        font-size: 10px;
+    }
+
+    .qd-container {
+        gap: 0.5rem;
+        margin-top: 0.8rem;
+    }
+
+    .cart-right-functions {
+        width: 22vw;
+        padding-right: 0.3rem;
+    }
+
+    .cart-item-checkbox {
+        padding-bottom: 1.8rem;
+    }
+
+    input[type="checkbox"] {
+        width: 13px;
+        height: 13px;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .cart-container {
+        grid-template-columns: 3fr 0.1fr;
+        gap: 0.3rem;
+    }
+
+    .cc-size {
+        font-size: 0.6rem;
+    }
+
+    .cc-2 {
+        gap: 0.6rem;
+    }
+
+    .cart-product-img {
+        width: 3rem;
+    }
+
+    .cart-name {
+        font-size: 0.6rem;
+    }
+
+    .cart-price {
+        font-size: 0.65rem;
+    }
+
+    .cart-select-all {
+        font-size: 0.65rem;
+    }
+
+    .checkout-total-price {
+        font-size: 0.72rem;
+    }
+
+    .cart-button-delete,
+    .cart-button-checkout {
+        width: 7rem;
+        height: 2rem;
+        font-size: 0.6rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .quantity-btn-cart {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+    }
+
+    .quantity-input-cart {
+        width: 30px;
+        height: 18px;
+        font-size: 9px;
+    }
+
+    .qd-container {
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+    }
+
+    .cart-right-functions {
+        width: 24vw;
+        padding-right: 0.2rem;
+    }
+
+    .cart-item-checkbox {
+        padding-bottom: 1.5rem;
+    }
+
+    input[type="checkbox"] {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .cart-container {
+        grid-template-columns: 2.5fr 0.1fr;
+        gap: 0.2rem;
+    }
+
+    .cc-size {
+        font-size: 0.55rem;
+    }
+
+    .cc-2 {
+        gap: 0.4rem;
+    }
+
+    .cart-product-img {
+        width: 2.5rem;
+    }
+
+    .cart-name {
+        font-size: 0.55rem;
+    }
+
+    .cart-price {
+        font-size: 0.55rem;
+    }
+
+    .cart-select-all {
+        font-size: 0.55rem;
+    }
+
+    .checkout-total-price {
+        font-size: 0.6rem;
+    }
+
+    .cart-button-delete,
+    .cart-button-checkout {
+        width: 6rem;
+        height: 1.8rem;
+        font-size: 0.5rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .quantity-btn-cart {
+        width: 16px;
+        height: 16px;
+        font-size: 9px;
+    }
+
+    .quantity-input-cart {
+        width: 26px;
+        height: 16px;
+        font-size: 8px;
+    }
+
+    .qd-container {
+        gap: 0.3rem;
+        margin-top: 0.5rem;
+    }
+
+    .cart-right-functions {
+        width: 26vw;
+        padding-right: 0.1rem;
+    }
+
+    .cart-item-checkbox {
+        padding-bottom: 1.2rem;
+    }
+
+    input[type="checkbox"] {
+        width: 11px;
+        height: 11px;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .cart-container {
+        grid-template-columns: 2fr 0.1fr;
+        gap: 0.15rem;
+    }
+
+    .cc-size {
+        font-size: 0.45rem;
+    }
+
+    .cc-2 {
+        gap: 0.3rem;
+    }
+
+    .cart-product-img {
+        width: 2rem;
+    }
+
+    .cart-name {
+        font-size: 0.45rem;
+    }
+
+    .cart-price {
+        font-size: 0.45rem;
+    }
+
+    .cart-select-all {
+        font-size: 0.45rem;
+    }
+
+    .checkout-total-price {
+        font-size: 0.5rem;
+    }
+
+    .cart-button-delete,
+    .cart-button-checkout {
+        width: 5rem;
+        height: 1.5rem;
+        font-size: 0.4rem;
+        padding: 0.15rem 0.3rem;
+    }
+
+    .quantity-btn-cart {
+        width: 14px;
+        height: 14px;
+        font-size: 8px;
+    }
+
+    .quantity-input-cart {
+        width: 22px;
+        height: 14px;
+        font-size: 7px;
+    }
+
+    .qd-container {
+        gap: 0.2rem;
+        margin-top: 0.4rem;
+    }
+
+    .cart-right-functions {
+        width: 28vw;
+        padding-right: 0;
+    }
+
+    .cart-item-checkbox {
+        padding-bottom: 1rem;
+    }
+
+    input[type="checkbox"] {
+        width: 10px;
+        height: 10px;
+    }
+}
 

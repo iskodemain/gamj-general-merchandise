@@ -123,3 +123,210 @@
   color: #777;
   padding: 30px 0;
 }
+
+/* || MOBILE RESPONSIVE (max-width: 600px down to 200px) */
+@media screen and (max-width: 600px) {
+    .custNotif-container {
+        padding: 15px;
+        margin-top: 0.8rem;
+    }
+
+    .custNotif-title {
+        font-size: 1.2rem;
+    }
+
+    .custNotif-item {
+        padding: 0.8rem;
+    }
+
+    .custNotif-avatar {
+        width: 40px;
+        margin-right: 10px;
+    }
+
+    .custNotif-titleRow {
+        font-size: 0.85rem;
+    }
+
+    .custNotif-message {
+        font-size: 0.8rem;
+    }
+
+    .custNotif-time {
+        font-size: 0.72rem;
+    }
+
+    .custNotif-dismiss {
+        font-size: 1.2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .custNotif-container {
+        padding: 12px;
+        margin-top: 0.6rem;
+    }
+
+    .custNotif-title {
+        font-size: 1.1rem;
+    }
+
+    .custNotif-item {
+        padding: 0.7rem;
+    }
+
+    .custNotif-avatar {
+        width: 35px;
+        margin-right: 8px;
+    }
+
+    .custNotif-dot {
+        width: 11px;
+        height: 11px;
+    }
+
+    .custNotif-titleRow {
+        font-size: 0.8rem;
+    }
+
+    .custNotif-message {
+        font-size: 0.75rem;
+    }
+
+    .custNotif-time {
+        font-size: 0.68rem;
+    }
+
+    .custNotif-dismiss {
+        font-size: 1.1rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .custNotif-container {
+        padding: 10px;
+        margin-top: 0.5rem;
+    }
+
+    .custNotif-title {
+        font-size: 1rem;
+    }
+
+    .custNotif-item {
+        padding: 0.6rem;
+        margin-bottom: 6px;
+    }
+
+    .custNotif-avatar {
+        width: 30px;
+        margin-right: 7px;
+    }
+
+    .custNotif-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .custNotif-titleRow {
+        font-size: 0.75rem;
+    }
+
+    .custNotif-message {
+        font-size: 0.7rem;
+    }
+
+    .custNotif-time {
+        font-size: 0.62rem;
+        margin-top: 3px;
+    }
+
+    .custNotif-dismiss {
+        font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .custNotif-container {
+        padding: 8px;
+        margin-top: 0.4rem;
+    }
+
+    .custNotif-title {
+        font-size: 0.85rem;
+    }
+
+    .custNotif-item {
+        padding: 0.5rem;
+        margin-bottom: 5px;
+    }
+
+    .custNotif-avatar {
+        width: 25px;
+        margin-right: 6px;
+    }
+
+    .custNotif-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .custNotif-titleRow {
+        font-size: 0.65rem;
+    }
+
+    .custNotif-message {
+        font-size: 0.62rem;
+    }
+
+    .custNotif-time {
+        font-size: 0.55rem;
+        margin-top: 2px;
+    }
+
+    .custNotif-dismiss {
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .custNotif-container {
+        padding: 6px;
+        margin-top: 0.3rem;
+    }
+
+    .custNotif-title {
+        font-size: 0.7rem;
+    }
+
+    .custNotif-item {
+        padding: 0.4rem;
+        margin-bottom: 4px;
+    }
+
+    .custNotif-avatar {
+        width: 20px;
+        margin-right: 4px;
+    }
+
+    .custNotif-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .custNotif-titleRow {
+        font-size: 0.55rem;
+    }
+
+    .custNotif-message {
+        font-size: 0.52rem;
+    }
+
+    .custNotif-time {
+        font-size: 0.45rem;
+        margin-top: 2px;
+    }
+
+    .custNotif-dismiss {
+        font-size: 0.75rem;
+    }
+}

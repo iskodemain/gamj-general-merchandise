@@ -1,21 +1,60 @@
 .ordersum-head {
     width: 100%;
+    min-width: 100px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .ordersum-content {
   display: flex;
-  flex-direction: column;   /* flex-col = vertical layout */
-  gap: 0.5rem;              /* gap-2 = 8px */
-  margin-top: 0.5rem;       /* mt-2 = 8px */
-  font-size: 0.875rem;      /* text-sm = 14px */
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: clamp(0.6rem, 2.5vw, 0.875rem);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .ordersum-list {
-    display: flex; 
-    justify-content: space-between; 
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .ordersum-price {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .ordersum-content {
+    font-size: clamp(0.65rem, 3vw, 0.85rem);
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .ordersum-content {
+    font-size: clamp(0.6rem, 3.5vw, 0.75rem);
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+  }
+}
+
+@media (max-width: 200px) {
+  .ordersum-content {
+    font-size: 0.6rem;
+    gap: 0.2rem;
+    margin-top: 0.2rem;
+  }
+
+  .ordersum-list {
+    flex-wrap: wrap;
+    gap: 0.1rem;
+  }
 }

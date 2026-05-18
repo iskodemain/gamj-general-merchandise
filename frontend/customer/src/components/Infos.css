@@ -133,3 +133,155 @@
 
   }
 }
+
+/* || MOBILE RESPONSIVE (max-width: 640px down to 200px) */
+@media screen and (max-width: 640px) {
+    .info-main {
+        margin-top: 6rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+
+    .infos-container {
+        row-gap: 2rem;
+    }
+
+    .infos-text {
+        font-size: 13px;
+    }
+
+    .infos-container .img-socials {
+        width: 10rem;
+        gap: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .info-main {
+        margin-top: 4rem;
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+
+    .infos-container {
+        row-gap: 1.5rem;
+    }
+
+    .infos-text {
+        font-size: 12px;
+    }
+
+    .infos-container .img-socials {
+        width: 9rem;
+        gap: 1.2rem;
+    }
+
+    .infos-container .img-socials .socials-img {
+        width: 22px;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .info-main {
+        margin-top: 3rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .infos-container {
+        row-gap: 1.2rem;
+    }
+
+    .infos-logo-img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .infos-logo-name {
+        font-size: 0.85rem;
+        max-width: 110px;
+    }
+
+    .infos-text {
+        font-size: 11px;
+    }
+
+    .infos-container .img-socials {
+        width: 8rem;
+        gap: 1rem;
+    }
+
+    .infos-container .img-socials .socials-img {
+        width: 20px;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    .info-main {
+        margin-top: 2rem;
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
+
+    .infos-container {
+        row-gap: 1rem;
+    }
+
+    .infos-logo-img {
+        width: 26px;
+        height: 26px;
+    }
+
+    .infos-logo-name {
+        font-size: 0.75rem;
+        max-width: 90px;
+    }
+
+    .infos-text {
+        font-size: 10px;
+    }
+
+    .infos-container .img-socials {
+        width: 7rem;
+        gap: 0.8rem;
+    }
+
+    .infos-container .img-socials .socials-img {
+        width: 18px;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .info-main {
+        margin-top: 1.5rem;
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+    }
+
+    .infos-container {
+        row-gap: 0.8rem;
+    }
+
+    .infos-logo-img {
+        width: 20px;
+        height: 20px;
+    }
+
+    .infos-logo-name {
+        font-size: 0.6rem;
+        max-width: 70px;
+    }
+
+    .infos-text {
+        font-size: 8px;
+    }
+
+    .infos-container .img-socials {
+        width: 5.5rem;
+        gap: 0.6rem;
+    }
+
+    .infos-container .img-socials .socials-img {
+        width: 14px;
+    }
+}
