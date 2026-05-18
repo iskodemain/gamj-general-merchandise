@@ -370,6 +370,9 @@ export default function InventoryDashboard() {
             <button onClick={() => navigate('inventory/add')} className="add-stock-btn">
               + Add Stock
             </button>
+            <button onClick={() => navigate('inventory/adjust')} className="adjust-stock-btn">
+              Stock Adjustment
+            </button>
           </div>
         </div>
 

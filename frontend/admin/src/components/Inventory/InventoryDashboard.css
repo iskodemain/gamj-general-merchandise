@@ -116,6 +116,21 @@
 .add-stock-btn:hover  { background-color: #7ED957; transform: translateY(-1px); }
 .add-stock-btn:active { transform: translateY(0); }
 
+.adjust-stock-btn {
+  background-color: #fea13b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.adjust-stock-btn:hover  { background-color: #e8892a; transform: translateY(-1px); }
+.adjust-stock-btn:active { transform: translateY(0); }
+
 /* ==================== Results Count ==================== */
 .results-count {
   font-size: 13px;
@@ -552,7 +567,8 @@
 
   .filter-select,
   .sort-select,
-  .add-stock-btn {
+  .add-stock-btn,
+  .adjust-stock-btn {
     width: 100%;
   }
 
