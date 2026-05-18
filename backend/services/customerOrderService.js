@@ -461,62 +461,54 @@ export const fetchOrderPaymentProofService = async (customerId) => {
     }
 }
 
-export const deleteOrderPaymentProofService = async (customerId, paymentProofID) => {
+export const editOrderPaymentProofService = async (customerId, paymentProofID, referenceId, receiptImageFile) => {
     try {
-      // Validate customer exists
       const user = await Customer.findByPk(customerId);
-      if (!user) {
-        return {
-          success: false,
-          message: "User not found",
-        };
-      }
+      if (!user) return { success: false, message: "User not found" };
 
       const paymentProof = await PaymentProof.findOne({
-        where: {
-          ID: paymentProofID,
-          customerId: customerId 
-        }
+        where: { ID: paymentProofID, customerId }
       });
-      if (!paymentProof) {
-        return {
-          success: false,
-          message: "Payment proof not found",
-        };
+      if (!paymentProof) return { success: false, message: "Payment proof not found" };
+
+      const order = await Orders.findByPk(paymentProof.orderId);
+      if (!order) return { success: false, message: "Order not found" };
+
+      let receiptImageUrl = paymentProof.receiptImage;
+
+      // Upload new image to Cloudinary if provided
+      if (receiptImageFile) {
+        const uploaded = await cloudinary.uploader.upload(receiptImageFile.path, {
+          folder: 'payment_proofs'
+        });
+        receiptImageUrl = uploaded.secure_url;
+        await fs.unlink(receiptImageFile.path).catch(() => {});
       }
 
-      const orders = await Orders.findByPk(paymentProof.orderId);
-      if (!orders) {
-        return {
-          success: false,
-          message: "Order not found",
-        };
-      }
+      await paymentProof.update({
+        referenceId,
+        receiptImage: receiptImageUrl,
+        paymentProofDate: new Date()
+      });
 
-      await paymentProof.destroy();
-
-      // ⭐ FIXED — NOTIFICATION ID BASE (DECLARE ONCE)
-      const lastNotification = await Notifications.findOne({order: [["ID", "DESC"]]});
+      // Notifications
+      const lastNotification = await Notifications.findOne({ order: [["ID", "DESC"]] });
       let nextNotificationNo = lastNotification ? Number(lastNotification.ID) + 1 : 1;
-
       const userName = user.medicalInstitutionName;
 
-      // 2️⃣ ADMIN NOTIFICATION (all admins)
       const adminNotification = await Notifications.create({
         notificationId: withTimestamp("NTFY", nextNotificationNo++),
-        senderId: customerId,  // ✅ Who triggered this
-        receiverId: null,      // ✅ null = broadcast to ALL admins
+        senderId: customerId,
+        receiverId: null,
         receiverType: "Admin",
         senderType: "System",
-        notificationType: `Transaction` ,
-        title: `${userName} - Delete Proof of Payment`,
-        message: `${userName} delete proof of payment for order #(${orders.orderId}).`,
+        notificationType: "Transaction",
+        title: `${userName} - Edited Proof of Payment`,
+        message: `${userName} updated proof of payment for order #(${order.orderId}).`,
         isRead: false,
         createAt: new Date()
       });
-      
 
-      // 2️⃣ ADMIN NOTIFICATION (all admins)
       const staffNotification = await Notifications.create({
         notificationId: withTimestamp("NTFY", nextNotificationNo++),
         senderId: customerId,
@@ -524,25 +516,22 @@ export const deleteOrderPaymentProofService = async (customerId, paymentProofID)
         receiverType: "Staff",
         senderType: "System",
         notificationType: "Transaction",
-        title: `${userName} - Delete Proof of Payment`,
-        message: `${userName} delete proof of payment for order #(${orders.orderId}).`,
+        title: `${userName} - Edited Proof of Payment`,
+        message: `${userName} updated proof of payment for order #(${order.orderId}).`,
         isRead: false,
-        createAt: new Date(),
+        createAt: new Date()
       });
 
       io.emit("newNotification_Admin", adminNotification);
       io.emit("newNotification_Staff", staffNotification);
 
-      return {
-        success: true,
-        message: "Order proof of payment successfully deleted"
-      };
+      return { success: true, message: "Payment proof updated successfully" };
 
     } catch (error) {
         console.log(error);
         throw new Error(error.message);
     }
-}
+};
 
 export const addOrderPaymentProofService = async (customerId, orderId, referenceId, amountPaid, receiptImage) => {
     try {

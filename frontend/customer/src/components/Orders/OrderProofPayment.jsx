@@ -7,14 +7,14 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from 'react-toastify';
 
 const OrderProofPayment = () => {
-  const { orderId, customerId, setShowOrderProofPayment, addOrderProofPayment, deleteOrderProofPayment, currency, toastError, fetchOrderProofPayment, orderTotalAmount, fetchOrderItems  } = useContext(ShopContext);
+  const { orderId, customerId, setShowOrderProofPayment, addOrderProofPayment, editOrderProofPayment, currency, toastError, fetchOrderProofPayment, orderTotalAmount, fetchOrderItems  } = useContext(ShopContext);
 
   const [referenceId, setReferenceId] = useState('');
   const [amountPaid, setAmountPaid] = useState(orderTotalAmount || '');
   const [receiptImage, setReceiptImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSubmitConfirmModal, setShowSubmitConfirmModal] = useState(false);
 
@@ -52,7 +52,7 @@ const OrderProofPayment = () => {
     setReceiptImage(null);
     setImagePreview(null);
     setIsSubmitting(false);
-    setIsDeleting(false);
+    setIsEditing(false);
   };
 
   const handleImageChange = (e) => {
@@ -74,10 +74,6 @@ const OrderProofPayment = () => {
   const handleRemoveImage = () => {
     setReceiptImage(null);
     setImagePreview(null);
-  };
-
-  const handleDeleteClick = () => {
-    setShowConfirmModal(true);
   };
 
   const handleSubmit = async (e) => {
@@ -110,15 +106,23 @@ const OrderProofPayment = () => {
     setShowSubmitConfirmModal(false);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleEditClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmEdit = async () => {
     if (!existingProof) return;
 
-    setIsDeleting(true);
+    setIsEditing(true);
     setShowConfirmModal(false);
 
-    const result = await deleteOrderProofPayment(existingProof.ID);
+    const result = await editOrderProofPayment(
+      existingProof.ID,
+      referenceId,
+      receiptImage
+    );
 
-    setIsDeleting(false);
+    setIsEditing(false);
 
     if (result) {
       handleClose();
@@ -128,7 +132,7 @@ const OrderProofPayment = () => {
     }
   };
 
-  const handleCancelDelete = () => {
+  const handleCancelEdit = () => {
     setShowConfirmModal(false);
   };
 
@@ -164,8 +168,7 @@ const OrderProofPayment = () => {
               value={referenceId}
               onChange={(e) => setReferenceId(e.target.value)}
               placeholder="e.g., PAYPAL-TXN-ABC123456"
-              disabled={isViewMode}
-              required={!isViewMode}
+              required
             />
           </div>
 
@@ -193,7 +196,7 @@ const OrderProofPayment = () => {
               Receipt Image {!isViewMode && <span className="required-asterisk">*</span>}
             </label>
             
-            {!imagePreview && !isViewMode ? (
+            {!imagePreview ? (
               <label className="proof-upload-area">
                 <input
                   type="file"
@@ -213,25 +216,23 @@ const OrderProofPayment = () => {
                 <div className="proof-image-preview">
                   <img src={imagePreview} alt="Receipt Preview" />
                 </div>
-                {!isViewMode && (
-                  <div className="proof-image-actions">
-                    <p className="proof-image-name">{receiptImage?.name || 'Uploaded Receipt'}</p>
-                    <div className="proof-image-buttons">
-                      <label className="proof-change-btn">
-                        Change
-                        <input
-                          type="file"
-                          className="proof-file-input"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                        />
-                      </label>
-                      <button type="button" className="proof-remove-btn" onClick={handleRemoveImage}>
-                        Remove
-                      </button>
-                    </div>
+                <div className="proof-image-actions">
+                  <p className="proof-image-name">{receiptImage?.name || 'Uploaded Receipt'}</p>
+                  <div className="proof-image-buttons">
+                    <label className="proof-change-btn">
+                      Change
+                      <input
+                        type="file"
+                        className="proof-file-input"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </label>
+                    <button type="button" className="proof-remove-btn" onClick={handleRemoveImage}>
+                      Remove
+                    </button>
                   </div>
-                )}
+                </div>
                 {isViewMode && (
                   <div className="proof-image-info">
                     <p className="proof-upload-date">
@@ -256,19 +257,19 @@ const OrderProofPayment = () => {
           {isViewMode && !isOrderCancelled ? (
             <button
               type="button"
-              className="proof-delete-btn"
-              onClick={handleDeleteClick}
-              disabled={isDeleting}
+              className="proof-edit-btn"
+              onClick={handleEditClick}
+              disabled={isEditing || !referenceId || !imagePreview}
             >
-              {isDeleting ? (
+              {isEditing ? (
                 <>
                   <span className="proof-spinner"></span>
-                  Deleting...
+                  Saving...
                 </>
               ) : (
                 <>
-                  <RiDeleteBin6Line />
-                  Delete Proof of Payment
+                  <MdOutlineUploadFile />
+                  Edit Proof of Payment
                 </>
               )}
             </button>
@@ -323,31 +324,31 @@ const OrderProofPayment = () => {
         </div>
       )}
 
-      {/* CONFIRMATION MODAL */}
+      {/* EDIT CONFIRMATION MODAL */}
       {showConfirmModal && (
         <div className="confirm-modal-overlay">
           <div className="confirm-modal-card">
             <div className="confirm-modal-header">
-              <MdWarning className="confirm-modal-icon" />
-              <h3 className="confirm-modal-title">Delete Payment Proof?</h3>
+              <MdWarning className="confirm-modal-icon confirm-modal-icon-submit" />
+              <h3 className="confirm-modal-title">Edit Payment Proof?</h3>
             </div>
-            
+
             <p className="confirm-modal-message">
-              Are you sure you want to delete this payment proof?
+              Are you sure you want to update this payment proof?
             </p>
 
             <div className="confirm-modal-buttons">
-              <button 
+              <button
                 className="confirm-modal-btn confirm-modal-btn-no"
-                onClick={handleCancelDelete}
+                onClick={handleCancelEdit}
               >
-                No, Keep It
+                No, Go Back
               </button>
-              <button 
-                className="confirm-modal-btn confirm-modal-btn-yes"
-                onClick={handleConfirmDelete}
+              <button
+                className="confirm-modal-btn submission-confirm-modal-btn-yes"
+                onClick={handleConfirmEdit}
               >
-                Yes, Delete
+                Yes, Update
               </button>
             </div>
           </div>

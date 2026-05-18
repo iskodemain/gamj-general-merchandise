@@ -170,9 +170,9 @@
 }
 
 /* ===================== DELETE BUTTON ===================== */
-.proof-delete-btn {
+.proof-edit-btn {
   width: 100%;
-  background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+  background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -185,22 +185,22 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
   margin-top: 2rem;
 }
 
-.proof-delete-btn:hover:not(:disabled) {
+.proof-edit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(211, 47, 47, 0.4);
-  background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+  box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4);
+  background: linear-gradient(135deg, #0D47A1 0%, #01296e 100%);
 }
 
-.proof-delete-btn:disabled {
+.proof-edit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.proof-delete-btn svg {
+.proof-edit-btn svg {
   font-size: 1.2rem;
 }
 
