@@ -17,9 +17,23 @@ export const generateAccessToken = async () => {
 };
 
 
-// 2️⃣ Create PayPal Order
+// 2️⃣ Calculate PayPal fee and grossed-up amount
+// Formula: customerPays = (originalAmount + fixedFee) / (1 - percentFee)
+// This ensures the owner receives exactly `originalAmount` after PayPal deducts its fee
+export const calculatePaypalFee = (originalAmount) => {
+  const percentFee = parseFloat(process.env.PAYPAL_PERCENT_FEE || "0.039");
+  const fixedFee = parseFloat(process.env.PAYPAL_FIXED_FEE || "15");
+  const grossed = (Number(originalAmount) + fixedFee) / (1 - percentFee);
+  const grossedRounded = Math.ceil(grossed * 100) / 100;
+  const fee = parseFloat((grossedRounded - Number(originalAmount)).toFixed(2));
+  return { grossedAmount: grossedRounded, paypalFee: fee };
+};
+
+// 3️⃣ Create PayPal Order
 export const createPayPalOrderService = async (amount) => {
   const accessToken = await generateAccessToken();
+  // Gross up the amount so owner receives exactly `amount` after PayPal fee
+  const { grossedAmount } = calculatePaypalFee(amount);
   const response = await axios.post(
     `${process.env.PAYPAL_BASE_URL}/v2/checkout/orders`,
     {
@@ -28,14 +42,14 @@ export const createPayPalOrderService = async (amount) => {
         {
             amount: { 
                 currency_code: process.env.PAYPAL_CURRENCY, 
-                value: Number(amount).toFixed(2) 
+                value: Number(grossedAmount).toFixed(2) 
             },
         },
       ],
     },
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
-  return response.data;
+  return { ...response.data, paypalFee: calculatePaypalFee(amount).paypalFee };
 };
 
 

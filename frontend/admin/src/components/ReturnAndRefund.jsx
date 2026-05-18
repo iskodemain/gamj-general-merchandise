@@ -130,6 +130,7 @@ function ReturnAndRefund() {
 
                   const subtotal = Number(order.subtotal || 0);
                   const shippingFee = Number(order.shippingFee || 0);
+                  const paypalFee = Number(order.paypalFee || 0);
                   const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
@@ -274,6 +275,13 @@ function ReturnAndRefund() {
                                 <span className="return-refund-label">Shipping Fee</span>
                                 <span className="return-refund-value">₱{shippingFee.toFixed(2)}</span>
                               </div>
+
+                              {order.paymentMethod === 'Paypal' && paypalFee > 0 && (
+                                <div className="return-refund-order-total-row">
+                                  <span className="return-refund-label">PayPal Fee</span>
+                                  <span className="return-refund-value">₱{paypalFee.toFixed(2)}</span>
+                                </div>
+                              )}
 
                               <div className="return-refund-order-total-divider"></div>
 

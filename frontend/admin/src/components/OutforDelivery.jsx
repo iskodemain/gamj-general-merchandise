@@ -112,6 +112,7 @@ function OutforDelivery() {
 
                   const subtotal = Number(order.subtotal || 0);
                   const shippingFee = Number(order.shippingFee || 0);
+                  const paypalFee = Number(order.paypalFee || 0);
                   const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
@@ -238,6 +239,13 @@ function OutforDelivery() {
                                 <span className="ofd-label">Shipping Fee</span>
                                 <span className="ofd-value">₱{shippingFee.toFixed(2)}</span>
                               </div>
+
+                              {order.paymentMethod === 'Paypal' && paypalFee > 0 && (
+                                <div className="ofd-order-total-row">
+                                  <span className="ofd-label">PayPal Fee</span>
+                                  <span className="ofd-value">₱{paypalFee.toFixed(2)}</span>
+                                </div>
+                              )}
 
                               <div className="ofd-order-total-divider"></div>
 

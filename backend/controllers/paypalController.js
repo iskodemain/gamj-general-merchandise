@@ -1,4 +1,4 @@
-import { createPayPalOrderService, capturePayPalOrderService } from "../services/paypalService.js";
+import { createPayPalOrderService, capturePayPalOrderService, calculatePaypalFee } from "../services/paypalService.js";
 import { addOrderService } from "../services/customerOrderService.js";
 
 
@@ -11,7 +11,8 @@ export const createPayPalOrder = async (req, res) => {
         }
 
         const result = await createPayPalOrderService(amount);
-        res.json(result);
+        // Return the PayPal order id + the calculated fee for the frontend
+        res.json({ id: result.id, paypalFee: result.paypalFee });
     } catch (error) {
         console.log(error);
         res.json({success: false, message:error.message})
@@ -20,7 +21,7 @@ export const createPayPalOrder = async (req, res) => {
 
 export const capturePayPalOrder = async (req, res) => {
   try {
-    const { orderID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount } = req.body;
+    const { orderID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount, paypalFee } = req.body;
     const { ID } = req.user;
 
     const capture = await capturePayPalOrderService(orderID);
@@ -29,7 +30,7 @@ export const capturePayPalOrder = async (req, res) => {
     const status = capture.status || capture?.purchase_units?.[0]?.payments?.captures?.[0]?.status;
 
     if (status === "COMPLETED") {
-      const result = await addOrderService(ID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount);
+      const result = await addOrderService(ID, paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount, paypalFee || null);
       return res.json(result);
     }
     return res.status(400).json({ success: false, message: "Payment not completed" });

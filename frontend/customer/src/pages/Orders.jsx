@@ -79,6 +79,7 @@ function Orders() {
     ...order,
     subtotal: Number(order.subtotal || 0),
     shippingFee: Number(order.shippingFee || 0),
+    paypalFee: Number(order.paypalFee || 0),
     totalAmount: Number(order.totalAmount || 0),
 
     items: fetchOrderItems.filter(item => item.orderId === order.ID && item.isDeletedByCustomer === false).map(item => {
@@ -537,6 +538,15 @@ function Orders() {
                       {currency} {order.shippingFee.toFixed(2)}
                     </span>
                   </div>
+
+                  {order.paymentMethod === 'Paypal' && order.paypalFee > 0 && (
+                    <div className="orders-summary-row">
+                      <span className="orders-label">PayPal Fee</span>
+                      <span className="orders-value">
+                        {currency} {order.paypalFee.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="orders-summary-divider"></div>
 

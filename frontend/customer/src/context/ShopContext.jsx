@@ -94,6 +94,7 @@ const ShopContextProvider = (props) => {
     
     const [shippingFee, getShippingFee] = useState(0);
     const [totalPrice, getTotalPrice] = useState(0);
+    const [paypalFee, setPaypalFee] = useState(0);
 
     /*--------------------------USE STATE--------------------------*/
     const [token, setToken] = useState(() => localStorage.getItem('authToken') || '');
@@ -706,7 +707,7 @@ const ShopContextProvider = (props) => {
 
 
     /*--------------------------ADD ORDER----------------------------*/
-    const addOrder = async (paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount) => {
+    const addOrder = async (paymentMethod, orderItems, cartItemsToDelete, subtotal, shippingFee, totalAmount, paypalFee = null) => {
         if (token) {
             try {
                 const response = await axios.post(backendUrl + "/api/order/add", {
@@ -715,7 +716,8 @@ const ShopContextProvider = (props) => {
                     cartItemsToDelete,
                     subtotal,
                     shippingFee,
-                    totalAmount
+                    totalAmount,
+                    paypalFee: paypalFee || null
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -725,6 +727,7 @@ const ShopContextProvider = (props) => {
                     setOrderItems([]);
                     getOrderSubTotal(0);
                     getTotalPrice(0);
+                    setPaypalFee(0);
                     return true;
                 } else {
                     toast.error(response.data.message, { ...toastError });
@@ -1574,7 +1577,7 @@ const ShopContextProvider = (props) => {
 
     /*----------------------------VALUE ACCESS-----------------------------*/
     const value = {
-        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund, fetchNotifications, setFetchNotifications, cartItemsToDelete, setCartItemsToDelete, deleteNotification, readNotification, paypalClientId, showPaypalModal, setShowPaypalModal, rejectedCustomer, setRejectedCustomer, settingsData, fetchInventoryStock, showOrderProofPayment, setShowOrderProofPayment, orderId, setOrderId, addOrderProofPayment, fetchOrderProofPayment, editOrderProofPayment, customerId, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof, fetchStorePolicy, fetchShippingRates, returnQuantity, setReturnQuantity, returnMethod, setReturnMethod, pickupScheduledDate, setPickupScheduledDate, orderTotalAmount, setOrderTotalAmount, hasPaymentProof, setHasPaymentProof, markCanceledOrderComplete
+        products, setProducts, productVariantValues, setProductVariantValues, variantName, setVariantName, currency, search, setSearch, showSearch, setShowSearch, cartItems, addToCart, getCartCount, updateQuantity, showCartContent, setShowCartContent, setCartItems, orderSubTotal, getOrderSubTotal, navigate, totalPrice, getTotalPrice, toastSuccess, toastError, wishlistItems, setWishListItems, addToWishlist, removeFromWishlist, isInWishlist, backendUrl, token, setToken, getWishlistCount, showWishlistContent, signUpStep, setSignUpStep, signUpData, setSignUpData, loginToken, setLoginToken, loginIdentifier, setLoginIdentifier, fpIdentifier, setFpIdentifier, resetPasswordToken, setResetPasswordToken, provinces, filteredCities, filteredBarangays, selectedProvince, setSelectedProvince, selectedCity, setSelectedCity, selectedBarangay, setSelectedBarangay, productCategory, setProductCategory, deleteCartItem, deleteMultipleCartItem, verifiedUser, setVerifiedUser, showImportantNote, setShowImportantNote, showUnavailableNote, setShowUnavailableNote, activeStep, setActiveStep, hasDeliveryInfo, setHasDeliveryInfo, poMedicalInstitutionName, setPoMedicalInstitutionName, poEmailAddress, setPoEmailAddress, poDetailedAddress, setPoDetailedAddress, poZipCode, setPoZipCode, poContactNumber, setPoContactNumber, paymentMethod, setPaymentMethod, shippingFee, getShippingFee, nbProfileImage, setNbProfileImage, handleFetchDeliveryInfo, fetchVerifiedCustomer, productVariantCombination, setProductVariantCombination, orderItems, setOrderItems, addOrder, fetchOrders, fetchOrderItems, paymentUsed, setPaymentUsed, orderItemId, setOrderItemId, reasonForCancellation, setReasonForCancellation, cancelComments, setCancelComments, cancelPaypalEmail, setCancelPaypalEmail, cancelledBy, setCancelledBy, cancelOrder, setCancelOrder, addCancelOrder, cancellationStatus, setCancellationStatus, fetchCancelledOrders, removeOrder, cancelOrderRequest, markRefundReceived, viewRefundReceipt, setViewRefundReceipt, fetchRefundProof, refundOrder, setRefundOrder, reasonForRefund, setReasonForRefund, refundComments, setRefundComments,imageProof1, setImageProof1, imageProof2, setImageProof2, refundResolution, setRefundResolution,refundMethod, setRefundMethod, refundPaypalEmail, setRefundPaypalEmail, refundStatus, setRefundStatus, otherReason, setOtherReason, addOrderRefund, fetchOrderRefund, setFetchOrderRefund, cancelOrderRefundRequest, showRejectedRefund, setShowRejectedRefund, fetchNotifications, setFetchNotifications, cartItemsToDelete, setCartItemsToDelete, deleteNotification, readNotification, paypalClientId, showPaypalModal, setShowPaypalModal, rejectedCustomer, setRejectedCustomer, settingsData, fetchInventoryStock, showOrderProofPayment, setShowOrderProofPayment, orderId, setOrderId, addOrderProofPayment, fetchOrderProofPayment, editOrderProofPayment, customerId, setCustomerId, fetchReturnRefundPolicy, fetchOrderDeliveryProof, fetchStorePolicy, fetchShippingRates, returnQuantity, setReturnQuantity, returnMethod, setReturnMethod, pickupScheduledDate, setPickupScheduledDate, orderTotalAmount, setOrderTotalAmount, hasPaymentProof, setHasPaymentProof, markCanceledOrderComplete, paypalFee, setPaypalFee
     }
 
     return (

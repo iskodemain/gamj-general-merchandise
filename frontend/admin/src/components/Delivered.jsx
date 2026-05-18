@@ -114,6 +114,7 @@ function Delivered() {
 
                   const subtotal = Number(order.subtotal || 0);
                   const shippingFee = Number(order.shippingFee || 0);
+                  const paypalFee = Number(order.paypalFee || 0);
                   const totalAmount = Number(order.totalAmount || 0);
 
                   const deliveryInfo = deliveryInfoList.find(
@@ -256,6 +257,13 @@ function Delivered() {
                                 <span className="delivered-label">Shipping Fee</span>
                                 <span className="delivered-value">₱{shippingFee.toFixed(2)}</span>
                               </div>
+
+                              {order.paymentMethod === 'Paypal' && paypalFee > 0 && (
+                                <div className="delivered-order-total-row">
+                                  <span className="delivered-label">PayPal Fee</span>
+                                  <span className="delivered-value">₱{paypalFee.toFixed(2)}</span>
+                                </div>
+                              )}
 
                               <div className="delivered-order-total-divider"></div>
 
