@@ -77,22 +77,12 @@ const OrderItems = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
-    isDeletedByStaff: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
     isDeletedByDeliveryStaff: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     },
     isDeletedByAdmin: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    isDeletedBySuperAdmin: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,

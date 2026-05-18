@@ -91,6 +91,18 @@ function ActiveOrders() {
           {currentUser === "Delivery Staff" && 
             <div className="active-orders-grid">
               <ActiveOrderCard
+                color="orange"
+                title="Pending Orders"
+                number={pendingOrders.length}
+                onClick={() => navigate("/pending")}
+              />
+              <ActiveOrderCard
+                color="teal"
+                title="Processing Orders"
+                number={processingOrders.length}
+                onClick={() => navigate("/processing")}
+              />
+              <ActiveOrderCard
                 color="blue"
                 title="Out for Delivery Orders"
                 number={outForDeliveryOrders.length}

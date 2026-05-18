@@ -1,6 +1,6 @@
 import express from 'express';
 import adminAuth from '../../middleware/adminAuth.js';
-import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchOrderTransaction, fetchOrderPaymentProof, addOrderDeliveryProof, fetchOrderDeliveryProof, adminRemoveCancellation } from '../../controllers/admin/adminOrderController.js';
+import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchOrderTransaction, fetchOrderPaymentProof, addOrderDeliveryProof, fetchOrderDeliveryProof, adminRemoveCancellation, adminDeleteOrderItem } from '../../controllers/admin/adminOrderController.js';
 
 import upload from '../../middleware/multer.js';
 
@@ -17,6 +17,9 @@ adminOrderRouter.get('/order-delivery-proof/fetch', adminAuth, fetchOrderDeliver
 
 // ADMIN REMOVE CANCELLATION
 adminOrderRouter.patch('/cancel/remove-cancellation', adminAuth, adminRemoveCancellation);
+
+// ADMIN SOFT-DELETE ORDER ITEM
+adminOrderRouter.patch('/cancel/delete-order-item', adminAuth, adminDeleteOrderItem);
 
 
 // UPDATE ORDER STATUS

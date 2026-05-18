@@ -36,7 +36,9 @@ function CancelOrder() {
         total: Number(order.totalAmount),
         itemsCount: items.length,
 
-        items: items.map((item) => {
+        items: items
+          .filter((item) => item.orderStatus === "Cancelled" && !item.isDeletedByAdmin)
+          .map((item) => {
           const product = products.find(
             (p) => p.ID === item.productId
           );
@@ -96,7 +98,7 @@ function CancelOrder() {
     const items = fetchOrderItems.filter(
       (item) => item.orderId === order.ID
     );
-    return items.some((item) => item.orderStatus === "Cancelled");
+    return items.some((item) => item.orderStatus === "Cancelled" && !item.isDeletedByAdmin);
   }) || [];
 
 
@@ -133,7 +135,8 @@ function CancelOrder() {
                 cancelledOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
                   const items = fetchOrderItems
                     .filter((item) => item.orderId === order.ID)
-                    .filter((item) => item.orderStatus === "Cancelled");
+                    .filter((item) => item.orderStatus === "Cancelled")
+                    .filter((item) => !item.isDeletedByAdmin);
 
                   const subtotal = Number(order.subtotal || 0);
                   const shippingFee = Number(order.shippingFee || 0);

@@ -1,16 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import "./CancelOrderReview.css";
 import { FaTrashCan, FaArrowLeft } from "react-icons/fa6";
 import { IoSearchOutline } from "react-icons/io5";
 import CancelReason from "./CancelReason.jsx";
 import CancelReview from "./CancelReview.jsx";
+import { AdminContext } from "../../context/AdminContextProvider";
+import Loading from "../../../../customer/src/components/Loading";
 
 function CancelOrderReview({ order = null, onClose = () => {}, orderStatus = "" }) {
+  const { adminDeleteOrderItem } = useContext(AdminContext);
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [showReasonModal, setShowReasonModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!order) return;
@@ -23,6 +27,16 @@ function CancelOrderReview({ order = null, onClose = () => {}, orderStatus = "" 
     setItems(filteredItems);
     setSearch("");
   }, [order, orderStatus]);
+
+  const handleDeleteItem = async (item) => {
+    setLoading(true);
+    const success = await adminDeleteOrderItem(item.id);
+    setLoading(false);
+    if (success) {
+      // Remove the item from local state immediately
+      setItems((prev) => prev.filter((i) => i.id !== item.id));
+    }
+  };
 
 
   const visible = useMemo(() => {
@@ -38,6 +52,8 @@ function CancelOrderReview({ order = null, onClose = () => {}, orderStatus = "" 
 
   return (
     <div className="cor-review-wrapper">
+
+      {loading && <Loading />}
 
       {/* If Reason modal is open, show CancelReason */}
       {showReasonModal && selectedItem ? (
@@ -157,7 +173,10 @@ function CancelOrderReview({ order = null, onClose = () => {}, orderStatus = "" 
 
                       <div className="cor-review-btn-ctn">
                         {item.cancellationStatus === "Completed" && (
-                          <button type="button">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteItem(item)}
+                          >
                             <FaTrashCan className="cor-review-btn-trash" />
                           </button>
                         )}

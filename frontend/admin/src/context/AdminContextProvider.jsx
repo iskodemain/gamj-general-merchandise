@@ -938,9 +938,30 @@ const AdminContextProvider = (props) => {
       }
   }, [token]);
 
+  /*---------------------------ADMIN DELETE ORDER ITEM (SOFT DELETE)-----------------------------*/
+  const adminDeleteOrderItem = async (orderItemId) => {
+    if (!token) return;
+    try {
+      const response = await axios.patch(
+        backendUrl + "/api/order/cancel/delete-order-item",
+        { orderItemId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) {
+        toast.success(response.data.message, { ...toastSuccess });
+        return true;
+      } else {
+        toast.error(response.data.message, { ...toastError });
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   /*---------------------------ADMIN REMOVE CANCELLATION-----------------------------*/
-  const adminRemoveCancellation = async (orderCancelID, customerID, orderItemID) => {
-    if (token) {
+  const adminRemoveCancellation = async (orderCancelID, customerID, orderItemID) => {    if (token) {
       const payload = {orderCancelID, customerID, orderItemID};
       try {
         const response = await axios.patch(backendUrl + "/api/order/cancel/remove-cancellation", payload, {
@@ -1713,7 +1734,7 @@ const AdminContextProvider = (props) => {
 
 
   const value = {
-    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchInventoryStock, addStock, adjustStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser, fetchReturnRefundPolicy, addReturnRefundPolicy, updateReturnRefundPolicy, addInventorySettings, fetchInventorySettings, deleteInventorySettings, updateInventorySettings, addOrderDeliveryProof, addStorePolicy, fetchOrderDeliveryProof, fetchStorePolicy, updateStorePolicy, fetchShippingRates, addShippingRates, updateShippingRates, deleteShippingRates, handleFetchShippingRates, adminRemoveCancellation
+    navigate, toastSuccess, toastError, backendUrl, currency, adminLogin, loginIdentifier, setLoginIdentifier, loginToken, adminLoginVerify, isSidebarOpen, setIsSidebarOpen, setToken, token, products, productCategory, addProduct, variantName, productVariantValues, productVariantCombination, updateProduct, customerList, fetchOrders, fetchOrderItems, deliveryInfoList, barangays, cities, provinces, fetchCancelledOrders, fetchReturnRefundOrders, adminList, handleApproveUser, handleRejectUser, handleDeletetUser, handleSaveUserInfo, handleAddUser, fetchAdminProfile, adminProfileInfo, handleSaveAdminProfile, handleChangeOrderStatus, settingsData, handleChangeSettingsData, fetchRefundProof, processRefundRequest, approveRefundRequest, successfullyProcessedRefund, rejectRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchInventoryStock, addStock, adjustStock, fetchInventoryBatch, fetchInventoryHistory, addProductCategory, updateProductCategory, deleteProductCategory, deleteAllProductCategories, fetchOrderTransaction, deleteProduct, fetchNotifications, addProvince, deleteProvince, updateProvince, addCity, updateCity, deleteCity, addBarangay, updateBarangay, deleteBarangay, fetchOrderProofPayment, showOrderPaymentProof, setShowOrderPaymentProof, selectedPaymentProof, setSelectedPaymentProof, currentUser, setCurrentUser, fetchReturnRefundPolicy, addReturnRefundPolicy, updateReturnRefundPolicy, addInventorySettings, fetchInventorySettings, deleteInventorySettings, updateInventorySettings, addOrderDeliveryProof, addStorePolicy, fetchOrderDeliveryProof, fetchStorePolicy, updateStorePolicy, fetchShippingRates, addShippingRates, updateShippingRates, deleteShippingRates, handleFetchShippingRates, adminRemoveCancellation, adminDeleteOrderItem
   }  
   return (
     <AdminContext.Provider value={value}>
