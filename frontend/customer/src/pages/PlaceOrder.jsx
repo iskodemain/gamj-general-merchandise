@@ -511,10 +511,29 @@ function PlaceOrder() {
                     <span className="confirm-label">Payment Method:</span>
                     <span className="confirm-value">{paymentMethod}</span>
                   </div>
+
+                  <div className="confirm-items-label">Items Ordered:</div>
+                  <ul className="confirm-items-list">
+                    {orderItems?.map((item, idx) => {
+                      const product = products.find((p) => p.ID === item.productId);
+                      return (
+                        <li key={idx} className="confirm-item-row">
+                          <span className="confirm-item-name">
+                            {product?.productName || "Unknown Product"}
+                            {item.value ? ` (${item.value})` : ""}
+                            <span className="confirm-item-qty-inline"> x{item.quantity}</span>
+                          </span>
+                          <span className="confirm-item-price">₱{Number(item.subTotal).toFixed(2)}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+
                   <div className="confirm-detail-row">
-                    <span className="confirm-label">Total Items:</span>
-                    <span className="confirm-value">{orderItems?.length || 0}</span>
+                    <span className="confirm-label">Shipping Fee:</span>
+                    <span className="confirm-value">₱{Number(shippingFee).toFixed(2)}</span>
                   </div>
+
                   {paymentMethod === 'Paypal' && paypalFee > 0 && (
                     <div className="confirm-detail-row">
                       <span className="confirm-label">PayPal Fee:</span>

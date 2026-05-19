@@ -1766,7 +1766,7 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
         };
       }
 
-      const validReturnMethods = ["PICKUP", "DROP_OFF"];
+      const validReturnMethods = ["PICKUP"];
 
       if (returnMethod && !validReturnMethods.includes(returnMethod)) {
         return {
@@ -1857,7 +1857,22 @@ export const addOrderRefundService = async (customerId, orderItemId, reasonForRe
       // Fetch the complete order record to include auto-generated orderId
       const fullOrder = await Orders.findByPk(orderItem.orderId);
       const userName = user.medicalInstitutionName;
-      // Fetch product info FOR NOTITICATION
+
+      // 6️⃣ Create OrderTransaction record
+      const lastTransaction = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+      const nextTransactionNo = lastTransaction ? Number(lastTransaction.ID) + 1 : 1;
+      await OrderTransaction.create({
+        transactionId: withTimestamp('TRXN', nextTransactionNo),
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId,
+        transactionType: 'Order Refund Requested',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      // Fetch product info FOR NOTIFICATION
       const product = await Products.findByPk(orderItem.productId);
       if (!product) {
         return {

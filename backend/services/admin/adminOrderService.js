@@ -19,8 +19,9 @@ import OrderDeliveryProof from "../../models/orderDeliveryProof.js";
 import InventoryStock from "../../models/inventoryStock.js";
 import InventoryBatch from "../../models/inventoryBatch.js";
 import InventoryHistory from "../../models/inventoryHistory.js";
+import ProductInventorySettings from "../../models/productInventorySettings.js";
 import fs from 'fs/promises';
-import { adminCancellationRemovedTemplate, adminRefundSubmittedTemplate } from "../../utils/emailTemplates.js";
+import { adminCancellationRemovedTemplate, adminRefundSubmittedTemplate, returnRefundStatusTemplate, stockAdjustmentLowStockTemplate } from "../../utils/emailTemplates.js";
 
 
 // ID GENERATOR
@@ -803,34 +804,58 @@ export const updateOrderStatusService = async (adminId, data) => {
 
 export const processRefundRequestService = async (adminId, refundID, newStatus) => {
   try {
-    // Verify admin exists
     const adminUser = await Admin.findByPk(adminId);
-    if (!adminUser) {
-      return {
-        success: false,
-        message: "Admin user not found"
-      };
-    }
+    if (!adminUser) return { success: false, message: "Admin user not found" };
 
-    // Find refund order
     const refundOrder = await OrderRefund.findByPk(refundID);
-    if (!refundOrder) {
-      return {
-        success: false,
-        message: "Refund request not found"
-      };
-    }
+    if (!refundOrder) return { success: false, message: "Refund request not found" };
 
-    // Update status
     refundOrder.refundStatus = newStatus;
     await refundOrder.save();
 
-    return {
-      success: true,
-      message: "Refund request updated successfully",
-      updatedRefund: refundOrder,
-    };
+    // ── Gather context for notifications ──
+    const orderItem = await OrderItems.findByPk(refundOrder.orderItemId);
+    const fullOrder = orderItem ? await Orders.findByPk(orderItem.orderId) : null;
+    const customer = await Customer.findByPk(refundOrder.customerId);
+    const product = orderItem ? await Products.findByPk(orderItem.productId) : null;
 
+    if (orderItem && fullOrder && customer && product) {
+      // Transaction
+      const lastTx = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+      const txNo = lastTx ? Number(lastTx.ID) + 1 : 1;
+      await OrderTransaction.create({
+        transactionId: withTimestamp('TRXN', txNo),
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId: customer.ID,
+        transactionType: 'Order Refund Processing',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      // Notifications
+      const lastNotif = await Notifications.findOne({ order: [['ID', 'DESC']] });
+      let notifNo = lastNotif ? Number(lastNotif.ID) + 1 : 1;
+      const msg = `Return/refund request for "${product.productName}" (Order #${fullOrder.orderId}) is now being processed.`;
+
+      const custNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: null, receiverId: customer.ID, receiverType: 'Customer', senderType: 'System', notificationType: 'Order Return/Refund', title: 'Return/Refund Processing', message: msg, isRead: false, createAt: new Date() });
+      const adminNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Admin', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Processing — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+      const staffNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Staff', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Processing — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+
+      io.emit('newNotification_Customer', custNotif);
+      io.emit('newNotification_Admin', adminNotif);
+      io.emit('newNotification_Staff', staffNotif);
+
+      // Email
+      orderSendMail({
+        to: customer.loginEmail || customer.emailAddress,
+        subject: 'Your Return/Refund Request is Being Processed',
+        html: returnRefundStatusTemplate(customer.medicalInstitutionName, 'Processing', fullOrder.paymentMethod, product.productName, fullOrder.orderId),
+      });
+    }
+
+    return { success: true, message: "Refund request updated successfully", updatedRefund: refundOrder };
   } catch (error) {
     console.error(error);
     throw new Error(error.message);
@@ -839,42 +864,67 @@ export const processRefundRequestService = async (adminId, refundID, newStatus) 
 
 export const approveRefundRequestService = async (adminId, refundID, newStatus, pickupScheduledDate = null) => {
   try {
-    // Verify admin exists
     const adminUser = await Admin.findByPk(adminId);
-    if (!adminUser) {
-      return {
-        success: false,
-        message: "Admin user not found"
-      };
-    }
+    if (!adminUser) return { success: false, message: "Admin user not found" };
 
-    // Find refund order
     const approveRefund = await OrderRefund.findByPk(refundID);
-    if (!approveRefund) {
-      return {
-        success: false,
-        message: "Approve Refund request not found"
-      };
-    }
+    if (!approveRefund) return { success: false, message: "Approve Refund request not found" };
 
-    // Update status
     approveRefund.refundStatus = newStatus;
-
-    // Only save pickupScheduledDate if returnMethod is PICKUP and date is provided
     if (approveRefund.returnMethod === 'PICKUP' && pickupScheduledDate) {
       approveRefund.pickupScheduledDate = new Date(pickupScheduledDate);
     } else if (approveRefund.returnMethod !== 'PICKUP') {
-      approveRefund.pickupScheduledDate = null; // clear it if not pickup
+      approveRefund.pickupScheduledDate = null;
     }
-
     await approveRefund.save();
 
-    return {
-      success: true,
-      message: "Approve Refund request successfully",
-      updatedRefund: approveRefund,
-    };
+    // ── Gather context ──
+    const orderItem = await OrderItems.findByPk(approveRefund.orderItemId);
+    const fullOrder = orderItem ? await Orders.findByPk(orderItem.orderId) : null;
+    const customer = await Customer.findByPk(approveRefund.customerId);
+    const product = orderItem ? await Products.findByPk(orderItem.productId) : null;
 
+    if (orderItem && fullOrder && customer && product) {
+      // Transaction
+      const lastTx = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+      const txNo = lastTx ? Number(lastTx.ID) + 1 : 1;
+      await OrderTransaction.create({
+        transactionId: withTimestamp('TRXN', txNo),
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId: customer.ID,
+        transactionType: 'Order Refund Approved',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      // Notifications
+      const lastNotif = await Notifications.findOne({ order: [['ID', 'DESC']] });
+      let notifNo = lastNotif ? Number(lastNotif.ID) + 1 : 1;
+      const pickupInfo = approveRefund.returnMethod === 'PICKUP' && pickupScheduledDate
+        ? ` Pickup scheduled on ${new Date(pickupScheduledDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.`
+        : '';
+      const msg = `Return/refund request for "${product.productName}" (Order #${fullOrder.orderId}) has been approved.${pickupInfo}`;
+
+      const custNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: null, receiverId: customer.ID, receiverType: 'Customer', senderType: 'System', notificationType: 'Order Return/Refund', title: 'Return/Refund Approved', message: msg, isRead: false, createAt: new Date() });
+      const adminNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Admin', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Approved — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+      const staffNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Staff', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Approved — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+
+      io.emit('newNotification_Customer', custNotif);
+      io.emit('newNotification_Admin', adminNotif);
+      io.emit('newNotification_Staff', staffNotif);
+
+      // Email
+      const extraInfo = pickupInfo ? `<strong>Note:</strong>${pickupInfo}` : '';
+      orderSendMail({
+        to: customer.loginEmail || customer.emailAddress,
+        subject: 'Your Return/Refund Request Has Been Approved',
+        html: returnRefundStatusTemplate(customer.medicalInstitutionName, 'Processing', fullOrder.paymentMethod, product.productName, fullOrder.orderId, extraInfo),
+      });
+    }
+
+    return { success: true, message: "Approve Refund request successfully", updatedRefund: approveRefund };
   } catch (error) {
     console.error(error);
     throw new Error(error.message);
@@ -883,34 +933,58 @@ export const approveRefundRequestService = async (adminId, refundID, newStatus, 
 
 export const sucessfullyProcessedRefundService = async (adminId, refundID, newStatus) => {
   try {
-    // Verify admin exists
     const adminUser = await Admin.findByPk(adminId);
-    if (!adminUser) {
-      return {
-        success: false,
-        message: "Admin user not found"
-      };
-    }
+    if (!adminUser) return { success: false, message: "Admin user not found" };
 
-    // Find refund order
     const successProcessedRefund = await OrderRefund.findByPk(refundID);
-    if (!successProcessedRefund) {
-      return {
-        success: false,
-        message: "Success processed refund not found"
-      };
-    }
+    if (!successProcessedRefund) return { success: false, message: "Success processed refund not found" };
 
-    // Update status
     successProcessedRefund.refundStatus = newStatus;
     await successProcessedRefund.save();
 
-    return {
-      success: true,
-      message: "Processed Refund successfully",
-      updatedRefund: successProcessedRefund,
-    };
+    // ── Gather context ──
+    const orderItem = await OrderItems.findByPk(successProcessedRefund.orderItemId);
+    const fullOrder = orderItem ? await Orders.findByPk(orderItem.orderId) : null;
+    const customer = await Customer.findByPk(successProcessedRefund.customerId);
+    const product = orderItem ? await Products.findByPk(orderItem.productId) : null;
 
+    if (orderItem && fullOrder && customer && product) {
+      // Transaction
+      const lastTx = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+      const txNo = lastTx ? Number(lastTx.ID) + 1 : 1;
+      await OrderTransaction.create({
+        transactionId: withTimestamp('TRXN', txNo),
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId: customer.ID,
+        transactionType: 'Order Refund Completed',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      // Notifications
+      const lastNotif = await Notifications.findOne({ order: [['ID', 'DESC']] });
+      let notifNo = lastNotif ? Number(lastNotif.ID) + 1 : 1;
+      const msg = `Return/refund request for "${product.productName}" (Order #${fullOrder.orderId}) has been successfully processed.`;
+
+      const custNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: null, receiverId: customer.ID, receiverType: 'Customer', senderType: 'System', notificationType: 'Order Return/Refund', title: 'Return/Refund Completed', message: msg, isRead: false, createAt: new Date() });
+      const adminNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Admin', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Completed — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+      const staffNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Staff', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Completed — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+
+      io.emit('newNotification_Customer', custNotif);
+      io.emit('newNotification_Admin', adminNotif);
+      io.emit('newNotification_Staff', staffNotif);
+
+      // Email
+      orderSendMail({
+        to: customer.loginEmail || customer.emailAddress,
+        subject: 'Your Return/Refund Request Has Been Successfully Processed',
+        html: returnRefundStatusTemplate(customer.medicalInstitutionName, 'Successfully Processed', fullOrder.paymentMethod, product.productName, fullOrder.orderId),
+      });
+    }
+
+    return { success: true, message: "Processed Refund successfully", updatedRefund: successProcessedRefund };
   } catch (error) {
     console.error(error);
     throw new Error(error.message);
@@ -919,35 +993,59 @@ export const sucessfullyProcessedRefundService = async (adminId, refundID, newSt
 
 export const rejectedRefundRequestService = async (adminId, refundID, newStatus, rejectedReason) => {
   try {
-    // Verify admin exists
     const adminUser = await Admin.findByPk(adminId);
-    if (!adminUser) {
-      return {
-        success: false,
-        message: "Admin user not found"
-      };
-    }
+    if (!adminUser) return { success: false, message: "Admin user not found" };
 
-    // Find refund order
     const rejectedRefund = await OrderRefund.findByPk(refundID);
-    if (!rejectedRefund) {
-      return {
-        success: false,
-        message: "Rejected refund not found"
-      };
-    }
+    if (!rejectedRefund) return { success: false, message: "Rejected refund not found" };
 
-    // Update status
     rejectedRefund.refundStatus = newStatus;
     rejectedRefund.rejectedReason = rejectedReason;
     await rejectedRefund.save();
 
-    return {
-      success: true,
-      message: "Reject refund successfully",
-      updatedRefund: rejectedRefund,
-    };
+    // ── Gather context ──
+    const orderItem = await OrderItems.findByPk(rejectedRefund.orderItemId);
+    const fullOrder = orderItem ? await Orders.findByPk(orderItem.orderId) : null;
+    const customer = await Customer.findByPk(rejectedRefund.customerId);
+    const product = orderItem ? await Products.findByPk(orderItem.productId) : null;
 
+    if (orderItem && fullOrder && customer && product) {
+      // Transaction
+      const lastTx = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+      const txNo = lastTx ? Number(lastTx.ID) + 1 : 1;
+      await OrderTransaction.create({
+        transactionId: withTimestamp('TRXN', txNo),
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId: customer.ID,
+        transactionType: 'Order Refund Rejected',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      // Notifications
+      const lastNotif = await Notifications.findOne({ order: [['ID', 'DESC']] });
+      let notifNo = lastNotif ? Number(lastNotif.ID) + 1 : 1;
+      const msg = `Return/refund request for "${product.productName}" (Order #${fullOrder.orderId}) has been rejected. Reason: ${rejectedReason}`;
+
+      const custNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: null, receiverId: customer.ID, receiverType: 'Customer', senderType: 'System', notificationType: 'Order Return/Refund', title: 'Return/Refund Rejected', message: msg, isRead: false, createAt: new Date() });
+      const adminNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Admin', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Rejected — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+      const staffNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Staff', senderType: 'System', notificationType: 'Order Return/Refund', title: `Return/Refund Rejected — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+
+      io.emit('newNotification_Customer', custNotif);
+      io.emit('newNotification_Admin', adminNotif);
+      io.emit('newNotification_Staff', staffNotif);
+
+      // Email
+      orderSendMail({
+        to: customer.loginEmail || customer.emailAddress,
+        subject: 'Your Return/Refund Request Has Been Rejected',
+        html: returnRefundStatusTemplate(customer.medicalInstitutionName, 'Rejected', fullOrder.paymentMethod, product.productName, fullOrder.orderId, `<strong>Reason:</strong> ${rejectedReason}`),
+      });
+    }
+
+    return { success: true, message: "Reject refund successfully", updatedRefund: rejectedRefund };
   } catch (error) {
     console.error(error);
     throw new Error(error.message);
@@ -956,108 +1054,84 @@ export const rejectedRefundRequestService = async (adminId, refundID, newStatus,
 
 export const submitRefundProofService = async (adminId, body, file) => {
   try {
-    // ----------------------------------
-    // 1. Validate admin
-    // ----------------------------------
     const adminUser = await Admin.findByPk(adminId);
-    if (!adminUser) {
-      return {
-        success: false,
-        message: "Admin user not found"
-      };
-    }
+    if (!adminUser) return { success: false, message: "Admin user not found" };
 
-    // ----------------------------------
-    // 2. Find refund order
-    // ----------------------------------
     const orderRefund = await OrderRefund.findByPk(body.refundID);
-    if (!orderRefund) {
-      return {
-        success: false,
-        message: "Refund request not found"
-      };
-    }
+    if (!orderRefund) return { success: false, message: "Refund request not found" };
 
-    // ----------------------------------
-    // 3. Update refund status
-    // ----------------------------------
     orderRefund.refundStatus = body.newStatus;
     await orderRefund.save();
 
-    // ----------------------------------
-    // 4. Validate customer
-    // ----------------------------------
     const customer = await Customer.findByPk(body.customerID);
-    if (!customer) {
-      return {
-        success: false,
-        message: "Customer not found"
-      };
-    }
+    if (!customer) return { success: false, message: "Customer not found" };
 
-    // ----------------------------------
-    // 5. Upload image to Cloudinary
-    // ----------------------------------
+    // Upload image to Cloudinary
     let cloudResult = null;
-
     if (file?.receiptImage?.[0]) {
       try {
-        cloudResult = await cloudinary.uploader.upload(
-          file.receiptImage[0].path,
-          {
-            folder: "gamj/refundReceipt",
-            resource_type: "image"
-          }
-        );
+        cloudResult = await cloudinary.uploader.upload(file.receiptImage[0].path, { folder: "gamj/refundReceipt", resource_type: "image" });
       } catch (err) {
-        return {
-          success: false,
-          message: "Image upload failed",
-          error: err.message
-        };
+        return { success: false, message: "Image upload failed", error: err.message };
       }
-
-      // Delete local image after upload
-      try {
-        await fs.unlink(file.receiptImage[0].path);
-      } catch (unlinkErr) {
-        console.error("Image unlink failed: ", unlinkErr.message);
-      }
+      try { await fs.unlink(file.receiptImage[0].path); } catch (e) { console.error("Image unlink failed:", e.message); }
     }
-    
-    // 6. AUTO-GENERATE refundProofId
-    const lastRefundProof = await RefundProof.findOne({
-      order: [["ID", "DESC"]],
-    });
 
+    const lastRefundProof = await RefundProof.findOne({ order: [["ID", "DESC"]] });
     const nextRefundProofNo = lastRefundProof ? Number(lastRefundProof.ID) + 1 : 1;
     const refundProofId = withTimestamp("RFDP", nextRefundProofNo);
 
-    // ----------------------------------
-    // 7. Save RefundProof record
-    // ----------------------------------
     const createdProof = await RefundProof.create({
       refundProofId,
       customerId: body.customerID,
       refundId: body.refundID,
       refundAmount: body.refundAmount,
-      receiptImage: cloudResult ? cloudResult.secure_url : body.receiptImage, // supports image URL fallback
-      transactionID: body.transactionID
+      receiptImage: cloudResult ? cloudResult.secure_url : body.receiptImage,
+      transactionID: body.transactionID,
     });
 
-    return {
-      success: true,
-      message: "Refund processed successfully",
-      refundProof: createdProof,
-      updatedRefund: orderRefund
-    };
+    // ── Notifications + Transaction + Email ──
+    const orderItem = await OrderItems.findByPk(orderRefund.orderItemId);
+    const fullOrder = orderItem ? await Orders.findByPk(orderItem.orderId) : null;
+    const product = orderItem ? await Products.findByPk(orderItem.productId) : null;
 
+    if (orderItem && fullOrder && product) {
+      const lastTx = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+      const txNo = lastTx ? Number(lastTx.ID) + 1 : 1;
+      await OrderTransaction.create({
+        transactionId: withTimestamp('TRXN', txNo),
+        orderId: fullOrder.ID,
+        orderItemId: orderItem.ID,
+        customerId: customer.ID,
+        transactionType: 'Order Refund Completed',
+        totalAmount: orderItem.subTotal,
+        paymentMethod: fullOrder.paymentMethod,
+        transactionDate: new Date(),
+      });
+
+      const lastNotif = await Notifications.findOne({ order: [['ID', 'DESC']] });
+      let notifNo = lastNotif ? Number(lastNotif.ID) + 1 : 1;
+      const msg = `Refund of ₱${Number(body.refundAmount).toFixed(2)} for "${product.productName}" (Order #${fullOrder.orderId}) has been successfully processed to your PayPal account.`;
+
+      const custNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: null, receiverId: customer.ID, receiverType: 'Customer', senderType: 'System', notificationType: 'Order Return/Refund', title: 'Refund Successfully Processed', message: msg, isRead: false, createAt: new Date() });
+      const adminNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Admin', senderType: 'System', notificationType: 'Order Return/Refund', title: `Refund Completed — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+      const staffNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo++), senderId: customer.ID, receiverId: null, receiverType: 'Staff', senderType: 'System', notificationType: 'Order Return/Refund', title: `Refund Completed — ${customer.medicalInstitutionName}`, message: msg, isRead: false, createAt: new Date() });
+
+      io.emit('newNotification_Customer', custNotif);
+      io.emit('newNotification_Admin', adminNotif);
+      io.emit('newNotification_Staff', staffNotif);
+
+      orderSendMail({
+        to: customer.loginEmail || customer.emailAddress,
+        subject: 'Your Refund Has Been Successfully Processed',
+        html: returnRefundStatusTemplate(customer.medicalInstitutionName, 'Successfully Processed', fullOrder.paymentMethod, product.productName, fullOrder.orderId, `<strong>Refund Amount:</strong> ₱${Number(body.refundAmount).toFixed(2)}<br><strong>PayPal Transaction ID:</strong> ${body.transactionID}`),
+      });
+    }
+
+    return { success: true, message: "Refund processed successfully", refundProof: createdProof, updatedRefund: orderRefund };
   } catch (error) {
     console.error("submitRefundProofService ERROR:", error);
-    return {
-      success: false,
-      message: error.message
-    };
+    return { success: false, message: error.message };
   }
 };
 
@@ -1472,6 +1546,239 @@ export const adminDeleteOrderItemService = async (adminId, orderItemId) => {
       success: true,
       message: "Order item deleted successfully.",
     };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+// ─── PROCESS RETURN/REFUND STOCK (DAMAGED or RETURN) ────────────────────────
+export const processRefundStockService = async (adminId, refundId, stockAction, quantity) => {
+  try {
+    const adminUser = await Admin.findByPk(adminId);
+    if (!adminUser) return { success: false, message: "Admin not found" };
+
+    if (!['DAMAGED', 'RETURN'].includes(stockAction)) {
+      return { success: false, message: "Invalid stock action. Must be DAMAGED or RETURN." };
+    }
+
+    if (!quantity || Number(quantity) <= 0) {
+      return { success: false, message: "Quantity must be greater than 0." };
+    }
+
+    const orderRefund = await OrderRefund.findByPk(refundId);
+    if (!orderRefund) return { success: false, message: "Refund record not found." };
+
+    const orderItem = await OrderItems.findByPk(orderRefund.orderItemId);
+    if (!orderItem) return { success: false, message: "Order item not found." };
+
+    const fullOrder = await Orders.findByPk(orderItem.orderId);
+    if (!fullOrder) return { success: false, message: "Order not found." };
+
+    const customer = await Customer.findByPk(orderRefund.customerId);
+    if (!customer) return { success: false, message: "Customer not found." };
+
+    const product = await Products.findByPk(orderItem.productId);
+    if (!product) return { success: false, message: "Product not found." };
+
+    const adjustQty = Number(quantity);
+
+    // ── Find inventory stock ──
+    const stock = await InventoryStock.findOne({
+      where: {
+        productId: orderItem.productId,
+        variantValueId: orderItem.productVariantValueId || null,
+        variantCombinationId: orderItem.productVariantCombinationId || null,
+      },
+    });
+    if (!stock) return { success: false, message: "Inventory stock record not found." };
+
+    const currentQty = Number(stock.totalQuantity || 0);
+
+    // DAMAGED → deduct (subtract from stock)
+    // RETURN  → add (restore to stock)
+    let newTotalQuantity;
+    if (stockAction === 'DAMAGED') {
+      if (adjustQty > currentQty) {
+        return { success: false, message: `Cannot deduct ${adjustQty} — only ${currentQty} in stock.` };
+      }
+      newTotalQuantity = Math.max(0, currentQty - adjustQty);
+    } else {
+      newTotalQuantity = currentQty + adjustQty;
+    }
+
+    await stock.update({ totalQuantity: newTotalQuantity, updatedAt: new Date() });
+
+    // ── Update isOutOfStock flag ──
+    if (newTotalQuantity === 0) {
+      await Products.update({ isOutOfStock: true }, { where: { ID: orderItem.productId } });
+    } else {
+      await Products.update({ isOutOfStock: false }, { where: { ID: orderItem.productId } });
+    }
+
+    // ── Update InventoryBatch ──
+    if (stockAction === 'DAMAGED') {
+      // FIFO deduct
+      let remaining = adjustQty;
+      const batches = await InventoryBatch.findAll({
+        where: {
+          productId: orderItem.productId,
+          variantValueId: orderItem.productVariantValueId || null,
+          variantCombinationId: orderItem.productVariantCombinationId || null,
+        },
+        order: [["expirationDate", "ASC"], ["dateReceived", "ASC"]],
+      });
+      for (const batch of batches) {
+        if (remaining <= 0) break;
+        const batchRemaining = Number(batch.remainingQuantity || 0);
+        const deduct = Math.min(batchRemaining, remaining);
+        await batch.update({ remainingQuantity: batchRemaining - deduct, updatedAt: new Date() });
+        remaining -= deduct;
+      }
+    } else {
+      // RETURN → add to latest batch
+      const latestBatch = await InventoryBatch.findOne({
+        where: {
+          productId: orderItem.productId,
+          variantValueId: orderItem.productVariantValueId || null,
+          variantCombinationId: orderItem.productVariantCombinationId || null,
+        },
+        order: [["dateReceived", "DESC"]],
+      });
+      if (latestBatch) {
+        await latestBatch.update({
+          quantityReceived: Number(latestBatch.quantityReceived) + adjustQty,
+          remainingQuantity: Number(latestBatch.remainingQuantity) + adjustQty,
+          updatedAt: new Date(),
+        });
+      }
+    }
+
+    // ── InventoryHistory ──
+    const lastHistory = await InventoryHistory.findOne({ order: [["ID", "DESC"]] });
+    const nextHistoryNo = lastHistory ? Number(lastHistory.ID) + 1 : 1;
+    await InventoryHistory.create({
+      inventoryHistoryId: withTimestamp("IHT", nextHistoryNo),
+      productId: orderItem.productId,
+      variantValueId: orderItem.productVariantValueId || null,
+      variantCombinationId: orderItem.productVariantCombinationId || null,
+      type: stockAction === 'DAMAGED' ? 'DAMAGED' : 'RETURN',
+      adjustType: stockAction === 'DAMAGED' ? 'DEDUCT' : 'ADD',
+      quantity: adjustQty,
+      stockAfter: newTotalQuantity,
+      referenceId: `REFUND-${orderRefund.refundId}`,
+      remarks: `${stockAction === 'DAMAGED' ? 'Damaged stock deducted' : 'Returned stock restored'} from return/refund for ${customer.medicalInstitutionName} — Order #${fullOrder.orderId}`,
+      createdAt: new Date(),
+    });
+
+    // ── OrderTransaction ──
+    const lastTx = await OrderTransaction.findOne({ order: [['ID', 'DESC']] });
+    const txNo = lastTx ? Number(lastTx.ID) + 1 : 1;
+    await OrderTransaction.create({
+      transactionId: withTimestamp('TRXN', txNo),
+      orderId: fullOrder.ID,
+      orderItemId: orderItem.ID,
+      customerId: customer.ID,
+      transactionType: 'Return/Refund Stock Processed',
+      totalAmount: orderItem.subTotal,
+      paymentMethod: fullOrder.paymentMethod,
+      transactionDate: new Date(),
+    });
+
+    // ── Low stock / out-of-stock check ──
+    const inventorySettings = await ProductInventorySettings.findOne({
+      where: {
+        productId: orderItem.productId,
+        variantValueId: orderItem.productVariantValueId || null,
+        variantCombinationId: orderItem.productVariantCombinationId || null,
+      },
+    });
+
+    const shouldNotifyLow = stockAction === 'DAMAGED' && inventorySettings && newTotalQuantity > 0 && newTotalQuantity <= inventorySettings.lowStockThreshold;
+    const shouldNotifyOos = newTotalQuantity === 0;
+
+    if (shouldNotifyOos || shouldNotifyLow) {
+      const lastNotif = await Notifications.findOne({ order: [["ID", "DESC"]] });
+      let notifNo = lastNotif ? Number(lastNotif.ID) + 1 : 1;
+
+      const alertTitle = shouldNotifyOos ? "Out of Stock Alert" : "Low Stock Alert";
+      const alertMsg = shouldNotifyOos
+        ? `❌ "${product.productName}" is now OUT OF STOCK after a return/refund stock adjustment.`
+        : `⚠️ "${product.productName}" is running low after a return/refund stock adjustment. Only ${newTotalQuantity} left!`;
+
+      const alertNotif = await Notifications.create({
+        notificationId: withTimestamp("NTFY", notifNo++),
+        senderId: null, receiverId: null, receiverType: "All", senderType: "System",
+        notificationType: "Product Update", title: alertTitle, message: alertMsg,
+        isRead: false, createAt: new Date(),
+      });
+      io.emit("lowStockAlert", alertNotif);
+
+      const allAdmins = await Admin.findAll({ where: { verifiedUser: true } });
+      const allCustomers = await Customer.findAll({ where: { verifiedCustomer: true } });
+      const allEmails = [...new Set([
+        ...allAdmins.map(a => a.emailAddress).filter(Boolean),
+        ...allCustomers.map(c => c.loginEmail || c.emailAddress).filter(Boolean),
+      ])];
+
+      if (allEmails.length > 0) {
+        orderSendMail({
+          to: allEmails.join(","),
+          subject: shouldNotifyOos ? `OUT OF STOCK: ${product.productName}` : `Low Stock Alert: ${product.productName}`,
+          html: stockAdjustmentLowStockTemplate(
+            product.productName,
+            stockAction === 'DAMAGED' ? 'DEDUCT' : 'ADD',
+            adjustQty,
+            newTotalQuantity,
+            `Return/Refund — Order #${fullOrder.orderId}`,
+            inventorySettings?.lowStockThreshold || 0
+          ),
+        });
+      }
+    }
+
+    // ── Notifications to Customer / Admin / Staff ──
+    const lastNotif2 = await Notifications.findOne({ order: [["ID", "DESC"]] });
+    let notifNo2 = lastNotif2 ? Number(lastNotif2.ID) + 1 : 1;
+    const stockMsg = `Stock for "${product.productName}" has been ${stockAction === 'DAMAGED' ? 'deducted (damaged)' : 'restored (returned)'} — ${adjustQty} stock. Order #${fullOrder.orderId}.`;
+
+    const custNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo2++), senderId: null, receiverId: customer.ID, receiverType: 'Customer', senderType: 'System', notificationType: 'Order Return/Refund', title: 'Return/Refund Stock Updated', message: stockMsg, isRead: false, createAt: new Date() });
+    const adminNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo2++), senderId: customer.ID, receiverId: null, receiverType: 'Admin', senderType: 'System', notificationType: 'Order Return/Refund', title: `Stock Updated — ${customer.medicalInstitutionName}`, message: stockMsg, isRead: false, createAt: new Date() });
+    const staffNotif = await Notifications.create({ notificationId: withTimestamp('NTFY', notifNo2++), senderId: customer.ID, receiverId: null, receiverType: 'Staff', senderType: 'System', notificationType: 'Order Return/Refund', title: `Stock Updated — ${customer.medicalInstitutionName}`, message: stockMsg, isRead: false, createAt: new Date() });
+
+    io.emit('newNotification_Customer', custNotif);
+    io.emit('newNotification_Admin', adminNotif);
+    io.emit('newNotification_Staff', staffNotif);
+
+    return {
+      success: true,
+      message: `Stock ${stockAction === 'DAMAGED' ? 'deducted (damaged)' : 'restored (returned)'} successfully. New total: ${newTotalQuantity}.`,
+      newTotalQuantity,
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+// ─── DELETE REFUND RECORD (hard delete — only for Completed/Rejected) ────────
+export const deleteRefundRecordService = async (adminId, refundID) => {
+  try {
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) return { success: false, message: "Admin not found" };
+
+    const refundRecord = await OrderRefund.findByPk(refundID);
+    if (!refundRecord) return { success: false, message: "Refund record not found." };
+
+    // Only allow deletion when the process is fully done
+    const allowedStatuses = ["Successfully Processed", "Rejected"];
+    if (!allowedStatuses.includes(refundRecord.refundStatus)) {
+      return { success: false, message: "Can only delete completed or rejected refund records." };
+    }
+
+    await refundRecord.destroy();
+
+    return { success: true, message: "Refund record deleted successfully." };
   } catch (error) {
     console.error(error);
     throw new Error(error.message);

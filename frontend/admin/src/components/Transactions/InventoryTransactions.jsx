@@ -2,6 +2,8 @@ import React, { useContext, useState, useMemo } from 'react'
 import './InventoryTransactions.css'
 import { AdminContext } from '../../context/AdminContextProvider'
 import Navbar from '../Navbar';
+import ExportBar from '../ExportBar';
+import { exportExcel, exportPDF, printTable } from '../../utils/exportUtils';
 
 const InventoryTransactions = () => {
   const { products, variantName, productVariantValues, productVariantCombination, fetchInventoryHistory } = useContext(AdminContext);
@@ -120,6 +122,17 @@ const InventoryTransactions = () => {
     };
   }, [filteredAndSortedHistory]);
 
+  // ── Export rows ──
+  const exportRows = useMemo(() => filteredAndSortedHistory.map(h => ({
+    "Date": formatDate(h.createdAt),
+    "Product": getProductName(h.productId),
+    "Variant": getVariantDetails(h.variantValueId, h.variantCombinationId),
+    "Type": h.type === 'IN' ? 'Stock In' : h.type === 'OUT' ? 'Stock Out' : h.type === 'RETURN' ? 'Return' : h.type === 'DAMAGED' ? 'Damaged' : 'Adjustment',
+    "Quantity": `${h.type === 'IN' || h.type === 'RETURN' || (h.type === 'ADJUST' && h.adjustType === 'ADD') ? '+' : '-'}${h.quantity}`,
+    "Stock After": h.stockAfter ?? "—",
+    "Remarks": h.remarks || "—",
+  })), [filteredAndSortedHistory]);
+
   return (
     <>
       <Navbar TitleName="Inventory Transactions" />
@@ -128,8 +141,18 @@ const InventoryTransactions = () => {
           
           {/* Header */}
           <div className="it-header">
-            <h1 className="it-title">Inventory Transactions History</h1>
-            <p className="it-subtitle">View and track all inventory transactions</p>
+            <div className="it-header-top">
+              <div>
+                <h1 className="it-title">Inventory Transactions History</h1>
+                <p className="it-subtitle">View and track all inventory transactions</p>
+              </div>
+              <ExportBar
+                disabled={!exportRows.length}
+                onExcelClick={() => exportExcel(exportRows, "inventory-transactions.xlsx")}
+                onPDFClick={() => exportPDF(exportRows, "Inventory Transactions", "inventory-transactions.pdf")}
+                onPrintClick={() => printTable(exportRows, "Inventory Transactions")}
+              />
+            </div>
           </div>
 
           {/* Statistics Cards */}

@@ -423,3 +423,79 @@
     height: 200px !important;
   }
 }
+
+/* ── ExportBar integration fixes ───────────────────────────────────────────── */
+
+/* card-head: allow ExportBar to wrap below the title on small screens */
+.ov-card-head {
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* section-head: allow ExportBar + controls to wrap */
+.ov-section-head {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* actions row: ExportBar + View All side by side, wrapping if needed */
+.ov-actions {
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* controls row: timeframe toggles + ExportBar */
+.ov-controls {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Responsive tweaks for ExportBar in Overview ────────────────────────────── */
+@media (max-width: 600px) {
+  .ov-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ov-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ov-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 400px) {
+  .ov-card-head h4 {
+    font-size: 0.85rem;
+  }
+
+  .ov-section-head h3 {
+    font-size: 0.9rem;
+  }
+
+  .ov-viewall-btn {
+    padding: 6px 14px;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 280px) {
+  .ov-card-head h4 {
+    font-size: 0.75rem;
+  }
+
+  .ov-section-head h3 {
+    font-size: 0.8rem;
+  }
+
+  .ov-container {
+    padding: 10px 10px;
+  }
+}

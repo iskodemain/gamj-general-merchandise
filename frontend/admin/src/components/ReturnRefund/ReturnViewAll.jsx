@@ -1,14 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import "./ReturnViewAll.css";
 import { FaTrashCan, FaArrowLeft } from "react-icons/fa6";
 import { IoSearchOutline } from "react-icons/io5";
-import ReviewRefund from "./ReviewRefund.jsx"
+import ReviewRefund from "./ReviewRefund.jsx";
+import { AdminContext } from "../../context/AdminContextProvider.jsx";
+import Loading from "../../../../customer/src/components/Loading.jsx";
 
 function ReturnViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
+  const { adminDeleteOrderItem } = useContext(AdminContext);
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [showReasonModal, setShowReasonModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!order) return;
@@ -21,6 +25,15 @@ function ReturnViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
     setItems(filteredItems);
     setSearch("");
   }, [order, orderStatus]);
+
+  const handleDeleteItem = async (item) => {
+    setLoading(true);
+    const success = await adminDeleteOrderItem(item.id);
+    setLoading(false);
+    if (success) {
+      setItems((prev) => prev.filter((i) => i.id !== item.id));
+    }
+  };
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -35,6 +48,8 @@ function ReturnViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
 
   return (
     <div className="return-viewall-wrapper">
+
+      {loading && <Loading />}
 
       {/* If modal is open, show ReviewRefund */}
       {showReasonModal && selectedItem ? (
@@ -145,8 +160,11 @@ function ReturnViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                       </div>
 
                       <div className="return-viewall-btn-ctn">
-                        {(item.refundStatus === "Refunded" || item.refundStatus === "Rejected") && (
-                          <button type="button">
+                        {item.refundStatus === "Successfully Processed" && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteItem(item)}
+                          >
                             <FaTrashCan className="return-viewall-btn-trash" />
                           </button>
                         )}
@@ -154,10 +172,8 @@ function ReturnViewAll({ order = null, onClose = () => {}, orderStatus = "" }) {
                         type="button" 
                         className="return-viewall-btn-admin"
                         onClick={() => {
-                          console.log(item);
                           setSelectedItem(item);
                           setShowReasonModal(true);
-
                         }}>
                           Review
                         </button>

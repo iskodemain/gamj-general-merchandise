@@ -3,6 +3,8 @@ import React, { useContext, useMemo, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import "./Overview.css";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
+import ExportBar from "../components/ExportBar.jsx";
+import { exportExcel, exportPDF,printTable } from "../utils/exportUtils.js";
 
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend} from "chart.js";
 import { Line, Pie, Doughnut, Bar } from "react-chartjs-2";
@@ -429,6 +431,43 @@ function Overview() {
     return typeColors[type] || '#FFA600';
   }
 
+  // ── Export row builders ──────────────────────────────────────────────────────
+
+  const ordersOverTimeRows = ordersOverTime.labels.map((label, i) => ({
+    "Period": label,
+    "Orders": ordersOverTime.data[i],
+  }));
+
+  const orderStatusRows = orderStatusDistribution.labels.map((label, i) => ({
+    "Status": label,
+    "Count": orderStatusDistribution.data[i],
+  }));
+
+  const inventoryStatusRows = inventoryStatusOverview.labels.map((label, i) => ({
+    "Status": label,
+    "Count": inventoryStatusOverview.data[i],
+  }));
+
+  const mostOrderedRows = mostOrderedProducts.labels.map((label, i) => ({
+    "Product": label,
+    "Total Qty Ordered": mostOrderedProducts.data[i],
+  }));
+
+  const lowStockRows = lowStockItems.map(p => ({
+    "Product": p.name,
+    "Stock Remaining": p.stock,
+  }));
+
+  const recentTxRows = recentTransactions.map(t => ({
+    "Transaction ID": t.transactionId,
+    "Order ID": t.orderId,
+    "Customer": t.name,
+    "Type": t.transactionType,
+    "Amount": `₱${t.amount.toFixed(2)}`,
+    "Payment": t.paymentMethod || "—",
+    "Date": new Date(t.date).toLocaleString(),
+  }));
+
   return (
     <>
       <Navbar TitleName="Overview" />
@@ -484,31 +523,18 @@ function Overview() {
           <div className="ov-section-head">
             <h3>Orders Over Time</h3>
             <div className="ov-controls">
-              <button
-                className={`ov-toggle ${timeframe === "daily" ? "active" : ""}`}
-                onClick={() => setTimeframe("daily")}
-              >
-                Daily
-              </button>
-              <button
-                className={`ov-toggle ${timeframe === "weekly" ? "active" : ""}`}
-                onClick={() => setTimeframe("weekly")}
-              >
-                Weekly
-              </button>
-              <button
-                className={`ov-toggle ${timeframe === "monthly" ? "active" : ""}`}
-                onClick={() => setTimeframe("monthly")}
-              >
-                Monthly
-              </button>
-               <button
-                  className={`ov-toggle ${timeframe === "yearly" ? "active" : ""}`}
-                  onClick={() => setTimeframe("yearly")}
-                >
-                  Yearly
-                </button>
+              <button className={`ov-toggle ${timeframe === "daily" ? "active" : ""}`} onClick={() => setTimeframe("daily")}>Daily</button>
+              <button className={`ov-toggle ${timeframe === "weekly" ? "active" : ""}`} onClick={() => setTimeframe("weekly")}>Weekly</button>
+              <button className={`ov-toggle ${timeframe === "monthly" ? "active" : ""}`} onClick={() => setTimeframe("monthly")}>Monthly</button>
+              <button className={`ov-toggle ${timeframe === "yearly" ? "active" : ""}`} onClick={() => setTimeframe("yearly")}>Yearly</button>
             </div>
+            <ExportBar
+              disabled={!ordersOverTimeRows.length}
+              onExcelClick={() => exportExcel(ordersOverTimeRows, "orders-over-time.xlsx")}
+              onPDFClick={() => exportPDF(ordersOverTimeRows, "Orders Over Time", "orders-over-time.pdf")}
+              onDOCXClick={() => exportDOCX(ordersOverTimeRows, "Orders Over Time", "orders-over-time.docx")}
+              onPrintClick={() => printTable(ordersOverTimeRows, "Orders Over Time")}
+            />
           </div>
           <div className="ov-chart ov-chart-line">
             <Line data={lineData} options={{lineOptions, responsive: true, maintainAspectRatio: false}} />
@@ -520,6 +546,13 @@ function Overview() {
           <div className="ov-card ov-chart-card">
             <div className="ov-card-head">
               <h4>Order Status Distribution</h4>
+              <ExportBar
+                disabled={!orderStatusRows.length}
+                onExcelClick={() => exportExcel(orderStatusRows, "order-status.xlsx")}
+                onPDFClick={() => exportPDF(orderStatusRows, "Order Status Distribution", "order-status.pdf")}
+                onDOCXClick={() => exportDOCX(orderStatusRows, "Order Status Distribution", "order-status.docx")}
+                onPrintClick={() => printTable(orderStatusRows, "Order Status Distribution")}
+              />
             </div>
             <div className="ov-card-body chart-center">
               <Pie data={pieData} options={{responsive: true, maintainAspectRatio: false}} />
@@ -529,6 +562,13 @@ function Overview() {
           <div className="ov-card ov-chart-card">
             <div className="ov-card-head">
               <h4>Inventory Status Overview</h4>
+              <ExportBar
+                disabled={!inventoryStatusRows.length}
+                onExcelClick={() => exportExcel(inventoryStatusRows, "inventory-status.xlsx")}
+                onPDFClick={() => exportPDF(inventoryStatusRows, "Inventory Status Overview", "inventory-status.pdf")}
+                onDOCXClick={() => exportDOCX(inventoryStatusRows, "Inventory Status Overview", "inventory-status.docx")}
+                onPrintClick={() => printTable(inventoryStatusRows, "Inventory Status Overview")}
+              />
             </div>
             <div className="ov-card-body chart-center">
               <Doughnut data={donutData} options={{responsive: true, maintainAspectRatio: false}}/>
@@ -541,6 +581,13 @@ function Overview() {
           <div className="ov-card ov-chart-card">
             <div className="ov-card-head">
               <h4>Most Ordered Products</h4>
+              <ExportBar
+                disabled={!mostOrderedRows.length}
+                onExcelClick={() => exportExcel(mostOrderedRows, "most-ordered.xlsx")}
+                onPDFClick={() => exportPDF(mostOrderedRows, "Most Ordered Products", "most-ordered.pdf")}
+                onDOCXClick={() => exportDOCX(mostOrderedRows, "Most Ordered Products", "most-ordered.docx")}
+                onPrintClick={() => printTable(mostOrderedRows, "Most Ordered Products")}
+              />
             </div>
             <div className="ov-card-body">
               {mostOrderedProducts.labels.length ? (
@@ -554,6 +601,13 @@ function Overview() {
           <div className="ov-card ov-card-list">
             <div className="ov-card-head">
               <h4>Low Stock Items</h4>
+              <ExportBar
+                disabled={!lowStockRows.length}
+                onExcelClick={() => exportExcel(lowStockRows, "low-stock.xlsx")}
+                onPDFClick={() => exportPDF(lowStockRows, "Low Stock Items", "low-stock.pdf")}
+                onDOCXClick={() => exportDOCX(lowStockRows, "Low Stock Items", "low-stock.docx")}
+                onPrintClick={() => printTable(lowStockRows, "Low Stock Items")}
+              />
             </div>
             <div className="ov-card-body">
               {lowStockItems.length ? (

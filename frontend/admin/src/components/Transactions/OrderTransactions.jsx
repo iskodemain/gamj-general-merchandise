@@ -2,6 +2,8 @@ import React, { useContext, useState, useEffect } from 'react';
 import "./OrderTransactions.css";
 import Navbar from '../Navbar';
 import { AdminContext } from '../../context/AdminContextProvider';
+import ExportBar from '../ExportBar';
+import { exportExcel, exportPDF, printTable } from '../../utils/exportUtils';
 
 const OrderTransactions = () => {
   const { fetchOrderTransaction, fetchOrders, fetchOrderItems, customerList } = useContext(AdminContext);
@@ -10,13 +12,10 @@ const OrderTransactions = () => {
   const [filterType, setFilterType] = useState('All');
   const [filterPayment, setFilterPayment] = useState('All');
 
-  // Apply filters whenever any dependency changes
   useEffect(() => {
     const transactions = Array.isArray(fetchOrderTransaction) ? fetchOrderTransaction : [];
-    
     let filtered = [...transactions];
 
-    // Filter by search term
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (t) =>
@@ -25,12 +24,10 @@ const OrderTransactions = () => {
       );
     }
 
-    // Filter by transaction type
     if (filterType !== 'All') {
       filtered = filtered.filter((t) => t.transactionType === filterType);
     }
 
-    // Filter by payment method
     if (filterPayment !== 'All') {
       filtered = filtered.filter((t) => t.paymentMethod === filterPayment);
     }
@@ -41,20 +38,13 @@ const OrderTransactions = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
     });
   };
 
-  const formatAmount = (amount) => {
-    return `₱${parseFloat(amount).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
+  const formatAmount = (amount) =>
+    `₱${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const getTypeColor = (type) => {
     const typeColors = {
@@ -63,12 +53,11 @@ const OrderTransactions = () => {
       'Out for Delivery': '#656DFF',
       'Order Delivered': '#00DD31',
       'Order Cancelled': '#D10000',
-      'Order Return/Refund': '#FF3333'
+      'Order Return/Refund': '#FF3333',
     };
     return typeColors[type] || '#FFA600';
   };
 
-  // Helper functions to get related data
   const getCustomerName = (customerId) => {
     const customer = customerList?.find(c => c.ID === customerId);
     return customer?.medicalInstitutionName || 'Unknown Customer';
@@ -89,20 +78,39 @@ const OrderTransactions = () => {
   const uniqueTypes = ['All', ...new Set(transactions.map((t) => t.transactionType))];
   const uniquePayments = ['All', ...new Set(transactions.map((t) => t.paymentMethod))];
 
+  const exportRows = filteredTransactions.map(t => ({
+    "Transaction ID": t.transactionId,
+    "Order ID": getOrderId(t.orderId),
+    "Order Item ID": getOrderItemId(t.orderItemId) || "—",
+    "Customer": getCustomerName(t.customerId),
+    "Type": t.transactionType,
+    "Amount": `₱${parseFloat(t.totalAmount).toFixed(2)}`,
+    "Payment": t.paymentMethod || "—",
+    "Date": formatDate(t.transactionDate),
+  }));
+
   return (
     <>
       <Navbar TitleName="Order Transactions" />
       <div className="transactions-container">
-        
-        {/* Header Section */}
+
+        {/* Header */}
         <div className="transactions-header">
-          <h1 className="transactions-title">Order Transaction History</h1>
-          <p className="transactions-subtitle">
-            View all order transactions and their current status
-          </p>
+          <div className="transactions-header-top">
+            <div>
+              <h1 className="transactions-title">Order Transaction History</h1>
+              <p className="transactions-subtitle">View all order transactions and their current status</p>
+            </div>
+            <ExportBar
+              disabled={!exportRows.length}
+              onExcelClick={() => exportExcel(exportRows, "order-transactions.xlsx")}
+              onPDFClick={() => exportPDF(exportRows, "Order Transactions", "order-transactions.pdf")}
+              onPrintClick={() => printTable(exportRows, "Order Transactions")}
+            />
+          </div>
         </div>
 
-        {/* Filters Section */}
+        {/* Filters */}
         <div className="filters-section">
           <div className="search-box">
             <input
@@ -113,35 +121,21 @@ const OrderTransactions = () => {
               className="search-input"
             />
           </div>
-
           <div className="filter-group">
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="filter-select"
-            >
+            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-select">
               {uniqueTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type === 'All' ? 'All Types' : type}
-                </option>
+                <option key={type} value={type}>{type === 'All' ? 'All Types' : type}</option>
               ))}
             </select>
-
-            <select
-              value={filterPayment}
-              onChange={(e) => setFilterPayment(e.target.value)}
-              className="filter-select"
-            >
+            <select value={filterPayment} onChange={(e) => setFilterPayment(e.target.value)} className="filter-select">
               {uniquePayments.map((payment) => (
-                <option key={payment} value={payment}>
-                  {payment === 'All' ? 'All Payments' : payment}
-                </option>
+                <option key={payment} value={payment}>{payment === 'All' ? 'All Payments' : payment}</option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats */}
         <div className="stats-cards">
           <div className="stat-card">
             <div className="stat-number">{transactions.length}</div>
@@ -153,14 +147,12 @@ const OrderTransactions = () => {
           </div>
         </div>
 
-        {/* Transactions List */}
+        {/* List */}
         <div className="transactions-list">
           {filteredTransactions.length === 0 ? (
-            <div className="no-transactions">
-              <p>No transactions found</p>
-            </div>
+            <div className="no-transactions"><p>No transactions found</p></div>
           ) : (
-            filteredTransactions.map((transaction) => (
+            [...filteredTransactions].reverse().map((transaction) => (
               <div key={transaction.ID} className="transaction-card">
                 <div className="transaction-header-row">
                   <div className="transaction-id">
@@ -168,21 +160,15 @@ const OrderTransactions = () => {
                   </div>
                   <div className="transaction-date">{formatDate(transaction.transactionDate)}</div>
                 </div>
-
                 <div className="transaction-body">
                   <div className="transaction-info">
-                    <div
-                      className="transaction-type-badge"
-                      style={{ backgroundColor: getTypeColor(transaction.transactionType) }}
-                    >
+                    <div className="transaction-type-badge" style={{ backgroundColor: getTypeColor(transaction.transactionType) }}>
                       {transaction.transactionType}
                     </div>
                     <div className="transaction-payment">{transaction.paymentMethod}</div>
                   </div>
-
                   <div className="transaction-amount">{formatAmount(transaction.totalAmount)}</div>
                 </div>
-
                 <div className="transaction-footer">
                   <div className="transaction-detail">
                     <span className="detail-label">Order ID:</span>
@@ -200,7 +186,7 @@ const OrderTransactions = () => {
                   </div>
                 </div>
               </div>
-            )).reverse()
+            ))
           )}
         </div>
       </div>

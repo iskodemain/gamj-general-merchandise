@@ -349,3 +349,16 @@
     font-size: 11px;
   }
 }
+
+/* ── Export header row ─────────────────────────────────────────────────────── */
+.transactions-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .transactions-header-top { flex-direction: column; gap: 8px; }
+}

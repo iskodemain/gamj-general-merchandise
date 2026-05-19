@@ -1,4 +1,4 @@
-import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService, adminRemoveCancellationService, adminDeleteOrderItemService } from "../../services/admin/adminOrderService.js";
+import { fetchOrdersService, fetchOrderCancelService, fetchOrderReturnAndRefundService, updateOrderStatusService, fetchRefundProofService, processRefundRequestService, approveRefundRequestService, sucessfullyProcessedRefundService, rejectedRefundRequestService, submitRefundProofService, cancelSubmitAsRefundService, cancelSubmitAsCompletedService, fetchOrderTransactionService, fetchOrderPaymentProofService, addOrderDeliveryProofService, fetchOrderDeliveryProofService, adminRemoveCancellationService, adminDeleteOrderItemService, processRefundStockService, deleteRefundRecordService } from "../../services/admin/adminOrderService.js";
 
 export const fetchOrders = async (req, res) => {
     try {
@@ -203,6 +203,32 @@ export const adminDeleteOrderItem = async (req, res) => {
         const { orderItemId } = req.body;
         const { ID } = req.admin;
         const result = await adminDeleteOrderItemService(ID, orderItemId);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// PROCESS RETURN/REFUND STOCK (DAMAGED or RETURN)
+export const processRefundStock = async (req, res) => {
+    try {
+        const { refundId, stockAction, quantity } = req.body;
+        const { ID } = req.admin;
+        const result = await processRefundStockService(ID, refundId, stockAction, quantity);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// DELETE REFUND RECORD
+export const deleteRefundRecord = async (req, res) => {
+    try {
+        const { refundID } = req.body;
+        const { ID } = req.admin;
+        const result = await deleteRefundRecordService(ID, refundID);
         res.json(result);
     } catch (error) {
         console.log(error);

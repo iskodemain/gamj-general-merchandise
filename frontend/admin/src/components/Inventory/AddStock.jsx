@@ -152,7 +152,7 @@ export default function AddStock() {
             const result = await addStock(payload);
 
             if (result?.success) {
-                setSuccess(`✅ Successfully added ${quantityReceived} units to inventory!`);
+                setSuccess(`✅ Successfully added ${quantityReceived} to inventory!`);
             } else {
                 setError("Failed to add stock.");
             }

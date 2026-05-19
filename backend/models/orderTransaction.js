@@ -59,13 +59,15 @@ const OrderTransaction = sequelize.define(
         'Order Cancelled',
         'Order Refund Requested',
         'Order Refund Approved',
+        'Order Refund Processing',
         'Order Refund Completed',
         'Order Refund Rejected',
         'Order Cancellation Request',
         'Order Cancellation Processed',
         'Order Cancellation Request Cancelled',
         'Admin Cancellation Removed',
-        'Order Cancellation Refunded'
+        'Order Cancellation Refunded',
+        'Return/Refund Stock Processed'
       ),
       allowNull: false,
     },

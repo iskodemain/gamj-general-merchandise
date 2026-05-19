@@ -123,7 +123,18 @@ function ReturnAndRefund() {
                   No return/refund orders.
                 </div>
               ) : (
-                returnRefundOrders.toSorted((a, b) => new Date(b.dateOrdered) - new Date(a.dateOrdered)).map((order) => {
+                returnRefundOrders.toSorted((a, b) => {
+                    // Sort by the most recent refund request date for this order
+                    const aRefund = fetchReturnRefundOrders.find(r =>
+                      fetchOrderItems.some(i => i.orderId === a.ID && i.ID === r.orderItemId)
+                    );
+                    const bRefund = fetchReturnRefundOrders.find(r =>
+                      fetchOrderItems.some(i => i.orderId === b.ID && i.ID === r.orderItemId)
+                    );
+                    const aDate = aRefund?.dateRequest ? new Date(aRefund.dateRequest) : new Date(a.dateOrdered);
+                    const bDate = bRefund?.dateRequest ? new Date(bRefund.dateRequest) : new Date(b.dateOrdered);
+                    return bDate - aDate;
+                  }).map((order) => {
                   const items = fetchOrderItems
                     .filter((item) => item.orderId === order.ID)
                     .filter((item) => item.orderStatus === "Return/Refund");

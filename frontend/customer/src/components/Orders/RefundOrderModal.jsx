@@ -76,9 +76,7 @@ const RefundOrderModal = () => {
 
         const needsReturnMethod = [
             'Return and Refund',
-            'Return Only',
-            'Replace with a New Item',
-            'Other (please specify)'
+            'Return Only'
         ].includes(refundResolution);
 
         if (reasonForRefund && imageProof1 && imageProof2 && refundResolution && Number(returnQuantity) >= 1) {
@@ -87,33 +85,19 @@ const RefundOrderModal = () => {
             if (needsReturnMethod && !returnMethod) {
                 complete = false;
             }
-            // CASE 1: Return and Refund
+            // CASE 1: Return and Refund — needs returnMethod + PayPal refundMethod + email
             else if (refundResolution === 'Return and Refund' && returnMethod && refundMethod) {
                 if (refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && refundPaypalEmail) {
                     complete = true;
-                } else if (refundMethod === 'Cash Refund — Receive your refund in cash.') {
-                    complete = true;
                 }
             }
-            // CASE 2: Other (please specify)
-            else if (refundResolution === 'Other (please specify)' && otherReason && returnMethod && refundMethod) {
-                if (refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && refundPaypalEmail) {
-                    complete = true;
-                } else if (refundMethod === 'Cash Refund — Receive your refund in cash.' || refundMethod === "No Refund Needed — I don't need a refund") {
-                    complete = true;
-                }
-            }
-            // CASE 3: Resend Missing Items — no return needed
-            else if (refundResolution === 'Resend Missing Items') {
-                complete = true;
-            }
-            // CASE 4: Replace or Return Only — needs returnMethod, no refundMethod
-            else if ((refundResolution === 'Replace with a New Item' || refundResolution === 'Return Only') && returnMethod) {
+            // CASE 2: Return Only — needs returnMethod + "No Refund Needed" refundMethod
+            else if (refundResolution === 'Return Only' && returnMethod && refundMethod === "No Refund Needed — I don't need a refund") {
                 complete = true;
             }
         }
         setRefundInfoComplete(complete);
-    }, [reasonForRefund, imageProof1, imageProof2, refundResolution, refundMethod, otherReason, refundPaypalEmail, returnQuantity, returnMethod]);
+    }, [reasonForRefund, imageProof1, imageProof2, refundResolution, refundMethod, refundPaypalEmail, returnQuantity, returnMethod]);
 
 
     const handleCloseButton = () => {
@@ -158,16 +142,14 @@ const RefundOrderModal = () => {
 
         const needsReturnMethod = [
             'Return and Refund',
-            'Return Only',
-            'Replace with a New Item',
-            'Other (please specify)'
+            'Return Only'
         ].includes(refundResolution);
 
         if (needsReturnMethod && !returnMethod) {
-            return toast.error("Please select a return method (Pickup or Drop-off).");
+            return toast.error("Please select a return method.");
         }
 
-        if (refundResolution === 'Return and Refund' || refundResolution === 'Other (please specify)') {
+        if (refundResolution === 'Return and Refund' || refundResolution === 'Return Only') {
             if (!refundMethod) {
                 return toast.error("Please select your refund method.");
             }
@@ -209,14 +191,36 @@ const RefundOrderModal = () => {
                 {isCancelling ? "Cancelling..." : "Cancel Request"}
             </button>
             );
-        } 
-        else if (existingRefund.refundStatus === 'Processing') {
+        }
+
+        if (existingRefund.refundStatus === 'Processing') {
             return (
             <button type="button" className="refund-request-btn waiting-btn" disabled>
                 Waiting for Processing...
             </button>
             );
-        } 
+        }
+
+        if (existingRefund.refundStatus === 'Successfully Processed') {
+            return (
+            <div className="refund-status-info completed-status">
+                ✅ Your return/refund request has been successfully processed.
+            </div>
+            );
+        }
+
+        if (existingRefund.refundStatus === 'Rejected') {
+            return (
+            <div className="refund-status-info rejected-status">
+                ❌ Your return/refund request has been rejected.
+                {existingRefund.rejectedReason && (
+                    <p className="rejected-reason">Reason: {existingRefund.rejectedReason}</p>
+                )}
+            </div>
+            );
+        }
+
+        return null;
     };
 
     let step = 1;
@@ -236,12 +240,9 @@ const RefundOrderModal = () => {
                     <label>{nextStep()}. Select the reason for your return</label>
                     <select value={reasonForRefund} onChange={(e) => setReasonForRefund(e.target.value)} className='cancel-input' disabled={isDisabled}>
                     <option value="" disabled hidden>Select Reason</option>
-                    <option value="Order not received">Order not received</option>
-                    <option value="Incomplete product received">Incomplete product received</option>
-                    <option value="Incorrect product received">Incorrect product received</option>
                     <option value="Physically damaged product">Physically damaged product</option>
                     <option value="Defective product received">Defective product received</option>
-                    <option value="Other">Other</option>
+                    <option value="Incorrect product received">Incorrect product received</option>
                     </select>
                     <textarea value={refundComments} onChange={(e) => setRefundComments(e.target.value)} className='refund-textarea' placeholder="Additional Comments (optional)" disabled={isDisabled}/>
                 </div>
@@ -279,39 +280,37 @@ const RefundOrderModal = () => {
                         disabled={isDisabled}
                     >
                     <option value="" disabled hidden>Select Return Request</option>
-                    <option value="Return and Refund">Return and Refund</option>
-                    <option value="Resend Missing Items">Resend Missing Items</option>
-                    <option value="Replace with a New Item">Replace with a New Item</option>
                     <option value="Return Only">Return Only</option>
-                    <option value="Other (please specify)">Other (please specify)</option>
+                    <option value="Return and Refund">Return and Refund</option>
                     </select>
-                    { 
-                        refundResolution === 'Other (please specify)' && 
-                        <input type="text" placeholder='Please specify' value={otherReason} onChange={(e) => setOtherReason(e.target.value)} disabled={isDisabled}/>
-                    }
                 </div>
 
 
                 {/* FOURTH CONTENT */}
                     {
-                        (refundResolution === 'Other (please specify)' || refundResolution === 'Return and Refund') && (
+                        (refundResolution === 'Return and Refund' || refundResolution === 'Return Only') && (
                             <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                                 <label>{nextStep()}. Select your preferred refund method</label>
                                 <select value={refundMethod} onChange={(e) => setRefundMethod(e.target.value)} className='cancel-input' disabled={isDisabled}>
                                     <option value="" disabled hidden>Select Refund Method</option>
-                                    <option value="PayPal Refund — Refund will be processed to your PayPal account.">PayPal Refund — Refund will be processed to your PayPal account.</option>
-                                    <option value="Cash Refund — Receive your refund in cash.">Cash Refund — Receive your refund in cash.</option>
-                                    {   
-                                        refundResolution === 'Other (please specify)' &&
-                                        <option value="No Refund Needed — I don't need a refund">No Refund Needed — I don't need a refund</option> 
-                                    }
+                                    {refundResolution === 'Return and Refund' && (
+                                        <option value="PayPal Refund — Refund will be processed to your PayPal account.">
+                                            PayPal Refund — processed to your PayPal account
+                                        </option>
+                                    )}
+                                    {refundResolution === 'Return Only' && (
+                                        <option value="No Refund Needed — I don't need a refund">
+                                            No Refund Needed — I don't need a refund
+                                        </option>
+                                    )}
                                 </select>
                             </div>
                         )
                     }
 
                 {/* RETURN QUANTITY */}
-                <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
+                {refundResolution && (
+                    <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                     <label>
                         {nextStep()}. How many pieces are you returning?
                         {maxReturnQuantity > 0 && (
@@ -351,9 +350,10 @@ const RefundOrderModal = () => {
                         disabled={isDisabled}
                     />
                 </div>
+                )}
 
                 {/* RETURN METHOD — only shown for resolutions that require physical return */}
-                {['Return and Refund', 'Return Only', 'Replace with a New Item', 'Other (please specify)'].includes(refundResolution) && (
+                {['Return and Refund', 'Return Only'].includes(refundResolution) && (
                     <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                         <label>{nextStep()}. How will you return the item?</label>
                         <select
@@ -364,7 +364,6 @@ const RefundOrderModal = () => {
                         >
                             <option value="" disabled hidden>Select Return Method</option>
                             <option value="PICKUP">Pickup — We will arrange a rider to collect the item</option>
-                            <option value="DROP_OFF">Drop-off — I will bring the item to the store</option>
                         </select>
 
                         {/* Show scheduled pickup date only if Processing + PICKUP + date exists */}
@@ -380,7 +379,7 @@ const RefundOrderModal = () => {
                 {/* FIFTH CONTENT */}
                 <div className={`refund-form ${isDisabled ? 'disabled-refund-section' : ''}`}>
                     {
-                        refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && (refundResolution === 'Return and Refund' || refundResolution === 'Other (please specify)') && (
+                        refundMethod === 'PayPal Refund — Refund will be processed to your PayPal account.' && refundResolution === 'Return and Refund' && (
                             <>
                                 <label>{nextStep()}. Give your PayPal email address.</label>
                                 <input type="email" placeholder='Enter your PayPal account email address.' value={refundPaypalEmail} onChange={(e) => setRefundPaypalEmail(e.target.value)} required disabled={isDisabled}/>

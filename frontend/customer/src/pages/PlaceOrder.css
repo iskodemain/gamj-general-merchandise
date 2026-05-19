@@ -1942,3 +1942,82 @@
     font-size: 0.625rem;
   }
 }
+
+/* ── Confirm modal: items ordered list ─────────────────────────────────────── */
+.confirm-items-label {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-weight: 500;
+  padding: 0.75rem 0 0.375rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.confirm-items-list {
+  list-style: none;
+  margin: 0 0 0.25rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.confirm-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #111827;
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.confirm-item-row:last-child {
+  border-bottom: none;
+}
+
+.confirm-item-name {
+  flex: 1;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.confirm-item-qty-inline {
+  font-weight: 600;
+  color: #43A047;
+}
+
+.confirm-item-price {
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .confirm-items-label {
+    font-size: 0.75rem;
+    padding: 0.625rem 0 0.3125rem;
+  }
+
+  .confirm-item-row {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .confirm-items-label {
+    font-size: 0.6875rem;
+  }
+
+  .confirm-item-row {
+    font-size: 0.6875rem;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .confirm-item-price {
+    font-size: 0.6875rem;
+  }
+}
