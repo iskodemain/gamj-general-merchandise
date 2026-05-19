@@ -1,6 +1,6 @@
 import express from 'express';
 import adminAuth from '../../middleware/adminAuth.js';
-import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchOrderTransaction, fetchOrderPaymentProof, addOrderDeliveryProof, fetchOrderDeliveryProof, adminRemoveCancellation, adminDeleteOrderItem } from '../../controllers/admin/adminOrderController.js';
+import { fetchOrders, fetchOrderCancel, fetchOrderReturnAndRefund, updateOrderStatus, fetchRefundProof, processRefundRequest, approveRefundRequest, sucessfullyProcessedRefund, rejectedRefundRequest, submitRefundProof, cancelSubmitAsRefund, cancelSubmitAsCompleted, fetchOrderTransaction, fetchOrderPaymentProof, addOrderDeliveryProof, fetchOrderDeliveryProof, adminRemoveCancellation, adminDeleteOrderItem, processRefundStock, deleteRefundRecord } from '../../controllers/admin/adminOrderController.js';
 
 import upload from '../../middleware/multer.js';
 
@@ -20,6 +20,12 @@ adminOrderRouter.patch('/cancel/remove-cancellation', adminAuth, adminRemoveCanc
 
 // ADMIN SOFT-DELETE ORDER ITEM
 adminOrderRouter.patch('/cancel/delete-order-item', adminAuth, adminDeleteOrderItem);
+
+// PROCESS RETURN/REFUND STOCK
+adminOrderRouter.patch('/refund/process-stock', adminAuth, processRefundStock);
+
+// DELETE REFUND RECORD
+adminOrderRouter.patch('/refund/delete-record', adminAuth, deleteRefundRecord);
 
 
 // UPDATE ORDER STATUS

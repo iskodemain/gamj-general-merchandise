@@ -65,7 +65,7 @@ const OrderRefund = sequelize.define(
       defaultValue: 1,
     },
     returnMethod: {
-      type: DataTypes.ENUM("PICKUP", "DROP_OFF"),
+      type: DataTypes.ENUM("PICKUP"),
       allowNull: true,
     },
     pickupScheduledDate: {
@@ -75,7 +75,6 @@ const OrderRefund = sequelize.define(
     refundMethod: {
       type: DataTypes.ENUM(
         'PayPal Refund — Refund will be processed to your PayPal account.',
-        'Cash Refund — Receive your refund in cash.',
         'No Refund Needed — I don\'t need a refund'
       ),
       allowNull: true,

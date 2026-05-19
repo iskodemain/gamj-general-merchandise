@@ -2498,3 +2498,60 @@ export const outOfStockTemplate = (productName, triggeredBy, quantity, reason) =
 </body>
 </html>`;
 };
+
+// ─── RETURN / REFUND STATUS UPDATE EMAIL ───────────────────────────────────
+export const returnRefundStatusTemplate = (userName, refundStatus, paymentMethod, productName, orderId, extraInfo = '') => {
+  const statusConfig = {
+    'Processing': { color: '#00E3B6', icon: '', message: 'Your return/refund request is now being processed by our team.' },
+    'Successfully Processed': { color: '#00DD31', icon: '', message: 'Your return/refund request has been successfully completed.' },
+    'Rejected': { color: '#e36666', icon: '', message: 'Unfortunately, your return/refund request has been rejected.' },
+  };
+  const cfg = statusConfig[refundStatus] || { color: '#888', icon: '📋', message: 'Your return/refund request status has been updated.' };
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Return/Refund Status Update</title>
+<style>
+  body,table,td,a{margin:0;padding:0;font-family:Arial,sans-serif;}
+  img{border:0;display:block;max-width:100%;}
+  .ec{width:100%;background-color:#f4f6f9;padding:20px 0;}
+  .em{max-width:600px;margin:0 auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,.1);}
+  .eh{text-align:center;margin-bottom:30px;}
+  .eh img{margin:0 auto;max-width:120px;}
+  .eb{text-align:center;font-size:16px;line-height:1.6;color:#333;}
+  .badge{display:inline-block;padding:10px 20px;background:${cfg.color};color:#fff;font-weight:bold;border-radius:10px;margin:20px 0;}
+  .ib{background:#f9f9f9;border-left:4px solid ${cfg.color};border-radius:6px;padding:14px 18px;margin:20px 0;text-align:left;font-size:14px;color:#1a1a1a;}
+  .ib p{margin:5px 0;}
+  .ef{text-align:center;font-size:12px;color:#777;margin-top:30px;border-top:1px solid #e0e0e0;padding-top:20px;}
+  .ef a{color:#43A047;text-decoration:none;font-weight:600;}
+</style>
+</head>
+<body>
+<table class="ec" role="presentation"><tr><td>
+<div class="em">
+  <div class="eh"><img src="https://res.cloudinary.com/dxm5frxoh/image/upload/v1774259209/GAMJ_y9xmpj.png" alt="GAMJ"></div>
+  <h2 style="text-align:center;">Return/Refund Status Update</h2>
+  <div class="eb">
+    <p>Hi <strong>${userName}</strong>,</p>
+    <p>Your return/refund request status has been updated.</p>
+    <div class="badge">${cfg.icon} ${refundStatus}</div>
+    <p>${cfg.message}</p>
+    <div class="ib">
+      <p><strong>Order ID:</strong> ${orderId}</p>
+      <p><strong>Product:</strong> ${productName}</p>
+      <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+      ${extraInfo ? `<p>${extraInfo}</p>` : ''}
+    </div>
+    <p>Thank you for your patience.</p>
+  </div>
+  <div class="ef">
+    <p>Questions? Contact us at: <a href="mailto:gamjmerchandisehelp@gmail.com">gamjmerchandisehelp@gmail.com</a></p>
+    <p style="margin-top:15px;">© ${new Date().getFullYear()} GAMJ General Merchandise. All rights reserved.</p>
+  </div>
+</div>
+</td></tr></table>
+</body></html>`;
+};

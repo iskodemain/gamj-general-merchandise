@@ -709,3 +709,16 @@
     padding: 10px;
   }
 }
+
+/* ── Export header row ─────────────────────────────────────────────────────── */
+.it-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .it-header-top { flex-direction: column; gap: 8px; }
+}

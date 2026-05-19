@@ -2,412 +2,257 @@ import React, { useContext, useMemo, useState } from "react";
 import "./Reports.css";
 import { AdminContext } from "../context/AdminContextProvider";
 import Navbar from "../components/Navbar";
+import ExportBar from "../components/ExportBar";
+import { exportExcel, exportPDF, printTable } from "../utils/exportUtils";
 
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable"
-import { Document, Packer, Paragraph } from "docx";
-import { saveAs } from "file-saver";
+const ORDER_TYPE_OPTIONS = [
+  "All","Pending","Processing","Out for Delivery","Delivered","Cancellation","Return and Refund",
+];
+const PAYMENT_OPTIONS = ["All", "Cash On Delivery", "Paypal"];
+const INV_TYPE_OPTIONS = ["All", "Stock In", "Stock Out", "Return", "Damaged", "Adjust"];
+const INV_TYPE_MAP = { "Stock In":"IN","Stock Out":"OUT","Return":"RETURN","Damaged":"DAMAGED","Adjust":"ADJUST" };
+const STOCK_STATUS_OPTIONS = ["All", "In Stock", "Low Stock", "Out of Stock"];
 
 const Reports = () => {
   const {
-    fetchOrderTransaction,
-    fetchOrders,
-    fetchOrderItems,
-    fetchCancelledOrders,
-    fetchInventoryStock,
-    fetchInventoryBatch,
-    fetchInventoryHistory,
-    fetchInventorySettings,
-    products,
-    variantName,
-    productVariantValues,
-    productVariantCombination,
+    fetchOrderTransaction, fetchOrders, fetchOrderItems,
+    fetchInventoryStock, fetchInventoryHistory, fetchInventorySettings,
+    products, variantName, productVariantValues, productVariantCombination,
   } = useContext(AdminContext);
 
-  /* ======================
-     📅 DATE RANGE STATES
-  ====================== */
   const [orderFrom, setOrderFrom] = useState("");
   const [orderTo, setOrderTo] = useState("");
-
+  const [orderTypeFilter, setOrderTypeFilter] = useState("All");
+  const [orderPaymentFilter, setOrderPaymentFilter] = useState("All");
   const [inventoryFrom, setInventoryFrom] = useState("");
   const [inventoryTo, setInventoryTo] = useState("");
+  const [invTypeFilter, setInvTypeFilter] = useState("All");
+  const [stockStatusFilter, setStockStatusFilter] = useState("All");
 
   const inRange = (date, from, to) => {
-    if (!from || !to) return true;
+    if (!from && !to) return true;
     const d = new Date(date);
-    return d >= new Date(from) && d <= new Date(to);
+    if (from && d < new Date(from)) return false;
+    if (to) { const end = new Date(to); end.setHours(23,59,59,999); if (d > end) return false; }
+    return true;
   };
 
-  /* ======================
-     🔍 FILTERED DATA
-  ====================== */
-  const filteredOrderTransactions = useMemo(
-    () =>
-      fetchOrderTransaction
-        .filter(t => inRange(t.transactionDate, orderFrom, orderTo))
-        .sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)),
-    [fetchOrderTransaction, orderFrom, orderTo]
-  );
+  const getOrderId = (id) => fetchOrders?.find(o => o.ID === id)?.orderId || "N/A";
 
-  const filteredInventoryHistory = useMemo(
-    () =>
-      fetchInventoryHistory
-        .filter(h => inRange(h.createdAt, inventoryFrom, inventoryTo))
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [fetchInventoryHistory, inventoryFrom, inventoryTo]
-  );
-
-  /* ======================
-     🔧 HELPER FUNCTIONS
-  ====================== */
-  
-  // Get orderId string from fetchOrders
-  const getOrderId = (orderIdNum) => {
-    const order = fetchOrders?.find(o => o.ID === orderIdNum);
-    return order?.orderId || 'N/A';
-  };
-
-  // Get product details with variants (for single item)
   const getProductDetails = (productId, variantValueId, variantCombinationId) => {
     const product = products?.find(p => p.ID === productId);
-    const productName = product?.productName || 'Unknown Product';
-
-    let variantInfo = '';
-
-    // Check for variant combination first
+    const name = product?.productName || "Unknown";
     if (variantCombinationId) {
       const combo = productVariantCombination?.find(c => c.ID === variantCombinationId);
-      if (combo && combo.combinations) {
-        try {
-          const combinations = JSON.parse(combo.combinations);
-          variantInfo = ` (${combinations.join(', ')})`;
-        } catch {
-          variantInfo = ` (${combo.combinations})`;
-        }
+      if (combo?.combinations) {
+        try { return `${name} (${JSON.parse(combo.combinations).join(", ")})`; } catch { return `${name} (${combo.combinations})`; }
       }
     }
-    // Then check for single variant value
-    else if (variantValueId) {
-      const variant = productVariantValues?.find(v => v.ID === variantValueId);
-      if (variant) {
-        const vName = variantName?.find(vn => vn.ID === variant.variantNameId);
-        variantInfo = ` (${vName?.name || 'Variant'}: ${variant.value})`;
-      }
+    if (variantValueId) {
+      const v = productVariantValues?.find(v => v.ID === variantValueId);
+      if (v) { const vn = variantName?.find(vn => vn.ID === v.variantNameId); return `${name} (${vn?.name || "Variant"}: ${v.value})`; }
     }
-
-    return `${productName}${variantInfo}`;
+    return name;
   };
 
-  // Get product details for order transaction (with full variant info)
   const getOrderProductDetails = (orderIdNum, orderItemIdNum) => {
-    // If there's an orderItemId, get that specific item with variants
     if (orderItemIdNum) {
       const item = fetchOrderItems?.find(oi => oi.ID === orderItemIdNum);
-      if (item) {
-        return getProductDetails(
-          item.productId, 
-          item.productVariantValueId, 
-          item.productVariantCombinationId
-        );
-      }
-      return 'Unknown Product';
+      if (item) return getProductDetails(item.productId, item.productVariantValueId, item.productVariantCombinationId);
+      return "Unknown";
     }
-    
-    // Otherwise, get all items for this order with their variants
     const items = fetchOrderItems?.filter(oi => oi.orderId === orderIdNum) || [];
-    const productDetails = items.map(item => 
-      getProductDetails(
-        item.productId, 
-        item.productVariantValueId, 
-        item.productVariantCombinationId
-      )
-    );
-    
-    return productDetails.length > 0 ? productDetails.join(', ') : 'N/A';
+    return items.map(i => getProductDetails(i.productId, i.productVariantValueId, i.productVariantCombinationId)).join(", ") || "N/A";
   };
 
-  const getDisplayTransactionType = (type) => {
-    if (type === "Order Placed") return "Order Placed (Pending)";
-    return type;
-  };
+  const getThreshold = (productId, variantValueId, variantCombinationId) =>
+    fetchInventorySettings?.find(s => s.productId === productId && s.variantValueId === variantValueId && s.variantCombinationId === variantCombinationId);
 
-  /* ======================
-    📊 INVENTORY STATUS HELPERS
-  ====================== */
+  const getCurrentStock = (productId, variantValueId, variantCombinationId) =>
+    fetchInventoryStock?.find(s => s.productId === productId && s.variantValueId === variantValueId && s.variantCombinationId === variantCombinationId)?.totalQuantity ?? 0;
 
-  // Get threshold settings for a product/variant
-  const getThresholdForStock = (productId, variantValueId, variantCombinationId) => {
-    const setting = fetchInventorySettings?.find(s => 
-      s.productId === productId &&
-      s.variantValueId === variantValueId &&
-      s.variantCombinationId === variantCombinationId
-    );
-    return setting;
-  };
-
-  // Get current stock quantity
-  const getCurrentStock = (productId, variantValueId, variantCombinationId) => {
-    const stock = fetchInventoryStock?.find(s =>
-      s.productId === productId &&
-      s.variantValueId === variantValueId &&
-      s.variantCombinationId === variantCombinationId
-    );
-    return stock?.totalQuantity ?? 0;
-  };
-
-  // Compute stock status
-  const computeStockStatus = (qty, thresholdSettings) => {
-    if (qty === 0) return 'Out-of-Stock';
-    if (!thresholdSettings) return 'In-Stock'; // No threshold set
-    return qty <= thresholdSettings.lowStockThreshold ? 'Low Stock' : 'In-Stock';
-  };
-
-  // Get stock status for a product/variant
   const getStockStatus = (productId, variantValueId, variantCombinationId) => {
     const qty = getCurrentStock(productId, variantValueId, variantCombinationId);
-    const threshold = getThresholdForStock(productId, variantValueId, variantCombinationId);
-    return computeStockStatus(qty, threshold);
+    if (qty === 0) return "Out of Stock";
+    const t = getThreshold(productId, variantValueId, variantCombinationId);
+    return t && qty <= t.lowStockThreshold ? "Low Stock" : "In Stock";
   };
 
-  /* ======================
-    🧱 TABLE ROW BUILDERS
-  ====================== */
-
-  // ORDER REPORT ROWS (with orderId and product details including variants)
-  const orderReportRows = useMemo(() => {
-    return filteredOrderTransactions.map(tx => ({
-      "Transaction ID": tx.transactionId,
-      "Order ID": getOrderId(tx.orderId),
-      "Product(s)": getOrderProductDetails(tx.orderId, tx.orderItemId),
-      "Type": getDisplayTransactionType(tx.transactionType),
-      "Amount": `₱ ${Number(tx.totalAmount).toFixed(2)}`,
-      "Payment": tx.paymentMethod,
-      "Date": new Date(tx.transactionDate).toLocaleDateString(),
-    }));
-  }, [filteredOrderTransactions, fetchOrders, fetchOrderItems, products, variantName, productVariantValues, productVariantCombination]);
-
-  // INVENTORY REPORT ROWS (with product names & variants)
-  const inventoryReportRows = useMemo(() => {
-    return filteredInventoryHistory.map(h => {
-      const productDetails = getProductDetails(
-        h.productId, 
-        h.variantValueId, 
-        h.variantCombinationId
-      );
-
-      const currentStock = getCurrentStock(h.productId, h.variantValueId, h.variantCombinationId);
-      const stockStatus = getStockStatus(h.productId, h.variantValueId, h.variantCombinationId);
-
-      return {
-        "Product": productDetails,
-        "Type": h.type,
-        "Quantity": h.quantity,
-        "Stock After": h.stockAfter !== null && h.stockAfter !== undefined ? h.stockAfter : '—',
-        "Stock Status": stockStatus,
-        "Reference": h.referenceId || "-",
-        "Date": new Date(h.createdAt).toLocaleDateString(),
-      };
-    });
-  }, [filteredInventoryHistory, fetchInventoryStock, fetchInventorySettings, products, variantName, productVariantValues, productVariantCombination]);
-
-  /* ======================
-     ⬇️ EXPORT HELPERS
-  ====================== */
-  const exportCSV = (rows, filename) => {
-    if (!rows.length) return;
-
-    const headers = Object.keys(rows[0]).join(",");
-    const values = rows.map(r =>
-      Object.values(r).map(v => `"${v}"`).join(",")
-    );
-
-    const csv = [headers, ...values].join("\n");
-    saveAs(new Blob([csv], { type: "text/csv" }), filename);
+  const orderTypeLabelMap = {
+    "Pending": ["Order Placed"],
+    "Processing": ["Order Processing"],
+    "Out for Delivery": ["Out for Delivery"],
+    "Delivered": ["Order Delivered"],
+    "Cancellation": ["Order Cancelled","Order Cancellation Processed","Order Cancellation Request","Order Cancellation Request Cancelled","Admin Cancellation Removed","Order Cancellation Refunded"],
+    "Return and Refund": ["Order Refund Requested","Order Refund Approved","Order Refund Processing","Order Refund Completed","Order Refund Rejected","Return/Refund Stock Processed"],
   };
 
-  const exportExcel = (rows, filename) => {
-    if (!rows.length) return;
+  const filteredOrderTransactions = useMemo(() => {
+    let list = [...(fetchOrderTransaction || [])];
+    list = list.filter(t => inRange(t.transactionDate, orderFrom, orderTo));
+    if (orderTypeFilter !== "All") {
+      const allowed = orderTypeLabelMap[orderTypeFilter] || [];
+      list = list.filter(t => allowed.includes(t.transactionType));
+    }
+    if (orderPaymentFilter !== "All") list = list.filter(t => t.paymentMethod === orderPaymentFilter);
+    return list.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate));
+  }, [fetchOrderTransaction, orderFrom, orderTo, orderTypeFilter, orderPaymentFilter]);
 
-    // 1️⃣ Lock header order (same as table)
-    const headers = Object.keys(rows[0]);
+  const filteredInventoryHistory = useMemo(() => {
+    let list = [...(fetchInventoryHistory || [])];
+    list = list.filter(h => inRange(h.createdAt, inventoryFrom, inventoryTo));
+    if (invTypeFilter !== "All") { const mapped = INV_TYPE_MAP[invTypeFilter]; if (mapped) list = list.filter(h => h.type === mapped); }
+    if (stockStatusFilter !== "All") list = list.filter(h => getStockStatus(h.productId, h.variantValueId, h.variantCombinationId) === stockStatusFilter);
+    return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [fetchInventoryHistory, inventoryFrom, inventoryTo, invTypeFilter, stockStatusFilter, fetchInventoryStock, fetchInventorySettings]);
 
-    // 2️⃣ Force everything to STRING (no Excel auto-format)
-    const data = rows.map(row =>
-      headers.map(h => String(row[h] ?? ""))
-    );
+  const orderRows = useMemo(() => filteredOrderTransactions.map(tx => ({
+    "Transaction ID": tx.transactionId,
+    "Order ID": getOrderId(tx.orderId),
+    "Product(s)": getOrderProductDetails(tx.orderId, tx.orderItemId),
+    "Type": tx.transactionType,
+    "Amount": `₱${Number(tx.totalAmount).toFixed(2)}`,
+    "Payment": tx.paymentMethod || "—",
+    "Date": new Date(tx.transactionDate).toLocaleDateString(),
+  })), [filteredOrderTransactions]);
 
-    // 3️⃣ Build AOA (Array of Arrays)
-    const worksheet = XLSX.utils.aoa_to_sheet([
-      headers,
-      ...data
-    ]);
+  const inventoryRows = useMemo(() => filteredInventoryHistory.map(h => ({
+    "Product": getProductDetails(h.productId, h.variantValueId, h.variantCombinationId),
+    "Type": h.type,
+    "Qty": h.quantity,
+    "Stock After": h.stockAfter ?? "—",
+    "Stock Status": getStockStatus(h.productId, h.variantValueId, h.variantCombinationId),
+    "Reference": h.referenceId || "—",
+    "Date": new Date(h.createdAt).toLocaleDateString(),
+  })), [filteredInventoryHistory]);
 
-    // 4️⃣ Optional: improve readability
-    worksheet["!cols"] = headers.map(() => ({ wch: 25 }));
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-
-    XLSX.writeFile(workbook, filename);
-  };
-
-  const exportPDF = (rows, title, filename) => {
-    if (!rows.length) return;
-
-    const doc = new jsPDF("l", "pt", "a4");
-    doc.text(title, 40, 40);
-
-    autoTable(doc, {
-      startY: 60,
-      head: [Object.keys(rows[0])],
-      body: rows.map(r => Object.values(r)),
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [40, 40, 40] },
-    });
-
-    doc.save(filename);
-  };
-
-  const exportDOCX = async (rows, filename) => {
-    if (!rows.length) return;
-
-    const headers = Object.keys(rows[0]);
-
-    const doc = new Document({
-      sections: [
-        {
-          children: [
-            new Paragraph({ text: filename.replace(".docx", ""), bold: true }),
-
-            ...headers.map(h =>
-              new Paragraph({ text: h, bold: true })
-            ),
-
-            ...rows.flatMap(row =>
-              Object.values(row).map(val =>
-                new Paragraph(String(val))
-              )
-            ),
-          ],
-        },
-      ],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, filename);
-  };
+  const statusClass = (s) => s === "Out of Stock" ? "status-out" : s === "Low Stock" ? "status-low" : "status-ok";
+  const statusLabel = (s) => s === "Out of Stock" ? "❌ OUT" : s === "Low Stock" ? "⚠️ LOW" : "✅ OK";
 
   return (
     <>
       <Navbar TitleName="Order & Inventory Reports" />
-
       <div className="reports-container">
-        {/* ===== ORDER REPORTS ===== */}
-        <section className="table-section">
-          <div className="section-header">
-            <h3>Order Reports</h3>
 
-            <div className="date-range">
-              <input type="date" value={orderFrom} onChange={e => setOrderFrom(e.target.value)} />
-              <span>to</span>
-              <input type="date" value={orderTo} onChange={e => setOrderTo(e.target.value)} />
-            </div>
-
-            <div className="export-buttons">
-              <button onClick={() => exportExcel(orderReportRows, "orders.xlsx")}>Export to Excel</button>
+        {/* ══ ORDER REPORTS ══ */}
+        <section className="rpt-section">
+          <div className="rpt-section-head">
+            <h3 className="rpt-section-title">Order Reports</h3>
+            <div className="rpt-controls">
+              <div className="rpt-filters">
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">Type</label>
+                  <select className="rpt-select" value={orderTypeFilter} onChange={e => setOrderTypeFilter(e.target.value)}>
+                    {ORDER_TYPE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">Payment</label>
+                  <select className="rpt-select" value={orderPaymentFilter} onChange={e => setOrderPaymentFilter(e.target.value)}>
+                    {PAYMENT_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">From</label>
+                  <input className="rpt-date" type="date" value={orderFrom} onChange={e => setOrderFrom(e.target.value)} />
+                </div>
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">To</label>
+                  <input className="rpt-date" type="date" value={orderTo} onChange={e => setOrderTo(e.target.value)} />
+                </div>
+              </div>
+              <ExportBar
+                disabled={!orderRows.length}
+                onExcelClick={() => exportExcel(orderRows, "order-report.xlsx")}
+                onPDFClick={() => exportPDF(orderRows, "Order Report", "order-report.pdf")}
+                onPrintClick={() => printTable(orderRows, "Order Report")}
+              />
             </div>
           </div>
-
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Transaction ID</th>
-                  <th>Order ID</th>
-                  <th>Product(s)</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Payment</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
+          <div className="rpt-count">{orderRows.length} record{orderRows.length !== 1 ? "s" : ""}</div>
+          <div className="rpt-table-wrap">
+            <table className="rpt-table">
+              <thead><tr><th>Transaction ID</th><th>Order ID</th><th>Product(s)</th><th>Type</th><th>Amount</th><th>Payment</th><th>Date</th></tr></thead>
               <tbody>
-                {filteredOrderTransactions.map(tx => (
-                  <tr key={tx.ID}>
-                    <td>{tx.transactionId}</td>
-                    <td>{getOrderId(tx.orderId)}</td>
-                    <td>{getOrderProductDetails(tx.orderId, tx.orderItemId)}</td>
-                    <td>{getDisplayTransactionType(tx.transactionType)}</td>
-                    <td>₱ {tx.totalAmount}</td>
-                    <td>{tx.paymentMethod}</td>
-                    <td>{new Date(tx.transactionDate).toLocaleDateString()}</td>
+                {orderRows.length ? orderRows.map((r, i) => (
+                  <tr key={i}>
+                    <td>{r["Transaction ID"]}</td>
+                    <td>{r["Order ID"]}</td>
+                    <td className="rpt-td-product">{r["Product(s)"]}</td>
+                    <td>{r["Type"]}</td>
+                    <td>{r["Amount"]}</td>
+                    <td>{r["Payment"]}</td>
+                    <td>{r["Date"]}</td>
                   </tr>
-                ))}
+                )) : (
+                  <tr><td colSpan="7" className="rpt-empty">No records found.</td></tr>
+                )}
               </tbody>
             </table>
           </div>
         </section>
 
-        {/* ===== INVENTORY REPORTS ===== */}
-        <section className="table-section">
-          <div className="section-header">
-            <h3>Inventory Reports</h3>
-
-            <div className="date-range">
-              <input type="date" value={inventoryFrom} onChange={e => setInventoryFrom(e.target.value)} />
-              <span>to</span>
-              <input type="date" value={inventoryTo} onChange={e => setInventoryTo(e.target.value)} />
-            </div>
-
-            <div className="export-buttons">
-              <button onClick={() => exportExcel(inventoryReportRows, "inventory-history.xlsx")}>Export to Excel</button>
+        {/* ══ INVENTORY REPORTS ══ */}
+        <section className="rpt-section">
+          <div className="rpt-section-head">
+            <h3 className="rpt-section-title">Inventory Reports</h3>
+            <div className="rpt-controls">
+              <div className="rpt-filters">
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">Type</label>
+                  <select className="rpt-select" value={invTypeFilter} onChange={e => setInvTypeFilter(e.target.value)}>
+                    {INV_TYPE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">Stock Status</label>
+                  <select className="rpt-select" value={stockStatusFilter} onChange={e => setStockStatusFilter(e.target.value)}>
+                    {STOCK_STATUS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">From</label>
+                  <input className="rpt-date" type="date" value={inventoryFrom} onChange={e => setInventoryFrom(e.target.value)} />
+                </div>
+                <div className="rpt-filter-group">
+                  <label className="rpt-filter-label">To</label>
+                  <input className="rpt-date" type="date" value={inventoryTo} onChange={e => setInventoryTo(e.target.value)} />
+                </div>
+              </div>
+              <ExportBar
+                disabled={!inventoryRows.length}
+                onExcelClick={() => exportExcel(inventoryRows, "inventory-report.xlsx")}
+                onPDFClick={() => exportPDF(inventoryRows, "Inventory Report", "inventory-report.pdf")}
+                onPrintClick={() => printTable(inventoryRows, "Inventory Report")}
+              />
             </div>
           </div>
-
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Type</th>
-                  <th>Quantity</th>
-                  <th>Stock After</th>
-                  <th>Stock Status</th> 
-                  <th>Reference</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
+          <div className="rpt-count">{inventoryRows.length} record{inventoryRows.length !== 1 ? "s" : ""}</div>
+          <div className="rpt-table-wrap">
+            <table className="rpt-table">
+              <thead><tr><th>Product</th><th>Type</th><th>Qty</th><th>Stock After</th><th>Stock Status</th><th>Reference</th><th>Date</th></tr></thead>
               <tbody>
-                {filteredInventoryHistory.map(h => {
-                  const currentStock = getCurrentStock(h.productId, h.variantValueId, h.variantCombinationId);
-                  const stockStatus = getStockStatus(h.productId, h.variantValueId, h.variantCombinationId);
-                  
+                {inventoryRows.length ? inventoryRows.map((r, i) => {
+                  const s = r["Stock Status"];
                   return (
-                    <tr key={h.ID}>
-                      <td>{getProductDetails(h.productId, h.variantValueId, h.variantCombinationId)}</td>
-                      <td>{h.type}</td>
-                      <td>{h.quantity}</td>
-                      <td>{h.stockAfter !== null && h.stockAfter !== undefined ? h.stockAfter : '—'}</td>
-                      <td>
-                        <span className={`status-badge status-${
-                          stockStatus === 'Out-of-Stock' ? 'out' : 
-                          stockStatus === 'Low Stock' ? 'low' : 'ok'
-                        }`}>
-                          {stockStatus === 'Out-of-Stock' ? '❌ OUT' : 
-                          stockStatus === 'Low Stock' ? '⚠️ LOW' : '✅ OK'}
-                        </span>
-                      </td> 
-                      <td>{h.referenceId || '-'}</td>
-                      <td>{new Date(h.createdAt).toLocaleDateString()}</td>
+                    <tr key={i}>
+                      <td className="rpt-td-product">{r["Product"]}</td>
+                      <td>{r["Type"]}</td>
+                      <td>{r["Qty"]}</td>
+                      <td>{r["Stock After"]}</td>
+                      <td><span className={`rpt-status-badge ${statusClass(s)}`}>{statusLabel(s)}</span></td>
+                      <td>{r["Reference"]}</td>
+                      <td>{r["Date"]}</td>
                     </tr>
                   );
-                })}
+                }) : (
+                  <tr><td colSpan="7" className="rpt-empty">No records found.</td></tr>
+                )}
               </tbody>
             </table>
           </div>
         </section>
+
       </div>
     </>
   );
