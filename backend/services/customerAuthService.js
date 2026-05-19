@@ -5,6 +5,7 @@ import Customer from '../models/customer.js';
 import { createCustomerToken, generateLoginToken, generatePasswordResetToken } from '../utils/token.js';
 import { generateVerificationCode } from '../utils/codeGenerator.js';
 import { sendMail } from '../utils/mailer.js';
+import { sendSMS } from '../utils/sms.js';
 import { validateEmail, validatePhone, validatePassword } from '../validators/userValidator.js';
 import { loginEmailTemplate, registrationEmailTemplate, resetPasswordEmailTemplate } from '../utils/emailTemplates.js';
 
@@ -139,7 +140,8 @@ export const registerCustomerService = async (medicalInstitutionName, contactNum
                 html: registrationEmailTemplate(verificationCode)
             });
         } else {
-            // Phone Number Verification Code Logic Here
+            // Send SMS verification code
+            sendSMS([loginPhoneNum], `Your GAMJ General Merchandise verification code is: ${verificationCode}. Do not share this code.`).catch(err => console.error('SMS sending failed:', err));
         }
         
 
@@ -275,6 +277,8 @@ export const loginCustomerService = async (identifier, password) => {
                 subject: 'Login Verification Code',
                 html: loginEmailTemplate(user.medicalInstitutionName, code)
             });
+        } else if (user.loginPhoneNum) {
+            sendSMS([user.loginPhoneNum], `Your GAMJ General Merchandise login code is: ${code}. Do not share this code.`).catch(err => console.error('SMS sending failed:', err));
         }
 
         return {
@@ -399,7 +403,8 @@ export const requestPasswordResetService = async (identifier) => {
                 html: resetPasswordEmailTemplate(user.medicalInstitutionName, code)
             });
         } else {
-            // Send phone verification Code
+            // Send SMS reset code
+            sendSMS([identifier], `Your GAMJ General Merchandise password reset code is: ${code}. Do not share this code.`).catch(err => console.error('SMS sending failed:', err));
         }
 
         // Update User Data
