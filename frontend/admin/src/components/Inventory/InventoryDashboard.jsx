@@ -364,7 +364,7 @@ export default function InventoryDashboard() {
               <option value="product">Sort: Product Name</option>
               <option value="stock-asc">Sort: Stock (Low to High)</option>
               <option value="stock-desc">Sort: Stock (High to Low)</option>
-              // <option value="status">Sort: Status (Critical First)</option>
+              {/* <option value="status">Sort: Status (Critical First)</option> */}
             </select>
 
             <button onClick={() => navigate('inventory/add')} className="add-stock-btn">
