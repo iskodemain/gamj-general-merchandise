@@ -145,7 +145,7 @@ io.on("connection", (socket) => {
 const startServer = async () => {
     try {
         await connectToDatabase();
-        // await sequelize.sync({ alter: true }); 
+        await sequelize.sync({ alter: true }); 
         console.log("Database connected successfully.");
         createSuperAdminIfNotExists()
         server.listen(port, () => {
