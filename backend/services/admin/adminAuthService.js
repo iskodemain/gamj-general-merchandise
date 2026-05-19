@@ -2,7 +2,8 @@ import bcrypt from 'bcrypt';
 import Admin from '../../models/admin.js';
 import { generateLoginToken, createAdminToken } from '../../utils/token.js';
 import { generateVerificationCode } from '../../utils/codeGenerator.js';
-import { sendMail } from '../../utils/mailer.js'; 
+import { sendMail } from '../../utils/mailer.js';
+import { sendSMS } from '../../utils/sms.js';
 import { validateEmail, validatePhone, validatePassword } from '../../validators/userValidator.js';
 import { loginEmailTemplate } from '../../utils/emailTemplates.js';
 import { Op } from "sequelize";
@@ -51,7 +52,9 @@ export const loginAdminService = async (identifier, password) => {
                 to: admin.emailAddress,
                 subject: 'Login Verification Code',
                 html: loginEmailTemplate(admin.userName, code)
-            }).catch(err => console.error('Email sending failed:', err));;
+            }).catch(err => console.error('Email sending failed:', err));
+        } else if (admin.phoneNumber) {
+            sendSMS([admin.phoneNumber], `Your GAMJ General Merchandise admin login code is: ${code}. Do not share this code.`).catch(err => console.error('SMS sending failed:', err));
         }
 
         return {
