@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import "./StockAdjustment.css";
 import Navbar from "../Navbar";
 import { AdminContext } from "../../context/AdminContextProvider";
@@ -29,6 +29,22 @@ export default function StockAdjustment() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Product search state
+  const [productSearch, setProductSearch] = useState("");
+  const [productDropdownOpen, setProductDropdownOpen] = useState(false);
+  const productSearchRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (productSearchRef.current && !productSearchRef.current.contains(e.target)) {
+        setProductDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Get product details
   const selectedProductData = products.find(p => p.ID === Number(selectedProduct));
@@ -155,6 +171,8 @@ export default function StockAdjustment() {
     setReason("");
     setError("");
     setSuccess("");
+    setProductSearch("");
+    setProductDropdownOpen(false);
   };
 
   return (
@@ -201,24 +219,66 @@ export default function StockAdjustment() {
                 <label className="stockadj-label" htmlFor="product">
                   Product <span className="stockadj-required">*</span>
                 </label>
-                <select
-                  id="product"
-                  className="stockadj-select"
-                  value={selectedProduct}
-                  onChange={(e) => setSelectedProduct(e.target.value)}
-                  disabled={loading}
-                >
-                  <option value="">-- Select Product --</option>
-                  {products.map((p) => {
-                    const unitLabel = p.unitType === 'BOX' ? `📦 Per Box (${p.piecesPerBox} pcs)` : '🔹 Per Piece';
-                    const stockLabel = p.isOutOfStock ? ' — ⚠️ No Stock' : '';
-                    return (
-                      <option key={p.ID} value={p.ID}>
-                        {p.productName} | {unitLabel}{stockLabel}
-                      </option>
-                    );
-                  })}
-                </select>
+                <div className="stockadj-product-search-wrapper" ref={productSearchRef}>
+                  <input
+                    id="product"
+                    type="text"
+                    className="stockadj-product-search-input"
+                    value={
+                      productDropdownOpen
+                        ? productSearch
+                        : selectedProduct
+                          ? products.find(p => p.ID === Number(selectedProduct))?.productName || ""
+                          : ""
+                    }
+                    onChange={(e) => {
+                      setProductSearch(e.target.value);
+                      setProductDropdownOpen(true);
+                    }}
+                    onFocus={() => {
+                      setProductSearch("");
+                      setProductDropdownOpen(true);
+                    }}
+                    placeholder="-- Search or Select Product --"
+                    disabled={loading}
+                    autoComplete="off"
+                  />
+                  {productDropdownOpen && (
+                    <div className="stockadj-product-dropdown">
+                      {products
+                        .filter((p) =>
+                          p.productName.toLowerCase().includes(productSearch.toLowerCase())
+                        )
+                        .length === 0 ? (
+                        <div className="stockadj-product-dropdown-empty">No products found</div>
+                      ) : (
+                        products
+                          .filter((p) =>
+                            p.productName.toLowerCase().includes(productSearch.toLowerCase())
+                          )
+                          .map((p) => {
+                            const unitLabel = p.unitType === "BOX"
+                              ? `📦 Per Box (${p.piecesPerBox} pcs)`
+                              : "🔹 Per Piece";
+                            const stockLabel = p.isOutOfStock ? " — ⚠️ No Stock" : "";
+                            return (
+                              <div
+                                key={p.ID}
+                                className={`stockadj-product-dropdown-item${Number(selectedProduct) === p.ID ? " active" : ""}`}
+                                onMouseDown={() => {
+                                  setSelectedProduct(String(p.ID));
+                                  setProductSearch("");
+                                  setProductDropdownOpen(false);
+                                }}
+                              >
+                                {p.productName} | {unitLabel}{stockLabel}
+                              </div>
+                            );
+                          })
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Single variant */}

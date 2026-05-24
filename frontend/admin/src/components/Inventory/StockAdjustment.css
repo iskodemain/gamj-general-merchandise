@@ -287,3 +287,74 @@ input::-webkit-inner-spin-button {
   .stockadj-wrapper { max-width: 1000px; }
   .stockadj-card { padding: 40px; }
 }
+
+/* Searchable Product Dropdown */
+.stockadj-product-search-wrapper {
+  position: relative;
+}
+
+.stockadj-product-search-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.stockadj-product-search-input:focus {
+  border-color: #fea13b;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(254, 161, 59, 0.15);
+}
+
+.stockadj-product-search-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.stockadj-product-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #fea13b;
+  border-radius: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 999;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stockadj-product-dropdown-item {
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.stockadj-product-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.stockadj-product-dropdown-item:hover,
+.stockadj-product-dropdown-item.active {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.stockadj-product-dropdown-empty {
+  padding: 12px 15px;
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+}
