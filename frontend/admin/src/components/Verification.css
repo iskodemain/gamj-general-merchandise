@@ -126,3 +126,106 @@
   width: 100%;
   gap: 1rem;
 }
+
+/* ── Resend / Rate-limit block ─────────────────────────────────────────────── */
+.vf-resend-block {
+  width: 100%;
+}
+
+.vf-resend-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.vf-resend-hint { color: #555; }
+
+.vf-resend-btn {
+  background: none;
+  border: none;
+  color: #43A047;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.vf-resend-btn:hover:not(:disabled) { color: #2FA14C; }
+
+.vf-resend-btn:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.vf-attempts-left {
+  font-size: 0.78rem;
+  color: #e65c00;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.vf-lockout-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: #fff8f0;
+  border: 1.5px solid #f5c6a0;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  text-align: center;
+}
+
+.vf-lockout-icon { font-size: 1.4rem; line-height: 1; }
+
+.vf-lockout-msg {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #c0392b;
+  margin: 0;
+}
+
+.vf-lockout-sub {
+  font-size: 0.78rem;
+  color: #777;
+  margin: 0;
+}
+
+.vf-countdown {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #e65c00;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.2rem;
+}
+
+/* ── Responsive (min 200px) ─────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .verification-card {
+    padding: 1.5rem 1rem 1.2rem 1rem;
+    border-radius: 14px;
+  }
+  .verification-title { font-size: 1.5rem; }
+}
+
+@media (max-width: 360px) {
+  .verification-card { padding: 1.2rem 0.7rem; border-radius: 10px; }
+  .verification-title { font-size: 1.3rem; }
+  .vf-resend-row { flex-direction: column; gap: 0.3rem; }
+  .vf-countdown { font-size: 1.3rem; }
+}
+
+@media (max-width: 260px) {
+  .verification-card { padding: 0.8rem 0.4rem; border-radius: 8px; }
+  .verification-title { font-size: 1.1rem; }
+  .vf-lockout-box { padding: 0.5rem 0.4rem; }
+  .vf-countdown { font-size: 1rem; }
+}

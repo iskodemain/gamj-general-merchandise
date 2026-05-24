@@ -566,3 +566,120 @@ export const confirmPasswordResetService = async (identifier, resetPasswordToken
 }
 
 
+
+// ─── RESEND: CUSTOMER LOGIN OTP ───────────────────────────────────────────────
+export const resendLoginCodeService = async (loginToken) => {
+    try {
+        if (!loginToken) {
+            return { success: false, message: 'Login session not found. Please log in again.' };
+        }
+
+        const user = await Customer.findOne({ where: { loginToken } });
+        if (!user) {
+            return { success: false, message: 'Login session expired. Please log in again.' };
+        }
+
+        // Generate a fresh code and reset expiry
+        const code = generateVerificationCode();
+        const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+        await user.update({ verificationCode: code, codeExpiresAt: expirationTime });
+
+        if (user.loginEmail) {
+            sendMail({
+                to: user.loginEmail,
+                subject: 'Login Verification Code (Resent)',
+                html: loginEmailTemplate(user.medicalInstitutionName, code)
+            }).catch(err => console.error('Resend email failed:', err));
+        } else if (user.loginPhoneNum) {
+            sendSMS([user.loginPhoneNum], `Your GAMJ General Merchandise login code is: ${code}. Do not share this code.`)
+                .catch(err => console.error('Resend SMS failed:', err));
+        }
+
+        return { success: true, message: 'A new verification code has been sent.' };
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};
+
+// ─── RESEND: CUSTOMER SIGNUP OTP ─────────────────────────────────────────────
+export const resendRegisterCodeService = async (registerKey) => {
+    try {
+        if (!registerKey) {
+            return { success: false, message: 'Registration session not found. Please register again.' };
+        }
+
+        const userData = tempUserData[registerKey];
+        if (!userData) {
+            return { success: false, message: 'Registration session expired. Please register again.' };
+        }
+
+        // Generate a fresh code and reset expiry
+        const code = generateVerificationCode();
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+        userData.verificationCode = code;
+        userData.expiresAt = expiresAt;
+
+        const hasEmail = Boolean(userData.loginEmail);
+        if (hasEmail) {
+            sendMail({
+                to: userData.loginEmail,
+                subject: 'Account Verification (Resent)',
+                html: registrationEmailTemplate(code)
+            }).catch(err => console.error('Resend email failed:', err));
+        } else {
+            sendSMS([userData.loginPhoneNum], `Your GAMJ General Merchandise verification code is: ${code}. Do not share this code.`)
+                .catch(err => console.error('Resend SMS failed:', err));
+        }
+
+        return {
+            success: true,
+            message: `A new verification code has been sent to your ${hasEmail ? 'email' : 'phone'}.`
+        };
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};
+
+// ─── RESEND: CUSTOMER FORGOT PASSWORD OTP ────────────────────────────────────
+export const resendForgotPasswordCodeService = async (identifier) => {
+    try {
+        if (!identifier) {
+            return { success: false, message: 'Identifier is required.' };
+        }
+
+        const isEmail = validateEmail(identifier);
+        const user = await Customer.findOne({
+            where: isEmail ? { loginEmail: identifier } : { loginPhoneNum: identifier }
+        });
+
+        if (!user) {
+            return { success: false, message: 'No account found with that email or phone.' };
+        }
+
+        // Generate a fresh code and reset expiry
+        const code = generateVerificationCode();
+        const expirationTime = new Date(Date.now() + 30 * 60 * 1000); // 30 min
+        await user.update({ verificationCode: code, codeExpiresAt: expirationTime });
+
+        if (isEmail) {
+            sendMail({
+                to: identifier,
+                subject: 'Reset Password Verification (Resent)',
+                html: resetPasswordEmailTemplate(user.medicalInstitutionName, code)
+            }).catch(err => console.error('Resend email failed:', err));
+        } else {
+            sendSMS([identifier], `Your GAMJ General Merchandise password reset code is: ${code}. Do not share this code.`)
+                .catch(err => console.error('Resend SMS failed:', err));
+        }
+
+        return {
+            success: true,
+            message: `A new verification code has been sent to your ${isEmail ? 'email' : 'phone'}.`
+        };
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};

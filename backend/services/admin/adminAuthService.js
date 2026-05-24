@@ -223,3 +223,38 @@ export const saveAdminProfileService = async (adminId, data) => {
     throw new Error(error.message);
   }
 };
+
+// ─── RESEND: ADMIN LOGIN OTP ──────────────────────────────────────────────────
+export const resendAdminLoginCodeService = async (loginToken) => {
+    try {
+        if (!loginToken) {
+            return { success: false, message: 'Login session not found. Please log in again.' };
+        }
+
+        const admin = await Admin.findOne({ where: { loginToken } });
+        if (!admin) {
+            return { success: false, message: 'Login session expired. Please log in again.' };
+        }
+
+        // Generate a fresh code and reset expiry
+        const code = generateVerificationCode();
+        const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+        await admin.update({ verificationCode: code, codeExpiresAt: expirationTime });
+
+        if (admin.emailAddress) {
+            sendMail({
+                to: admin.emailAddress,
+                subject: 'Login Verification Code (Resent)',
+                html: loginEmailTemplate(admin.userName, code)
+            }).catch(err => console.error('Resend email failed:', err));
+        } else if (admin.phoneNumber) {
+            sendSMS([admin.phoneNumber], `Your GAMJ General Merchandise admin login code is: ${code}. Do not share this code.`)
+                .catch(err => console.error('Resend SMS failed:', err));
+        }
+
+        return { success: true, message: 'A new verification code has been sent.' };
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};

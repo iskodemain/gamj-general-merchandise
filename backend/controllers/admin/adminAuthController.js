@@ -1,4 +1,4 @@
-import { loginAdminService, loginCodeVerifyService, fetchAdminProfileService, saveAdminProfileService} from "../../services/admin/adminAuthService.js";
+import { loginAdminService, loginCodeVerifyService, fetchAdminProfileService, saveAdminProfileService, resendAdminLoginCodeService } from "../../services/admin/adminAuthService.js";
 
 // ADMIN LOGIN INPUT
 export const loginAdmin = async (req, res) => {
@@ -47,3 +47,15 @@ export const saveAdminProfile = async (req, res) => {
         res.json({success: false, message:error.message})
     }
 }
+
+// RESEND ADMIN LOGIN OTP
+export const resendAdminLoginCode = async (req, res) => {
+    try {
+        const { loginToken } = req.body;
+        const result = await resendAdminLoginCodeService(loginToken);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};

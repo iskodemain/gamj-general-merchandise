@@ -1,5 +1,5 @@
 import express from 'express';
-import { loginCustomer, loginCodeVerify, registerCustomer, registerCodeVerify, requestPasswordResetCustomer, verifyPasswordResetCustomer, confirmPasswordResetCustomer,fetchVerifiedCustomer } from '../controllers/customerAuthController.js';
+import { loginCustomer, loginCodeVerify, registerCustomer, registerCodeVerify, requestPasswordResetCustomer, verifyPasswordResetCustomer, confirmPasswordResetCustomer, fetchVerifiedCustomer, resendLoginCode, resendRegisterCode, resendForgotPasswordCode } from '../controllers/customerAuthController.js';
 
 import { fetchCustomerEditProfile, updateCustomerEditProfile, fetchCustomerDeliveryInfo, updateCustomerDeliveryInfo, fetchCustomerAccountSecurity, updateCustomerAccountSecurity, verifyCustomerAccountSecurity, deleteCustomerAccount } from '../controllers/customerProfileController.js'
 
@@ -13,15 +13,18 @@ const customerRouter = express.Router();
 // LOGIN PROCESS
 customerRouter.post('/login', loginCustomer);
 customerRouter.post('/login/verify', loginCodeVerify);
+customerRouter.post('/login/resend', resendLoginCode);
 
 // REGISTRATION PROCESS
 customerRouter.post('/register', upload.single('imageProof'), registerCustomer);
 customerRouter.post('/register/verify', registerCodeVerify);
+customerRouter.post('/register/resend', resendRegisterCode);
 
 // FORGOT PASSWORD PROCESS
 customerRouter.post('/forgot-password', requestPasswordResetCustomer);
 customerRouter.post('/forgot-password/verify', verifyPasswordResetCustomer);
 customerRouter.post('/forgot-password/confirm', confirmPasswordResetCustomer);
+customerRouter.post('/forgot-password/resend', resendForgotPasswordCode);
 
 // VERIFIED CUSTOMER
 customerRouter.get('/verified-customer', customerAuth, fetchVerifiedCustomer);
