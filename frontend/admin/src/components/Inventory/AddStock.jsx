@@ -53,6 +53,7 @@ export default function AddStock() {
   const selectedProductData = products.find(p => p.ID === Number(selectedProduct));
   const hasVariants = selectedProductData?.hasVariant;
   const hasVariantCombination = selectedProductData?.hasVariantCombination;
+  const hasExpirationDate = selectedProductData?.hasExpirationDate;
   const unitType = selectedProductData?.unitType || 'PIECE';
   const piecesPerBox = selectedProductData?.piecesPerBox || 1;
   const minQuantity = unitType === 'BOX' ? piecesPerBox : 1;
@@ -62,6 +63,7 @@ export default function AddStock() {
     setSelectedVariantValue("");
     setSelectedVariantCombo("");
     setQuantityReceived("");
+    setExpirationDate("");
   }, [selectedProduct]);
   // Auto-generate batch number
   useEffect(() => {
@@ -139,6 +141,11 @@ export default function AddStock() {
 
     if (!manufacturingDate) {
       toast.error("Manufacturing Date is required.", { ...toastError });
+      return false;
+    }
+
+    if (hasExpirationDate && !expirationDate) {
+      toast.error("Expiration Date is required for this product.", { ...toastError });
       return false;
     }
 
@@ -396,22 +403,39 @@ export default function AddStock() {
                 />
               </div>
 
-              <div className="addstock-form-row">
-                <div className="addstock-form-group">
-                  <label className="addstock-label" htmlFor="expirationDate">
-                    Expiration Date
-                  </label>
-                  <input
-                    id="expirationDate"
-                    type="date"
-                    className="addstock-input"
-                    value={expirationDate}
-                    onChange={(e) => setExpirationDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
-                    disabled={loading}
-                  />
-                </div>
+              {hasExpirationDate ? (
+                <div className="addstock-form-row">
+                  <div className="addstock-form-group">
+                    <label className="addstock-label" htmlFor="expirationDate">
+                      Expiration Date <span className="addstock-required">*</span>
+                    </label>
+                    <input
+                      id="expirationDate"
+                      type="date"
+                      className="addstock-input"
+                      value={expirationDate}
+                      onChange={(e) => setExpirationDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      disabled={loading}
+                    />
+                  </div>
 
+                  <div className="addstock-form-group">
+                    <label className="addstock-label" htmlFor="supplier">
+                      Supplier Name <span className="addstock-required">*</span>
+                    </label>
+                    <input
+                      id="supplier"
+                      type="text"
+                      className="addstock-input"
+                      value={supplier}
+                      onChange={(e) => setSupplier(e.target.value)}
+                      placeholder="Enter supplier name"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              ) : (
                 <div className="addstock-form-group">
                   <label className="addstock-label" htmlFor="supplier">
                     Supplier Name <span className="addstock-required">*</span>
@@ -426,7 +450,7 @@ export default function AddStock() {
                     disabled={loading}
                   />
                 </div>
-              </div>
+              )}
               <div className="addstock-form-row">
                 <div className="addstock-form-group">
                   <label className="addstock-label" htmlFor="batchNumber">

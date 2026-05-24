@@ -42,6 +42,7 @@ function AddProduct() {
   const [isBestSeller, setIsBestSeller] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [isOutOfStock, setIsOutOfStock] = useState(false);
+  const [hasExpirationDate, setHasExpirationDate] = useState(false);
 
   // variants (names & values sets)
   const [variantNamesList, setVariantNamesList] = useState([{ name: '' }]);
@@ -308,6 +309,7 @@ function AddProduct() {
     formData.append('isOutOfStock', isOutOfStock);
     formData.append('hasVariant', hasVariants);
     formData.append('hasVariantCombination', hasVariantCombination);
+    formData.append('hasExpirationDate', hasExpirationDate);
     formData.append('variantNames', JSON.stringify(finalVariantNames || []));
     formData.append('variantValues', JSON.stringify(finalVariantValues || []));
     formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
@@ -650,10 +652,10 @@ function AddProduct() {
                   <input type="checkbox" checked={isBestSeller} onChange={() => setIsBestSeller(!isBestSeller)} />
                   Feature on Homepage
                 </label>
-                {/* <label className="toggle-row">
-                  <input type="checkbox" checked={isOutOfStock} onChange={() => setIsOutOfStock(!isOutOfStock)} />
-                  Mark as Out of Stock
-                </label> */}
+                <label className="toggle-row">
+                  <input type="checkbox" checked={hasExpirationDate} onChange={() => setHasExpirationDate(!hasExpirationDate)} />
+                  This product has an expiration date
+                </label>
               </div>
 
               <div className="ap-actions">

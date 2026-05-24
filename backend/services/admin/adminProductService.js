@@ -11,7 +11,7 @@ const withTimestamp = (prefix, number) => {
   return `${prefix}-${number.toString().padStart(5, "0")}-${Date.now()}`;
 };
 
-export const addProductService = async ( adminId, categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination) => {
+export const addProductService = async ( adminId, categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, image1, image2, image3, image4, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, hasExpirationDate, variantNames, variantValues, variantCombination) => {
   try {
       // Convert types
       const toBool = (v) => v === "true" || v === true || v === 1 || v === "1";
@@ -24,6 +24,7 @@ export const addProductService = async ( adminId, categoryId, productName, produ
       isOutOfStock = toBool(isOutOfStock);
       hasVariant = toBool(hasVariant);
       hasVariantCombination = toBool(hasVariantCombination);
+      hasExpirationDate = toBool(hasExpirationDate);
       unitType = unitType || "PIECE";
       piecesPerBox = unitType === "BOX" ? Number(piecesPerBox) : 1;
 
@@ -112,7 +113,8 @@ export const addProductService = async ( adminId, categoryId, productName, produ
         isActive,
         isOutOfStock,
         hasVariant,
-        hasVariantCombination
+        hasVariantCombination,
+        hasExpirationDate
       });
 
       // ------------------------------
@@ -327,7 +329,7 @@ export const addProductService = async ( adminId, categoryId, productName, produ
 };
 
 
-export const updateProductService = async (adminId, productID, categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, image1File, image2File, image3File, image4File, image1Body, image2Body, image3Body, image4Body, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, variantNames, variantValues, variantCombination) => {
+export const updateProductService = async (adminId, productID, categoryId, productName, productDescription, productDetails, price, unitType, piecesPerBox, image1File, image2File, image3File, image4File, image1Body, image2Body, image3Body, image4Body, isBestSeller, isActive, isOutOfStock, hasVariant, hasVariantCombination, hasExpirationDate, variantNames, variantValues, variantCombination) => {
   try {
       // ---------- helpers ----------
       const toBool = (v) => v === "true" || v === true || v === 1 || v === "1";
@@ -341,6 +343,7 @@ export const updateProductService = async (adminId, productID, categoryId, produ
       isOutOfStock = toBool(isOutOfStock);
       hasVariant = toBool(hasVariant);
       hasVariantCombination = toBool(hasVariantCombination);
+      hasExpirationDate = toBool(hasExpirationDate);
       unitType = unitType || 'PIECE';
       piecesPerBox = unitType === 'BOX' ? Number(piecesPerBox) : 1;
 
@@ -508,7 +511,8 @@ export const updateProductService = async (adminId, productID, categoryId, produ
               isActive: isActive ? 1 : 0,
               isOutOfStock: isOutOfStock ? 1 : 0,
               hasVariant: hasVariant ? 1 : 0,
-              hasVariantCombination: hasVariantCombination ? 1 : 0
+              hasVariantCombination: hasVariantCombination ? 1 : 0,
+              hasExpirationDate: hasExpirationDate ? 1 : 0
           }, {
               where: { ID: existingProduct.ID }
           });
