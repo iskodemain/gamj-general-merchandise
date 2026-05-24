@@ -1,4 +1,5 @@
 import Admin from "../../models/admin.js";
+import { Op } from "sequelize";
 import OrderItems from "../../models/orderItems.js";
 import Orders from "../../models/orders.js";
 import OrderRefund from '../../models/orderRefund.js'
@@ -229,61 +230,10 @@ export const adminRemoveCancellationService = async (adminID, customerID, orderI
       return { success: false, message: "Product not found." };
     }
 
-    const quantityToDeduct = Number(orderItem.quantity || 0);
-
-    // 5️⃣ Deduct InventoryStock
-    const inventoryStock = await InventoryStock.findOne({
-      where: {
-        productId: orderItem.productId,
-        variantValueId: orderItem.productVariantValueId || null,
-        variantCombinationId: orderItem.productVariantCombinationId || null,
-      },
-    });
-    if (!inventoryStock) {
-      return { success: false, message: "Inventory stock record not found" };
-    }
-
-    const newTotalQuantity = Math.max(0, Number(inventoryStock.totalQuantity || 0) - quantityToDeduct);
-    await inventoryStock.update({ totalQuantity: newTotalQuantity, updatedAt: new Date() });
-
-    // 6️⃣ Deduct InventoryBatch (FIFO)
-    const deductBatch = await InventoryBatch.findOne({
-      where: {
-        productId: orderItem.productId,
-        variantValueId: orderItem.productVariantValueId || null,
-        variantCombinationId: orderItem.productVariantCombinationId || null,
-      },
-      order: [["expirationDate", "ASC"], ["dateReceived", "ASC"]],
-    });
-    if (deductBatch) {
-      const newRemaining = Math.max(0, Number(deductBatch.remainingQuantity || 0) - quantityToDeduct);
-      await deductBatch.update({ remainingQuantity: newRemaining });
-    } else {
-      return { success: false, message: "No inventory batch found for deduction" };
-    }
-
-    // 7️⃣ InventoryHistory (OUT)
-    const lastInventoryHistory = await InventoryHistory.findOne({ order: [["ID", "DESC"]] });
-    const nextInventoryHistoryNo = lastInventoryHistory ? Number(lastInventoryHistory.ID) + 1 : 1;
-
-    await InventoryHistory.create({
-      inventoryHistoryId: withTimestamp("IHST", nextInventoryHistoryNo),
-      productId: orderItem.productId,
-      variantValueId: orderItem.productVariantValueId || null,
-      variantCombinationId: orderItem.productVariantCombinationId || null,
-      type: "OUT",
-      adjustType: null,
-      quantity: quantityToDeduct,
-      stockAfter: newTotalQuantity,
-      referenceId: `CANCEL-REQUEST-REMOVED-${orderItem.orderId}`,
-      remarks: `Admin cancellation removed for ${user.medicalInstitutionName} — STOCK DEDUCTED AGAIN`,
-      createdAt: new Date(),
-    });
-
-    // 8️⃣ Delete the cancel request
+    // 5️⃣ Delete the cancel request
     await removeCancellation.destroy();
 
-    // 9️⃣ Reset order item status
+    // 6️⃣ Reset order item status
     await orderItem.update({ orderStatus: 'Pending' });
 
     const fullOrder = await Orders.findByPk(orderItem.orderId);
@@ -317,7 +267,7 @@ export const adminRemoveCancellationService = async (adminID, customerID, orderI
       senderType: "System",
       notificationType: "Order Cancellation",
       title: "Order Cancellation Removed by Admin",
-      message: `The admin has removed the cancellation for your order "${product.productName}" (Order #${fullOrder.orderId}). Your order is now back to Pending. ${quantityToDeduct} stock has been deducted again.`,
+      message: `The admin has removed the cancellation for your order "${product.productName}" (Order #${fullOrder.orderId}). Your order is now back to Pending.`,
       isRead: false,
       createAt: new Date(),
     });
@@ -330,7 +280,7 @@ export const adminRemoveCancellationService = async (adminID, customerID, orderI
       senderType: "System",
       notificationType: "Order Cancellation",
       title: `Admin Cancellation Removed — ${userName}`,
-      message: `Admin removed the cancellation for "${product.productName}" (Order #${fullOrder.orderId}) of ${userName}. Order restored to Pending. ${quantityToDeduct} stock has been deducted again.`,
+      message: `Admin removed the cancellation for "${product.productName}" (Order #${fullOrder.orderId}) of ${userName}. Order restored to Pending.`,
       isRead: false,
       createAt: new Date(),
     });
@@ -343,7 +293,7 @@ export const adminRemoveCancellationService = async (adminID, customerID, orderI
       senderType: "System",
       notificationType: "Order Cancellation",
       title: `Admin Cancellation Removed — ${userName}`,
-      message: `Admin removed the cancellation for "${product.productName}" (Order #${fullOrder.orderId}) of ${userName}. Order restored to Pending. ${quantityToDeduct} stock has been deducted again.`,
+      message: `Admin removed the cancellation for "${product.productName}" (Order #${fullOrder.orderId}) of ${userName}. Order restored to Pending.`,
       isRead: false,
       createAt: new Date(),
     });
@@ -363,7 +313,7 @@ export const adminRemoveCancellationService = async (adminID, customerID, orderI
 
     return {
       success: true,
-      message: "Admin cancellation successfully removed. Stock has been deducted again.",
+      message: "Admin cancellation successfully removed. Order restored to Pending.",
     };
   } catch (error) {
     console.error(error);
@@ -457,81 +407,11 @@ export const updateOrderStatusService = async (adminId, data) => {
       // CANCELLED → CREATE OrderCancel
       // -------------------------
       if (changeStatus === "Cancelled") {
-        const quantityToRestore = Number(orderItem.quantity || 0);
+        // ✅ Stock is NOT restored on cancellation — stock was never deducted at order placement.
+        // Stock deduction only happens when the order is marked as Delivered.
 
         /* ================================
-          1️⃣ RESTORE INVENTORY STOCK
-        ================================= */
-        const inventoryStock = await InventoryStock.findOne({
-          where: {
-            productId: orderItem.productId,
-            variantValueId: orderItem.productVariantValueId || null,
-            variantCombinationId: orderItem.productVariantCombinationId || null,
-          },
-        });
-
-        if (!inventoryStock) {
-          return { success: false, message: "Inventory stock record not found" };
-        }
-
-        const newTotalQuantity = Number(inventoryStock.totalQuantity || 0) + quantityToRestore;
-
-        await inventoryStock.update({
-          totalQuantity: newTotalQuantity,
-          updatedAt: new Date(),
-        });
-
-        /* ================================
-          2️⃣ RESTORE INVENTORY BATCH (FEFO)
-        ================================= */
-        const restoreBatch = await InventoryBatch.findOne({
-          where: {
-            productId: orderItem.productId,
-            variantValueId: orderItem.productVariantValueId || null,
-            variantCombinationId: orderItem.productVariantCombinationId || null,
-          },
-          order: [
-            ["expirationDate", "ASC"],
-            ["dateReceived", "ASC"],
-          ],
-        });
-
-        if (!restoreBatch) {
-          return { success: false, message: "No inventory batch found for restoration" };
-        }
-
-        const maxCapacity = Number(restoreBatch.quantityReceived);
-        const currentRemaining = Number(restoreBatch.remainingQuantity);
-        const newRemaining = Math.min(maxCapacity, currentRemaining + quantityToRestore);
-
-        await restoreBatch.update({ remainingQuantity: newRemaining });
-
-        /* ================================
-          3️⃣ INVENTORY HISTORY (IN)
-        ================================= */
-        const lastInventoryHistory = await InventoryHistory.findOne({
-          order: [["ID", "DESC"]],
-        });
-
-        const nextInventoryHistoryNo = lastInventoryHistory
-          ? Number(lastInventoryHistory.ID) + 1
-          : 1;
-
-        await InventoryHistory.create({
-          inventoryHistoryId: withTimestamp("IHST", nextInventoryHistoryNo),
-          productId: orderItem.productId,
-          variantValueId: orderItem.productVariantValueId || null,
-          variantCombinationId: orderItem.productVariantCombinationId || null,
-          type: "RETURN",
-          quantity: quantityToRestore,
-          stockAfter: newTotalQuantity,
-          referenceId: `CANCEL-${orderItem.orderId}`,
-          remarks: `Order cancelled by Admin for ${customer.medicalInstitutionName}`,
-          createdAt: new Date(),
-        });
-
-        /* ================================
-          4️⃣ CREATE OrderCancel RECORD
+          1️⃣ CREATE OrderCancel RECORD
         ================================= */
         const lastCancel = await OrderCancel.findOne({
           order: [["ID", "DESC"]],
@@ -564,28 +444,25 @@ export const updateOrderStatusService = async (adminId, data) => {
         const fullOrder = await Orders.findByPk(orderItem.orderId);
 
         /* ================================
-          5️⃣ DEDUCT CANCELLED ITEM PRICE FROM ORDER TOTAL
+          2️⃣ DEDUCT CANCELLED ITEM PRICE FROM ORDER TOTAL
              (only when cancellationStatus === 'Completed')
         ================================= */
         if (cancellationStatus === 'Completed') {
           let itemUnitPrice = 0;
 
           if (orderItem.productVariantCombinationId) {
-            // Priority 1: Variant Combination price
             const variantCombination = await ProductVariantCombination.findByPk(
               orderItem.productVariantCombinationId
             );
             itemUnitPrice = Number(variantCombination?.price || 0);
 
           } else if (orderItem.productVariantValueId) {
-            // Priority 2: Variant Value price
-            const variantValue = await ProductVariantValue.findByPk(
+            const variantValue = await ProductVariantValues.findByPk(
               orderItem.productVariantValueId
             );
             itemUnitPrice = Number(variantValue?.price || 0);
 
           } else {
-            // Priority 3: Base product price
             itemUnitPrice = Number(product?.price || 0);
           }
 
@@ -642,6 +519,183 @@ export const updateOrderStatusService = async (adminId, data) => {
           paymentMethod: order.paymentMethod,
           transactionDate: new Date(),
         });
+      }
+
+      // -------------------------
+      // DELIVERED → DEDUCT STOCK
+      // -------------------------
+      if (changeStatus === "Delivered") {
+        const unitType = product.unitType || 'PIECE';
+        const piecesPerBox = Number(product.piecesPerBox) || 1;
+        const quantityToDeduct = unitType === 'BOX'
+          ? Number(orderItem.quantity) * piecesPerBox
+          : Number(orderItem.quantity);
+
+        /* ================================
+          1️⃣ DEDUCT INVENTORY STOCK
+        ================================= */
+        const inventoryStock = await InventoryStock.findOne({
+          where: {
+            productId: orderItem.productId,
+            variantValueId: orderItem.productVariantValueId || null,
+            variantCombinationId: orderItem.productVariantCombinationId || null,
+          },
+        });
+
+        if (!inventoryStock) {
+          return { success: false, message: "Inventory stock record not found" };
+        }
+
+        const newTotalQuantity = Math.max(0, Number(inventoryStock.totalQuantity || 0) - quantityToDeduct);
+
+        await inventoryStock.update({
+          totalQuantity: newTotalQuantity,
+          updatedAt: new Date(),
+        });
+
+        /* ================================
+          2️⃣ DEDUCT INVENTORY BATCH (FIFO)
+        ================================= */
+        let remainingToDeduct = quantityToDeduct;
+        const inventoryBatches = await InventoryBatch.findAll({
+          where: {
+            productId: orderItem.productId,
+            variantValueId: orderItem.productVariantValueId || null,
+            variantCombinationId: orderItem.productVariantCombinationId || null,
+            remainingQuantity: { [Op.gt]: 0 },
+          },
+          order: [
+            ["expirationDate", "ASC"],
+            ["dateReceived", "ASC"],
+          ],
+        });
+
+        for (const batch of inventoryBatches) {
+          if (remainingToDeduct <= 0) break;
+          const batchRemaining = Number(batch.remainingQuantity || 0);
+          const deductFromBatch = Math.min(batchRemaining, remainingToDeduct);
+          await batch.update({ remainingQuantity: batchRemaining - deductFromBatch });
+          remainingToDeduct -= deductFromBatch;
+        }
+
+        /* ================================
+          3️⃣ INVENTORY HISTORY (OUT)
+        ================================= */
+        const lastInventoryHistory = await InventoryHistory.findOne({ order: [["ID", "DESC"]] });
+        const nextInventoryHistoryNo = lastInventoryHistory ? Number(lastInventoryHistory.ID) + 1 : 1;
+
+        await InventoryHistory.create({
+          inventoryHistoryId: withTimestamp("IHST", nextInventoryHistoryNo),
+          productId: orderItem.productId,
+          variantValueId: orderItem.productVariantValueId || null,
+          variantCombinationId: orderItem.productVariantCombinationId || null,
+          type: "OUT",
+          quantity: quantityToDeduct,
+          stockAfter: newTotalQuantity,
+          referenceId: `DELIVERED-${order.orderId}`,
+          remarks: `Order delivered to ${customer.medicalInstitutionName}. ${unitType === 'BOX' ? `(${orderItem.quantity} box/es × ${piecesPerBox} pcs)` : `(${orderItem.quantity} piece/s)`}`,
+          createdAt: new Date(),
+        });
+
+        /* ================================
+          4️⃣ OUT OF STOCK CHECK
+        ================================= */
+        if (newTotalQuantity === 0) {
+          await Products.update({ isOutOfStock: true }, { where: { ID: orderItem.productId } });
+
+          const lastOosNotif = await Notifications.findOne({ order: [["ID", "DESC"]] });
+          let oosNotifNo = lastOosNotif ? Number(lastOosNotif.ID) + 1 : 1;
+
+          const oosNotification = await Notifications.create({
+            notificationId: withTimestamp("NTFY", oosNotifNo++),
+            senderId: null,
+            receiverId: null,
+            receiverType: "All",
+            senderType: "System",
+            notificationType: "Product Update",
+            title: "Out of Stock Alert",
+            message: `❌ The product "${product.productName}" is now OUT OF STOCK.`,
+            isRead: false,
+            createAt: new Date(),
+          });
+
+          io.emit("lowStockAlert", oosNotification);
+
+          const oosAdmins = await Admin.findAll({ where: { verifiedUser: true } });
+          const oosCustomers = await Customer.findAll({ where: { verifiedCustomer: true } });
+          const oosAllEmails = [...new Set([
+            ...oosAdmins.map(a => a.emailAddress).filter(Boolean),
+            ...oosCustomers.map(c => c.loginEmail || c.emailAddress).filter(Boolean),
+          ])];
+
+          if (oosAllEmails.length > 0) {
+            orderSendMail({
+              to: oosAllEmails.join(","),
+              subject: `OUT OF STOCK: ${product.productName}`,
+              html: stockAdjustmentLowStockTemplate(
+                product.productName,
+                "ORDER",
+                quantityToDeduct,
+                newTotalQuantity,
+                `Order delivered to ${customer.medicalInstitutionName}`,
+                0
+              ),
+            });
+          }
+        }
+
+        /* ================================
+          5️⃣ LOW STOCK ALERT
+        ================================= */
+        const inventorySettings = await ProductInventorySettings.findOne({
+          where: {
+            productId: orderItem.productId,
+            variantValueId: orderItem.productVariantValueId || null,
+            variantCombinationId: orderItem.productVariantCombinationId || null,
+          },
+        });
+
+        if (inventorySettings && newTotalQuantity > 0 && newTotalQuantity <= inventorySettings.lowStockThreshold) {
+          const lastLowNotif = await Notifications.findOne({ order: [["ID", "DESC"]] });
+          let lowNotifNo = lastLowNotif ? Number(lastLowNotif.ID) + 1 : 1;
+
+          const lowStockNotification = await Notifications.create({
+            notificationId: withTimestamp("NTFY", lowNotifNo++),
+            senderId: null,
+            receiverId: null,
+            receiverType: "All",
+            senderType: "System",
+            notificationType: "Product Update",
+            title: "Low Stock Alert",
+            message: `⚠️ The product "${product.productName}" is running low. Only ${newTotalQuantity} left in stock!`,
+            isRead: false,
+            createAt: new Date(),
+          });
+
+          io.emit("lowStockAlert", lowStockNotification);
+
+          const allAdmins = await Admin.findAll({ where: { verifiedUser: true } });
+          const allCustomers = await Customer.findAll({ where: { verifiedCustomer: true } });
+          const allEmails = [...new Set([
+            ...allAdmins.map(a => a.emailAddress).filter(Boolean),
+            ...allCustomers.map(c => c.loginEmail || c.emailAddress).filter(Boolean),
+          ])];
+
+          if (allEmails.length > 0) {
+            orderSendMail({
+              to: allEmails.join(","),
+              subject: `Low Stock Alert: ${product.productName}`,
+              html: stockAdjustmentLowStockTemplate(
+                product.productName,
+                "ORDER",
+                quantityToDeduct,
+                newTotalQuantity,
+                `Order delivered to ${customer.medicalInstitutionName}`,
+                inventorySettings.lowStockThreshold
+              ),
+            });
+          }
+        }
       }
 
       // -------------------------
