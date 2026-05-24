@@ -66,9 +66,12 @@ export default function AddStock() {
   // Auto-generate batch number
   useEffect(() => {
     if (selectedProduct) {
-        const timestamp = Date.now();
-        const productCode = selectedProductData?.productId || "PROD";
-        setBatchNumber(`BATCH-${productCode}-${timestamp}`);
+      const now = new Date();
+      const datePart = now.getFullYear().toString() +
+        String(now.getMonth() + 1).padStart(2, "0") +
+        String(now.getDate()).padStart(2, "0");
+      const randomPart = Math.random().toString(36).toUpperCase().slice(2, 6);
+      setBatchNumber(`BCH-${datePart}-${randomPart}`);
     }
   }, [selectedProduct]);
 
