@@ -49,6 +49,7 @@ function UpdateProduct() {
   const [isBestSeller, setIsBestSeller] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [isOutOfStock, setIsOutOfStock] = useState(false);
+  const [hasExpirationDate, setHasExpirationDate] = useState(false);
 
   // variants (names & values sets)
   const [variantNamesList, setVariantNamesList] = useState([{ name: '' }]);
@@ -82,6 +83,7 @@ function UpdateProduct() {
     setIsOutOfStock(Boolean(found.isOutOfStock));
     setHasVariants(Boolean(found.hasVariant));
     setHasVariantCombination(Boolean(found.hasVariantCombination));
+    setHasExpirationDate(Boolean(found.hasExpirationDate));
     setUnitType(found.unitType || 'PIECE');
     setPiecesPerBox(found.piecesPerBox !== undefined && found.piecesPerBox !== null ? Number(found.piecesPerBox) : 1);
 
@@ -452,6 +454,7 @@ function UpdateProduct() {
     formData.append('isOutOfStock', isOutOfStock);
     formData.append('hasVariant', hasVariants);
     formData.append('hasVariantCombination', hasVariantCombination);
+    formData.append('hasExpirationDate', hasExpirationDate);
     formData.append('variantNames', JSON.stringify(finalVariantNames || []));
     formData.append('variantValues', JSON.stringify(finalVariantValues || []));
     formData.append('variantCombination', JSON.stringify(finalVariantCombinations || []));
@@ -826,10 +829,10 @@ function UpdateProduct() {
                   <input type="checkbox" checked={isBestSeller} onChange={() => setIsBestSeller(!isBestSeller)} />
                   Feature on Homepage
                 </label>
-                {/* <label className="upp-toggle-row">
-                  <input type="checkbox" checked={isOutOfStock} onChange={() => setIsOutOfStock(!isOutOfStock)} />
-                  Mark as Out of Stock
-                </label> */}
+                <label className="upp-toggle-row">
+                  <input type="checkbox" checked={hasExpirationDate} onChange={() => setHasExpirationDate(!hasExpirationDate)} />
+                  This product has an expiration date
+                </label>
               </div>
 
               <div className="upp-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>

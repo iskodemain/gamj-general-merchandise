@@ -110,6 +110,11 @@ const Products = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    hasExpirationDate: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     createAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
