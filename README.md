@@ -78,7 +78,7 @@ Developed as an academic and industry-aligned system, it follows modern **fullâ€
 
 ## ğŸŒ Live URLs
 
-- **Customer Site:** [https://gamj-general-merchandise-customer.vercel.app/](https://gamj-general-merchandise-customer.vercel.app/)  
+- **Customer Site:** [https://www.gamjgeneralmerchandise.store](https://www.gamjgeneralmerchandise.store)  
 - **Admin Site:** [https://gamj-general-merchandise-admin.vercel.app/](https://gamj-general-merchandise-admin.vercel.app/)  
 
 ---
