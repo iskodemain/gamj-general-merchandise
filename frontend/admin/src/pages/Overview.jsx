@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar.jsx";
 import "./Overview.css";
 import { AdminContext } from "../context/AdminContextProvider.jsx";
 import ExportBar from "../components/ExportBar.jsx";
-import { exportExcel, exportPDF,printTable } from "../utils/exportUtils.js";
+import { exportExcel, exportPDF, printTable } from "../utils/exportUtils.js";
 
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend} from "chart.js";
 import { Line, Pie, Doughnut, Bar } from "react-chartjs-2";
@@ -530,9 +530,8 @@ function Overview() {
             </div>
             <ExportBar
               disabled={!ordersOverTimeRows.length}
-              onExcelClick={() => exportExcel(ordersOverTimeRows, "orders-over-time.xlsx")}
+              onExcelClick={() => exportExcel(ordersOverTimeRows, "orders-over-time.xlsx", "Orders Over Time")}
               onPDFClick={() => exportPDF(ordersOverTimeRows, "Orders Over Time", "orders-over-time.pdf")}
-              onDOCXClick={() => exportDOCX(ordersOverTimeRows, "Orders Over Time", "orders-over-time.docx")}
               onPrintClick={() => printTable(ordersOverTimeRows, "Orders Over Time")}
             />
           </div>
@@ -548,9 +547,8 @@ function Overview() {
               <h4>Order Status Distribution</h4>
               <ExportBar
                 disabled={!orderStatusRows.length}
-                onExcelClick={() => exportExcel(orderStatusRows, "order-status.xlsx")}
+                onExcelClick={() => exportExcel(orderStatusRows, "order-status.xlsx", "Order Status Distribution")}
                 onPDFClick={() => exportPDF(orderStatusRows, "Order Status Distribution", "order-status.pdf")}
-                onDOCXClick={() => exportDOCX(orderStatusRows, "Order Status Distribution", "order-status.docx")}
                 onPrintClick={() => printTable(orderStatusRows, "Order Status Distribution")}
               />
             </div>
@@ -564,9 +562,8 @@ function Overview() {
               <h4>Inventory Status Overview</h4>
               <ExportBar
                 disabled={!inventoryStatusRows.length}
-                onExcelClick={() => exportExcel(inventoryStatusRows, "inventory-status.xlsx")}
+                onExcelClick={() => exportExcel(inventoryStatusRows, "inventory-status.xlsx", "Inventory Status Overview")}
                 onPDFClick={() => exportPDF(inventoryStatusRows, "Inventory Status Overview", "inventory-status.pdf")}
-                onDOCXClick={() => exportDOCX(inventoryStatusRows, "Inventory Status Overview", "inventory-status.docx")}
                 onPrintClick={() => printTable(inventoryStatusRows, "Inventory Status Overview")}
               />
             </div>
@@ -583,9 +580,8 @@ function Overview() {
               <h4>Most Ordered Products</h4>
               <ExportBar
                 disabled={!mostOrderedRows.length}
-                onExcelClick={() => exportExcel(mostOrderedRows, "most-ordered.xlsx")}
+                onExcelClick={() => exportExcel(mostOrderedRows, "most-ordered.xlsx", "Most Ordered Products")}
                 onPDFClick={() => exportPDF(mostOrderedRows, "Most Ordered Products", "most-ordered.pdf")}
-                onDOCXClick={() => exportDOCX(mostOrderedRows, "Most Ordered Products", "most-ordered.docx")}
                 onPrintClick={() => printTable(mostOrderedRows, "Most Ordered Products")}
               />
             </div>
@@ -603,9 +599,8 @@ function Overview() {
               <h4>Low Stock Items</h4>
               <ExportBar
                 disabled={!lowStockRows.length}
-                onExcelClick={() => exportExcel(lowStockRows, "low-stock.xlsx")}
+                onExcelClick={() => exportExcel(lowStockRows, "low-stock.xlsx", "Low Stock Items")}
                 onPDFClick={() => exportPDF(lowStockRows, "Low Stock Items", "low-stock.pdf")}
-                onDOCXClick={() => exportDOCX(lowStockRows, "Low Stock Items", "low-stock.docx")}
                 onPrintClick={() => printTable(lowStockRows, "Low Stock Items")}
               />
             </div>

@@ -148,7 +148,7 @@ const InventoryTransactions = () => {
               </div>
               <ExportBar
                 disabled={!exportRows.length}
-                onExcelClick={() => exportExcel(exportRows, "inventory-transactions.xlsx")}
+                onExcelClick={() => exportExcel(exportRows, "inventory-transactions.xlsx", "Inventory Transactions")}
                 onPDFClick={() => exportPDF(exportRows, "Inventory Transactions", "inventory-transactions.pdf")}
                 onPrintClick={() => printTable(exportRows, "Inventory Transactions")}
               />
