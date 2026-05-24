@@ -132,3 +132,99 @@ input::-webkit-inner-spin-button {
     max-width: 35rem; 
   }
 }
+
+/* ── Resend / Rate-limit block ─────────────────────────────────────────────── */
+.sp4-resend-block {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.sp4-resend-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.sp4-resend-hint { color: #555; }
+
+.sp4-resend-btn {
+  background: none;
+  border: none;
+  color: #43A047;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.sp4-resend-btn:hover:not(:disabled) { color: #2FA14C; }
+
+.sp4-resend-btn:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.sp4-attempts-left {
+  font-size: 0.78rem;
+  color: #e65c00;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sp4-lockout-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: #fff8f0;
+  border: 1.5px solid #f5c6a0;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  text-align: center;
+}
+
+.sp4-lockout-icon { font-size: 1.4rem; line-height: 1; }
+
+.sp4-lockout-msg {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #c0392b;
+  margin: 0;
+}
+
+.sp4-lockout-sub {
+  font-size: 0.78rem;
+  color: #777;
+  margin: 0;
+}
+
+.sp4-countdown {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #e65c00;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.2rem;
+}
+
+@media (max-width: 360px) {
+  .sp4-form { padding: 24px 12px 20px 12px; width: 98%; }
+  .sp2-vc-text { font-size: 1.4rem; }
+  .sp4-vc-textsm { font-size: 0.9rem; }
+  .sp4-resend-row { flex-direction: column; gap: 0.3rem; }
+  .sp4-countdown { font-size: 1.3rem; }
+}
+
+@media (max-width: 260px) {
+  .sp4-form { padding: 16px 8px; border-radius: 12px; }
+  .sp2-vc-text { font-size: 1.2rem; }
+  .sp4-lockout-box { padding: 0.6rem 0.5rem; }
+  .sp4-countdown { font-size: 1.1rem; }
+}

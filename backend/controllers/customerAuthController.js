@@ -1,4 +1,4 @@
-import { loginCustomerService, loginCodeVerifyService, registerCustomerService, registerCodeVerifyService, requestPasswordResetService, verifyPasswordResetService, confirmPasswordResetService, fetchVerifiedCustomerService } from '../services/customerAuthService.js';
+import { loginCustomerService, loginCodeVerifyService, registerCustomerService, registerCodeVerifyService, requestPasswordResetService, verifyPasswordResetService, confirmPasswordResetService, fetchVerifiedCustomerService, resendLoginCodeService, resendRegisterCodeService, resendForgotPasswordCodeService } from '../services/customerAuthService.js';
 
 
 // CUSTOMER LOGIN INPUT
@@ -113,3 +113,39 @@ export const confirmPasswordResetCustomer = async (req, res) => {
         })
     }
 }
+
+// RESEND CUSTOMER LOGIN OTP
+export const resendLoginCode = async (req, res) => {
+    try {
+        const { loginToken } = req.body;
+        const result = await resendLoginCodeService(loginToken);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// RESEND CUSTOMER SIGNUP OTP
+export const resendRegisterCode = async (req, res) => {
+    try {
+        const { registerKey } = req.body;
+        const result = await resendRegisterCodeService(registerKey);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// RESEND CUSTOMER FORGOT PASSWORD OTP
+export const resendForgotPasswordCode = async (req, res) => {
+    try {
+        const { identifier } = req.body;
+        const result = await resendForgotPasswordCodeService(identifier);
+        res.json(result);
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};

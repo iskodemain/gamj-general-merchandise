@@ -104,3 +104,111 @@
     max-width: 30rem; 
   }
 }
+
+/* ── Resend / Rate-limit block ─────────────────────────────────────────────── */
+.lcv-resend-block {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.lcv-resend-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.lcv-resend-hint {
+  color: #555;
+}
+
+.lcv-resend-btn {
+  background: none;
+  border: none;
+  color: #43A047;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.lcv-resend-btn:hover:not(:disabled) {
+  color: #2FA14C;
+}
+
+.lcv-resend-btn:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.lcv-attempts-left {
+  font-size: 0.78rem;
+  color: #e65c00;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Lockout box */
+.lcv-lockout-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: #fff8f0;
+  border: 1.5px solid #f5c6a0;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  text-align: center;
+}
+
+.lcv-lockout-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.lcv-lockout-msg {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #c0392b;
+  margin: 0;
+}
+
+.lcv-lockout-sub {
+  font-size: 0.78rem;
+  color: #777;
+  margin: 0;
+}
+
+.lcv-countdown {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #e65c00;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.2rem;
+}
+
+/* ── Responsive (min 200px) ─────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .lcv-form {
+    padding: 24px 12px 20px 12px;
+    width: 98%;
+  }
+  .lcv-vc-text { font-size: 1.4rem; }
+  .lcv-vc-textsm { font-size: 0.9rem; }
+  .lcv-resend-row { flex-direction: column; gap: 0.3rem; }
+  .lcv-countdown { font-size: 1.3rem; }
+}
+
+@media (max-width: 260px) {
+  .lcv-form { padding: 16px 8px; border-radius: 12px; }
+  .lcv-vc-text { font-size: 1.2rem; }
+  .lcv-lockout-box { padding: 0.6rem 0.5rem; }
+  .lcv-countdown { font-size: 1.1rem; }
+}

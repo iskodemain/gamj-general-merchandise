@@ -6,13 +6,18 @@ import './StepFourVerifyEmail.css'
 import { ShopContext } from '../../context/ShopContext';
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { useOtpRateLimit } from '../../hooks/useOtpRateLimit.js';
 
 const StepFourVerifyEmail = () => {
   const {token, setToken, navigate, backendUrl, toastSuccess, toastError, signUpData, setVerifiedUser, setShowImportantNote} = useContext(ShopContext);
 
   const [loading, setLoading] = useState(false);
-
   const [verificationCode, setVerificationCode] = useState('');
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const {
+    isLocked, attemptsLeft, formattedTime, recordAttempt, reset: resetRateLimit
+  } = useOtpRateLimit('otp_rl_customer_signup');
 
   const handleVerifyCode = (e) => {
     let value = e.target.value;
@@ -41,6 +46,7 @@ const StepFourVerifyEmail = () => {
     try {
       const response = await axios.post(backendUrl + "/api/customer/register/verify", {registerKey: signUpData.registerKey, code: verificationCode});
       if (response.data.success) {
+        resetRateLimit();
         localStorage.setItem("authToken", response.data.token);
         setToken(response.data.token);
 
@@ -62,6 +68,27 @@ const StepFourVerifyEmail = () => {
       setLoading(false);
     }
   }
+  const handleResendCode = async () => {
+    if (isLocked || resendLoading) return;
+    setResendLoading(true);
+    try {
+      const response = await axios.post(backendUrl + '/api/customer/register/resend', {
+        registerKey: signUpData.registerKey
+      });
+      if (response.data.success) {
+        recordAttempt();
+        setVerificationCode('');
+        toast.success(response.data.message, { ...toastSuccess });
+      } else {
+        toast.error(response.data.message, { ...toastError });
+      }
+    } catch (error) {
+      toast.error(error.message, { ...toastError });
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       navigate('/')
@@ -93,6 +120,35 @@ const StepFourVerifyEmail = () => {
         </div>
         <input type="text" inputMode="numeric" pattern="\d{6}" value={verificationCode} onChange={handleVerifyCode} maxLength={6}  className='sp4-input-code-page' placeholder='Enter the 6-digit code' required/>
         <button type='submit' className='sp4-vc-button' disabled={loading || verificationCode.length !== 6}>{loading ? 'Verifying...' : 'Verify Code'}</button>
+
+        {/* ── Resend / Rate-limit block ── */}
+        <div className='sp4-resend-block'>
+          {isLocked ? (
+            <div className='sp4-lockout-box'>
+              <span className='sp4-lockout-icon'>🔒</span>
+              <p className='sp4-lockout-msg'>Too many resend attempts.</p>
+              <p className='sp4-lockout-sub'>Please wait before requesting a new code.</p>
+              <div className='sp4-countdown'>{formattedTime}</div>
+            </div>
+          ) : (
+            <div className='sp4-resend-row'>
+              <span className='sp4-resend-hint'>Didn't receive the code?</span>
+              <button
+                type='button'
+                className='sp4-resend-btn'
+                onClick={handleResendCode}
+                disabled={resendLoading}
+              >
+                {resendLoading ? 'Sending...' : 'Resend Code'}
+              </button>
+              {attemptsLeft < 3 && (
+                <span className='sp4-attempts-left'>
+                  {attemptsLeft} resend{attemptsLeft !== 1 ? 's' : ''} left
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </form>
       <Infos/>
       <Footer/>
