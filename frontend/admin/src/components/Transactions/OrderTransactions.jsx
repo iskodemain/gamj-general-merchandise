@@ -103,7 +103,7 @@ const OrderTransactions = () => {
             </div>
             <ExportBar
               disabled={!exportRows.length}
-              onExcelClick={() => exportExcel(exportRows, "order-transactions.xlsx")}
+              onExcelClick={() => exportExcel(exportRows, "order-transactions.xlsx", "Order Transactions")}
               onPDFClick={() => exportPDF(exportRows, "Order Transactions", "order-transactions.pdf")}
               onPrintClick={() => printTable(exportRows, "Order Transactions")}
             />

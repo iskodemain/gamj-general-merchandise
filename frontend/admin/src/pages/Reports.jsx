@@ -163,7 +163,7 @@ const Reports = () => {
               </div>
               <ExportBar
                 disabled={!orderRows.length}
-                onExcelClick={() => exportExcel(orderRows, "order-report.xlsx")}
+                onExcelClick={() => exportExcel(orderRows, "order-report.xlsx", "Order Report")}
                 onPDFClick={() => exportPDF(orderRows, "Order Report", "order-report.pdf")}
                 onPrintClick={() => printTable(orderRows, "Order Report")}
               />
@@ -221,7 +221,7 @@ const Reports = () => {
               </div>
               <ExportBar
                 disabled={!inventoryRows.length}
-                onExcelClick={() => exportExcel(inventoryRows, "inventory-report.xlsx")}
+                onExcelClick={() => exportExcel(inventoryRows, "inventory-report.xlsx", "Inventory Report")}
                 onPDFClick={() => exportPDF(inventoryRows, "Inventory Report", "inventory-report.pdf")}
                 onPrintClick={() => printTable(inventoryRows, "Inventory Report")}
               />
