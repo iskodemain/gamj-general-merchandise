@@ -24,6 +24,7 @@ import ForgotPassword from './components/ForgotPassword.jsx';
 import ResetVerifyCode from './components/ResetVerifyCode.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
 import LoginCodeVerification from "./components/LoginCodeVerification.jsx";
+import Loading from "./components/Loading.jsx";
 
 // CSS
 import './App.css'
@@ -33,8 +34,13 @@ import { IoIosArrowUp } from "react-icons/io";
 
 
 const App = () => {
-  const { token, loginToken, fpIdentifier, resetPasswordToken, orderItems } = useContext(ShopContext);
+  const { token, loginToken, fpIdentifier, resetPasswordToken, orderItems, appLoading } = useContext(ShopContext);
   const cannotResetPassword = token || !fpIdentifier || !resetPasswordToken;
+
+  if (appLoading) {
+    return <Loading />;
+  }
+
   return(
     <div className="App">
       <button onClick={()=> window.scrollTo(0, 0)} className="up-scroll"><IoIosArrowUp className="arrow"/></button>
